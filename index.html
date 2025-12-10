@@ -586,12 +586,29 @@
             }
         }
         
-        // Allow Enter key to submit
         document.getElementById('studentCode').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 checkAccessCode();
             }
         });
+
+function checkAccessCode() {
+    const code = document.getElementById('studentCode').value.trim().toUpperCase();
+    
+    // Your actual codes here
+    const codeMap = {
+        'ADE102': 'https://nyairyg.github.io/abu-dhabi-experience/',
+        'MATH202': 'https://your-username.github.io/math-visualizations/',
+        'DEMO': 'https://your-username.github.io/demo-content/'
+    };
+    
+    if (codeMap[code]) {
+        // Redirect to your other GitHub Pages site
+        window.location.href = codeMap[code];
+    } else {
+        alert(`Invalid code.`);
+    }
+}
     </script>
 </body>
 </html>
