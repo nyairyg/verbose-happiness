@@ -79,19 +79,28 @@
         
         .text-content {
             padding: 30px;
-            line-height: 1.7;
+            line-height: 1.6;
             font-size: 1.05rem;
             color: #24292e;
         }
         
+        .text-content p {
+            margin-bottom: 20px;
+        }
+        
+        /* Shorter gaps - fixed width based on content */
         .drop-zone {
+            display: inline-block;
             background-color: #f0f7ff;
             border: 2px dashed #4a90e2;
-            border-radius: 8px;
-            min-height: 45px;
-            margin: 10px 0;
-            padding: 8px;
-            transition: all 0.3s;
+            border-radius: 4px;
+            height: 34px;
+            margin: 0 3px;
+            padding: 0 8px;
+            transition: all 0.2s;
+            vertical-align: middle;
+            position: relative;
+            min-width: 40px; /* Much shorter minimum width */
         }
         
         .drop-zone.highlight {
@@ -100,21 +109,52 @@
             border-style: solid;
         }
         
+        .drop-zone.empty {
+            display: inline-block;
+        }
+        
+        .drop-zone.empty::after {
+            content: "___";
+            color: #a0aec0;
+            font-size: 0.9rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* Dropped items - auto width based on content */
         .dropped-item {
+            display: inline-block;
             background-color: #4a90e2;
             color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            margin: 5px;
-            cursor: move;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin: 0;
+            cursor: pointer;
             font-weight: 500;
-            box-shadow: 0 3px 8px rgba(74, 144, 226, 0.3);
+            box-shadow: 0 1px 3px rgba(74, 144, 226, 0.3);
             user-select: none;
+            border: 1px solid #3a80d2;
+            line-height: 1.4;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            vertical-align: middle;
+            white-space: nowrap;
         }
         
         .dropped-item:hover {
             background-color: #3a80d2;
+        }
+        
+        .dropped-item.correct {
+            background-color: #2ea043;
+            border-color: #22863a;
+        }
+        
+        .dropped-item.incorrect {
+            background-color: #da3633;
+            border-color: #cb2431;
         }
         
         .phrase-bank {
@@ -151,22 +191,22 @@
         .drag-item {
             background-color: #f8f9fa;
             border: 2px solid #e1e4e8;
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin-bottom: 10px;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
             cursor: grab;
             transition: all 0.2s;
             text-align: center;
             font-weight: 500;
             color: #24292e;
             user-select: none;
+            line-height: 1.4;
+            font-size: 0.95rem;
         }
         
         .drag-item:hover {
             background-color: #f0f7ff;
             border-color: #4a90e2;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
         
         .drag-item.dragging {
@@ -198,11 +238,12 @@
             display: flex;
             gap: 15px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
         
         .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 6px;
             border: none;
             font-weight: 600;
             cursor: pointer;
@@ -210,6 +251,7 @@
             align-items: center;
             gap: 8px;
             transition: all 0.2s;
+            font-size: 0.95rem;
         }
         
         .btn-check {
@@ -241,10 +283,11 @@
         
         .result {
             margin-top: 20px;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             display: none;
             font-weight: 500;
+            font-size: 0.95rem;
         }
         
         .result.correct {
@@ -261,31 +304,44 @@
         
         .instructions {
             background-color: #f8f9fa;
-            padding: 15px 20px;
-            border-radius: 8px;
+            padding: 12px 15px;
+            border-radius: 6px;
             margin-top: 15px;
             border-left: 4px solid #f0b429;
         }
         
         .instructions h3 {
             color: #f0b429;
-            margin-bottom: 8px;
-            font-size: 1rem;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
         }
         
         .instructions p {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #57606a;
         }
         
         .counter {
             background-color: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
             font-weight: 600;
             color: #4a6fa5;
             margin-top: 15px;
             text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .text-highlight {
+            font-weight: 600;
+            color: #4a6fa5;
+        }
+        
+        .phrase-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-top: 15px;
         }
         
         @media (max-width: 768px) {
@@ -301,8 +357,28 @@
                 font-size: 2rem;
             }
             
+            .drop-zone {
+                min-width: 30px;
+                height: 32px;
+            }
+            
+            .dropped-item {
+                padding: 3px 8px;
+                font-size: 0.9rem;
+            }
+            
+            .drag-item {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
+            
             .controls {
-                flex-direction: column;
+                justify-content: center;
+            }
+            
+            .text-content {
+                padding: 20px;
+                line-height: 1.5;
             }
         }
     </style>
@@ -321,22 +397,22 @@
             <div class="text-content">
                 <p>I visited Abu Dhabi last month, and it was a very interesting experience.</p>
                 
-                <p><strong>First, the good things.</strong> The city is 
-                    <span class="drop-zone" data-correct="incredibly beautiful" data-id="1"></span>. 
+                <p><span class="text-highlight">First, the good things.</span> The city is 
+                    <span class="drop-zone empty" data-correct="incredibly beautiful" data-id="1"></span>. 
                     The architecture is amazing. I loved the Sheikh Zayed Mosque – it is so white and grand. The modern buildings in the city center are also very impressive and futuristic. At night, with all the lights, the city looks like something from 
-                    <span class="drop-zone" data-correct="a science fiction movie" data-id="2"></span>. 
+                    <span class="drop-zone empty" data-correct="a science fiction movie" data-id="2"></span>. 
                     <strong>I took hundreds of photos!</strong></p>
                 
-                <p><strong>However, I have to be honest about the atmosphere.</strong> For me, the city feels very calm and formal. Everything is very clean, organized, and… quiet. There aren't 
-                    <span class="drop-zone" data-correct="many young people just hanging out" data-id="3"></span> 
+                <p><span class="text-highlight">However, I have to be honest about the atmosphere.</span> For me, the city feels very calm and formal. Everything is very clean, organized, and… quiet. There aren't 
+                    <span class="drop-zone empty" data-correct="many young people just hanging out" data-id="3"></span> 
                     in the streets or in small, interesting cafes. Most places feel designed for 
-                    <span class="drop-zone" data-correct="business people or older tourists" data-id="4"></span> 
+                    <span class="drop-zone empty" data-correct="business people or older tourists" data-id="4"></span> 
                     who want luxury.</p>
                 
-                <p><strong>So, my conclusion is mixed.</strong> If you love beautiful buildings, luxury shopping, and a very 
-                    <span class="drop-zone" data-correct="peaceful environment" data-id="5"></span>, 
+                <p><span class="text-highlight">So, my conclusion is mixed.</span> If you love beautiful buildings, luxury shopping, and a very 
+                    <span class="drop-zone empty" data-correct="peaceful environment" data-id="5"></span>, 
                     you will probably love Abu Dhabi. But if you are a young person looking for a city with 
-                    <span class="drop-zone" data-correct="a wild nightlife" data-id="6"></span> 
+                    <span class="drop-zone empty" data-correct="a wild nightlife" data-id="6"></span> 
                     or a lot of street energy, you might find it a bit boring.</p>
                 
                 <p>For me, it was beautiful to see, but I don't think I would go back soon. I prefer cities with a younger feel.</p>
@@ -351,10 +427,10 @@
                         <i class="fas fa-check-circle"></i> Check Answers
                     </button>
                     <button class="btn btn-reset" onclick="resetExercise()">
-                        <i class="fas fa-redo"></i> Reset Exercise
+                        <i class="fas fa-redo"></i> Reset
                     </button>
                     <button class="btn btn-solution" onclick="showSolution()">
-                        <i class="fas fa-lightbulb"></i> Show Solution
+                        <i class="fas fa-lightbulb"></i> Solution
                     </button>
                 </div>
                 
@@ -376,23 +452,8 @@
                     <p>Drag and drop these phrases into the empty spaces in the text.</p>
                 </div>
                 
-                <div class="drag-item" draggable="true" data-phrase="incredibly beautiful" data-id="1">
-                    incredibly beautiful
-                </div>
-                <div class="drag-item" draggable="true" data-phrase="a science fiction movie" data-id="2">
-                    a science fiction movie
-                </div>
-                <div class="drag-item" draggable="true" data-phrase="many young people just hanging out" data-id="3">
-                    many young people just hanging out
-                </div>
-                <div class="drag-item" draggable="true" data-phrase="business people or older tourists" data-id="4">
-                    business people or older tourists
-                </div>
-                <div class="drag-item" draggable="true" data-phrase="peaceful environment" data-id="5">
-                    peaceful environment
-                </div>
-                <div class="drag-item" draggable="true" data-phrase="a wild nightlife" data-id="6">
-                    a wild nightlife
+                <div class="phrase-grid" id="phrase-container">
+                    <!-- Phrases will be loaded here in random order -->
                 </div>
                 
                 <div class="counter">
@@ -413,22 +474,66 @@
             6: "a wild nightlife"
         };
         
+        // All phrases with their IDs
+        const allPhrases = [
+            { id: 1, text: "incredibly beautiful" },
+            { id: 2, text: "a science fiction movie" },
+            { id: 3, text: "many young people just hanging out" },
+            { id: 4, text: "business people or older tourists" },
+            { id: 5, text: "peaceful environment" },
+            { id: 6, text: "a wild nightlife" }
+        ];
+        
         // Track which phrases have been used
         const usedPhrases = new Set();
         let placedCount = 0;
         
-        // Initialize drag and drop functionality
+        // Initialize the exercise
         document.addEventListener('DOMContentLoaded', function() {
-            const dragItems = document.querySelectorAll('.drag-item');
-            const dropZones = document.querySelectorAll('.drop-zone');
+            shuffleAndLoadPhrases();
+            setupDragAndDrop();
+        });
+        
+        // Shuffle and load phrases in random order
+        function shuffleAndLoadPhrases() {
+            const phraseContainer = document.getElementById('phrase-container');
+            phraseContainer.innerHTML = '';
             
-            // Set up drag events for draggable items
+            // Create a shuffled copy of the phrases
+            const shuffledPhrases = [...allPhrases].sort(() => Math.random() - 0.5);
+            
+            // Add each phrase to the container
+            shuffledPhrases.forEach(phrase => {
+                const dragItem = document.createElement('div');
+                dragItem.className = 'drag-item';
+                dragItem.draggable = true;
+                dragItem.dataset.phrase = phrase.text;
+                dragItem.dataset.id = phrase.id;
+                dragItem.textContent = phrase.text;
+                
+                phraseContainer.appendChild(dragItem);
+            });
+            
+            // Re-setup drag events
+            setTimeout(() => {
+                setupDragEvents();
+            }, 10);
+        }
+        
+        // Setup drag events for draggable items
+        function setupDragEvents() {
+            const dragItems = document.querySelectorAll('.drag-item');
+            
             dragItems.forEach(item => {
                 item.addEventListener('dragstart', dragStart);
                 item.addEventListener('dragend', dragEnd);
             });
+        }
+        
+        // Setup drop zones
+        function setupDragAndDrop() {
+            const dropZones = document.querySelectorAll('.drop-zone');
             
-            // Set up drop events for drop zones
             dropZones.forEach(zone => {
                 zone.addEventListener('dragover', dragOver);
                 zone.addEventListener('dragenter', dragEnter);
@@ -437,7 +542,7 @@
             });
             
             updateCounters();
-        });
+        }
         
         // Drag and Drop Functions
         function dragStart(e) {
@@ -453,7 +558,10 @@
         }
         
         function dragEnd() {
-            this.classList.remove('dragging');
+            const draggingItems = document.querySelectorAll('.drag-item.dragging');
+            draggingItems.forEach(item => {
+                item.classList.remove('dragging');
+            });
         }
         
         function dragOver(e) {
@@ -463,10 +571,14 @@
         function dragEnter(e) {
             e.preventDefault();
             this.classList.add('highlight');
+            this.classList.remove('empty');
         }
         
         function dragLeave() {
             this.classList.remove('highlight');
+            if (this.children.length === 0) {
+                this.classList.add('empty');
+            }
         }
         
         function drop(e) {
@@ -499,6 +611,9 @@
             // Check if phrase is already in use elsewhere
             if (usedPhrases.has(id)) {
                 alert("This phrase is already placed elsewhere. Remove it first if you want to move it.");
+                if (this.children.length === 0) {
+                    this.classList.add('empty');
+                }
                 return;
             }
             
@@ -506,22 +621,31 @@
             const droppedElement = document.createElement('div');
             droppedElement.className = 'dropped-item';
             droppedElement.textContent = phrase;
-            droppedElement.draggable = true;
             droppedElement.dataset.originalId = id;
             droppedElement.dataset.droppedIn = dropZoneId;
             
-            // Add remove functionality
+            // Add remove functionality on click
             droppedElement.addEventListener('click', function() {
                 const originalId = this.dataset.originalId;
                 markPhraseAsAvailable(originalId);
                 usedPhrases.delete(originalId);
-                this.remove();
+                
+                // Get the parent drop zone
+                const parentZone = this.parentElement;
+                parentZone.innerHTML = '';
+                parentZone.classList.add('empty');
+                
                 placedCount--;
                 updateCounters();
+                
+                // Reset result display
+                document.getElementById('result').style.display = 'none';
             });
             
-            // Add to drop zone
+            // Clear drop zone and add the new element
+            this.innerHTML = '';
             this.appendChild(droppedElement);
+            this.classList.remove('empty');
             
             // Mark phrase as used
             markPhraseAsUsed(id);
@@ -565,13 +689,14 @@
                     const droppedPhrase = droppedItem.textContent;
                     const correctPhrase = zone.dataset.correct;
                     
+                    // Reset any previous styling
+                    droppedItem.classList.remove('correct', 'incorrect');
+                    
                     if (droppedPhrase === correctPhrase) {
                         correctCount++;
-                        zone.style.backgroundColor = 'rgba(46, 160, 67, 0.1)';
-                        droppedItem.style.backgroundColor = '#2ea043';
+                        droppedItem.classList.add('correct');
                     } else {
-                        zone.style.backgroundColor = 'rgba(218, 54, 51, 0.1)';
-                        droppedItem.style.backgroundColor = '#da3633';
+                        droppedItem.classList.add('incorrect');
                     }
                 }
             });
@@ -579,15 +704,15 @@
             // Show result
             const resultDiv = document.getElementById('result');
             
-            if (correctCount === 6) {
-                resultDiv.className = 'result correct';
-                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Perfect! All ${correctCount} answers are correct!`;
-            } else if (correctCount > 3) {
-                resultDiv.className = 'result correct';
-                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Good job! ${correctCount} out of 6 answers are correct.`;
-            } else if (totalFilled < 6) {
+            if (totalFilled < 6) {
                 resultDiv.className = 'result incorrect';
                 resultDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> You filled ${totalFilled} out of 6 blanks. Please fill all blanks before checking.`;
+            } else if (correctCount === 6) {
+                resultDiv.className = 'result correct';
+                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Perfect! All ${correctCount} answers are correct!`;
+            } else if (correctCount >= 4) {
+                resultDiv.className = 'result correct';
+                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Good job! ${correctCount} out of 6 answers are correct.`;
             } else {
                 resultDiv.className = 'result incorrect';
                 resultDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${correctCount} out of 6 answers are correct. Try again or use the "Show Solution" button.`;
@@ -602,7 +727,7 @@
             const dropZones = document.querySelectorAll('.drop-zone');
             dropZones.forEach(zone => {
                 zone.innerHTML = '';
-                zone.style.backgroundColor = '';
+                zone.classList.add('empty');
             });
             
             // Reset all drag items
@@ -638,13 +763,33 @@
                 if (dragItem && !dragItem.classList.contains('used')) {
                     // Create the dropped element
                     const droppedElement = document.createElement('div');
-                    droppedElement.className = 'dropped-item';
+                    droppedElement.className = 'dropped-item correct';
                     droppedElement.textContent = correctPhrase;
                     droppedElement.dataset.originalId = id;
                     droppedElement.dataset.droppedIn = id;
                     
-                    // Add to drop zone
+                    // Add remove functionality on click
+                    droppedElement.addEventListener('click', function() {
+                        const originalId = this.dataset.originalId;
+                        markPhraseAsAvailable(originalId);
+                        usedPhrases.delete(originalId);
+                        
+                        // Get the parent drop zone
+                        const parentZone = this.parentElement;
+                        parentZone.innerHTML = '';
+                        parentZone.classList.add('empty');
+                        
+                        placedCount--;
+                        updateCounters();
+                        
+                        // Reset result display
+                        document.getElementById('result').style.display = 'none';
+                    });
+                    
+                    // Clear drop zone and add the new element
+                    zone.innerHTML = '';
                     zone.appendChild(droppedElement);
+                    zone.classList.remove('empty');
                     
                     // Mark as used
                     dragItem.classList.add('used');
@@ -658,7 +803,7 @@
             // Show message
             const resultDiv = document.getElementById('result');
             resultDiv.className = 'result correct';
-            resultDiv.innerHTML = `<i class="fas fa-lightbulb"></i> Solution has been filled in. You can now check the answers to see they are all correct.`;
+            resultDiv.innerHTML = `<i class="fas fa-lightbulb"></i> Solution has been filled in. All answers are correct!`;
             resultDiv.style.display = 'block';
         }
     </script>
