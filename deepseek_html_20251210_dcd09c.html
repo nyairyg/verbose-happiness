@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag & Drop: Abu Dhabi Experience</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f6f8;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #24292e;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #57606a;
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .text-container {
+            flex: 2;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #e1e4e8;
+        }
+        
+        .text-header {
+            background-color: #4a6fa5;
+            color: white;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        .text-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .text-content {
+            padding: 30px;
+            line-height: 1.7;
+            font-size: 1.05rem;
+            color: #24292e;
+        }
+        
+        .drop-zone {
+            background-color: #f0f7ff;
+            border: 2px dashed #4a90e2;
+            border-radius: 8px;
+            min-height: 45px;
+            margin: 10px 0;
+            padding: 8px;
+            transition: all 0.3s;
+        }
+        
+        .drop-zone.highlight {
+            background-color: #e8f4fd;
+            border-color: #0969da;
+            border-style: solid;
+        }
+        
+        .dropped-item {
+            background-color: #4a90e2;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 5px;
+            cursor: move;
+            font-weight: 500;
+            box-shadow: 0 3px 8px rgba(74, 144, 226, 0.3);
+            user-select: none;
+        }
+        
+        .dropped-item:hover {
+            background-color: #3a80d2;
+        }
+        
+        .phrase-bank {
+            flex: 1;
+            min-width: 250px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #e1e4e8;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .phrase-header {
+            background-color: #2ea043;
+            color: white;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        .phrase-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .phrase-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .drag-item {
+            background-color: #f8f9fa;
+            border: 2px solid #e1e4e8;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 500;
+            color: #24292e;
+            user-select: none;
+        }
+        
+        .drag-item:hover {
+            background-color: #f0f7ff;
+            border-color: #4a90e2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .drag-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        
+        .drag-item.used {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4a6fa5;
+        }
+        
+        .feedback h3 {
+            color: #4a6fa5;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-check {
+            background-color: #2ea043;
+            color: white;
+        }
+        
+        .btn-check:hover {
+            background-color: #22863a;
+        }
+        
+        .btn-reset {
+            background-color: #da3633;
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background-color: #cb2431;
+        }
+        
+        .btn-solution {
+            background-color: #4a6fa5;
+            color: white;
+        }
+        
+        .btn-solution:hover {
+            background-color: #3a5f95;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .result.correct {
+            background-color: rgba(46, 160, 67, 0.1);
+            border-left: 4px solid #2ea043;
+            color: #2ea043;
+        }
+        
+        .result.incorrect {
+            background-color: rgba(218, 54, 51, 0.1);
+            border-left: 4px solid #da3633;
+            color: #da3633;
+        }
+        
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #f0b429;
+        }
+        
+        .instructions h3 {
+            color: #f0b429;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .instructions p {
+            font-size: 0.95rem;
+            color: #57606a;
+        }
+        
+        .counter {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            color: #4a6fa5;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .text-container, .phrase-bank {
+                width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Abu Dhabi Experience: Drag & Drop Exercise</h1>
+        <p>Drag the phrases from the bank to the correct drop zones in the text to complete the story.</p>
+    </div>
+    
+    <div class="container">
+        <div class="text-container">
+            <div class="text-header">
+                <h2>My Abu Dhabi Experience</h2>
+            </div>
+            <div class="text-content">
+                <p>I visited Abu Dhabi last month, and it was a very interesting experience.</p>
+                
+                <p><strong>First, the good things.</strong> The city is 
+                    <span class="drop-zone" data-correct="incredibly beautiful" data-id="1"></span>. 
+                    The architecture is amazing. I loved the Sheikh Zayed Mosque – it is so white and grand. The modern buildings in the city center are also very impressive and futuristic. At night, with all the lights, the city looks like something from 
+                    <span class="drop-zone" data-correct="a science fiction movie" data-id="2"></span>. 
+                    <strong>I took hundreds of photos!</strong></p>
+                
+                <p><strong>However, I have to be honest about the atmosphere.</strong> For me, the city feels very calm and formal. Everything is very clean, organized, and… quiet. There aren't 
+                    <span class="drop-zone" data-correct="many young people just hanging out" data-id="3"></span> 
+                    in the streets or in small, interesting cafes. Most places feel designed for 
+                    <span class="drop-zone" data-correct="business people or older tourists" data-id="4"></span> 
+                    who want luxury.</p>
+                
+                <p><strong>So, my conclusion is mixed.</strong> If you love beautiful buildings, luxury shopping, and a very 
+                    <span class="drop-zone" data-correct="peaceful environment" data-id="5"></span>, 
+                    you will probably love Abu Dhabi. But if you are a young person looking for a city with 
+                    <span class="drop-zone" data-correct="a wild nightlife" data-id="6"></span> 
+                    or a lot of street energy, you might find it a bit boring.</p>
+                
+                <p>For me, it was beautiful to see, but I don't think I would go back soon. I prefer cities with a younger feel.</p>
+                
+                <div class="feedback">
+                    <h3><i class="fas fa-info-circle"></i> Exercise Instructions</h3>
+                    <p>Drag phrases from the bank on the right and drop them into the empty spaces in the text above. When you're done, click "Check Answers" to see how you did.</p>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-check" onclick="checkAnswers()">
+                        <i class="fas fa-check-circle"></i> Check Answers
+                    </button>
+                    <button class="btn btn-reset" onclick="resetExercise()">
+                        <i class="fas fa-redo"></i> Reset Exercise
+                    </button>
+                    <button class="btn btn-solution" onclick="showSolution()">
+                        <i class="fas fa-lightbulb"></i> Show Solution
+                    </button>
+                </div>
+                
+                <div class="result" id="result"></div>
+                
+                <div class="counter">
+                    Phrases placed: <span id="counter">0</span> / 6
+                </div>
+            </div>
+        </div>
+        
+        <div class="phrase-bank">
+            <div class="phrase-header">
+                <h2>Phrase Bank</h2>
+            </div>
+            <div class="phrase-content">
+                <div class="instructions">
+                    <h3><i class="fas fa-hand-pointer"></i> How to use</h3>
+                    <p>Drag and drop these phrases into the empty spaces in the text.</p>
+                </div>
+                
+                <div class="drag-item" draggable="true" data-phrase="incredibly beautiful" data-id="1">
+                    incredibly beautiful
+                </div>
+                <div class="drag-item" draggable="true" data-phrase="a science fiction movie" data-id="2">
+                    a science fiction movie
+                </div>
+                <div class="drag-item" draggable="true" data-phrase="many young people just hanging out" data-id="3">
+                    many young people just hanging out
+                </div>
+                <div class="drag-item" draggable="true" data-phrase="business people or older tourists" data-id="4">
+                    business people or older tourists
+                </div>
+                <div class="drag-item" draggable="true" data-phrase="peaceful environment" data-id="5">
+                    peaceful environment
+                </div>
+                <div class="drag-item" draggable="true" data-phrase="a wild nightlife" data-id="6">
+                    a wild nightlife
+                </div>
+                
+                <div class="counter">
+                    Phrases remaining: <span id="remaining">6</span> / 6
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Store the correct answers
+        const correctAnswers = {
+            1: "incredibly beautiful",
+            2: "a science fiction movie", 
+            3: "many young people just hanging out",
+            4: "business people or older tourists",
+            5: "peaceful environment",
+            6: "a wild nightlife"
+        };
+        
+        // Track which phrases have been used
+        const usedPhrases = new Set();
+        let placedCount = 0;
+        
+        // Initialize drag and drop functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            // Set up drag events for draggable items
+            dragItems.forEach(item => {
+                item.addEventListener('dragstart', dragStart);
+                item.addEventListener('dragend', dragEnd);
+            });
+            
+            // Set up drop events for drop zones
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', dragOver);
+                zone.addEventListener('dragenter', dragEnter);
+                zone.addEventListener('dragleave', dragLeave);
+                zone.addEventListener('drop', drop);
+            });
+            
+            updateCounters();
+        });
+        
+        // Drag and Drop Functions
+        function dragStart(e) {
+            // Don't allow dragging if already used
+            if (this.classList.contains('used')) {
+                e.preventDefault();
+                return;
+            }
+            
+            this.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', this.dataset.phrase);
+            e.dataTransfer.setData('id', this.dataset.id);
+        }
+        
+        function dragEnd() {
+            this.classList.remove('dragging');
+        }
+        
+        function dragOver(e) {
+            e.preventDefault();
+        }
+        
+        function dragEnter(e) {
+            e.preventDefault();
+            this.classList.add('highlight');
+        }
+        
+        function dragLeave() {
+            this.classList.remove('highlight');
+        }
+        
+        function drop(e) {
+            e.preventDefault();
+            this.classList.remove('highlight');
+            
+            // Get the dragged data
+            const phrase = e.dataTransfer.getData('text/plain');
+            const id = e.dataTransfer.getData('id');
+            const dropZoneId = this.dataset.id;
+            
+            // Check if this drop zone already has content
+            if (this.children.length > 0) {
+                // Remove existing content
+                const existingItem = this.firstElementChild;
+                const existingId = existingItem.dataset.originalId;
+                
+                // Mark the phrase as available again
+                markPhraseAsAvailable(existingId);
+                
+                // Remove from used phrases set
+                usedPhrases.delete(existingId);
+                
+                // Remove from DOM
+                existingItem.remove();
+                
+                placedCount--;
+            }
+            
+            // Check if phrase is already in use elsewhere
+            if (usedPhrases.has(id)) {
+                alert("This phrase is already placed elsewhere. Remove it first if you want to move it.");
+                return;
+            }
+            
+            // Create the dropped element
+            const droppedElement = document.createElement('div');
+            droppedElement.className = 'dropped-item';
+            droppedElement.textContent = phrase;
+            droppedElement.draggable = true;
+            droppedElement.dataset.originalId = id;
+            droppedElement.dataset.droppedIn = dropZoneId;
+            
+            // Add remove functionality
+            droppedElement.addEventListener('click', function() {
+                const originalId = this.dataset.originalId;
+                markPhraseAsAvailable(originalId);
+                usedPhrases.delete(originalId);
+                this.remove();
+                placedCount--;
+                updateCounters();
+            });
+            
+            // Add to drop zone
+            this.appendChild(droppedElement);
+            
+            // Mark phrase as used
+            markPhraseAsUsed(id);
+            usedPhrases.add(id);
+            placedCount++;
+            updateCounters();
+            
+            // Reset result display
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        function markPhraseAsUsed(id) {
+            const dragItem = document.querySelector(`.drag-item[data-id="${id}"]`);
+            if (dragItem) {
+                dragItem.classList.add('used');
+            }
+        }
+        
+        function markPhraseAsAvailable(id) {
+            const dragItem = document.querySelector(`.drag-item[data-id="${id}"]`);
+            if (dragItem) {
+                dragItem.classList.remove('used');
+            }
+        }
+        
+        function updateCounters() {
+            document.getElementById('counter').textContent = placedCount;
+            document.getElementById('remaining').textContent = 6 - placedCount;
+        }
+        
+        // Check answers function
+        function checkAnswers() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            let correctCount = 0;
+            let totalFilled = 0;
+            
+            dropZones.forEach(zone => {
+                if (zone.children.length > 0) {
+                    totalFilled++;
+                    const droppedItem = zone.firstElementChild;
+                    const droppedPhrase = droppedItem.textContent;
+                    const correctPhrase = zone.dataset.correct;
+                    
+                    if (droppedPhrase === correctPhrase) {
+                        correctCount++;
+                        zone.style.backgroundColor = 'rgba(46, 160, 67, 0.1)';
+                        droppedItem.style.backgroundColor = '#2ea043';
+                    } else {
+                        zone.style.backgroundColor = 'rgba(218, 54, 51, 0.1)';
+                        droppedItem.style.backgroundColor = '#da3633';
+                    }
+                }
+            });
+            
+            // Show result
+            const resultDiv = document.getElementById('result');
+            
+            if (correctCount === 6) {
+                resultDiv.className = 'result correct';
+                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Perfect! All ${correctCount} answers are correct!`;
+            } else if (correctCount > 3) {
+                resultDiv.className = 'result correct';
+                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Good job! ${correctCount} out of 6 answers are correct.`;
+            } else if (totalFilled < 6) {
+                resultDiv.className = 'result incorrect';
+                resultDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> You filled ${totalFilled} out of 6 blanks. Please fill all blanks before checking.`;
+            } else {
+                resultDiv.className = 'result incorrect';
+                resultDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${correctCount} out of 6 answers are correct. Try again or use the "Show Solution" button.`;
+            }
+            
+            resultDiv.style.display = 'block';
+        }
+        
+        // Reset exercise function
+        function resetExercise() {
+            // Clear all drop zones
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                zone.innerHTML = '';
+                zone.style.backgroundColor = '';
+            });
+            
+            // Reset all drag items
+            const dragItems = document.querySelectorAll('.drag-item');
+            dragItems.forEach(item => {
+                item.classList.remove('used');
+            });
+            
+            // Reset counters and sets
+            usedPhrases.clear();
+            placedCount = 0;
+            updateCounters();
+            
+            // Hide result
+            document.getElementById('result').style.display = 'none';
+        }
+        
+        // Show solution function
+        function showSolution() {
+            // First reset
+            resetExercise();
+            
+            // Automatically place all correct answers
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            dropZones.forEach(zone => {
+                const id = zone.dataset.id;
+                const correctPhrase = correctAnswers[id];
+                
+                // Find the drag item
+                const dragItem = document.querySelector(`.drag-item[data-id="${id}"]`);
+                
+                if (dragItem && !dragItem.classList.contains('used')) {
+                    // Create the dropped element
+                    const droppedElement = document.createElement('div');
+                    droppedElement.className = 'dropped-item';
+                    droppedElement.textContent = correctPhrase;
+                    droppedElement.dataset.originalId = id;
+                    droppedElement.dataset.droppedIn = id;
+                    
+                    // Add to drop zone
+                    zone.appendChild(droppedElement);
+                    
+                    // Mark as used
+                    dragItem.classList.add('used');
+                    usedPhrases.add(id);
+                    placedCount++;
+                }
+            });
+            
+            updateCounters();
+            
+            // Show message
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result correct';
+            resultDiv.innerHTML = `<i class="fas fa-lightbulb"></i> Solution has been filled in. You can now check the answers to see they are all correct.`;
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
