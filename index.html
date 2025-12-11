@@ -497,9 +497,9 @@
         <!-- Right Panel: Welcome & Access Form -->
         <div class="right-panel">
             <div class="welcome-message">
-                <h2>Welcome, Students!</h2>
-                <p>This portal contains <span class="highlight">interactive illustrations</span> and visual learning materials created to help you better understand complex concepts.</p>
-                <p>To access the materials, please enter the <span class="highlight">access code</span> provided by your instructor. Each code unlocks specific educational content tailored for your course.</p>
+                <h2>Welcome!</h2>
+                <p>This portal contains <span class="highlight">interactive tasks</span> and learning materials created to help you better understand complex concepts.</p>
+                <p>To access the materials, please enter the <span class="highlight">access code</span> provided by your instructor. Each code unlocks specific educational content.</p>
             </div>
             
             <div class="access-form">
@@ -511,7 +511,7 @@
                         type="text" 
                         id="studentCode" 
                         class="code-input" 
-                        placeholder="e.g., PHYS101-2024 or MATH202-A1"
+                        placeholder="e.g., SG275 or EDU202-A1"
                         maxlength="20"
                     >
                 </div>
@@ -597,9 +597,8 @@ function checkAccessCode() {
     
     // Your actual codes here
     const codeMap = {
-        'ADE102': 'Abu-Dhabi-experience.html',
-        'MATH202': 'https://your-username.github.io/math-visualizations/',
-        'DEMO': 'https://your-username.github.io/demo-content/'
+        'ADE-102': 'Abu-Dhabi-experience.html',
+        'ADE102': 'Abu-Dhabi-experience.html'
     };
     
     if (codeMap[code]) {
