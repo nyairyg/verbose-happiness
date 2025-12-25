@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Random Multi-level Matching</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif; color:#333;}
+body{background:#fbf9f8;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+.wrapper{position:relative;width:900px;display:flex;justify-content:center;gap:50px;margin-top:20px}
+.column{width:40%}
+.item{
+    background:#fbf9f8;
+    border:2px solid #c4a79b;
+    border-radius:6px;
+    padding:16px 12px;
+    margin-bottom:12px;
+    text-align:center;
+    cursor:pointer;
+    font-weight:600;
+    font-size:1.2rem;
+    position:relative;
+    color:#333;
+}
+.item.used{opacity:.4;pointer-events:none}
+.item.active{background:#e8f4fd;border-color:#538e9b}
+@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+.item.shake{animation:shake .4s}
+svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#message{margin-top:20px;font-size:1.2rem;font-weight:600;color:#538e9b}
+</style>
+</head>
+<body>
+
+<h2>Random Multi-level Matching</h2>
+
+<p style=font-size:1.2rem;font-weight:600;><br>Click on the word on the left and then click on its translation on the right. You will move <br> to the next level automatically.</p>
+
+<div class="wrapper" id="wrapper">
+<svg id="lines"></svg>
+<div class="column" id="left"></div>
+<div class="column" id="right"></div>
+</div>
+
+<div id="message"></div>
+
+<script>
+// Все доступные пары
+const allPairs = [
+    {id:1, en:"wrinkles", ru:"морщины"},
+  {id:2, en:"costume", ru:"костюм"},
+  {id:3, en:"calm", ru:"спокойный"},
+  {id:4, en:"air conditioning", ru:"кондиционер"},
+  {id:5, en:"remarried", ru:"женившийся/вышедшая замуж повторно"},
+  {id:6, en:"bored", ru:"скучающий"},
+  {id:7, en:"hotel", ru:"отель, гостиница"},
+  {id:8, en:"parking", ru:"парковка"},
+  {id:9, en:"security guard", ru:"охранник"},
+  {id:10, en:"fur", ru:"мех, шерсть"},
+  {id:11, en:"slim", ru:"стройный"},
+  {id:12, en:"confident", ru:"уверенный"},
+  {id:13, en:"disappointed", ru:"разочарованный"},
+  {id:14, en:"depressed", ru:"подавленный, в депрессии"},
+  {id:15, en:"credit card", ru:"кредитная карта"},
+  {id:16, en:"divorced", ru:"в разводе"},
+  {id:17, en:"strangers", ru:"незнакомцы"},
+  {id:18, en:"sleepy", ru:"сонный"},
+  {id:19, en:"stressed", ru:"в стрессе, напряженный"},
+  {id:20, en:"thirsty", ru:"испытывающий жажду"},
+  {id:21, en:"rest", ru:"остаток"},
+  {id:22, en:"change", ru:"сдача, мелочь"},
+  {id:23, en:"neighborhood", ru:"район, окружение"},
+  {id:24, en:"flight", ru:"рейс, полёт"},
+  {id:25, en:"gate", ru:"выход (в аэропорту)"},
+  {id:26, en:"seat", ru:"место (сидячее)"},
+  {id:27, en:"bother", ru:"тревожить, мешать"},
+  {id:28, en:"neck", ru:"шея"},
+  {id:29, en:"insects", ru:"насекомые"},
+  {id:30, en:"touch", ru:"трогать, прикасаться"},
+  {id:31, en:"both", ru:"оба"},
+  {id:32, en:"chef", ru:"шеф-повар"},
+  {id:33, en:"subway", ru:"метро"},
+  {id:34, en:"relax", ru:"расслабляться"},
+  {id:35, en:"beard", ru:"борода"},
+  {id:36, en:"expensive", ru:"дорогой"},
+  {id:37, en:"routine", ru:"распорядок дня"},
+  {id:38, en:"role", ru:"роль"},
+  {id:39, en:"crowded", ru:"заполненный людьми"},
+  {id:40, en:"peaceful", ru:"тихий, спокойный"},
+  {id:41, en:"truth", ru:"правда"},
+  {id:42, en:"lie", ru:"ложь"},
+  {id:43, en:"tough", ru:"тяжёлый, трудный"},
+  {id:44, en:"groceries", ru:"продукты (питания)"},
+  {id:45, en:"depends", ru:"зависит"},
+  {id:46, en:"qualifications", ru:"квалификация, навыки"},
+  {id:47, en:"earn", ru:"зарабатывать"},
+  {id:48, en:"lazy", ru:"ленивый"},
+  {id:49, en:"talkative", ru:"разговорчивый"},
+  {id:50, en:"loud", ru:"громкий"},
+  {id:51, en:"factory", ru:"фабрика, завод"},
+  {id:52, en:"niece", ru:"племянница"},
+  {id:53, en:"cost", ru:"стоить"},
+  {id:54, en:"library", ru:"библиотека"},
+  {id:55, en:"nephew", ru:"племянник"},
+  {id:56, en:"builder", ru:"строитель"},
+  {id:57, en:"requirements", ru:"требования"},
+  {id:58, en:"listen", ru:"слушать"},
+  {id:59, en:"watch", ru:"смотреть (ТВ, фильм)"},
+  {id:60, en:"once a week", ru:"раз в неделю"},
+  {id:61, en:"every month", ru:"каждый месяц"},
+  {id:62, en:"weekends", ru:"выходные"},
+  {id:63, en:"once a year", ru:"раз в год"},
+  {id:64, en:"vacation", ru:"отпуск, каникулы"},
+  {id:65, en:"keys", ru:"ключи"},
+  {id:66, en:"diary", ru:"дневник (записи)"},
+  {id:67, en:"passport", ru:"паспорт"},
+  {id:68, en:"purse", ru:"кошелек, сумочка (женская)"},
+  {id:69, en:"ticket", ru:"билет"},
+  {id:70, en:"shampoo", ru:"шампунь"},
+  {id:71, en:"earphones", ru:"наушники (вставные)"},
+  {id:72, en:"procrastinate", ru:"прокрастинировать, откладывать"},
+  {id:73, en:"map", ru:"карта"},
+  {id:74, en:"sofa", ru:"диван"},
+  {id:75, en:"babysitter", ru:"няня"},
+  {id:76, en:"printer", ru:"принтер"},
+  {id:77, en:"tissues", ru:"салфетки (бумажные)"},
+  {id:78, en:"wipes", ru:"влажные салфетки"},
+  {id:79, en:"neat", ru:"опрятный, аккуратный"},
+  {id:80, en:"messy", ru:"неприбранный, беспорядочный"},
+  {id:81, en:"wallet", ru:"кошелек (мужской)"},
+  {id:82, en:"change purse", ru:"кошелек для монет"},
+  {id:83, en:"charger", ru:"зарядное устройство"},
+  {id:84, en:"safe", ru:"безопасный"},
+  {id:85, en:"dangerous", ru:"опасный"},
+  {id:86, en:"dirty", ru:"грязный"},
+  {id:87, en:"empty", ru:"пустой"},
+  {id:88, en:"weak", ru:"слабый"},
+  {id:89, en:"sibling", ru:"брат или сестра"},
+  {id:90, en:"appearance", ru:"внешность"}
+];
+let selected=null, currentLevel=0, correctCount=0;
+const levelsCount=15, pairsPerLevel=6;
+
+function initLevel(){
+    left.innerHTML=""; right.innerHTML=""; lines.innerHTML="";
+    correctCount=0;
+    message.textContent=`Level ${currentLevel+1} of ${levelsCount}`;
+
+    // выбираем случайные пары для уровня
+    const shuffled = [...allPairs].sort(()=>Math.random()-0.5);
+    const levelPairs = shuffled.slice(0,pairsPerLevel);
+
+    // создаем блоки
+    shuffle(levelPairs).forEach(p=>left.appendChild(createItem(p.en,p.id,"left")));
+    shuffle(levelPairs).forEach(p=>right.appendChild(createItem(p.ru,p.id,"right")));
+}
+
+function createItem(text,id,side){
+    const d=document.createElement("div");
+    d.className="item "+side;
+    d.dataset.id=id;
+    d.dataset.side=side;
+    d.textContent=text;
+    d.addEventListener("click",()=>selectItem(d));
+    return d;
+}
+
+function anchor(el){
+    const r=el.getBoundingClientRect();
+    const w=wrapper.getBoundingClientRect();
+    return el.dataset.side==="left"
+        ? {x:r.right-w.left,y:r.top+r.height/2-w.top}
+        : {x:r.left-w.left,y:r.top+r.height/2-w.top};
+}
+
+function selectItem(el){
+    if(el.classList.contains("used"))return;
+
+    if(!selected){
+        selected=el;
+        el.classList.add("active");
+        return;
+    }
+
+    if(selected.dataset.side===el.dataset.side){
+        selected.classList.remove("active");
+        selected=el;
+        el.classList.add("active");
+        return;
+    }
+
+    const p1=anchor(selected),p2=anchor(el);
+    const line=document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",p1.x); line.setAttribute("y1",p1.y);
+    line.setAttribute("x2",p2.x); line.setAttribute("y2",p2.y);
+    line.setAttribute("stroke-width","2");
+    lines.appendChild(line);
+
+    if(selected.dataset.id===el.dataset.id){
+        line.setAttribute("stroke","#4fa46b");
+        selected.classList.add("used");
+        el.classList.add("used");
+        correctCount++;
+        if(correctCount===pairsPerLevel){
+            setTimeout(nextLevel,500);
+        }
+    }else{
+        line.setAttribute("stroke","#c05b6d");
+        selected.classList.add("shake");
+        el.classList.add("shake");
+        setTimeout(()=>{
+            line.remove();
+            selected.classList.remove("shake");
+            el.classList.remove("shake");
+        },400);
+    }
+
+    selected.classList.remove("active");
+    selected=null;
+}
+
+function nextLevel(){
+    currentLevel++;
+    if(currentLevel<levelsCount){
+        initLevel();
+    }else{
+        left.innerHTML=""; right.innerHTML=""; lines.innerHTML="";
+        message.textContent="🎉 Congratulations! You completed all levels!";
+    }
+}
+
+function shuffle(a){return [...a].sort(()=>Math.random()-0.5)}
+
+initLevel();
+</script>
+</body>
+</html>
