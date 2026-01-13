@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Country Traditions Matching</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
+body{background:#fbf9f8;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+.wrapper{position:relative;width:900px;display:flex;justify-content:center;gap:50px;margin-top:20px}
+.column{width:40%}
+.item{
+  background:#fbf9f8;
+  border:2px solid #c4a79b;
+  border-radius:6px;
+  padding:16px 12px;
+  margin-bottom:12px;
+  text-align:center;
+  cursor:pointer;
+  font-weight:600;
+  font-size:1.1rem;
+}
+.item.used{opacity:.4;pointer-events:none}
+.item.active{background:#e8f4fd;border-color:#538e9b}
+@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+.item.shake{animation:shake .4s}
+svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#message{margin-top:20px;font-size:1.2rem;font-weight:600;color:#538e9b}
+</style>
+</head>
+<body>
+
+<h2>Country Traditions</h2>
+<p style="font-size:1.1rem;font-weight:600;text-align:center">
+Match each country with its New Year tradition.
+</p>
+
+<div class="wrapper" id="wrapper">
+  <svg id="lines"></svg>
+  <div class="column" id="left"></div>
+  <div class="column" id="right"></div>
+</div>
+
+<div id="message"></div>
+
+<script>
+const allPairs = [
+  {id:1,left:"Italy",right:"People throw old things out of windows."},
+  {id:2,left:"Japan",right:"People laugh for good luck."},
+  {id:3,left:"Venezuela",right:"People wear yellow underwear for luck."},
+  {id:4,left:"France",right:"People make a lot of noise."},
+  {id:5,left:"Philippines",right:"Children jump 10 times at midnight."},
+  {id:6,left:"Denmark",right:"People throw plates at friends’ doors."}
+];
+
+let selected=null, correctCount=0;
+const totalPairs = allPairs.length;
+
+function initGame(){
+  left.innerHTML=""; right.innerHTML=""; lines.innerHTML="";
+  correctCount=0;
+  message.textContent="Connect all pairs";
+
+  const shuffled = shuffle(allPairs);
+  shuffle(shuffled).forEach(p=>left.appendChild(createItem(p.left,p.id,"left")));
+  shuffle(shuffled).forEach(p=>right.appendChild(createItem(p.right,p.id,"right")));
+}
+
+function createItem(text,id,side){
+  const d=document.createElement("div");
+  d.className="item "+side;
+  d.dataset.id=id;
+  d.dataset.side=side;
+  d.textContent=text;
+  d.onclick=()=>selectItem(d);
+  return d;
+}
+
+function anchor(el){
+  const r=el.getBoundingClientRect();
+  const w=wrapper.getBoundingClientRect();
+  return el.dataset.side==="left"
+    ? {x:r.right-w.left,y:r.top+r.height/2-w.top}
+    : {x:r.left-w.left,y:r.top+r.height/2-w.top};
+}
+
+function selectItem(el){
+  if(el.classList.contains("used"))return;
+
+  if(!selected){
+    selected=el;
+    el.classList.add("active");
+    return;
+  }
+
+  if(selected.dataset.side===el.dataset.side){
+    selected.classList.remove("active");
+    selected=el;
+    el.classList.add("active");
+    return;
+  }
+
+  const p1=anchor(selected),p2=anchor(el);
+  const line=document.createElementNS("http://www.w3.org/2000/svg","line");
+  line.setAttribute("x1",p1.x);
+  line.setAttribute("y1",p1.y);
+  line.setAttribute("x2",p2.x);
+  line.setAttribute("y2",p2.y);
+  line.setAttribute("stroke-width","2");
+  lines.appendChild(line);
+
+  if(selected.dataset.id===el.dataset.id){
+    line.setAttribute("stroke","#4fa46b");
+    selected.classList.add("used");
+    el.classList.add("used");
+    correctCount++;
+    if(correctCount===totalPairs){
+      message.textContent="🎉 All traditions matched!";
+    }
+  }else{
+    line.setAttribute("stroke","#c05b6d");
+    selected.classList.add("shake");
+    el.classList.add("shake");
+    setTimeout(()=>{
+      line.remove();
+      selected.classList.remove("shake");
+      el.classList.remove("shake");
+    },400);
+  }
+
+  selected.classList.remove("active");
+  selected=null;
+}
+
+function shuffle(a){
+  return [...a].sort(()=>Math.random()-0.5);
+}
+
+initGame();
+</script>
+</body>
+</html>
