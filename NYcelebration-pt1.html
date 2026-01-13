@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ESL Vocabulary Matching</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
+body{background:#fbf9f8;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+.wrapper{position:relative;width:900px;display:flex;justify-content:center;gap:150px;margin-top:20px;align-items:flex-start;}
+.column{width:40%;display:flex;flex-direction:column;}
+.item{
+  background:#fbf9f8;
+  border:2px solid #c4a79b;
+  border-radius:6px;
+  padding:16px 12px;
+  margin-bottom:12px;
+  text-align:center;
+  cursor:pointer;
+  font-weight:600;
+  font-size:1.1rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.item.used{opacity:.4;pointer-events:none}
+.item.active{background:#e8f4fd;border-color:#538e9b}
+.item .sentence{font-weight:400;font-size:0.9rem;margin-top:4px;color:#555;}
+@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+.item.shake{animation:shake .4s}
+svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#message{margin-top:20px;font-size:1.2rem;font-weight:600;color:#538e9b}
+.emoji { font-size: 4rem; display: inline-block; }
+#afterGame { display: none; width: 900px; margin-top: 40px; text-align: center; }
+#translations { background:#fbf9f8; border:2px solid #c4a79b; border-radius:6px; padding:16px; text-align:left; margin-top:20px; color:#333;}
+#translations h3 { margin-bottom:10px; font-size:1.2rem; font-weight:600; color:#538e9b; }
+</style>
+</head>
+<body>
+
+<h2>Vocabulary Matching</h2>
+<p style="font-size:1.1rem;font-weight:600;text-align:center">
+Match each word with its meaning using the emoji.
+</p>
+
+<div class="wrapper" id="wrapper">
+  <svg id="lines"></svg>
+  <div class="column" id="left"></div>
+  <div class="column" id="right"></div>
+</div>
+
+<div id="message"></div>
+
+<script>
+ const allPairs = [
+  {id:1,left:"luck<br><span class='sentence'>I have luck when I find a coin on the street and it brings me happiness.</span>",right:"<span class='emoji'>🍀</span>"},
+  {id:2,left:"vices<br><span class='sentence'>People eat a lot of chocolate and watch TV every day; these vices are not healthy.</span>",right:"<span class='emoji'>⚠️</span>"},
+  {id:3,left:"greed<br><span class='sentence'>He takes many cakes from the table because of greed, and he does not share with friends.</span>",right:"<span class='emoji'>🤑</span>"},
+  {id:4,left:"wish<br><span class='sentence'>I make a wish on my birthday and I hope it comes true.</span>",right:"<span class='emoji'>🌠</span>"},
+  {id:5,left:"anger<br><span class='sentence'>She feels anger when someone breaks her toy and she does not like it.</span>",right:"<span class='emoji'>😡</span>"},
+  {id:6,left:"spirit<br><span class='sentence'>People believe that a friendly spirit lives in the house and helps them.</span>",right:"<span class='emoji'>👻</span>"},
+  {id:7,left:"junk<br><span class='sentence'>He throws old junk, like broken toys and papers, into the bin.</span>",right:"<span class='emoji'>🧸❌🗑️</span>"},
+  {id:8,left:"bell strokes<br><span class='sentence'>The bell strokes make a loud sound in the church every morning.</span>",right:"<span class='emoji'>🔔</span>"},
+  {id:9,left:"plates<br><span class='sentence'>She puts the food on plates before she serves it to her family.</span>",right:"<span class='emoji'>🍽️</span>"}
+];
+
+let selected=null, correctCount=0;
+const totalPairs = allPairs.length;
+
+function initGame(){
+  left.innerHTML=""; right.innerHTML=""; lines.innerHTML="";
+  correctCount=0;
+  message.textContent="Connect all words with the correct emoji";
+
+  const shuffled = shuffle(allPairs);
+  const leftItems = shuffle(shuffled).map(p=>createItem(p.left,p.id,"left"));
+  const rightItems = shuffle(shuffled).map(p=>createItem(p.right,p.id,"right"));
+
+  leftItems.forEach(item=>left.appendChild(item));
+  rightItems.forEach(item=>right.appendChild(item));
+
+  // Make right items match the height of the left items
+  for(let i=0;i<totalPairs;i++){
+    rightItems[i].style.height = leftItems[i].offsetHeight + "px";
+  }
+}
+
+function createItem(text,id,side){
+  const d=document.createElement("div");
+  d.className="item "+side;
+  d.dataset.id=id;
+  d.dataset.side=side;
+  d.innerHTML=text;
+  d.onclick=()=>selectItem(d);
+  return d;
+}
+
+function anchor(el){
+  const r=el.getBoundingClientRect();
+  const w=wrapper.getBoundingClientRect();
+  return el.dataset.side==="left"
+    ? {x:r.right-w.left,y:r.top+r.height/2-w.top}
+    : {x:r.left-w.left,y:r.top+r.height/2-w.top};
+}
+
+function selectItem(el){
+  if(el.classList.contains("used"))return;
+
+  if(!selected){
+    selected=el;
+    el.classList.add("active");
+    return;
+  }
+
+  if(selected.dataset.side===el.dataset.side){
+    selected.classList.remove("active");
+    selected=el;
+    el.classList.add("active");
+    return;
+  }
+
+  const p1=anchor(selected),p2=anchor(el);
+  const line=document.createElementNS("http://www.w3.org/2000/svg","line");
+  line.setAttribute("x1",p1.x);
+  line.setAttribute("y1",p1.y);
+  line.setAttribute("x2",p2.x);
+  line.setAttribute("y2",p2.y);
+  line.setAttribute("stroke-width","2");
+  lines.appendChild(line);
+
+  if(selected.dataset.id===el.dataset.id){
+    line.setAttribute("stroke","#4fa46b");
+    selected.classList.add("used");
+    el.classList.add("used");
+    correctCount++;
+    if(correctCount===totalPairs){
+      message.textContent="🎉 All words matched!";
+      // show the after-game container
+      document.getElementById("afterGame").style.display = "block";
+    }
+  }else{
+    line.setAttribute("stroke","#c05b6d");
+    selected.classList.add("shake");
+    el.classList.add("shake");
+    setTimeout(()=>{
+      line.remove();
+      selected.classList.remove("shake");
+      el.classList.remove("shake");
+    },400);
+  }
+
+  selected.classList.remove("active");
+  selected=null;
+}
+
+function shuffle(a){
+  return [...a].sort(()=>Math.random()-0.5);
+}
+
+initGame();
+</script>
+
+<!-- After game container -->
+<div id="afterGame">
+  <p><a href="https://www.youtube.com/watch?v=h-TTCypCyvc" target="_blank" style="font-weight:600; font-size:1.1rem; color:#538e9b;">Теперь кликни сюда, чтобы посмотреть видео на YouTube</a></p>
+  
+  <div id="translations">
+    <h3>Эти слова ты тоже увидишь в видео:</h3>
+<p>• believe — верить</p>
+  <p>• throw — бросать</p>
+  <p>• get rid of — избавляться</p>
+  <p>• laugh out loud — громко смеяться</p>
+  <p>• gather — собирать</p>
+  <p>• chase away — прогонять</p>
+  <p>• grow tall — вырасти высоким</p>
+  <p>• underwear — нижнее бельё</p>
+  <p>• be like — быть (каким-то)</p>
+  </div>
+</div>
+
+</body>
+</html>
