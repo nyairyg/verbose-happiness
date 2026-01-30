@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sentence Reorder Activity</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
+body{background:#fbf9f8;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+h2{margin-bottom:14px;font-size:1.2rem;}
+p{font-size:1rem;font-weight:600;margin-bottom:20px;text-align:center;}
+#wordPool, #sentenceArea{
+    display:flex;flex-wrap:wrap;justify-content:center;max-width:1000px;min-height:60px;margin-bottom:20px;
+    padding:10px;border-radius:8px;
+}
+#wordPool{background:#f5f3f2;border:2px solid #c4a79b;gap:12px;}
+#sentenceArea{background:#e6f4ea;border:2px solid #4fa46b;gap:0px;}
+.word{background:#fbf9f8;border:2px solid #fbf9f8;font-size:1.2rem;font-weight:600;cursor:pointer;transition: all .3s; user-select:none;}
+.word.correct{background:#4fa46b;color:white;pointer-events:none;}
+.word.wrong{background:#c05b6d;color:white;animation:shake .4s;}
+#wordPool .word {padding:12px 16px;border-radius:6px;}
+#sentenceArea .word {padding:12px 4px;border-radius:0px;}
+@keyframes shake{0%{transform:translateX(0)}5%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+.word.animate{
+  animation: jump 0.6s ease-in-out 0s 3;
+}
+
+@keyframes jump{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+
+#message{margin-top:20px;font-size:1rem;font-weight:600;color:#538e9b;text-align:center;}
+</style>
+</head>
+<body>
+
+<h2>Put the words in the correct order</h2>
+<p>Click the words to form a correct sentence.</p>
+
+<div id="wordPool"></div>
+<div id="sentenceArea"></div>
+<div id="message"></div>
+
+<script>
+// Sentences
+const sentences = [
+"I am living with my family",
+"My mother is cooking dinner",
+"My father is watching TV",
+"My sister is doing her homework",
+"My brother is playing with his toys",
+
+"We are eating together at home",
+"I am helping my parents now",
+"My family is talking in the living room",
+
+"Our neighbors are talking outside",
+"The neighbors are making a lot of noise",
+"A dog is barking near the house",
+
+"Someone is singing next door",
+"My sister is singing a song",
+"I am listening to music",
+"My father is listening to the radio",
+
+"Music is playing in the house",
+"The children are dancing to the music",
+"My neighbors are playing loud music",
+"I am closing the window now",
+"We are enjoying the music together"
+
+];
+
+let currentSentenceIndex = 0;
+let words = [];
+let currentIndex = 0;
+
+const wordPool = document.getElementById("wordPool");
+const sentenceArea = document.getElementById("sentenceArea");
+const message = document.getElementById("message");
+
+// Shuffle array
+function shuffle(a){return [...a].sort(()=>Math.random()-0.5);}
+
+// Initialize sentence
+function initSentence(){
+    wordPool.innerHTML="";
+    sentenceArea.innerHTML="";
+    message.textContent="";
+    currentIndex=0;
+    
+    words = sentences[currentSentenceIndex].split(" ");
+    const shuffled = shuffle(words);
+    
+    shuffled.forEach(word=>{
+        const div = document.createElement("div");
+        div.className="word";
+        div.textContent=word;
+        div.addEventListener("click",()=>handleClick(div));
+        wordPool.appendChild(div);
+    });
+}
+
+// Handle word click
+function handleClick(el){
+    if(el.classList.contains("correct")) return;
+
+    if(el.textContent === words[currentIndex]){
+        el.classList.add("correct");
+        // Move word to sentence area
+        const moved = el.cloneNode(true);
+        moved.classList.remove("correct");
+        sentenceArea.appendChild(moved);
+        currentIndex++;
+        if(currentIndex === words.length){
+            document.querySelectorAll(".word").forEach(w=>w.classList.add("animate"));
+            message.textContent="🎉 Correct! Well done!";
+            // Next sentence after 1.5s
+            setTimeout(()=>{
+                currentSentenceIndex++;
+                if(currentSentenceIndex < sentences.length){
+                    initSentence();
+                } else {
+                    message.textContent="🎉 You completed all sentences!";
+                    wordPool.innerHTML="";
+                    sentenceArea.innerHTML="";
+                }
+            },2000);
+        }
+    } else {
+        el.classList.add("wrong");
+        setTimeout(()=>el.classList.remove("wrong"),400);
+    }
+}
+
+initSentence();
+</script>
+</body>
+</html>
