@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tag Question</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
+html,body{height:100%;width:100%;overflow:auto;}
+body{background:#f8fafc;display:flex;flex-direction:column;align-items:center;padding:20px;}
+h2,p{text-align:center;margin-bottom:10px;}
+.sentences-container{width:95vw;max-width:900px;background:#eef6f9;border-radius:8px;padding:15px;margin-bottom:20px;}
+.sentence{margin-bottom:12px;font-size:1.5vw;display:flex;align-items:center;flex-wrap:wrap;}
+.sentence-number{font-weight:700;margin-right:8px;}
+.sentence input{width:auto;min-width:8vw;padding:5px 8px;margin-left:6px;font-size:1.5vw;text-align:center;border:2px solid #e2e8f0;border-radius:4px;flex-shrink:0;transition:border-color 0.2s;cursor:pointer;}
+#pool{width:95vw;max-width:900px;background:#f1f5f9;border:2px solid #cbd5e1;border-radius:6px;padding:10px;display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.tag{background:#e8f4fd;border:2px solid #538e9b;border-radius:6px;padding:6px 12px;font-size:1.4vw;cursor:pointer;user-select:none;}
+.tag.dragging{opacity:0.5;}
+.tag.used{background:#cbd5e1;border-color:#a0a0a0;color:#777;cursor:not-allowed;}
+button{padding:8px 16px;font-size:1.2vw;border:none;border-radius:6px;background:#538e9b;color:white;cursor:pointer;}
+button:hover{background:#3b6b7c;}
+#message{margin-top:10px;font-size:1.2vw;font-weight:600;color:#538e9b;text-align:center;}
+</style>
+</head>
+<body>
+
+<h2>Tag Question Fill-in</h2>
+<p>Drag the correct question tag into each blank. Click on a filled blank to retrieve the tag back to the pool.</p>
+
+<div class="sentences-container" id="sentences"></div>
+<div id="pool"></div>
+<button id="checkBtn">Check Answers</button>
+<div id="message"></div>
+
+<script>
+const allPairs = [
+  {id:1, left:"You have a phone,", right:"don’t you?"},
+  {id:2, left:"She isn’t coming to the party,", right:"is she?"},
+  {id:3, left:"They’ve finished their tasks for today,", right:"haven’t they?"},
+  {id:4, left:"We should leave early,", right:"shouldn’t we?"},
+  {id:5, left:"He can play the guitar,", right:"can’t he?"},
+  {id:6, left:"You haven’t seen that movie,", right:"have you?"},
+  {id:7, left:"It’s a beautiful day,", right:"isn’t it?"},
+  {id:8, left:"She hasn’t eaten meat today,", right:"has she?"},
+  {id:9, left:"We’re meeting at 7 pm,", right:"aren’t we?"},
+  {id:10, left:"They won’t tell anyone,", right:"will they?"},
+  {id:11, left:"Nobody called you yesterday,", right:"did they?"}
+];
+
+const extraRight = [
+  "haven’t you?",
+  "can he?",
+  "has you?",
+  "willn't they?",
+  "don’t she?"
+];
+
+let draggedTag = null;
+
+function initGame() {
+  const sentencesDiv = document.getElementById('sentences');
+  const poolDiv = document.getElementById('pool');
+  const message = document.getElementById('message');
+
+  sentencesDiv.innerHTML = "";
+  poolDiv.innerHTML = "";
+  message.textContent = "";
+
+  // Create sentence rows with input blanks and numbers
+  allPairs.forEach((pair,index) => {
+    const div = document.createElement("div");
+    div.className = "sentence";
+
+    const numberSpan = document.createElement("span");
+    numberSpan.className = "sentence-number";
+    numberSpan.textContent = (index+1) + ".";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.dataset.id = pair.id;
+    input.readOnly = true;
+    input.placeholder = "______";
+    input.dataset.tagId = ""; // store which tag is assigned
+
+    // Drop target
+    input.addEventListener('dragover', e => e.preventDefault());
+    input.addEventListener('drop', e => dropTag(e, input));
+
+    // Click to retrieve tag
+    input.addEventListener('click', ()=>retrieveTag(input));
+
+    div.appendChild(numberSpan);
+    div.appendChild(document.createTextNode(pair.left + " "));
+    div.appendChild(input);
+    sentencesDiv.appendChild(div);
+  });
+
+  // Create pool of tags (including extras)
+  const poolItems = shuffle([...allPairs.map(p=>({text:p.right,id:p.id})), ...extraRight.map(t=>({text:t,id:null}))]);
+  poolItems.forEach(item => {
+    const tag = document.createElement("div");
+    tag.className = "tag";
+    tag.textContent = item.text;
+    tag.dataset.id = item.id;
+    tag.draggable = true;
+    tag.addEventListener('dragstart', dragStart);
+    tag.addEventListener('dragend', dragEnd);
+    poolDiv.appendChild(tag);
+  });
+}
+
+// Drag & Drop functions
+function dragStart(e){
+  draggedTag = e.target;
+  e.target.classList.add('dragging');
+}
+
+function dragEnd(e){
+  e.target.classList.remove('dragging');
+  draggedTag = null;
+}
+
+function dropTag(e, input){
+  if(!draggedTag || draggedTag.classList.contains('used')) return;
+
+  // If input already has a tag assigned, reactivate that tag
+  if(input.dataset.tagId){
+    const previousTag = document.querySelector(`.tag[data-id='${input.dataset.tagId}']`);
+    if(previousTag){
+      previousTag.classList.remove('used');
+    }
+  }
+
+  input.value = draggedTag.textContent;
+  input.dataset.tagId = draggedTag.dataset.id;
+
+  // Reset border to default if it was red
+  input.style.borderColor = "#e2e8f0";
+
+  if(draggedTag.dataset.id){ // only disable real answer tags
+    draggedTag.classList.add('used');
+  }
+}
+
+// Retrieve tag from blank back to pool
+function retrieveTag(input){
+  if(!input.dataset.tagId) return; // nothing to retrieve
+  const tag = document.querySelector(`.tag[data-id='${input.dataset.tagId}']`);
+  if(tag) tag.classList.remove('used');
+  input.value = "";
+  input.dataset.tagId = "";
+  input.style.borderColor = "#e2e8f0"; // reset color
+}
+
+// Check answers button
+document.getElementById('checkBtn').addEventListener('click', ()=>{
+  const inputs = document.querySelectorAll('.sentence input');
+  let correctCount = 0;
+  inputs.forEach(input => {
+    const correctId = input.dataset.id;
+    if(input.value === ""){
+      input.style.borderColor = "#c05b6d"; // red for empty
+    } else if(input.value === getRightById(correctId)){
+      input.style.borderColor = "#4fa46b"; // green for correct
+      correctCount++;
+    } else {
+      input.style.borderColor = "#c05b6d"; // red for incorrect
+    }
+  });
+
+  if(correctCount === allPairs.length){
+    document.getElementById('message').textContent = "🎉 All answers correct!";
+  } else {
+    document.getElementById('message').textContent = "Some answers are incorrect. Fix the red blanks. Retrieve tags, if needed, by clicking on them.";
+  }
+});
+
+function getRightById(id){
+  const pair = allPairs.find(p=>p.id==id);
+  return pair ? pair.right : "";
+}
+
+function shuffle(a){return [...a].sort(()=>Math.random()-0.5);}
+
+initGame();
+</script>
+
+</body>
+</html>
