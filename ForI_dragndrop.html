@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Finished or Still Important</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
+html,body{height:100%;width:100%;}
+body{background:#f8fafc;display:flex;flex-direction:column;align-items:center;padding:10px;gap:10px;}
+
+h2,p{text-align:center;}
+
+.wrapper{width:100%;max-width:1000px;display:flex;flex-direction:column;gap:10px;flex-grow:1;}
+
+.columns{
+  display:flex;
+  gap:10px;
+  flex-grow:1;
+}
+
+.column{
+  flex:1;
+  background:#eef6f9;
+  border:2px dashed #94a3b8;
+  border-radius:8px;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.column h3{
+  text-align:center;
+  font-size:1.3vw;
+}
+
+.dropzone{
+  flex-grow:1;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+#pool{
+  background:#f1f5f9;
+  border:2px solid #cbd5e1;
+  border-radius:8px;
+  padding:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  min-height:80px;
+}
+
+.sentence{
+  background:#e8f4fd;
+  border:2px solid #538e9b;
+  border-radius:6px;
+  padding:8px 12px;
+  font-size:1.2vw;
+  cursor:grab;
+  user-select:none;
+}
+
+.sentence.dragging{opacity:0.5;}
+
+.correct{border-color:#4fa46b !important;background:#e7f6ec;}
+.incorrect{border-color:#c05b6d !important;background:#fdecee;}
+
+button{
+  padding:8px 16px;
+  font-size:1.2vw;
+  border:none;
+  border-radius:6px;
+  background:#538e9b;
+  color:white;
+  cursor:pointer;
+  align-self:center;
+}
+
+button:hover{background:#3b6b7c;}
+
+#message{
+  font-size:1.2vw;
+  font-weight:600;
+  text-align:center;
+  color:#538e9b;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Finished or Still Important?</h2>
+<p>
+Drag each sentence to the correct column.  
+If it’s incorrect, move it to change your answer.  
+Click a sentence to return it to the pool.
+</p>
+
+<div class="wrapper">
+
+  <div class="columns">
+    <div class="column" data-type="past">
+      <h3>✅ Finished</h3>
+      <div class="dropzone"></div>
+    </div>
+
+    <div class="column" data-type="present">
+      <h3>🔁 Still important now</h3>
+      <div class="dropzone"></div>
+    </div>
+  </div>
+
+  <div id="pool"></div>
+
+  <button id="checkBtn">Check Answers</button>
+  <div id="message"></div>
+
+</div>
+
+<script>
+const sentencesData = [
+  { text: "I argued with my neighbors.", type: "past" },
+  { text: "We moved out of the apartment in April.", type: "past" },
+  { text: "The landlord ignored my messages for weeks.", type: "past" },
+  { text: "I looked at five apartments before I chose this one.", type: "past" },
+  { text: "The police came because of a noise complaint.", type: "past" },
+  { text: "My neighbors played loud music every night.", type: "past" },
+
+  { text: "I have moved to a quieter neighborhood.", type: "present" },
+  { text: "I’ve had problems with neighbors before.", type: "present" },
+  { text: "I have learned to ask questions before renting.", type: "present" },
+  { text: "I’ve been happier since I changed apartments.", type: "present" },
+  { text: "I have talked to the landlord about the situation.", type: "present" },
+  { text: "I have never lived alone before.", type: "present" }
+];
+
+let draggedItem = null;
+
+const pool = document.getElementById("pool");
+const columns = document.querySelectorAll(".column .dropzone");
+const message = document.getElementById("message");
+
+function clearFeedback(el){
+  el.classList.remove("correct","incorrect");
+}
+
+function init(){
+  pool.innerHTML = "";
+  message.textContent = "";
+
+  shuffle(sentencesData).forEach(item=>{
+    const div = document.createElement("div");
+    div.className = "sentence";
+    div.textContent = item.text;
+    div.dataset.type = item.type;
+    div.draggable = true;
+
+    div.addEventListener("dragstart", ()=>{
+      draggedItem = div;
+      clearFeedback(div);
+    });
+
+    div.addEventListener("dragend", ()=>draggedItem = null);
+
+    div.addEventListener("click", ()=>{
+      clearFeedback(div);
+      pool.appendChild(div);
+    });
+
+    pool.appendChild(div);
+  });
+
+  columns.forEach(zone=>{
+    zone.addEventListener("dragover", e=>e.preventDefault());
+    zone.addEventListener("drop", ()=>{
+      if(draggedItem){
+        clearFeedback(draggedItem);
+        zone.appendChild(draggedItem);
+      }
+    });
+  });
+}
+
+document.getElementById("checkBtn").addEventListener("click", ()=>{
+  let allPlaced = true;
+  let correct = 0;
+
+  document.querySelectorAll(".sentence").forEach(s=>{
+    clearFeedback(s);
+
+    if(s.parentElement.id === "pool"){
+      allPlaced = false;
+      s.classList.add("incorrect");
+      return;
+    }
+
+    const columnType = s.closest(".column").dataset.type;
+    if(s.dataset.type === columnType){
+      s.classList.add("correct");
+      correct++;
+    } else {
+      s.classList.add("incorrect");
+    }
+  });
+
+  if(!allPlaced){
+    message.textContent = "Put all sentences into a column.";
+  } else if(correct === sentencesData.length){
+    message.textContent = "🎉 All answers correct!";
+  } else {
+    message.textContent = "Some answers are incorrect. Move the red ones to change your answers.";
+  }
+});
+
+function shuffle(arr){
+  return [...arr].sort(()=>Math.random()-0.5);
+}
+
+init();
+</script>
+
+</body>
+</html>
