@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotional States Matching</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            color: #2c5282;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 800px;
+        }
+
+        h1 {
+            color: #2c5282;
+            margin-bottom: 15px;
+            font-size: 2.8rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #4a5568;
+            font-weight: 400;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            margin: 20px 0 40px;
+        }
+
+        .column {
+            width: 400px;
+            min-height: 500px;
+        }
+
+        .column-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #538e9b;
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            letter-spacing: 0.5px;
+        }
+
+        .item {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 22px 20px;
+            margin-bottom: 18px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1.3rem;
+            position: relative;
+            transition: all 0.25s ease;
+            color: #2c5282;
+            box-shadow: 0 2px 4px rgba(44, 82, 130, 0.04);
+        }
+
+        .item:hover {
+            transform: translateY(-2px);
+            border-color: #538e9b;
+            box-shadow: 0 4px 12px rgba(83, 142, 155, 0.1);
+        }
+
+        .item.used {
+            opacity: 0.4;
+            pointer-events: none;
+            transform: scale(0.98);
+        }
+
+        .item.active {
+            background: #e8f4fd;
+            border-color: #538e9b;
+            border-width: 2px;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .item.shake {
+            animation: shake 0.4s;
+            background-color: #fff5f5;
+            border-color: #fc8181;
+        }
+
+        .item.correct {
+            background-color: #f7fcf9;
+            border-color: #48bb78;
+        }
+
+        #lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin: 30px 0;
+            padding: 20px 40px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.4rem;
+            font-weight: 300;
+            color: #538e9b;
+            letter-spacing: 1px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        #message {
+            margin: 30px 0;
+            font-size: 1.3rem;
+            font-weight: 400;
+            text-align: center;
+            min-height: 40px;
+            padding: 20px 40px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #538e9b;
+        }
+
+        .message-success {
+            background: #f7fcf9 !important;
+            border-color: #48bb78 !important;
+            color: #276749 !important;
+        }
+
+        .message-error {
+            background: #fff5f5 !important;
+            border-color: #fc8181 !important;
+            color: #c53030 !important;
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: #538e9b;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: #2c5282;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(44, 82, 130, 0.15);
+        }
+
+        #reset {
+            background: #ffffff;
+            color: #538e9b;
+            border: 1px solid #e2e8f0;
+        }
+
+        #reset:hover {
+            background: #f8fafc;
+            border-color: #538e9b;
+        }
+
+        .completion-screen {
+            text-align: center;
+            padding: 60px 40px;
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            max-width: 600px;
+            margin-top: 40px;
+            box-shadow: 0 8px 24px rgba(44, 82, 130, 0.08);
+        }
+
+        .completion-screen h2 {
+            color: #2c5282;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        .completion-screen p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .score-display {
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: #538e9b;
+            margin: 30px 0;
+            letter-spacing: 2px;
+        }
+
+        @media (max-width: 900px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 40px;
+            }
+            
+            .column {
+                width: 90%;
+                min-height: auto;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .item {
+                font-size: 1.2rem;
+                padding: 18px 15px;
+            }
+            
+            .stats-container {
+                gap: 40px;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Emotional States Matching</h1>
+        <p class="subtitle">Connect each feeling with its corresponding situation</p>
+    </div>
+    
+    <div class="stats-container">
+        <div class="stat">
+            <div class="stat-value" id="score">0</div>
+            <div class="stat-label">Score</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="matches">0</div>
+            <div class="stat-label">Matches</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value" id="total-matches">11</div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+    
+    <div class="game-container" id="wrapper">
+        <svg id="lines"></svg>
+        <div class="column">
+            <div class="column-title">Feelings / Emotional States</div>
+            <div id="left"></div>
+        </div>
+        <div class="column">
+            <div class="column-title">Situations</div>
+            <div id="right"></div>
+        </div>
+    </div>
+    
+    <div id="message" class="message-info">Click a feeling, then click a matching situation</div>
+    
+    <div class="controls">
+        <button id="reset">Reset Game</button>
+    </div>
+    
+    <script>
+        // Emotional states and their corresponding situations
+        const emotionPairs = [
+            { id: 1, emotion: "I'm angry.", situation: "My friend is late." },
+            { id: 2, emotion: "I'm bored.", situation: "I don't know what to do." },
+            { id: 3, emotion: "I'm cold.", situation: "It's -15° C." },
+            { id: 4, emotion: "I'm happy.", situation: "It's my birthday!" },
+            { id: 5, emotion: "I'm hot.", situation: "It's +35° C." },
+            { id: 6, emotion: "I'm hungry.", situation: "It's time for dinner." },
+            { id: 7, emotion: "I'm sad.", situation: "My close friend is in the hospital." },
+            { id: 8, emotion: "I'm stressed.", situation: "I have a lot of work." },
+            { id: 9, emotion: "I'm tired.", situation: "It's very late." },
+            { id: 10, emotion: "I'm thirsty.", situation: "I want water." },
+            { id: 11, emotion: "I'm worried.", situation: "My husband is very far away." }
+        ];
+
+        // Game variables
+        let selected = null;
+        let score = 0;
+        let matches = 0;
+        const totalMatches = emotionPairs.length;
+        
+        // DOM elements
+        const leftColumn = document.getElementById('left');
+        const rightColumn = document.getElementById('right');
+        const linesSvg = document.getElementById('lines');
+        const messageEl = document.getElementById('message');
+        const scoreEl = document.getElementById('score');
+        const matchesEl = document.getElementById('matches');
+        const totalMatchesEl = document.getElementById('total-matches');
+        const resetBtn = document.getElementById('reset');
+        
+        // Initialize the game
+        function initGame() {
+            score = 0;
+            matches = 0;
+            updateStats();
+            setupGameBoard();
+            
+            // Set up event listener for reset button
+            resetBtn.addEventListener('click', resetGame);
+        }
+        
+        // Set up the game board with all pairs
+        function setupGameBoard() {
+            leftColumn.innerHTML = '';
+            rightColumn.innerHTML = '';
+            linesSvg.innerHTML = '';
+            
+            // Create items for both columns
+            shuffleArray([...emotionPairs]).forEach(pair => {
+                leftColumn.appendChild(createItem(pair.emotion, pair.id, 'left'));
+            });
+            
+            shuffleArray([...emotionPairs]).forEach(pair => {
+                rightColumn.appendChild(createItem(pair.situation, pair.id, 'right'));
+            });
+            
+            // Update UI
+            messageEl.textContent = 'Click a feeling, then click a matching situation';
+            messageEl.className = '';
+            totalMatchesEl.textContent = totalMatches;
+        }
+        
+        // Create a draggable item
+        function createItem(text, id, side) {
+            const item = document.createElement('div');
+            item.className = 'item ' + side;
+            item.dataset.id = id;
+            item.dataset.side = side;
+            item.textContent = text;
+            item.addEventListener('click', () => selectItem(item));
+            return item;
+        }
+        
+        // Get the anchor point for drawing lines
+        function getAnchorPoint(element) {
+            const rect = element.getBoundingClientRect();
+            const wrapperRect = document.getElementById('wrapper').getBoundingClientRect();
+            
+            if (element.dataset.side === 'left') {
+                return {
+                    x: rect.right - wrapperRect.left,
+                    y: rect.top + rect.height / 2 - wrapperRect.top
+                };
+            } else {
+                return {
+                    x: rect.left - wrapperRect.left,
+                    y: rect.top + rect.height / 2 - wrapperRect.top
+                };
+            }
+        }
+        
+        // Handle item selection
+        function selectItem(item) {
+            if (item.classList.contains('used')) return;
+            
+            if (!selected) {
+                selected = item;
+                item.classList.add('active');
+                return;
+            }
+            
+            // If clicking on the same side, change selection
+            if (selected.dataset.side === item.dataset.side) {
+                selected.classList.remove('active');
+                selected = item;
+                item.classList.add('active');
+                return;
+            }
+            
+            // Draw a line between the two selected items
+            const point1 = getAnchorPoint(selected);
+            const point2 = getAnchorPoint(item);
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            
+            line.setAttribute('x1', point1.x);
+            line.setAttribute('y1', point1.y);
+            line.setAttribute('x2', point2.x);
+            line.setAttribute('y2', point2.y);
+            line.setAttribute('stroke-width', '2');
+            
+            linesSvg.appendChild(line);
+            
+            // Check if the match is correct
+            if (selected.dataset.id === item.dataset.id) {
+                // Correct match
+                line.setAttribute('stroke', '#48bb78');
+                selected.classList.add('used', 'correct');
+                item.classList.add('used', 'correct');
+                
+                matches++;
+                score += 10;
+                updateStats();
+                
+                // Check if game is complete
+                if (matches === totalMatches) {
+                    messageEl.textContent = 'Perfect! All matches completed correctly!';
+                    messageEl.className = 'message-success';
+                    showCompletionScreen();
+                } else {
+                    messageEl.textContent = 'Correct! Keep going...';
+                    messageEl.className = 'message-success';
+                }
+            } else {
+                // Incorrect match
+                line.setAttribute('stroke', '#fc8181');
+                selected.classList.add('shake');
+                item.classList.add('shake');
+                
+                messageEl.textContent = 'Not quite right. Try again!';
+                messageEl.className = 'message-error';
+                
+                // Remove the line and shake animation after a delay
+                setTimeout(() => {
+                    line.remove();
+                    selected.classList.remove('shake', 'active');
+                    item.classList.remove('shake');
+                    selected = null;
+                }, 800);
+                
+                // Penalty for incorrect match
+                score = Math.max(0, score - 2);
+                updateStats();
+                return;
+            }
+            
+            selected.classList.remove('active');
+            selected = null;
+        }
+        
+        // Reset the entire game
+        function resetGame() {
+            score = 0;
+            matches = 0;
+            setupGameBoard();
+            updateStats();
+            
+            // Hide completion screen if visible
+            const completionScreen = document.querySelector('.completion-screen');
+            if (completionScreen) {
+                completionScreen.remove();
+            }
+            
+            messageEl.style.display = 'block';
+            document.querySelector('.game-container').style.display = 'flex';
+            document.querySelector('.controls').style.display = 'flex';
+            document.querySelector('.stats-container').style.display = 'flex';
+        }
+        
+        // Show completion screen
+        function showCompletionScreen() {
+            const completionScreen = document.createElement('div');
+            completionScreen.className = 'completion-screen';
+            
+            completionScreen.innerHTML = `
+                <h2>Perfect Match</h2>
+                <p>All emotional states have been correctly matched with their corresponding situations.</p>
+                <div class="score-display">${score} points</div>
+                <p>You've demonstrated excellent understanding of emotional expressions.</p>
+                <button id="play-again" style="margin-top: 20px;">Play Again</button>
+            `;
+            
+            document.body.appendChild(completionScreen);
+            
+            // Hide the game UI
+            messageEl.style.display = 'none';
+            document.querySelector('.game-container').style.display = 'none';
+            document.querySelector('.controls').style.display = 'none';
+            document.querySelector('.stats-container').style.display = 'none';
+            
+            // Add event listener to the play again button
+            document.getElementById('play-again').addEventListener('click', () => {
+                completionScreen.remove();
+                resetGame();
+            });
+        }
+        
+        // Update statistics display
+        function updateStats() {
+            scoreEl.textContent = score;
+            matchesEl.textContent = matches;
+        }
+        
+        // Utility function to shuffle an array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        // Start the game when the page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
