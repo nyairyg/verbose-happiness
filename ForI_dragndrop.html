@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Finished or Still Important</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
 html,body{height:100%;width:100%;}
-body{background:#f8fafc;display:flex;flex-direction:column;align-items:center;padding:10px;gap:10px;touch-action:none;}
+body{background:#f8fafc;display:flex;flex-direction:column;align-items:center;padding:10px;gap:10px;}
 
 h2,p{text-align:center;}
 
@@ -28,12 +28,11 @@ h2,p{text-align:center;}
   display:flex;
   flex-direction:column;
   gap:10px;
-  min-height:200px;
 }
 
 .column h3{
   text-align:center;
-  font-size:min(1.3vw, 20px);
+  font-size:1.3vw;
 }
 
 .dropzone{
@@ -41,7 +40,6 @@ h2,p{text-align:center;}
   display:flex;
   flex-direction:column;
   gap:8px;
-  min-height:100px;
 }
 
 #pool{
@@ -60,27 +58,19 @@ h2,p{text-align:center;}
   border:2px solid #538e9b;
   border-radius:6px;
   padding:8px 12px;
-  font-size:min(1.2vw, 18px);
+  font-size:1.2vw;
   cursor:grab;
   user-select:none;
-  touch-action:none;
-  position:relative;
-  transition:transform 0.2s;
 }
 
-.sentence.dragging{
-  opacity:0.7;
-  transform:scale(1.05);
-  z-index:1000;
-  position:fixed !important;
-}
+.sentence.dragging{opacity:0.5;}
 
 .correct{border-color:#4fa46b !important;background:#e7f6ec;}
 .incorrect{border-color:#c05b6d !important;background:#fdecee;}
 
 button{
   padding:8px 16px;
-  font-size:min(1.2vw, 18px);
+  font-size:1.2vw;
   border:none;
   border-radius:6px;
   background:#538e9b;
@@ -92,29 +82,10 @@ button{
 button:hover{background:#3b6b7c;}
 
 #message{
-  font-size:min(1.2vw, 18px);
+  font-size:1.2vw;
   font-weight:600;
   text-align:center;
   color:#538e9b;
-}
-
-/* Mobile optimizations */
-@media (max-width: 768px) {
-  .columns {
-    flex-direction: column;
-  }
-  
-  .column {
-    min-height:150px;
-  }
-  
-  .sentence {
-    font-size:16px;
-  }
-  
-  .column h3 {
-    font-size:18px;
-  }
 }
 </style>
 </head>
@@ -124,7 +95,7 @@ button:hover{background:#3b6b7c;}
 <h2>Finished or Still Important?</h2>
 <p>
 Drag each sentence to the correct column.  
-If it's incorrect, move it to change your answer.  
+If it’s incorrect, move it to change your answer.  
 Click a sentence to return it to the pool.
 </p>
 
@@ -159,20 +130,14 @@ const sentencesData = [
   { text: "My neighbors played loud music every night.", type: "past" },
 
   { text: "I have moved to a quieter neighborhood.", type: "present" },
-  { text: "I've had problems with neighbors before.", type: "present" },
+  { text: "I’ve had problems with neighbors before.", type: "present" },
   { text: "I have learned to ask questions before renting.", type: "present" },
-  { text: "I've been happier since I changed apartments.", type: "present" },
+  { text: "I’ve been happier since I changed apartments.", type: "present" },
   { text: "I have talked to the landlord about the situation.", type: "present" },
   { text: "I have never lived alone before.", type: "present" }
 ];
 
 let draggedItem = null;
-let isTouchDragging = false;
-let touchStartX = 0;
-let touchStartY = 0;
-let touchOffsetX = 0;
-let touchOffsetY = 0;
-let activeDropzone = null;
 
 const pool = document.getElementById("pool");
 const columns = document.querySelectorAll(".column .dropzone");
@@ -180,23 +145,6 @@ const message = document.getElementById("message");
 
 function clearFeedback(el){
   el.classList.remove("correct","incorrect");
-}
-
-function addDragEvents(element) {
-  // Mouse events
-  element.addEventListener("dragstart", handleDragStart);
-  element.addEventListener("dragend", handleDragEnd);
-  
-  // Touch events
-  element.addEventListener("touchstart", handleTouchStart, { passive: false });
-  element.addEventListener("touchmove", handleTouchMove, { passive: false });
-  element.addEventListener("touchend", handleTouchEnd);
-  
-  // Click event
-  element.addEventListener("click", handleClick);
-  
-  // Prevent context menu on long press
-  element.addEventListener("contextmenu", e => e.preventDefault());
 }
 
 function init(){
@@ -209,178 +157,31 @@ function init(){
     div.textContent = item.text;
     div.dataset.type = item.type;
     div.draggable = true;
-    
-    addDragEvents(div);
+
+    div.addEventListener("dragstart", ()=>{
+      draggedItem = div;
+      clearFeedback(div);
+    });
+
+    div.addEventListener("dragend", ()=>draggedItem = null);
+
+    div.addEventListener("click", ()=>{
+      clearFeedback(div);
+      pool.appendChild(div);
+    });
+
     pool.appendChild(div);
   });
 
-  // Add drop events to all dropzones (including pool)
-  const allDropzones = document.querySelectorAll(".dropzone, #pool");
-  
-  allDropzones.forEach(zone=>{
-    // Mouse events
-    zone.addEventListener("dragover", handleDragOver);
-    zone.addEventListener("drop", handleDrop);
-    
-    // Touch events
-    zone.addEventListener("touchmove", handleZoneTouchMove, { passive: false });
-    zone.addEventListener("touchend", handleZoneTouchEnd);
+  columns.forEach(zone=>{
+    zone.addEventListener("dragover", e=>e.preventDefault());
+    zone.addEventListener("drop", ()=>{
+      if(draggedItem){
+        clearFeedback(draggedItem);
+        zone.appendChild(draggedItem);
+      }
+    });
   });
-}
-
-// Mouse event handlers
-function handleDragStart(e) {
-  draggedItem = e.target;
-  draggedItem.classList.add("dragging");
-  clearFeedback(draggedItem);
-  e.dataTransfer.setData('text/plain', ''); // Required for Firefox
-}
-
-function handleDragEnd(e) {
-  if (draggedItem) {
-    draggedItem.classList.remove("dragging");
-    draggedItem = null;
-  }
-}
-
-function handleDragOver(e) {
-  e.preventDefault();
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  if (draggedItem) {
-    clearFeedback(draggedItem);
-    this.appendChild(draggedItem);
-    draggedItem.classList.remove("dragging");
-    draggedItem = null;
-  }
-}
-
-// Touch event handlers
-function handleTouchStart(e) {
-  e.preventDefault();
-  const touch = e.touches[0];
-  draggedItem = e.target;
-  isTouchDragging = true;
-  
-  // Store initial positions
-  touchStartX = touch.clientX;
-  touchStartY = touch.clientY;
-  
-  const rect = draggedItem.getBoundingClientRect();
-  touchOffsetX = touch.clientX - rect.left;
-  touchOffsetY = touch.clientY - rect.top;
-  
-  // Setup for dragging
-  draggedItem.classList.add("dragging");
-  clearFeedback(draggedItem);
-  
-  // Store original parent
-  draggedItem.dataset.originalParent = draggedItem.parentElement.id || 'pool';
-  
-  // Position element for dragging
-  draggedItem.style.left = rect.left + 'px';
-  draggedItem.style.top = rect.top + 'px';
-  draggedItem.style.width = rect.width + 'px';
-}
-
-function handleTouchMove(e) {
-  if (!isTouchDragging || !draggedItem) return;
-  
-  e.preventDefault();
-  const touch = e.touches[0];
-  
-  // Move the element
-  draggedItem.style.left = (touch.clientX - touchOffsetX) + 'px';
-  draggedItem.style.top = (touch.clientY - touchOffsetY) + 'px';
-  
-  // Find dropzone under touch
-  const dropzone = findDropzoneAtPoint(touch.clientX, touch.clientY);
-  
-  // Visual feedback for active dropzone
-  if (activeDropzone !== dropzone) {
-    // Reset previous active dropzone
-    if (activeDropzone) {
-      activeDropzone.style.borderStyle = 'dashed';
-      activeDropzone.style.backgroundColor = '';
-    }
-    
-    // Highlight new active dropzone
-    activeDropzone = dropzone;
-    if (activeDropzone && activeDropzone !== draggedItem.parentElement) {
-      activeDropzone.style.borderStyle = 'solid';
-      activeDropzone.style.backgroundColor = 'rgba(83, 142, 155, 0.1)';
-    }
-  }
-}
-
-function handleTouchEnd(e) {
-  if (!isTouchDragging || !draggedItem) return;
-  
-  e.preventDefault();
-  isTouchDragging = false;
-  
-  // Reset active dropzone styling
-  if (activeDropzone) {
-    activeDropzone.style.borderStyle = 'dashed';
-    activeDropzone.style.backgroundColor = '';
-  }
-  
-  // Find where to drop
-  const touch = e.changedTouches[0];
-  const dropzone = findDropzoneAtPoint(touch.clientX, touch.clientY);
-  
-  // Move to new location if valid
-  if (dropzone && dropzone !== draggedItem.parentElement) {
-    clearFeedback(draggedItem);
-    dropzone.appendChild(draggedItem);
-  }
-  
-  // Reset element styling
-  draggedItem.classList.remove("dragging");
-  draggedItem.style.left = '';
-  draggedItem.style.top = '';
-  draggedItem.style.width = '';
-  draggedItem.style.position = '';
-  draggedItem.style.zIndex = '';
-  
-  draggedItem = null;
-  activeDropzone = null;
-}
-
-function handleZoneTouchMove(e) {
-  // Allow touch to pass through to handleTouchMove
-  if (isTouchDragging) {
-    e.preventDefault();
-  }
-}
-
-function handleZoneTouchEnd(e) {
-  // No special handling needed here
-}
-
-function handleClick(e) {
-  // Only process click if not currently dragging
-  if (!isTouchDragging && e.target.classList.contains('sentence')) {
-    clearFeedback(e.target);
-    pool.appendChild(e.target);
-  }
-}
-
-function findDropzoneAtPoint(x, y) {
-  // Check all dropzones (including pool)
-  const dropzones = document.querySelectorAll('.dropzone, #pool');
-  
-  for (const zone of dropzones) {
-    const rect = zone.getBoundingClientRect();
-    if (x >= rect.left && x <= rect.right && 
-        y >= rect.top && y <= rect.bottom) {
-      return zone;
-    }
-  }
-  
-  return null;
 }
 
 document.getElementById("checkBtn").addEventListener("click", ()=>{
