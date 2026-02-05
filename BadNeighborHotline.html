@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <title>Bad Neighbor Hotline — Unscramble Replies</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
-body{background:#f8fafc;display:flex;flex-direction:column;align-items:center;padding:10px;gap:10px;}
+body{background:#f8fafc;display:flex;flex-direction:column;align-items:center;padding:10px;gap:10px;touch-action:none;}
 h2{text-align:center;}
 .wrapper{width:100%;max-width:800px;display:flex;flex-direction:column;gap:10px;}
 #chat{border:2px solid #cbd5e1;border-radius:8px;background:#eef6f9;padding:10px;min-height:400px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
@@ -25,10 +26,15 @@ h2{text-align:center;}
   cursor: grab;
   user-select: none;
   transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+  touch-action: none; /* Important for touch devices */
+  position: relative; /* For positioning during drag */
+  z-index: 1; /* Default z-index */
 }
 .word.dragging {
-  opacity: 0.5;
+  opacity: 0.7;
   background-color: #94a3b8;
+  z-index: 1000; /* Bring to front when dragging */
+  position: relative;
 }
 .result {
   font-size: 18px;
@@ -98,6 +104,14 @@ const resultDiv = document.getElementById('result');
 const chat = document.getElementById('chat');
 const checkBtn = document.getElementById('checkBtn');
 
+// Variables for touch handling
+let dragged = null;
+let touchStartX = 0;
+let touchStartY = 0;
+let isTouchDragging = false;
+let touchDragOffsetX = 0;
+let touchDragOffsetY = 0;
+
 // Shuffle array
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -148,28 +162,47 @@ function loadPrompt() {
   addDragEvents();
 }
 
-// Drag & drop logic
-let dragged = null;
-
+// Combined drag & drop and touch logic
 function addDragEvents() {
   container.querySelectorAll('.word').forEach(word => {
-    word.addEventListener('dragstart', e => {
-      dragged = e.target;
-      e.target.classList.add('dragging');
-      resetBorders();
-    });
-    word.addEventListener('dragend', e => {
-      dragged = null;
-      e.target.classList.remove('dragging');
-    });
+    // Mouse events
+    word.addEventListener('dragstart', handleDragStart);
+    word.addEventListener('dragend', handleDragEnd);
+    
+    // Touch events
+    word.addEventListener('touchstart', handleTouchStart);
+    word.addEventListener('touchmove', handleTouchMove);
+    word.addEventListener('touchend', handleTouchEnd);
+    
+    // Prevent context menu on long press
+    word.addEventListener('contextmenu', e => e.preventDefault());
   });
 
-  container.addEventListener('dragover', e => {
-    e.preventDefault();
-    const afterElement = getDragAfterElement(container, e.clientX);
-    if (afterElement == null) container.appendChild(dragged);
-    else container.insertBefore(dragged, afterElement);
-  });
+  // Mouse drag over
+  container.addEventListener('dragover', handleDragOver);
+  
+  // Touch events for container
+  container.addEventListener('touchmove', handleContainerTouchMove, { passive: false });
+  container.addEventListener('touchend', handleContainerTouchEnd);
+}
+
+function handleDragStart(e) {
+  dragged = e.target;
+  e.target.classList.add('dragging');
+  e.dataTransfer.setData('text/plain', ''); // Required for Firefox
+  resetBorders();
+}
+
+function handleDragEnd(e) {
+  dragged = null;
+  e.target.classList.remove('dragging');
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  const afterElement = getDragAfterElement(container, e.clientX);
+  if (afterElement == null) container.appendChild(dragged);
+  else container.insertBefore(dragged, afterElement);
 }
 
 function getDragAfterElement(container, x) {
@@ -181,6 +214,98 @@ function getDragAfterElement(container, x) {
       return { offset: offset, element: child };
     } else return closest;
   }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+// Touch handling functions
+function handleTouchStart(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  dragged = e.target;
+  isTouchDragging = true;
+  
+  // Store initial touch position
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  
+  // Get element position
+  const rect = dragged.getBoundingClientRect();
+  touchDragOffsetX = touch.clientX - rect.left;
+  touchDragOffsetY = touch.clientY - rect.top;
+  
+  dragged.classList.add('dragging');
+  resetBorders();
+  
+  // Bring to front
+  dragged.style.position = 'fixed';
+  dragged.style.left = rect.left + 'px';
+  dragged.style.top = rect.top + 'px';
+  dragged.style.zIndex = '1000';
+  dragged.style.transform = 'scale(1.1)';
+}
+
+function handleTouchMove(e) {
+  if (!isTouchDragging || !dragged) return;
+  
+  e.preventDefault();
+  const touch = e.touches[0];
+  
+  // Move the element
+  dragged.style.left = (touch.clientX - touchDragOffsetX) + 'px';
+  dragged.style.top = (touch.clientY - touchDragOffsetY) + 'px';
+}
+
+function handleTouchEnd(e) {
+  if (!isTouchDragging || !dragged) return;
+  
+  isTouchDragging = false;
+  
+  // Reset styles
+  dragged.classList.remove('dragging');
+  dragged.style.position = '';
+  dragged.style.left = '';
+  dragged.style.top = '';
+  dragged.style.zIndex = '';
+  dragged.style.transform = '';
+  
+  // Find drop position
+  const touch = e.changedTouches[0];
+  const elements = [...container.querySelectorAll('.word')];
+  const droppedIndex = getTouchDropIndex(touch.clientX, touch.clientY, elements);
+  
+  // Reorder in container
+  if (droppedIndex !== -1 && dragged !== elements[droppedIndex]) {
+    if (droppedIndex === elements.length - 1) {
+      container.appendChild(dragged);
+    } else {
+      container.insertBefore(dragged, elements[droppedIndex]);
+    }
+  }
+  
+  dragged = null;
+}
+
+function handleContainerTouchMove(e) {
+  if (isTouchDragging) {
+    e.preventDefault();
+  }
+}
+
+function handleContainerTouchEnd() {
+  // Additional cleanup if needed
+}
+
+function getTouchDropIndex(x, y, elements) {
+  for (let i = 0; i < elements.length; i++) {
+    const elem = elements[i];
+    const rect = elem.getBoundingClientRect();
+    
+    // Check if touch is near this element
+    if (x >= rect.left && x <= rect.right && 
+        y >= rect.top && y <= rect.bottom) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 function resetBorders() {
@@ -233,12 +358,8 @@ function showStudentReply() {
   checkBtn.disabled = true;
 }
 
-// Reset Check button when dragging
-container.addEventListener('dragstart', () => checkBtn.disabled = false);
-
 // Initialize first prompt
 loadPrompt();
 </script>
-
 </body>
 </html>
