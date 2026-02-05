@@ -12,14 +12,22 @@ h1, h2, p { text-align:center; }
 
 .main-container { display:flex; max-width:1400px; width:100%; gap:15px; margin:0 auto; flex-grow:1; }
 
-.sentences-container { flex:2; display:flex; flex-direction:column; gap:10px; }
+.sentences-container { 
+  flex: 2;                /* keeps it 2/3 width */
+  display: flex; 
+  flex-direction: column; 
+  gap: 10px; 
+  max-height: 500px;      /* limits height */
+  overflow-y: auto;       /* adds vertical scroll if needed */
+  padding-right: 5px;     /* small padding so scrollbar doesn’t overlap content */
+}
 #sentences-container { display:flex; flex-direction:column; gap:20px; }
-.sentence-item { background:#eef6f9; border:2px dashed #94a3b8; border-radius:8px; padding:15px; font-size:1.1rem; }
+.sentence-item { background:#eef6f9; border:2px dashed #94a3b8; border-radius:8px; padding:7px; font-size:1.1rem; }
 .gap { display:inline-block; min-width:120px; height:36px; border-bottom:2px solid #538e9b; margin:0 5px; vertical-align:middle; text-align:center; cursor:pointer; }
 .gap span { font-style:italic; color:#94a3b8; }
 
-.word-pool { flex:1; background:#f1f5f9; border-radius:8px; padding:15px; display:flex; flex-wrap:wrap; gap:10px; min-width:200px; max-height:80vh; overflow-y:auto; }
-.word-option { background:#e8f4fd; border:2px solid #538e9b; border-radius:6px; padding:8px 12px; cursor:grab; user-select:none; display:flex; align-items:center; justify-content:center; text-align:center; }
+.word-pool { flex:1; background:#f1f5f9; border-radius:8px; padding:15px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:10px; min-width:200px; max-height:80vh; overflow-y:auto; }
+.word-option { flex:0 0 auto; height:auto; padding:8px 12px; font-size:1rem; background:#e8f4fd; border:2px solid #538e9b; border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:grab; user-select:none; }
 
 .word-option.dragging { opacity:0.6; transform:scale(0.95); position:fixed; z-index:1000; pointer-events:none; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
 
@@ -37,6 +45,7 @@ button { padding:10px 18px; font-size:1rem; border:none; border-radius:6px; curs
 @media(max-width:900px) {
   .main-container { flex-direction:column; }
   .word-pool { max-height:200px; }
+  .word-option { font-size:0.95rem; padding:6px 10px; }
 }
 </style>
 </head>
@@ -98,6 +107,7 @@ function createSentences(){
     div.innerHTML = `${parts[0]}<span class="gap" data-answer="${s.answer}"><span>[drop]</span></span>${parts[1]||""}`;
     sentencesContainer.appendChild(div);
   });
+  attachGapClick();
 }
 
 function createWordPool(){
@@ -150,24 +160,19 @@ function placeWord(gap, word){
   word.remove();
 }
 
-sentencesContainer.addEventListener("dragover", e=>e.preventDefault());
-wordPool.addEventListener("dragover", e=>e.preventDefault());
-
-document.querySelectorAll(".gap").forEach(g=>{
-  g.addEventListener("dragover", e=>e.preventDefault());
-  g.addEventListener("drop", e=>{
-    if(draggedItem) placeWord(g, draggedItem);
+function attachGapClick(){
+  document.querySelectorAll(".gap").forEach(g=>{
+    g.addEventListener("click", e=>{
+      if(g.classList.contains("filled")){
+        const div=document.createElement("div");
+        div.className="word-option"; div.textContent=g.textContent;
+        addDragEvents(div);
+        wordPool.appendChild(div);
+        g.innerHTML="<span>[drop]</span>"; g.classList.remove("filled","correct","incorrect");
+      }
+    });
   });
-  g.addEventListener("click", e=>{
-    if(g.classList.contains("filled")){
-      const div=document.createElement("div");
-      div.className="word-option"; div.textContent=g.textContent;
-      addDragEvents(div);
-      wordPool.appendChild(div);
-      g.innerHTML="<span>[drop]</span>"; g.classList.remove("filled","correct","incorrect");
-    }
-  });
-});
+}
 
 checkBtn.addEventListener("click", ()=>{
   document.querySelectorAll(".gap").forEach(g=>{
