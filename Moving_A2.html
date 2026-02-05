@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Category Sorting Activity</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  color: #333;
+}
+
+body {
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  gap: 15px;
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 5px;
+  font-size: 2.2rem;
+}
+
+.subtitle {
+  text-align: center;
+  color: #5d6d7e;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  max-width: 800px;
+}
+
+.wrapper {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex-grow: 1;
+}
+
+.category-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex-grow: 1;
+}
+
+.category-row {
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-left: 6px solid;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.category-title {
+  font-size: 1.5rem;
+}
+
+.dropzone {
+  flex-grow: 1;
+  min-height: 70px;
+  background: #f8f9fa;
+  border: 2px dashed #bdc3c7;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  transition: all 0.3s ease;
+  touch-action: none;
+}
+
+.dropzone.active {
+  border-color: #3498db;
+  background-color: #ebf5fb;
+}
+
+#pool {
+  background: #f1f5f9;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  min-height: 120px;
+  margin-top: 10px;
+  touch-action: none;
+}
+
+.item {
+  background: #e8f4fd;
+  border: 2px solid #538e9b;
+  border-radius: 6px;
+  padding: 10px 15px;
+  font-size: 1.1rem;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  touch-action: none;
+  -webkit-user-drag: none;
+}
+
+.item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.item.dragging {
+  opacity: 0.6;
+  transform: scale(0.95);
+  position: fixed !important;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.correct {
+  border-color: #27ae60 !important;
+  background: #d5f4e6 !important;
+}
+
+.incorrect {
+  border-color: #e74c3c !important;
+  background: #fadbd8 !important;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  background: #3498db;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-weight: 600;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+button#resetBtn {
+  background: #7f8c8d;
+}
+
+button#resetBtn:hover {
+  background: #5d6d7e;
+}
+
+#message {
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#message.success {
+  background-color: #d5f4e6;
+  color: #27ae60;
+}
+
+#message.error {
+  background-color: #fadbd8;
+  color: #e74c3c;
+}
+
+#message.info {
+  background-color: #ebf5fb;
+  color: #3498db;
+}
+
+.pool-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Category-specific colors */
+.furniture { border-color: #e67e22; }
+.furniture .category-header { color: #e67e22; }
+
+.money { border-color: #2ecc71; }
+.money .category-header { color: #2ecc71; }
+
+.people { border-color: #3498db; }
+.people .category-header { color: #3498db; }
+
+.paper { border-color: #9b59b6; }
+.paper .category-header { color: #9b59b6; }
+
+.other { border-color: #f39c12; }
+.other .category-header { color: #f39c12; }
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .category-header {
+    font-size: 1.3rem;
+  }
+  
+  .category-title {
+    font-size: 1.2rem;
+  }
+  
+  .item {
+    font-size: 1rem;
+    padding: 8px 12px;
+  }
+  
+  button {
+    padding: 10px 18px;
+    font-size: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  button {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .item {
+    padding: 10px 14px;
+    font-size: 1rem;
+  }
+}
+
+/* Touch-specific optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .item {
+    padding: 12px 16px;
+    font-size: 1.1rem;
+    margin: 4px;
+  }
+  
+  .dropzone {
+    min-height: 80px;
+  }
+  
+  button {
+    padding: 14px 28px;
+    font-size: 1.2rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<h1>Category Sorting Activity</h1>
+<p class="subtitle">Drag each item to the correct category. Click/tap an item to return it to the pool. Try to sort all items correctly!</p>
+
+<div class="wrapper">
+  <div class="category-rows">
+    <!-- Furniture Category -->
+    <div class="category-row furniture" data-type="furniture">
+      <div class="category-header">
+        <span>🛋</span>
+        <div class="category-title">Furniture</div>
+      </div>
+      <div class="dropzone" id="furniture-dropzone"></div>
+    </div>
+    
+    <!-- Money Category -->
+    <div class="category-row money" data-type="money">
+      <div class="category-header">
+        <span>💸</span>
+        <div class="category-title">Money</div>
+      </div>
+      <div class="dropzone" id="money-dropzone"></div>
+    </div>
+    
+    <!-- People Category -->
+    <div class="category-row people" data-type="people">
+      <div class="category-header">
+        <span>👥</span>
+        <div class="category-title">People</div>
+      </div>
+      <div class="dropzone" id="people-dropzone"></div>
+    </div>
+    
+    <!-- Paper Category -->
+    <div class="category-row paper" data-type="paper">
+      <div class="category-header">
+        <span>📄</span>
+        <div class="category-title">Paper</div>
+      </div>
+      <div class="dropzone" id="paper-dropzone"></div>
+    </div>
+    
+    <!-- Other Category -->
+    <div class="category-row other" data-type="other">
+      <div class="category-header">
+        <span>📦</span>
+        <div class="category-title">Other</div>
+      </div>
+      <div class="dropzone" id="other-dropzone"></div>
+    </div>
+  </div>
+  
+  <div class="pool-container">
+    <div class="pool-header">Drag items from here to the categories above</div>
+    <div id="pool"></div>
+  </div>
+  
+  <div class="controls">
+    <button id="checkBtn">Check Answers</button>
+    <button id="resetBtn">Reset Game</button>
+  </div>
+  
+  <div id="message" class="info">Drag or tap and drag items to their correct categories above.</div>
+</div>
+
+<script>
+// Data for the sorting activity
+const itemsData = [
+  // Furniture items
+  { text: "sofa", type: "furniture" },
+  { text: "bed", type: "furniture" },
+  { text: "table", type: "furniture" },
+  { text: "chair", type: "furniture" },
+  { text: "lamp", type: "furniture" },
+  { text: "shelf", type: "furniture" },
+  
+  // Money items
+  { text: "rent", type: "money" },
+  { text: "deposit", type: "money" },
+  { text: "bills", type: "money" },
+  { text: "receipt", type: "money" },
+  
+  // People items
+  { text: "landlord", type: "people" },
+  { text: "roommate", type: "people" },
+  { text: "neighbour", type: "people" },
+  { text: "moving company", type: "people" },
+  
+  // Paper items
+  { text: "contract", type: "paper" },
+  { text: "ID", type: "paper" },
+  { text: "address", type: "paper" },
+  
+  // Other items
+  { text: "keys", type: "other" },
+  { text: "boxes", type: "other" },
+  { text: "elevator", type: "other" },
+  { text: "utilities", type: "other" },
+  { text: "internet", type: "other" },
+  { text: "washing machine", type: "other" }
+];
+
+let draggedItem = null;
+let touchStartX = 0;
+let touchStartY = 0;
+let isTouchDragging = false;
+let touchDragThreshold = 10; // Minimum movement in pixels to start dragging
+
+// DOM elements
+const pool = document.getElementById("pool");
+const dropzones = document.querySelectorAll(".dropzone");
+const message = document.getElementById("message");
+const checkBtn = document.getElementById("checkBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+// Clear feedback styling from an element
+function clearFeedback(el) {
+  el.classList.remove("correct", "incorrect");
+}
+
+// Initialize the game
+function init() {
+  // Clear the pool and message
+  pool.innerHTML = "";
+  message.textContent = "Drag or tap and drag items to their correct categories above.";
+  message.className = "info";
+  
+  // Clear all dropzones
+  dropzones.forEach(zone => {
+    zone.innerHTML = "";
+    zone.classList.remove("active");
+  });
+  
+  // Shuffle and create items
+  shuffle(itemsData).forEach(item => {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.textContent = item.text;
+    div.dataset.type = item.type;
+    
+    // Mouse drag events (for desktop)
+    div.addEventListener("mousedown", startDragMouse);
+    div.addEventListener("dragstart", handleDragStart);
+    
+    // Touch events (for mobile)
+    div.addEventListener("touchstart", startDragTouch, { passive: false });
+    div.addEventListener("touchmove", handleTouchMove, { passive: false });
+    div.addEventListener("touchend", handleTouchEnd);
+    
+    // Click event to return item to pool (for both mouse and touch)
+    div.addEventListener("click", (e) => {
+      // Prevent click from firing when we were dragging
+      if (isTouchDragging) {
+        isTouchDragging = false;
+        return;
+      }
+      
+      clearFeedback(div);
+      pool.appendChild(div);
+      updateMessage("Item returned to pool.", "info");
+    });
+    
+    // Add to pool
+    pool.appendChild(div);
+  });
+  
+  // Set up dropzones for mouse
+  dropzones.forEach(zone => {
+    // Mouse events
+    zone.addEventListener("dragover", handleDragOver);
+    zone.addEventListener("drop", handleDrop);
+    
+    // Touch events
+    zone.addEventListener("touchmove", handleTouchMoveZone, { passive: false });
+    zone.addEventListener("touchend", handleTouchEndZone);
+  });
+  
+  // Add document-level touch end listener to handle drops anywhere
+  document.addEventListener("touchend", handleDocumentTouchEnd);
+}
+
+// Update message display
+function updateMessage(text, type = "info") {
+  message.textContent = text;
+  message.className = type;
+}
+
+// Start drag with mouse
+function startDragMouse(e) {
+  draggedItem = e.target;
+  draggedItem.classList.add("dragging");
+  
+  // Highlight valid dropzones
+  dropzones.forEach(zone => zone.classList.add("active"));
+  
+  // Set up document mouse events for dragging
+  document.addEventListener("mousemove", handleMouseMove);
+  document.addEventListener("mouseup", handleMouseUp);
+  
+  e.preventDefault();
+}
+
+// Handle mouse movement during drag
+function handleMouseMove(e) {
+  if (!draggedItem) return;
+  
+  // Update position of dragged item
+  draggedItem.style.left = (e.clientX - draggedItem.offsetWidth / 2) + "px";
+  draggedItem.style.top = (e.clientY - draggedItem.offsetHeight / 2) + "px";
+}
+
+// Handle mouse up (end of drag)
+function handleMouseUp(e) {
+  if (!draggedItem) return;
+  
+  // Find dropzone under the cursor
+  const elementsUnderCursor = document.elementsFromPoint(e.clientX, e.clientY);
+  const dropzone = elementsUnderCursor.find(el => el.classList.contains("dropzone"));
+  
+  if (dropzone) {
+    clearFeedback(draggedItem);
+    dropzone.appendChild(draggedItem);
+    const categoryName = dropzone.parentElement.querySelector(".category-title").textContent;
+    updateMessage(`Item placed in ${categoryName} category.`, "info");
+  }
+  
+  // Clean up
+  finishDrag();
+  document.removeEventListener("mousemove", handleMouseMove);
+  document.removeEventListener("mouseup", handleMouseUp);
+}
+
+// Start drag with touch
+function startDragTouch(e) {
+  if (e.touches.length !== 1) return;
+  
+  const touch = e.touches[0];
+  const item = e.target;
+  
+  // Store initial touch position
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  draggedItem = item;
+  
+  // Prevent default to avoid scrolling
+  e.preventDefault();
+}
+
+// Handle touch movement
+function handleTouchMove(e) {
+  if (!draggedItem || e.touches.length !== 1) return;
+  
+  const touch = e.touches[0];
+  
+  // Check if we've moved enough to start dragging
+  const deltaX = Math.abs(touch.clientX - touchStartX);
+  const deltaY = Math.abs(touch.clientY - touchStartY);
+  
+  if (!isTouchDragging && (deltaX > touchDragThreshold || deltaY > touchDragThreshold)) {
+    // Start dragging
+    isTouchDragging = true;
+    draggedItem.classList.add("dragging");
+    
+    // Highlight valid dropzones
+    dropzones.forEach(zone => zone.classList.add("active"));
+  }
+  
+  if (isTouchDragging) {
+    // Update position of dragged item
+    draggedItem.style.left = (touch.clientX - draggedItem.offsetWidth / 2) + "px";
+    draggedItem.style.top = (touch.clientY - draggedItem.offsetHeight / 2) + "px";
+    
+    // Prevent scrolling while dragging
+    e.preventDefault();
+  }
+}
+
+// Handle touch move on dropzone
+function handleTouchMoveZone(e) {
+  if (isTouchDragging) {
+    e.preventDefault(); // Prevent scrolling while dragging
+  }
+}
+
+// Handle touch end on dropzone
+function handleTouchEndZone(e) {
+  if (!draggedItem || !isTouchDragging) return;
+  
+  const touch = e.changedTouches[0];
+  if (!touch) return;
+  
+  // Simulate a drop at the touch position
+  const elementsUnderTouch = document.elementsFromPoint(touch.clientX, touch.clientY);
+  const dropzone = elementsUnderTouch.find(el => el.classList.contains("dropzone"));
+  
+  if (dropzone) {
+    clearFeedback(draggedItem);
+    dropzone.appendChild(draggedItem);
+    const categoryName = dropzone.parentElement.querySelector(".category-title").textContent;
+    updateMessage(`Item placed in ${categoryName} category.`, "info");
+  }
+  
+  finishDrag();
+  e.preventDefault();
+}
+
+// Handle document touch end (for drops anywhere)
+function handleDocumentTouchEnd(e) {
+  if (!draggedItem || !isTouchDragging) return;
+  
+  const touch = e.changedTouches[0];
+  if (!touch) return;
+  
+  // If not dropped on a dropzone, return to original position
+  if (draggedItem.parentElement.classList.contains("dropzone")) {
+    // Item was already placed in handleTouchEndZone
+    finishDrag();
+    return;
+  }
+  
+  finishDrag();
+}
+
+// Handle touch end
+function handleTouchEnd(e) {
+  if (!draggedItem || !isTouchDragging) return;
+  
+  // If the touch ended on the item itself (not handled by dropzone), return it to pool
+  if (draggedItem.parentElement === pool) {
+    finishDrag();
+  }
+}
+
+// Common drag handlers (for mouse)
+function handleDragStart(e) {
+  e.dataTransfer.setData("text/plain", e.target.textContent);
+  e.dataTransfer.effectAllowed = "move";
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  if (draggedItem) {
+    clearFeedback(draggedItem);
+    e.target.appendChild(draggedItem);
+    const categoryName = e.target.parentElement.querySelector(".category-title").textContent;
+    updateMessage(`Item placed in ${categoryName} category.`, "info");
+  }
+}
+
+// Clean up after dragging
+function finishDrag() {
+  if (draggedItem) {
+    draggedItem.classList.remove("dragging");
+    draggedItem.style.left = "";
+    draggedItem.style.top = "";
+    draggedItem = null;
+  }
+  
+  isTouchDragging = false;
+  
+  // Remove highlight from dropzones
+  dropzones.forEach(zone => zone.classList.remove("active"));
+}
+
+// Check answers
+checkBtn.addEventListener("click", () => {
+  let allPlaced = true;
+  let correct = 0;
+  let total = itemsData.length;
+  
+  // Check all items
+  document.querySelectorAll(".item").forEach(item => {
+    clearFeedback(item);
+    
+    // Check if item is in pool (not placed)
+    if (item.parentElement.id === "pool") {
+      allPlaced = false;
+      item.classList.add("incorrect");
+      return;
+    }
+    
+    // Check if item is in correct category
+    const categoryType = item.closest(".category-row").dataset.type;
+    if (item.dataset.type === categoryType) {
+      item.classList.add("correct");
+      correct++;
+    } else {
+      item.classList.add("incorrect");
+    }
+  });
+  
+  // Display results
+  if (!allPlaced) {
+    updateMessage(`You placed ${correct} of ${total} items correctly. Place all items in categories to finish.`, "error");
+  } else if (correct === total) {
+    updateMessage("🎉 Perfect! All items sorted correctly! Well done!", "success");
+  } else {
+    updateMessage(`You got ${correct} of ${total} correct. Move the red items to fix your answers.`, "error");
+  }
+});
+
+// Reset game
+resetBtn.addEventListener("click", init);
+
+// Shuffle array function
+function shuffle(arr) {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+// Prevent context menu on touch devices
+document.addEventListener("contextmenu", (e) => {
+  if (e.target.classList.contains("item")) {
+    e.preventDefault();
+  }
+});
+
+// Initialize the game on load
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
