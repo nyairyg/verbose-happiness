@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bad Neighbor Hotline — Unscramble Replies</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
+body{background:#f8fafc;display:flex;flex-direction:column;align-items:center;padding:10px;gap:10px;}
+h2{text-align:center;}
+.wrapper{width:100%;max-width:800px;display:flex;flex-direction:column;gap:10px;}
+#chat{border:2px solid #cbd5e1;border-radius:8px;background:#eef6f9;padding:10px;min-height:400px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;}
+#chat p { text-align:left; }
+
+.word-container {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.word {
+  padding: 8px 12px;
+  background-color: #cbd5e1;
+  border: 2px solid #94a3b8; 
+  border-radius: 6px;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+}
+.word.dragging {
+  opacity: 0.5;
+  background-color: #94a3b8;
+}
+.result {
+  font-size: 18px;
+  margin-top: 10px;
+  text-align: center;
+}
+button {
+  padding: 8px 16px;
+  font-size: 16px;
+  border: 2px solid #94a3b8;
+  border-radius: 6px;
+  background-color: #cbd5e1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+button:hover {
+  background-color: #94a3b8;
+  color: white;
+}
+.student-bubble {
+  align-self: flex-end;
+  background-color: #94a3b8;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 60%;
+  margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <h2>Unscramble the sentence</h2>
+
+  <div id="chat">
+    <!-- fixed part of sentence -->
+    <p id="sentence-text"></p>
+    <div class="word-container" id="word-container"></div>
+  </div>
+
+  <button id="checkBtn" onclick="checkAnswer()">Check Answer</button>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+// List of prompts with parts to shuffle in !!
+const prompts = [
+  "Hello, Bad Neighbor Hotline. I’m really sorry you’re dealing with this. Can you tell me !!what has been happening?!!",
+  "Oh wow… that sounds stressful. !!When did this first happen?!!",
+  "So this wasn’t just one time, right? !!How often did this happen?!!",
+  "I can imagine how frustrating that must be. !!How has this situation affected you personally?!!",
+  "That’s really hard. !!Have you already tried to solve the problem?!!",
+  "And !!how did your neighbors react?!!",
+  "I see… !!Have you spoken to your landlord about it?!!",
+  "Since then, !!has anything improved?!!",
+  "Thank you for sharing all of that. It sounds like you’ve been under a lot of stress, and I’m glad you reached out."
+];
+
+let currentPrompt = 0;
+let correctWords = [];
+let scrambledWords = [];
+
+const sentenceText = document.getElementById('sentence-text');
+const container = document.getElementById('word-container');
+const resultDiv = document.getElementById('result');
+const chat = document.getElementById('chat');
+const checkBtn = document.getElementById('checkBtn');
+
+// Shuffle array
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Load the current prompt
+function loadPrompt() {
+  container.innerHTML = '';
+  resultDiv.textContent = '';
+  checkBtn.disabled = false;
+
+  if (currentPrompt >= prompts.length) {
+    sentenceText.textContent = "All prompts completed!";
+    container.innerHTML = '';
+    checkBtn.style.display = "none";
+    return;
+  }
+
+  const prompt = prompts[currentPrompt];
+
+  // Extract the part inside !!
+  const match = prompt.match(/!!(.*?)!!/);
+  if (match) {
+    correctWords = match[1].trim().split(" ");
+    scrambledWords = shuffle([...correctWords]); // shuffle words
+  } else {
+    correctWords = [];
+    scrambledWords = [];
+  }
+
+  // Fixed part outside !!
+  const fixedPart = prompt.replace(/!!.*?!!/, '').trim();
+  sentenceText.textContent = fixedPart;
+
+  // Create draggable word blocks
+  scrambledWords.forEach(word => {
+    const div = document.createElement('div');
+    div.textContent = word;
+    div.className = 'word';
+    div.draggable = true;
+    container.appendChild(div);
+  });
+
+  addDragEvents();
+}
+
+// Drag & drop logic
+let dragged = null;
+
+function addDragEvents() {
+  container.querySelectorAll('.word').forEach(word => {
+    word.addEventListener('dragstart', e => {
+      dragged = e.target;
+      e.target.classList.add('dragging');
+      resetBorders();
+    });
+    word.addEventListener('dragend', e => {
+      dragged = null;
+      e.target.classList.remove('dragging');
+    });
+  });
+
+  container.addEventListener('dragover', e => {
+    e.preventDefault();
+    const afterElement = getDragAfterElement(container, e.clientX);
+    if (afterElement == null) container.appendChild(dragged);
+    else container.insertBefore(dragged, afterElement);
+  });
+}
+
+function getDragAfterElement(container, x) {
+  const draggableElements = [...container.querySelectorAll('.word:not(.dragging)')];
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = x - box.left - box.width / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else return closest;
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function resetBorders() {
+  [...container.children].forEach(word => word.style.borderColor = '#94a3b8');
+}
+
+// Check answer
+function checkAnswer() {
+  const words = [...container.children].map(w => w.textContent);
+  let isAllCorrect = true;
+
+  [...container.children].forEach((wordDiv, i) => {
+    if (words[i] === correctWords[i]) wordDiv.style.borderColor = '#4fa46b';
+    else {
+      wordDiv.style.borderColor = '#c05b6d';
+      isAllCorrect = false;
+    }
+  });
+
+  if (isAllCorrect || correctWords.length === 0) {
+    showStudentReply();
+  } else {
+    resultDiv.textContent = "Some words are incorrect. Try again.";
+    resultDiv.style.color = "red";
+  }
+}
+
+// Student bubble & Next button
+function showStudentReply() {
+  resultDiv.textContent = "Correct! 🎉";
+  resultDiv.style.color = "green";
+
+  const bubble = document.createElement('div');
+  bubble.className = 'student-bubble';
+  bubble.textContent = "Give your reply";
+  chat.appendChild(bubble);
+  chat.scrollTop = chat.scrollHeight;
+
+  const nextBtn = document.createElement('button');
+  nextBtn.textContent = "Next";
+  nextBtn.onclick = () => {
+    bubble.remove();
+    nextBtn.remove();
+    currentPrompt++;
+    loadPrompt();
+  };
+  chat.appendChild(nextBtn);
+  chat.scrollTop = chat.scrollHeight;
+
+  checkBtn.disabled = true;
+}
+
+// Reset Check button when dragging
+container.addEventListener('dragstart', () => checkBtn.disabled = false);
+
+// Initialize first prompt
+loadPrompt();
+</script>
+
+</body>
+</html>
