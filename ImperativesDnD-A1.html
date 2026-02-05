@@ -6,33 +6,35 @@
 <title>Gap-fill: "Please" Imperatives</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI, system-ui, sans-serif; color:#333; }
-body { background:#f8fafc; display:flex; flex-direction:column; padding:10px; gap:10px; min-height:100vh; -webkit-tap-highlight-color:transparent; user-select:none; }
+body { background:#f8fafc; display:flex; flex-direction:column; padding:10px; gap:10px; min-height:100vh; }
 
-h1, h2, p { text-align:center; }
+h1,p { text-align:center; }
 
 .main-container { display:flex; max-width:1400px; width:100%; gap:15px; margin:0 auto; flex-grow:1; }
 
 .sentences-container { 
-  flex: 2;                /* keeps it 2/3 width */
-  display: flex; 
+  flex:2; 
+  display:flex; 
   flex-direction: column; 
-  gap: 10px; 
-  max-height: 500px;      /* limits height */
-  overflow-y: auto;       /* adds vertical scroll if needed */
-  padding-right: 5px;     /* small padding so scrollbar doesn’t overlap content */
+  gap:10px; 
+  max-height:500px; 
+  overflow-y:scroll; 
+  padding-right:5px; 
+  -webkit-overflow-scrolling: touch; 
 }
-#sentences-container { display:flex; flex-direction:column; gap:20px; }
-.sentence-item { background:#eef6f9; border:2px dashed #94a3b8; border-radius:8px; padding:7px; font-size:1.1rem; }
+
+.sentence-item { background:#eef6f9; border:2px dashed #94a3b8; border-radius:8px; padding:15px; font-size:1.1rem; }
+
 .gap { display:inline-block; min-width:120px; height:36px; border-bottom:2px solid #538e9b; margin:0 5px; vertical-align:middle; text-align:center; cursor:pointer; }
 .gap span { font-style:italic; color:#94a3b8; }
+
+.gap.correct { border-color:#4fa46b; background:#e7f6ec; }
+.gap.incorrect { border-color:#c05b6d; background:#fdecee; }
 
 .word-pool { flex:1; background:#f1f5f9; border-radius:8px; padding:15px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:10px; min-width:200px; max-height:80vh; overflow-y:auto; }
 .word-option { flex:0 0 auto; height:auto; padding:8px 12px; font-size:1rem; background:#e8f4fd; border:2px solid #538e9b; border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:grab; user-select:none; }
 
 .word-option.dragging { opacity:0.6; transform:scale(0.95); position:fixed; z-index:1000; pointer-events:none; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
-
-.gap.correct { border-color:#4fa46b; background:#e7f6ec; }
-.gap.incorrect { border-color:#c05b6d; background:#fdecee; }
 
 .instructions { background:#fff3cd; border-left:4px solid #538e9b; border-radius:6px; padding:10px; margin-bottom:10px; font-size:0.95rem; }
 
@@ -59,10 +61,7 @@ button { padding:10px 18px; font-size:1rem; border:none; border-radius:6px; curs
 </div>
 
 <div class="main-container">
-  <!-- Left: Sentences -->
   <div class="sentences-container" id="sentences-container"></div>
-
-  <!-- Right: Word pool -->
   <div class="word-pool" id="word-pool"></div>
 </div>
 
@@ -89,8 +88,6 @@ const sentences = [
 const words = ["be","close","come","don't drink","don't park","slow","don't speak","turn","don't worry"];
 
 let draggedItem = null;
-let isTouchDragging = false;
-let touchStartX=0, touchStartY=0;
 
 const sentencesContainer = document.getElementById("sentences-container");
 const wordPool = document.getElementById("word-pool");
@@ -98,92 +95,94 @@ const message = document.getElementById("message");
 const checkBtn = document.getElementById("checkBtn");
 const resetBtn = document.getElementById("resetBtn");
 
-function createSentences(){
+// Create sentence elements
+function createSentences() {
   sentencesContainer.innerHTML="";
   sentences.forEach(s=>{
-    const div = document.createElement("div");
+    const div=document.createElement("div");
     div.className="sentence-item";
-    const parts = s.text.split("[  ]");
-    div.innerHTML = `${parts[0]}<span class="gap" data-answer="${s.answer}"><span>[drop]</span></span>${parts[1]||""}`;
+    const parts=s.text.split("[  ]");
+    const gap=document.createElement("span");
+    gap.className="gap";
+    gap.dataset.answer=s.answer;
+    gap.innerHTML="<span>[drop]</span>";
+    gap.addEventListener("dragover", e=>e.preventDefault());
+    gap.addEventListener("drop", e=>{
+      if(draggedItem){
+        gap.textContent=draggedItem.textContent;
+        gap.classList.add("filled");
+        draggedItem.remove();
+        attachGapClick();
+      }
+    });
+    div.appendChild(document.createTextNode(parts[0]));
+    div.appendChild(gap);
+    if(parts[1]) div.appendChild(document.createTextNode(parts[1]));
     sentencesContainer.appendChild(div);
   });
   attachGapClick();
 }
 
+// Make words draggable
 function createWordPool(){
   wordPool.innerHTML="";
   words.forEach(w=>{
-    const div = document.createElement("div");
+    const div=document.createElement("div");
     div.className="word-option";
     div.textContent=w;
     div.draggable=true;
-    addDragEvents(div);
+    div.addEventListener("dragstart", e=>draggedItem=div);
+    div.addEventListener("dragend", e=>draggedItem=null);
+    // mobile
+    div.addEventListener("touchstart", e=>{ draggedItem=div; });
+    div.addEventListener("touchend", e=>{
+      if(draggedItem){
+        const el=document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+        if(el && el.classList.contains("gap")){
+          el.textContent=draggedItem.textContent;
+          el.classList.add("filled");
+          draggedItem.remove();
+          attachGapClick();
+        }
+      }
+      draggedItem=null;
+    });
     wordPool.appendChild(div);
   });
 }
 
-function addDragEvents(el){
-  el.addEventListener("dragstart", e=>{ draggedItem=el; el.classList.add("dragging"); });
-  el.addEventListener("dragend", e=>{ draggedItem=null; el.classList.remove("dragging"); });
-
-  el.addEventListener("touchstart", e=>{
-    draggedItem=el; const t=e.touches[0];
-    touchStartX=t.clientX; touchStartY=t.clientY; isTouchDragging=false;
-  });
-  el.addEventListener("touchmove", e=>{
-    if(!draggedItem) return;
-    const t=e.touches[0]; 
-    const dx=Math.abs(t.clientX-touchStartX), dy=Math.abs(t.clientY-touchStartY);
-    if(dx>5||dy>5){ isTouchDragging=true; }
-    if(isTouchDragging){
-      draggedItem.style.position="fixed";
-      draggedItem.style.left=(t.clientX-30)+"px";
-      draggedItem.style.top=(t.clientY-20)+"px";
-      draggedItem.style.zIndex=1000;
-    }
-  }, {passive:false});
-  el.addEventListener("touchend", e=>{
-    if(draggedItem && isTouchDragging){
-      const elUnder=document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
-      if(elUnder && elUnder.classList.contains("gap")){
-        placeWord(elUnder, draggedItem);
-      }
-    }
-    if(draggedItem){ draggedItem.style.position=""; draggedItem.style.left=""; draggedItem.style.top=""; draggedItem.style.zIndex=""; }
-    draggedItem=null; isTouchDragging=false;
-  });
-}
-
-function placeWord(gap, word){
-  gap.textContent=word.textContent;
-  gap.classList.add("filled");
-  word.remove();
-}
-
+// click to remove word from gap
 function attachGapClick(){
   document.querySelectorAll(".gap").forEach(g=>{
     g.addEventListener("click", e=>{
       if(g.classList.contains("filled")){
         const div=document.createElement("div");
         div.className="word-option"; div.textContent=g.textContent;
-        addDragEvents(div);
+        div.draggable=true;
+        div.addEventListener("dragstart", e=>draggedItem=div);
+        div.addEventListener("dragend", e=>draggedItem=null);
         wordPool.appendChild(div);
-        g.innerHTML="<span>[drop]</span>"; g.classList.remove("filled","correct","incorrect");
+        g.innerHTML="<span>[drop]</span>";
+        g.classList.remove("filled","correct","incorrect");
       }
     });
   });
 }
 
+// check answers
 checkBtn.addEventListener("click", ()=>{
   document.querySelectorAll(".gap").forEach(g=>{
-    const ans=g.dataset.answer;
-    if(g.textContent===ans){ g.classList.add("correct"); g.classList.remove("incorrect"); }
-    else { g.classList.add("incorrect"); g.classList.remove("correct"); }
+    g.classList.remove("correct","incorrect");
+    if(g.textContent===g.dataset.answer) g.classList.add("correct");
+    else if(g.textContent!=="[drop]") g.classList.add("incorrect");
   });
 });
 
+// reset
 resetBtn.addEventListener("click", ()=>{
-  createSentences(); createWordPool(); message.textContent="";
+  createSentences();
+  createWordPool();
+  message.textContent="";
 });
 
 createSentences();
