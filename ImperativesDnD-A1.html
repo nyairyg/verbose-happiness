@@ -4,204 +4,185 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gap-fill: "Please" Imperatives</title>
-
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
-html,body{height:100%;width:100%;touch-action:none;}
+* { margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI, system-ui, sans-serif; color:#333; }
+body { background:#f8fafc; display:flex; flex-direction:column; padding:10px; gap:10px; min-height:100vh; -webkit-tap-highlight-color:transparent; user-select:none; }
 
-body{
-  background:#f8fafc;
-  display:flex;
-  flex-direction:row;
-  padding:10px;
-  gap:10px;
-}
+h1, h2, p { text-align:center; }
 
-/* LEFT EMPTY SPACE (2/3) */
-.spacer{
-  flex:2;
-}
+.main-container { display:flex; max-width:1400px; width:100%; gap:15px; margin:0 auto; flex-grow:1; }
 
-/* RIGHT CONTENT (1/3) */
-.wrapper{
-  flex:1;
-  max-width:520px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
+.sentences-container { flex:2; display:flex; flex-direction:column; gap:10px; }
+#sentences-container { display:flex; flex-direction:column; gap:20px; }
+.sentence-item { background:#eef6f9; border:2px dashed #94a3b8; border-radius:8px; padding:15px; font-size:1.1rem; }
+.gap { display:inline-block; min-width:120px; height:36px; border-bottom:2px solid #538e9b; margin:0 5px; vertical-align:middle; text-align:center; cursor:pointer; }
+.gap span { font-style:italic; color:#94a3b8; }
 
-/* Stack normally on small screens */
-@media (max-width: 900px){
-  body{
-    flex-direction:column;
-  }
-  .spacer{
-    display:none;
-  }
-  .wrapper{
-    max-width:100%;
-  }
-}
+.word-pool { flex:1; background:#f1f5f9; border-radius:8px; padding:15px; display:flex; flex-wrap:wrap; gap:10px; min-width:200px; max-height:80vh; overflow-y:auto; }
+.word-option { background:#e8f4fd; border:2px solid #538e9b; border-radius:6px; padding:8px 12px; cursor:grab; user-select:none; display:flex; align-items:center; justify-content:center; text-align:center; }
 
-h2,p{text-align:center;}
+.word-option.dragging { opacity:0.6; transform:scale(0.95); position:fixed; z-index:1000; pointer-events:none; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
 
-#sentences-container{
-  background:#eef6f9;
-  border:2px dashed #94a3b8;
-  border-radius:8px;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-}
+.gap.correct { border-color:#4fa46b; background:#e7f6ec; }
+.gap.incorrect { border-color:#c05b6d; background:#fdecee; }
 
-.sentence-item{
-  font-size:1.2vw;
-  line-height:1.5;
-  padding:10px;
-  background:#fff;
-  border-radius:6px;
-  box-shadow:0 2px 4px rgba(0,0,0,0.1);
-}
+.instructions { background:#fff3cd; border-left:4px solid #538e9b; border-radius:6px; padding:10px; margin-bottom:10px; font-size:0.95rem; }
 
-.gap{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-width:120px;
-  height:40px;
-  border-bottom:2px solid #538e9b;
-  margin:0 8px;
-}
+.controls { display:flex; justify-content:center; gap:10px; margin-top:10px; }
+button { padding:10px 18px; font-size:1rem; border:none; border-radius:6px; cursor:pointer; transition:background 0.2s; }
+#checkBtn { background:#538e9b; color:white; }
+#resetBtn { background:#f1f5f9; border:2px solid #cbd5e1; }
+#message { text-align:center; font-weight:600; min-height:30px; margin-top:5px; }
 
-.word-option{
-  background:#e8f4fd;
-  border:2px solid #538e9b;
-  border-radius:6px;
-  padding:8px 12px;
-  font-size:1.1vw;
-  cursor:grab;
-  margin:5px;
-}
-
-#word-pool{
-  background:#f1f5f9;
-  border:2px solid #cbd5e1;
-  border-radius:8px;
-  padding:15px;
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-}
-
-.buttons-container{
-  display:flex;
-  gap:15px;
-  justify-content:center;
-}
-
-button{
-  padding:12px 24px;
-  font-size:1.2vw;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-#checkBtn{background:#538e9b;color:white;}
-#resetBtn{background:#f1f5f9;border:2px solid #cbd5e1;}
-
-#message{
-  text-align:center;
-  font-weight:600;
-  min-height:30px;
-  color:#538e9b;
-}
-
-.instructions{
-  background:#fff3cd;
-  border:1px solid #ffeaa7;
-  border-radius:6px;
-  padding:12px;
-  font-size:1.1vw;
-}
-
-.empty-gap-hint{
-  color:#94a3b8;
-  font-style:italic;
+@media(max-width:900px) {
+  .main-container { flex-direction:column; }
+  .word-pool { max-height:200px; }
 }
 </style>
 </head>
-
 <body>
 
-<div class="spacer"></div>
+<h1>Gap-fill: "Please" Imperatives</h1>
+<p>Drag the correct words into the gaps. Click a word in a gap to return it to the pool.</p>
 
-<div class="wrapper">
-
-  <h2>Gap-fill: "Please" Imperatives</h2>
-  <p>Drag the correct words into the gaps.</p>
-
-  <div class="instructions">
-    <strong>Instructions:</strong> Drag the words below into the correct gaps.
-  </div>
-
-  <div id="sentences-container"></div>
-  <div id="word-pool"></div>
-
-  <div class="buttons-container">
-    <button id="checkBtn">Check Answers</button>
-    <button id="resetBtn">Reset All</button>
-  </div>
-
-  <div id="message"></div>
-
+<div class="instructions">
+<strong>Instructions:</strong> Drag words from the right panel to the gaps in sentences.
 </div>
 
+<div class="main-container">
+  <!-- Left: Sentences -->
+  <div class="sentences-container" id="sentences-container"></div>
+
+  <!-- Right: Word pool -->
+  <div class="word-pool" id="word-pool"></div>
+</div>
+
+<div class="controls">
+  <button id="checkBtn">Check Answers</button>
+  <button id="resetBtn">Reset All</button>
+</div>
+
+<div id="message"></div>
+
 <script>
-const sentences=[
- {id:1,text:"The city is dangerous at night. Please [  ] careful.",answer:"be"},
- {id:2,text:"It's cold in here. Please [  ] the window.",answer:"close"},
- {id:3,text:"It isn't a problem. Please [  ] about it.",answer:"don't worry"},
- {id:4,text:"This is an English class. Please [  ] Spanish.",answer:"don't speak"},
- {id:5,text:"Their house is on this street. Please [  ] down.",answer:"slow"},
- {id:6,text:"[  ] on! We're late!",answer:"come"},
- {id:7,text:"This is a bus stop. Please [  ] here.",answer:"don't park"},
- {id:8,text:"[  ] that water - it's dirty.",answer:"don't drink"},
- {id:9,text:"This music is terrible. Please [  ] it off.",answer:"turn"}
+const sentences = [
+  { id:1, text:"The city is dangerous at night. Please [  ] careful.", answer:"be" },
+  { id:2, text:"It's cold in here. Please [  ] the window.", answer:"close" },
+  { id:3, text:"It isn't a problem. Please [  ] about it.", answer:"don't worry" },
+  { id:4, text:"This is an English class. Please [  ] Spanish.", answer:"don't speak" },
+  { id:5, text:"Their house is on this street. Please [  ] down.", answer:"slow" },
+  { id:6, text:"[  ] on! We're late!", answer:"come" },
+  { id:7, text:"This is a bus stop. Please [  ] here.", answer:"don't park" },
+  { id:8, text:"[  ] that water - it's dirty.", answer:"don't drink" },
+  { id:9, text:"This music is terrible. Please [  ] it off.", answer:"turn" }
 ];
 
-const words=["be","close","come","don't drink","don't park","slow","don't speak","turn","don't worry"];
+const words = ["be","close","come","don't drink","don't park","slow","don't speak","turn","don't worry"];
 
-const sc=document.getElementById("sentences-container");
-const wp=document.getElementById("word-pool");
+let draggedItem = null;
+let isTouchDragging = false;
+let touchStartX=0, touchStartY=0;
 
-sentences.forEach(s=>{
-  const d=document.createElement("div");
-  d.className="sentence-item";
-  d.innerHTML=s.text.replace("[  ]",`<span class="gap" data-answer="${s.answer}"><span class="empty-gap-hint">[drop]</span></span>`);
-  sc.appendChild(d);
-});
+const sentencesContainer = document.getElementById("sentences-container");
+const wordPool = document.getElementById("word-pool");
+const message = document.getElementById("message");
+const checkBtn = document.getElementById("checkBtn");
+const resetBtn = document.getElementById("resetBtn");
 
-words.forEach(w=>{
-  const d=document.createElement("div");
-  d.className="word-option";
-  d.textContent=w;
-  d.draggable=true;
-  d.ondragstart=e=>e.dataTransfer.setData("text",w);
-  wp.appendChild(d);
-});
+function createSentences(){
+  sentencesContainer.innerHTML="";
+  sentences.forEach(s=>{
+    const div = document.createElement("div");
+    div.className="sentence-item";
+    const parts = s.text.split("[  ]");
+    div.innerHTML = `${parts[0]}<span class="gap" data-answer="${s.answer}"><span>[drop]</span></span>${parts[1]||""}`;
+    sentencesContainer.appendChild(div);
+  });
+}
+
+function createWordPool(){
+  wordPool.innerHTML="";
+  words.forEach(w=>{
+    const div = document.createElement("div");
+    div.className="word-option";
+    div.textContent=w;
+    div.draggable=true;
+    addDragEvents(div);
+    wordPool.appendChild(div);
+  });
+}
+
+function addDragEvents(el){
+  el.addEventListener("dragstart", e=>{ draggedItem=el; el.classList.add("dragging"); });
+  el.addEventListener("dragend", e=>{ draggedItem=null; el.classList.remove("dragging"); });
+
+  el.addEventListener("touchstart", e=>{
+    draggedItem=el; const t=e.touches[0];
+    touchStartX=t.clientX; touchStartY=t.clientY; isTouchDragging=false;
+  });
+  el.addEventListener("touchmove", e=>{
+    if(!draggedItem) return;
+    const t=e.touches[0]; 
+    const dx=Math.abs(t.clientX-touchStartX), dy=Math.abs(t.clientY-touchStartY);
+    if(dx>5||dy>5){ isTouchDragging=true; }
+    if(isTouchDragging){
+      draggedItem.style.position="fixed";
+      draggedItem.style.left=(t.clientX-30)+"px";
+      draggedItem.style.top=(t.clientY-20)+"px";
+      draggedItem.style.zIndex=1000;
+    }
+  }, {passive:false});
+  el.addEventListener("touchend", e=>{
+    if(draggedItem && isTouchDragging){
+      const elUnder=document.elementFromPoint(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+      if(elUnder && elUnder.classList.contains("gap")){
+        placeWord(elUnder, draggedItem);
+      }
+    }
+    if(draggedItem){ draggedItem.style.position=""; draggedItem.style.left=""; draggedItem.style.top=""; draggedItem.style.zIndex=""; }
+    draggedItem=null; isTouchDragging=false;
+  });
+}
+
+function placeWord(gap, word){
+  gap.textContent=word.textContent;
+  gap.classList.add("filled");
+  word.remove();
+}
+
+sentencesContainer.addEventListener("dragover", e=>e.preventDefault());
+wordPool.addEventListener("dragover", e=>e.preventDefault());
 
 document.querySelectorAll(".gap").forEach(g=>{
-  g.ondragover=e=>e.preventDefault();
-  g.ondrop=e=>{
-    const t=e.dataTransfer.getData("text");
-    g.textContent=t;
-  };
+  g.addEventListener("dragover", e=>e.preventDefault());
+  g.addEventListener("drop", e=>{
+    if(draggedItem) placeWord(g, draggedItem);
+  });
+  g.addEventListener("click", e=>{
+    if(g.classList.contains("filled")){
+      const div=document.createElement("div");
+      div.className="word-option"; div.textContent=g.textContent;
+      addDragEvents(div);
+      wordPool.appendChild(div);
+      g.innerHTML="<span>[drop]</span>"; g.classList.remove("filled","correct","incorrect");
+    }
+  });
 });
-</script>
 
+checkBtn.addEventListener("click", ()=>{
+  document.querySelectorAll(".gap").forEach(g=>{
+    const ans=g.dataset.answer;
+    if(g.textContent===ans){ g.classList.add("correct"); g.classList.remove("incorrect"); }
+    else { g.classList.add("incorrect"); g.classList.remove("correct"); }
+  });
+});
+
+resetBtn.addEventListener("click", ()=>{
+  createSentences(); createWordPool(); message.textContent="";
+});
+
+createSentences();
+createWordPool();
+</script>
 </body>
 </html>
