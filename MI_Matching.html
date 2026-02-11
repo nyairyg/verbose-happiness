@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mental Health: Question & Answer Matching</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Segoe UI, system-ui, sans-serif;
+  color: #333;
+}
+body {
+  background: #f8fafc;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.wrapper {
+  position: relative;
+  width: 1300px;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  margin-top: 20px;
+  align-items: flex-start;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+}
+#left {
+  width: 35%; /* Narrower column for questions */
+}
+#right {
+  width: 60%; /* Wider column for answers */
+}
+.item {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0;
+  margin-bottom: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start; /* Changed to left align */
+  word-wrap: break-word;
+  white-space: normal;
+  min-height: 100px;
+  transition: all 0.2s ease;
+}
+.item:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+.item.used {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.item.active {
+  background: #e8f4fd;
+  border-color: #538e9b;
+}
+.item.shake {
+  animation: shake 0.4s;
+}
+
+/* Styles for left items (questions) */
+.left-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+  gap: 20px;
+  text-align: left; /* Left aligned */
+}
+.word-photo {
+  width: 90px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+.word-photo:hover {
+  transform: scale(1.05);
+}
+.question-text {
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  flex: 1;
+  line-height: 1.4;
+  color: #1e293b;
+}
+
+/* Styles for right items (answers) */
+.right-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 100%;
+  width: 100%;
+  font-size: 14.5px;
+  font-weight: 500;
+  text-align: left; /* Left aligned */
+  padding: 18px;
+  line-height: 1.5;
+  color: #334155;
+}
+
+/* Image modal */
+.image-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.image-modal.active {
+  display: flex;
+}
+
+.modal-content {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  animation: zoomIn 0.3s ease;
+}
+
+.close-modal {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: white;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s;
+  z-index: 1001;
+}
+
+.close-modal:hover {
+  color: #ccc;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shake {
+  0% { transform: translateX(0) }
+  25% { transform: translateX(-5px) }
+  50% { transform: translateX(5px) }
+  75% { transform: translateX(-5px) }
+  100% { transform: translateX(0) }
+}
+
+svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#message {
+  margin-top: 25px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #538e9b;
+  text-align: center;
+  padding: 10px;
+  min-height: 50px;
+}
+
+h2 {
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+p.subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  color: #475569;
+  margin-bottom: 20px;
+  max-width: 900px;
+  line-height: 1.5;
+}
+
+.column-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 10px;
+  text-align: center;
+  padding: 5px 10px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+
+<h2>Mental Health: Question & Answer Matching</h2>
+<p class="subtitle">
+Match each question about mental illness and self-consciousness with its correct short answer.
+</p>
+
+<div class="wrapper" id="wrapper">
+  <svg id="lines"></svg>
+  
+  <div class="column" id="left">
+    <div class="column-label">QUESTIONS</div>
+    <!-- Questions will be inserted here -->
+  </div>
+  
+  <div class="column" id="right">
+    <div class="column-label">ANSWERS</div>
+    <!-- Answers will be inserted here -->
+  </div>
+</div>
+
+<div id="message">Click a question, then click the matching answer.</div>
+
+<!-- Image modal -->
+<div class="image-modal" id="imageModal">
+  <span class="close-modal">&times;</span>
+  <img class="modal-content" id="modalImage" alt="Enlarged image">
+</div>
+
+<script>
+const allPairs = [
+  {
+    id: 1,
+    left: `<div class='left-item'>
+             <img src='https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' 
+                  class='word-photo' 
+                  alt='Person looking in mirror'>
+             <div class='question-text'>Do people with mental illnesses care about their appearance?</div>
+           </div>`,
+    right: "Yes, intensely, but the relationship is often distorted. Caring can manifest as extreme over-concern (obsession, rituals) or severe under-concern (neglect). The illness often hijacks normal self-perception."
+  },
+  {
+    id: 2,
+    left: `<div class='left-item'>
+             <img src='https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' 
+                  class='word-photo' 
+                  alt='Person struggling with self-care'>
+             <div class='question-text'>Why do some people with depression stop showering or caring how they look?</div>
+           </div>`,
+    right: "This is a core symptom called avolition (lack of motivation) or anergia (lack of energy). It's not laziness. The illness depletes the mental and physical energy required for basic tasks, stemming from profound fatigue, apathy, and worthlessness."
+  },
+  {
+    id: 3,
+    left: `<div class='left-item'>
+             <img src='https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' 
+                  class='word-photo' 
+                  alt='Body image concept'>
+             <div class='question-text'>Are eating disorders and Body Dysmorphic Disorder (BDD) just about vanity?</div>
+           </div>`,
+    right: "Absolutely not. They are severe, life-threatening mental illnesses rooted in distorted brain perception, crippling anxiety, and obsessive-compulsive features. The focus on appearance is a symptom of the illness—a channel for deep-seated issues."
+  },
+  {
+    id: 4,
+    left: `<div class='left-item'>
+             <img src='https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' 
+                  class='word-photo' 
+                  alt='Anxious person in crowd'>
+             <div class='question-text'>Can anxiety make you overly self-conscious about your appearance in public?</div>
+           </div>`,
+    right: "Yes, overwhelmingly so. Social Anxiety Disorder and conditions like BDD can create a paralyzing 'spotlight effect'—a cognitive distortion where you feel hyper-visible and judged for perceived flaws, leading to avoidance and intense distress."
+  },
+  {
+    id: 5,
+    left: `<div class='left-item'>
+             <img src='https://images.unsplash.com/photo-1618835962143-68e6d6d3c5d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80' 
+                  class='word-photo' 
+                  alt='Abstract mental health concept'>
+             <div class='question-text'>How does psychosis (like in schizophrenia) affect self-consciousness and appearance?</div>
+           </div>`,
+    right: "The relationship is complex. A person may completely neglect appearance due to disorganized thinking, or become preoccupied/distressed by appearance due to delusions (e.g., believing their face is changing). Self-care becomes secondary to internal experiences."
+  }
+];
+
+let selected = null, correctCount = 0;
+const totalPairs = allPairs.length;
+const imageModal = document.getElementById('imageModal');
+const modalImage = document.getElementById('modalImage');
+const closeModal = document.querySelector('.close-modal');
+
+function initGame() {
+  const left = document.getElementById('left');
+  const right = document.getElementById('right');
+  const lines = document.getElementById('lines');
+  const message = document.getElementById('message');
+  
+  // Clear containers
+  left.querySelectorAll('.item').forEach(el => el.remove());
+  right.querySelectorAll('.item').forEach(el => el.remove());
+  lines.innerHTML = "";
+  
+  correctCount = 0;
+  message.textContent = "Click a question, then click the matching answer.";
+
+  // Shuffle items independently
+  const shuffledPairs = shuffle([...allPairs]);
+  const leftItems = shuffle([...shuffledPairs]).map(p => createItem(p.left, p.id, "left"));
+  const rightItems = shuffle([...shuffledPairs]).map(p => createItem(p.right, p.id, "right"));
+
+  leftItems.forEach(item => left.appendChild(item));
+  rightItems.forEach(item => right.appendChild(item));
+
+  // Add click handlers for images
+  document.querySelectorAll('.word-photo').forEach(img => {
+    img.addEventListener('click', function(e) {
+      e.stopPropagation();
+      openImageModal(this.src, this.alt);
+    });
+  });
+
+  // Close modal handlers
+  closeModal.addEventListener('click', closeImageModal);
+  imageModal.addEventListener('click', function(e) {
+    if (e.target === imageModal) {
+      closeImageModal();
+    }
+  });
+  
+  // Close with ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeImageModal();
+    }
+  });
+
+  // Adjust heights after rendering
+  setTimeout(() => {
+    const leftItems = left.querySelectorAll('.item');
+    const rightItems = right.querySelectorAll('.item');
+    
+    for(let i = 0; i < totalPairs; i++) {
+      if (leftItems[i] && rightItems[i]) {
+        const maxH = Math.max(leftItems[i].offsetHeight, rightItems[i].offsetHeight);
+        leftItems[i].style.minHeight = maxH + "px";
+        rightItems[i].style.minHeight = maxH + "px";
+      }
+    }
+  }, 100);
+}
+
+function createItem(html, id, side) {
+  const d = document.createElement("div");
+  d.className = "item " + side;
+  d.dataset.id = id;
+  d.dataset.side = side;
+  
+  if (side === "left") {
+    d.innerHTML = html;
+  } else {
+    const wrapper = document.createElement("div");
+    wrapper.className = "right-item";
+    wrapper.innerHTML = html;
+    d.appendChild(wrapper);
+  }
+  
+  d.onclick = () => selectItem(d);
+  return d;
+}
+
+function openImageModal(src, alt) {
+  modalImage.src = src;
+  modalImage.alt = alt;
+  imageModal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeImageModal() {
+  imageModal.classList.remove('active');
+  document.body.style.overflow = 'auto';
+}
+
+function anchor(el) {
+  const r = el.getBoundingClientRect();
+  const w = wrapper.getBoundingClientRect();
+  
+  if (el.dataset.side === "left") {
+    return {x: r.right - w.left, y: r.top + r.height / 2 - w.top};
+  } else {
+    return {x: r.left - w.left, y: r.top + r.height / 2 - w.top};
+  }
+}
+
+function selectItem(el) {
+  if (el.classList.contains("used")) return;
+
+  if (!selected) {
+    selected = el;
+    el.classList.add("active");
+    return;
+  }
+
+  if (selected.dataset.side === el.dataset.side) {
+    selected.classList.remove("active");
+    selected = el;
+    el.classList.add("active");
+    return;
+  }
+
+  const p1 = anchor(selected);
+  const p2 = anchor(el);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  
+  line.setAttribute("x1", p1.x);
+  line.setAttribute("y1", p1.y);
+  line.setAttribute("x2", p2.x);
+  line.setAttribute("y2", p2.y);
+  line.setAttribute("stroke-width", "2");
+  lines.appendChild(line);
+
+  if (selected.dataset.id === el.dataset.id) {
+    // Correct match
+    line.setAttribute("stroke", "#4fa46b");
+    selected.classList.add("used");
+    el.classList.add("used");
+    correctCount++;
+    
+    if (correctCount === totalPairs) {
+      document.getElementById('message').textContent = "✅ Excellent! All questions matched correctly. Well done!";
+    } else {
+      document.getElementById('message').textContent = `Correct! ${correctCount} of ${totalPairs} matched.`;
+    }
+  } else {
+    // Incorrect match
+    line.setAttribute("stroke", "#c05b6d");
+    selected.classList.add("shake");
+    el.classList.add("shake");
+    document.getElementById('message').textContent = "Not quite right. Try again!";
+    
+    setTimeout(() => {
+      line.remove();
+      selected.classList.remove("shake");
+      el.classList.remove("shake");
+      selected.classList.remove("active");
+      selected = null;
+    }, 400);
+    return;
+  }
+
+  selected.classList.remove("active");
+  selected = null;
+}
+
+function shuffle(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+// Initialize the game
+initGame();
+</script>
+
+</body>
+</html>
