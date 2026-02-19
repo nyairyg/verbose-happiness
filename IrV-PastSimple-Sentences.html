@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step-by-step: Past Simple</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,sans-serif;color:#333;}
+html,body{height:100%;width:100%;background:#f8fafc;display:flex;flex-direction:column;align-items:center;padding:10px;gap:10px;}
+h2,p{text-align:center;}
+
+.wrapper{width:100%;max-width:700px;display:flex;flex-direction:column;gap:15px;flex-grow:1;}
+
+#current-card{background:#fff;border:2px solid #cbd5e1;border-radius:20px;padding:30px 20px;font-size:1.8rem;text-align:center;box-shadow:0 10px 20px rgba(0,0,0,0.05);}
+
+.sentence-display{line-height:1.4;font-weight:500;background:#f1f9ff;padding:20px 15px;border-radius:40px;border:1px solid #b8d1db;}
+
+.gap-large{display:inline-flex;align-items:center;justify-content:center;min-width:160px;height:55px;border-bottom:4px solid #2c6c7c;margin:0 8px;background:#fcfcfc;border-radius:12px 12px 4px 4px;}
+.gap-large.filled{border-bottom-color:#1e7e34;background:#f0faf0;}
+
+.word-in-gap{font-weight:600;font-size:1.5rem;padding:0 10px;}
+.empty-gap-hint{color:#94a3b8;font-style:italic;font-size:0.9rem;opacity:0.8;}
+
+#word-pool{background:#f1f5f9;border:2px dashed #64748b;border-radius:60px;padding:20px 15px;display:flex;flex-wrap:wrap;gap:15px;justify-content:center;min-height:110px;}
+
+.word-tile{background:white;border:2px solid #2f7c8c;border-radius:60px;padding:12px 24px;font-size:1.3rem;font-weight:600;cursor:grab;user-select:none;}
+
+.nav-panel{display:flex;gap:12px;background:#ecf3f7;padding:12px 20px;border-radius:60px;}
+
+button{padding:12px 28px;font-size:1.2rem;border:none;border-radius:40px;cursor:pointer;font-weight:600;transition:0.2s;flex:1;}
+
+#checkStepBtn{background:#2f7c8c;color:white;}
+#checkStepBtn.checked{background:#2b6d4b;}
+#checkStepBtn:disabled{background:#b7c0c7;cursor:not-allowed;}
+
+#resetBtn{background:#f1f5f9;color:#1e3d4c;border:2px solid #94a3b8;}
+
+#message{font-size:1.2rem;font-weight:600;text-align:center;min-height:2.5rem;color:#1f5060;}
+</style>
+</head>
+
+<body>
+
+<h2>⏳ step-by-step: Past Simple</h2>
+
+<p>
+drag the correct verb into the gap → check → move forward.<br>
+used words are locked. if you make a mistake, tap reset and start again.
+</p>
+
+<div class="wrapper">
+
+<div id="current-card">
+<div class="sentence-display" id="sentenceDisplay"></div>
+</div>
+
+<div id="word-pool"></div>
+
+<div class="nav-panel">
+<button id="checkStepBtn">✔ check</button>
+<button id="resetBtn">↺ reset all</button>
+</div>
+
+<div id="message"></div>
+
+</div>
+
+<script>
+(function(){
+
+const sentences=[
+{ id:1,text:"I [  ] a dog when I was 5.",answer:"had"},
+{ id:2,text:"She [  ] her homework in the evening.",answer:"did"},
+{ id:3,text:"We [  ] to the park after school.",answer:"went"},
+{ id:4,text:"He [  ] a glass of water.",answer:"drank"},
+{ id:5,text:"They [  ] pizza for dinner.",answer:"ate"},
+{ id:6,text:"I [  ] a beautiful sunset yesterday.",answer:"saw"},
+{ id:7,text:"She [  ] this present by hand.",answer:"made"},
+{ id:8,text:"We [  ] a bus to the city.",answer:"took"},
+{ id:9,text:"He [  ] an interesting book.",answer:"read"},
+{ id:10,text:"They [  ] to my birthday party.",answer:"came"},
+{ id:11,text:"I [  ] a nice present.",answer:"got"},
+{ id:12,text:"She [  ] me a pen.",answer:"gave"},
+{ id:13,text:"We [  ] 5km in the morning.",answer:"ran"},
+{ id:14,text:"They [  ] a small cat on the street.",answer:"found"},
+{ id:15,text:"I [  ] some milk at the shop.",answer:"bought"},
+{ id:16,text:"She [  ] for 8 hours.",answer:"slept"},
+{ id:17,text:"We [  ] our friends yesterday.",answer:"met"},
+{ id:18,text:"He [  ] on a chair near the window.",answer:"sat"},
+{ id:19,text:"They [  ] English in class.",answer:"spoke"},
+{ id:20,text:"I [  ] a letter to my friend.",answer:"wrote"}
+];
+
+const allWords=["had","did","went","drank","ate","saw","made","took","read","came","got","gave","ran","found","bought","slept","met","sat","spoke","wrote"];
+
+let shuffledWords=[];
+let currentIndex=0;
+let userAnswers=new Array(sentences.length).fill(null);
+let draggedTile=null;
+
+const sentenceDisplay=document.getElementById('sentenceDisplay');
+const wordPool=document.getElementById('word-pool');
+const checkBtn=document.getElementById('checkStepBtn');
+const resetBtn=document.getElementById('resetBtn');
+const message=document.getElementById('message');
+
+/* shuffle */
+function shuffleArray(array){
+for(let i=array.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[array[i],array[j]]=[array[j],array[i]];
+}
+return array;
+}
+
+function renderSentence(){
+const s=sentences[currentIndex];
+const parts=s.text.split('[  ]');
+sentenceDisplay.innerHTML='';
+sentenceDisplay.append(parts[0]);
+
+const gap=document.createElement('span');
+gap.className='gap-large';
+
+if(userAnswers[currentIndex]){
+gap.innerHTML='<div class="word-in-gap">'+userAnswers[currentIndex]+'</div>';
+gap.classList.add('filled');
+}else{
+gap.innerHTML='<div class="empty-gap-hint">[drop here]</div>';
+}
+
+gap.addEventListener('dragover',e=>e.preventDefault());
+gap.addEventListener('drop',e=>{
+e.preventDefault();
+if(checkBtn.dataset.mode==="next")return;
+if(!draggedTile)return;
+gap.innerHTML='<div class="word-in-gap">'+draggedTile.textContent+'</div>';
+gap.classList.add('filled');
+userAnswers[currentIndex]=draggedTile.textContent;
+draggedTile.remove();
+draggedTile=null;
+});
+
+sentenceDisplay.appendChild(gap);
+if(parts[1])sentenceDisplay.append(parts[1]);
+
+checkBtn.classList.remove('checked');
+}
+
+function rebuildPool(){
+wordPool.innerHTML='';
+const used=userAnswers.filter(w=>w);
+shuffledWords.filter(w=>!used.includes(w)).forEach(w=>{
+const tile=document.createElement('div');
+tile.className='word-tile';
+tile.textContent=w;
+tile.draggable=true;
+tile.addEventListener('dragstart',()=>draggedTile=tile);
+wordPool.appendChild(tile);
+});
+}
+
+/* CHECK → NEXT logic */
+checkBtn.addEventListener('click',()=>{
+
+if(checkBtn.dataset.mode==="next"){
+if(currentIndex<sentences.length-1){
+currentIndex++;
+renderSentence();
+rebuildPool();
+message.textContent='';
+checkBtn.textContent='✔ check';
+checkBtn.dataset.mode='check';
+checkBtn.disabled=false;
+}
+return;
+}
+
+const answer=userAnswers[currentIndex];
+if(!answer){message.textContent='drop a word first';return;}
+
+if(answer===sentences[currentIndex].answer){
+message.textContent='correct!';
+checkBtn.classList.add('checked');
+checkBtn.textContent='→ next';
+checkBtn.dataset.mode='next';
+}else{
+message.textContent='not correct — tap reset';
+checkBtn.disabled=true;
+}
+});
+
+/* RESET */
+resetBtn.addEventListener('click',()=>{
+currentIndex=0;
+userAnswers=new Array(sentences.length).fill(null);
+shuffledWords=shuffleArray([...allWords]);
+renderSentence();
+rebuildPool();
+message.textContent='';
+checkBtn.disabled=false;
+checkBtn.textContent='✔ check';
+checkBtn.dataset.mode='check';
+checkBtn.classList.remove('checked');
+});
+
+/* init */
+shuffledWords=shuffleArray([...allWords]);
+checkBtn.dataset.mode='check';
+renderSentence();
+rebuildPool();
+
+})();
+</script>
+
+</body>
+</html>
