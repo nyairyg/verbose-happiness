@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversation Pattern</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(90deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .content-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .left-panel {
+            flex: 1;
+        }
+        
+        .right-panel {
+            flex: 1;
+            max-width: 500px;
+        }
+        
+        .conversation-frame {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .conversation-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+            background: linear-gradient(to bottom, #ff9a9e, #fad0c4, #a18cd1);
+        }
+        
+        .conversation-item {
+            padding: 20px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: flex-start;
+            transition: transform 0.3s, background 0.3s;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .conversation-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .item-1 { border-left-color: #ff9a9e; }
+        .item-2 { border-left-color: #fad0c4; }
+        .item-3 { border-left-color: #a1c4fd; }
+        .item-4 { border-left-color: #ff9a9e; }
+        .item-5 { border-left-color: #a18cd1; }
+        .item-6 { border-left-color: #fbc2eb; }
+        
+        .item-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #b0b0d0;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .item-label i {
+            margin-right: 8px;
+        }
+        
+        .item-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: #f0f0f0;
+        }
+        
+        .topics-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(90deg, #a1c4fd, #c2e9fb);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .topic-card-container {
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .topic-card {
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            max-width: 100%;
+            line-height: 1.6;
+            font-size: 18px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+        }
+        
+        .topic-card:active {
+            transform: translateY(-2px);
+        }
+        
+        .topic-card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+        }
+        
+        .topic-card-questions {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #444;
+        }
+        
+        .click-instruction {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #b0b0d0;
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .topic-counter {
+            font-size: 14px;
+            color: #888;
+            text-align: center;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        footer {
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+        }
+        
+        @media (max-width: 1024px) {
+            .content-container {
+                flex-direction: column;
+            }
+            
+            .right-panel {
+                max-width: 100%;
+            }
+            
+            .topic-card-container {
+                height: 350px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 10px;
+            }
+            
+            .content-container {
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .conversation-frame {
+                padding: 20px 15px;
+            }
+            
+            .conversation-item {
+                padding: 15px;
+                flex-direction: column;
+            }
+            
+            .item-number {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .topic-card {
+                padding: 20px;
+            }
+            
+            .topic-card-title {
+                font-size: 1.3rem;
+            }
+            
+            .topic-card-questions {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <header>
+            <h1>Conversation Pattern</h1>
+        </header>
+        
+        <div class="content-container">
+            <div class="left-panel">
+                <div class="conversation-frame">
+                    <div class="conversation-item item-1">
+                        <div class="item-number">1</div>
+                        <div class="item-content">
+                            <div class="item-label"><i class="fas fa-play-circle"></i> Intro sentence</div>
+                            <div class="item-text">Start the conversation with a general introduction to the topic to set context and capture attention.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="conversation-item item-2">
+                        <div class="item-number">2</div>
+                        <div class="item-content">
+                            <div class="item-label"><i class="fas fa-star"></i> The main advantage is that...</div>
+                            <div class="item-text">Present the main positive aspect or key benefit that is most important to the speaker.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="conversation-item item-3">
+                        <div class="item-number">3</div>
+                        <div class="item-content">
+                            <div class="item-label"><i class="fas fa-plus-circle"></i> In addition, ...</div>
+                            <div class="item-text">Add supporting information that strengthens the main advantage or provides additional details.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="conversation-item item-4">
+                        <div class="item-number">4</div>
+                        <div class="item-content">
+                            <div class="item-label"><i class="fas fa-exclamation-triangle"></i> However, ...</div>
+                            <div class="item-text">Discuss possible limitations, obstacles, or alternative perspectives to demonstrate objectivity.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="conversation-item item-5">
+                        <div class="item-number">5</div>
+                        <div class="item-content">
+                            <div class="item-label"><i class="fas fa-ellipsis-h"></i> And another thing, ...</div>
+                            <div class="item-text">Present an additional argument or clarification that is important but didn't fit into previous points.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="conversation-item item-6">
+                        <div class="item-number">6</div>
+                        <div class="item-content">
+                            <div class="item-label"><i class="fas fa-check-circle"></i> In general, ...</div>
+                            <div class="item-text">Summarize the discussion, recap key points, and formulate an overall conclusion or recommendation.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <h2 class="topics-title">Discussion Topics</h2>
+                
+                <div class="topic-card-container">
+                    <div class="topic-card" id="topicCard">
+                        <div class="topic-card-title" id="topicTitle">Social Media</div>
+                        <div class="topic-card-questions" id="topicQuestions">Is it good for our life? Does it help us connect or make us lonely?</div>
+                    </div>
+                    
+                    <div class="click-instruction">
+                        <i class="fas fa-mouse-pointer"></i> Click the card to see the next topic
+                    </div>
+                    
+                    <div class="topic-counter" id="topicCounter">
+                        Topic 1 of 14
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Conversation Pattern | Created with HTML, CSS and JavaScript</p>
+        </footer>
+    </div>
+
+    <script>
+        // Topic data
+        const topics = [
+            {
+                title: "Social Media",
+                questions: "Does it contribute to self-awareness?"
+            },
+            {
+                title: "Smartphones",
+                questions: "Are they making life easier or more stressful?"
+            },
+            {
+                title: "Online Shopping",
+                questions: "Can it take advantage of people with poor self-control?"
+            },
+            {
+                title: "Working from Home (Remote Work)",
+                questions: "Is it better for introverted people?"
+            },
+            {
+                title: "Video Games",
+                questions: "Are they good for the brain or a waste of time?"
+            },
+            {
+                title: "Artificial Intelligence (AI) in Everyday Life",
+                questions: "Are voice assistants (like Siri) useful or lazy?"
+            },
+            {
+                title: "E-Books vs. Paper Books",
+                questions: "Which is better for reading? Which is better for the environment?"
+            },
+            {
+                title: "Smart Home Devices",
+                questions: "Should smart home devices focus on and pay attention to mental health?"
+            },
+            {
+                title: "Drones",
+                questions: "Can drones trigger fear in people who've served in a war?"
+            },
+            {
+                title: "Robots",
+                questions: "Can a robot be a psychologist?"
+            },
+            {
+                title: "Digital Cameras vs. Phone Cameras",
+                questions: "Do phone cameras distort the visual perception of the person more than digital ones?"
+            },
+            {
+                title: "Streaming Services (Netflix, Spotify)",
+                questions: "Do we have too much choice now? How does it affect our psyche?"
+            },
+         
+            {
+                title: "Fitness Trackers & Smartwatches",
+                questions: "Do they help people become healthier or make them stressed about numbers?"
+            }
+        ];
+
+        // DOM elements
+        const topicCard = document.getElementById('topicCard');
+        const topicTitle = document.getElementById('topicTitle');
+        const topicQuestions = document.getElementById('topicQuestions');
+        const topicCounter = document.getElementById('topicCounter');
+
+        let currentIndex = 0;
+
+        // Function to update the card content
+        function updateTopicCard() {
+            const topic = topics[currentIndex];
+            topicTitle.textContent = topic.title;
+            topicQuestions.textContent = topic.questions;
+            topicCounter.textContent = `Topic ${currentIndex + 1} of ${topics.length}`;
+        }
+
+        // Function to show next topic
+        function nextTopic() {
+            currentIndex = (currentIndex + 1) % topics.length;
+            updateTopicCard();
+            
+            // Add a subtle animation effect
+            topicCard.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                topicCard.style.transform = 'scale(1)';
+            }, 150);
+        }
+
+        // Add click event to the card
+        topicCard.addEventListener('click', nextTopic);
+
+        // Initialize with first topic
+        updateTopicCard();
+
+        // Optional: Add keyboard navigation
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                nextTopic();
+            }
+        });
+    </script>
+</body>
+</html>
