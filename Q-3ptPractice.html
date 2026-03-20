@@ -882,7 +882,7 @@ const data=step3data[currentStep3];
 document.querySelectorAll(".choice").forEach(b=>b.classList.add("disabled"))
 if(word===data.correct){
 waitingForCell=true;
-document.getElementById("hint").innerHTML="<b>Click the correct cell in column 3.</b>";
+document.getElementById("hint").innerHTML="<b>Now connect the answer with the question. Click the correct cell in column 3 to place the answer.</b>";
 document.querySelectorAll(".choice").forEach(b=>{if(b.innerText===word)b.classList.add("correct")})
 
 // Заменяем текст на полный ответ
