@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Science Questions Activity</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', 'Segoe UI', system-ui, sans-serif;
+    color: #333;
+}
+
+body {
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.wrapper {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    padding: 30px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #334155;
+    margin: 20px 0 15px 0;
+}
+
+.instruction {
+    background: #eef2ff;
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 4px solid #818cf8;
+    margin: 20px 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #1e293b;
+}
+
+.row {
+    display: flex;
+    gap: 20px;
+    margin: 15px 0;
+    align-items: center;
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.words {
+    width: 450px;
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    font-weight: 500;
+    color: #475569;
+}
+
+input {
+    padding: 12px;
+    width: 450px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2);
+}
+
+.correct {
+    background: #dcfce7 !important;
+    border-color: #4ade80 !important;
+}
+
+.wrong {
+    background: #fee2e2 !important;
+    border-color: #f87171 !important;
+}
+
+button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    background: #818cf8;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #6366f1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.hidden {
+    display: none;
+}
+
+.match {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    position: relative;
+    gap: 30px;
+}
+
+.column {
+    width: 45%;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+}
+
+/* Правая колонка полностью кликабельна, но боксы в ней не имеют hover-эффекта */
+#qs .box {
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+/* Убираем hover-эффект для правой колонки */
+#qs .box:hover {
+    transform: none;
+    border-color: #e2e8f0;
+}
+
+.box {
+    border: 2px solid #e2e8f0;
+    padding: 15px;
+    margin: 10px 0;
+    cursor: pointer;
+    background: white;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.box:hover {
+    border-color: #818cf8;
+    transform: translateX(5px);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 0.05);
+}
+
+.selected {
+    background: #e0e7ff;
+    border-color: #818cf8;
+}
+
+.matched {
+    background: #dcfce7;
+    border-color: #4ade80;
+}
+
+svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.answersTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    margin-top: 20px;
+}
+
+.answersTable th {
+    text-align: left;
+    padding: 15px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    color: #475569;
+    font-weight: 600;
+}
+
+.answersTable td {
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+}
+
+.answerCell {
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s;
+}
+
+.answerCell:hover {
+    border-color: #818cf8;
+}
+
+.placeholder {
+    height: 100px;
+    background: #f1f5f9;
+    border-radius: 6px;
+}
+
+.answerCell.correct {
+    background: #dcfce7;
+    border-color: #4ade80;
+}
+
+.answerCell.wrong {
+    background: #fee2e2;
+    border-color: #f87171;
+}
+
+.story {
+    margin-top: 30px;
+    padding: 25px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+.story p {
+    margin-bottom: 20px;
+}
+
+.choice {
+    margin: 8px 8px 8px 0;
+    padding: 12px 24px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-block;
+    color: #1e293b;
+}
+
+.choice:hover {
+    border-color: #818cf8;
+    background: #f8fafc;
+    transform: translateY(-1px);
+}
+
+.choice.correct {
+    background: #dcfce7;
+    border-color: #4ade80;
+}
+
+.choice.disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.hint {
+    color: #ef4444;
+    margin-top: 15px;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.completed-message {
+    background: #f8fafc;
+    color: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    text-align: center;
+    margin-top: 20px;
+    font-weight: 600;
+    border: 2px solid #4ade80;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 250px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border: 3px dashed #94a3b8;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 25px 0;
+    font-size: 1.2rem;
+    color: #64748b;
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-placeholder::before {
+    content: "🖼️ Image Placeholder";
+    position: relative;
+    z-index: 1;
+}
+
+.image-placeholder::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 20px, rgba(255,255,255,0.3) 20px, rgba(255,255,255,0.3) 40px);
+}
+
+.timer {
+    font-size: 4rem;
+    font-weight: 700;
+    color: #818cf8;
+    text-align: center;
+    padding: 30px;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.completed {
+    text-align: center;
+    padding: 30px;
+    font-size: 1.8rem;
+    color: #1e293b;
+    font-weight: 600;
+    border: 2px solid #4ade80;
+    border-radius: 12px;
+    background: #f8fafc;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .wrapper {
+        padding: 15px;
+        gap: 15px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+    
+    h2 {
+        font-size: 1.3rem;
+        margin: 15px 0 10px 0;
+    }
+    
+    .instruction {
+        padding: 15px;
+        margin: 15px 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    
+    .row {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 10px;
+        margin: 10px 0;
+        gap: 10px;
+    }
+    
+    .words {
+        width: 100%;
+        font-size: 0.95rem;
+        padding: 10px;
+    }
+    
+    input {
+        width: 100%;
+        padding: 10px;
+        font-size: 0.95rem;
+    }
+    
+    .match {
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    
+    .column {
+        width: 100%;
+        padding: 15px;
+    }
+    
+    .box {
+        padding: 12px;
+        margin: 8px 0;
+        font-size: 0.95rem;
+    }
+    
+    .answersTable {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        margin: 15px 0;
+    }
+    
+    .answersTable th {
+        padding: 12px;
+        font-size: 0.9rem;
+        white-space: normal;
+        word-wrap: break-word;
+    }
+    
+    .answersTable td {
+        padding: 12px;
+        font-size: 0.9rem;
+        white-space: normal;
+        word-wrap: break-word;
+        min-width: 150px;
+    }
+    
+    .answersTable td:first-child {
+        min-width: 100px;
+    }
+    
+    .answersTable td:nth-child(2) {
+        min-width: 200px;
+    }
+    
+    .answersTable td:last-child {
+        min-width: 250px;
+    }
+    
+    .placeholder {
+        height: 80px;
+    }
+    
+    .story {
+        margin-top: 20px;
+        padding: 20px;
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    .choice {
+        margin: 6px 6px 6px 0;
+        padding: 10px 20px;
+        font-size: 0.95rem;
+    }
+    
+    .timer {
+        font-size: 3rem;
+        padding: 20px;
+    }
+    
+    .completed-message,
+    .completed {
+        padding: 15px;
+        font-size: 1.3rem;
+        margin-top: 15px;
+    }
+    
+    .image-placeholder {
+        height: 180px;
+        margin: 15px 0;
+        font-size: 1rem;
+    }
+    
+    button {
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        width: 100%;
+        max-width: 300px;
+        margin: 10px auto;
+        display: block;
+    }
+    
+    /* Убираем hover эффекты на мобильных */
+    .box:hover {
+        transform: none;
+        border-color: #e2e8f0;
+    }
+    
+    .choice:hover {
+        transform: none;
+        border-color: #e2e8f0;
+    }
+    
+    button:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    /* Добавляем активные состояния для тач-устройств */
+    .box:active {
+        background: #e0e7ff;
+        border-color: #818cf8;
+    }
+    
+    .choice:active {
+        background: #f8fafc;
+        border-color: #818cf8;
+    }
+    
+    button:active {
+        background: #6366f1;
+    }
+    
+    /* Улучшаем скролл на мобильных */
+    .answersTable::-webkit-scrollbar {
+        height: 4px;
+    }
+    
+    .answersTable::-webkit-scrollbar-thumb {
+        background: #94a3b8;
+        border-radius: 4px;
+    }
+}
+
+/* Дополнительные улучшения для очень маленьких экранов */
+@media (max-width: 480px) {
+    .wrapper {
+        padding: 12px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    h2 {
+        font-size: 1.2rem;
+    }
+    
+    .instruction {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    .box {
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .answersTable th,
+    .answersTable td {
+        padding: 10px;
+        font-size: 0.85rem;
+    }
+    
+    .story {
+        padding: 15px;
+        font-size: 0.95rem;
+    }
+    
+    .choice {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+        margin: 5px 5px 5px 0;
+    }
+    
+    .completed-message,
+    .completed {
+        padding: 12px;
+        font-size: 1.2rem;
+    }
+    
+    .timer {
+        font-size: 2.5rem;
+        padding: 15px;
+    }
+    
+    .image-placeholder {
+        height: 150px;
+    }
+}
+
+/* Поддержка safe areas для современных мобильных устройств */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+        padding-top: max(20px, env(safe-area-inset-top));
+        padding-bottom: max(20px, env(safe-area-inset-bottom));
+    }
+}
+
+/* Улучшаем читаемость на мобильных */
+@media (max-width: 768px) {
+    .words, 
+    .box,
+    .instruction,
+    .story p {
+        word-break: break-word;
+        hyphens: auto;
+    }
+    
+    /* Центрируем кнопки выбора на мобильных */
+    .story div {
+        text-align: center;
+    }
+    
+    .choice {
+        display: inline-block;
+        margin: 5px;
+    }
+}
+
+/* Анимация для плавного появления на мобильных */
+@keyframes mobileFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .step {
+        animation: mobileFadeIn 0.3s ease-out;
+    }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<h1>Science Questions</h1>
+
+<!-- STEP 1 -->
+<div id="step1">
+<div class="instruction">
+Below you can see the main words for creating a question. <br><br> Write the complete question. Make sure you use correct punctuation and correct capital and lowercase letters. You may add some function words, such as helping words or particles.<br><br>
+When you are done, press Check.
+</div>
+<h2>Step 1 – Write the Questions</h2>
+<div id="qArea"></div>
+<button onclick="checkAnswers()">Check</button>
+</div>
+
+<!-- STEP 2 -->
+<div id="step2" class="hidden">
+<div class="instruction">
+Look at the picture below. <br><br> Match the picture with the question from Step 1. The task will be checked automatically.
+</div>
+<h2>Step 2 – Match Pictures and Questions</h2>
+<div class="image-placeholder">
+    <img src="https://nyairyg.github.io/verbose-happiness/questions.png" 
+         alt="Science educational image"
+         style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+</div>
+<div class="match" id="matchArea">
+<svg id="lines"></svg>
+<div class="column" id="pics"></div>
+<div class="column" id="qs"></div>
+</div>
+<div id="congratsMessage" class="completed-message hidden">Completed!</div>
+</div>
+
+<!-- STEP 3 -->
+<div id="step3" class="hidden">
+<h2>Step 3</h2>
+<div class="image-placeholder">
+    <img src="https://nyairyg.github.io/verbose-happiness/questions.png" 
+         alt="Science educational image"
+         style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
+</div>
+<p><b>Scroll down</b></p>
+
+<table class="answersTable">
+<thead>
+<tr>
+<th style="width:120px;">Picture</th>
+<th style="width:320px;">Question</th>
+<th style="width:520px;">Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td data-label="Picture">Picture A</td>
+<td data-label="Question">Is there an easy way to prove the Earth is round?</td>
+<td class="answerCell" data-row="0"><div class="placeholder"></div></td>
+</tr>
+<tr>
+<td data-label="Picture">Picture B</td>
+<td data-label="Question">Why do onions make you cry?</td>
+<td class="answerCell" data-row="1"><div class="placeholder"></div></td>
+</tr>
+<tr>
+<td data-label="Picture">Picture C</td>
+<td data-label="Question">Why is snow cold?</td>
+<td class="answerCell" data-row="2"><div class="placeholder"></div></td>
+</tr>
+<tr>
+<td data-label="Picture">Picture D</td>
+<td data-label="Question">Is a rainbow hot or cold?</td>
+<td class="answerCell" data-row="3"><div class="placeholder"></div></td>
+</tr>
+<tr>
+<td data-label="Picture">Picture E</td>
+<td data-label="Question">Is it possible to surf a tsunami?</td>
+<td class="answerCell" data-row="4"><div class="placeholder"></div></td>
+</tr>
+<tr>
+<td data-label="Picture">Picture F</td>
+<td data-label="Question">Why are sumo wrestlers so fat?</td>
+<td class="answerCell" data-row="5"><div class="placeholder"></div></td>
+</tr>
+</tbody>
+</table>
+
+<div class="instruction">
+Read the short part of the text. Choose the correct word to fill in the gap.
+</div>
+<div id="storyArea"></div>
+</div>
+</div>
+
+<script>
+/* STEP 1 DATA */
+const prompts=["it / possible / surf a tsunami?","why / snow / cold?","there / an easy way / prove / the Earth / round?","why / onions / make you cry?","a rainbow / hot or cold?","why / sumo wrestlers / so fat?"];
+const correct=["Is it possible to surf a tsunami?","Why is snow cold?","Is there an easy way to prove the Earth is round?","Why do onions make you cry?","Is a rainbow hot or cold?","Why are sumo wrestlers so fat?"];
+/* STEP 1 */
+const qArea=document.getElementById("qArea");
+prompts.forEach((p,i)=>{
+qArea.innerHTML+=`<div class="row"><div class="words">${p}</div><input id="input${i}"></div>`;
+});
+function checkAnswers(){
+let ok=true;
+correct.forEach((q,i)=>{
+let inp=document.getElementById("input"+i)
+let val=inp.value.trim().toLowerCase()
+if(val===q.toLowerCase()){
+inp.classList.add("correct")
+}else{
+inp.classList.add("wrong")
+ok=false
+setTimeout(()=>inp.classList.remove("wrong"),3000)
+}
+})
+if(ok){setTimeout(()=>{document.getElementById("step1").classList.add("hidden");startStep2()},1200)}
+}
+
+/* STEP 2 */
+const pictures=["A","B","C","D","E","F"];
+const answers={A:2,B:3,C:1,D:4,E:0,F:5};
+let selectedPic=null,matched=0;
+function startStep2(){
+document.getElementById("step2").classList.remove("hidden")
+const picDiv=document.getElementById("pics"),qDiv=document.getElementById("qs")
+pictures.forEach((p)=>{
+let el=document.createElement("div");el.className="box";el.innerText="Picture "+p;el.dataset.pic=p;
+el.onclick=()=>{
+if(el.classList.contains("matched")) return
+clearSelection()
+selectedPic=el;el.classList.add("selected")}
+picDiv.appendChild(el)})
+correct.forEach((q,i)=>{
+let el=document.createElement("div");el.className="box";el.innerText=q;el.dataset.index=i;
+el.onclick=()=>tryMatch(el);
+qDiv.appendChild(el)})
+}
+function clearSelection(){document.querySelectorAll(".selected").forEach(e=>e.classList.remove("selected"))}
+function drawLine(el1,el2,color){
+const svg=document.getElementById("lines")
+const r1=el1.getBoundingClientRect(),r2=el2.getBoundingClientRect(),parent=document.getElementById("matchArea").getBoundingClientRect()
+const x1=r1.right-parent.left,y1=r1.top+r1.height/2-parent.top
+const x2=r2.left-parent.left,y2=r2.top+r2.height/2-parent.top
+const line=document.createElementNS("http://www.w3.org/2000/svg","line")
+line.setAttribute("x1",x1);line.setAttribute("y1",y1);line.setAttribute("x2",x2);line.setAttribute("y2",y2)
+line.setAttribute("stroke",color);line.setAttribute("stroke-width","3");svg.appendChild(line)
+return line
+}
+function tryMatch(questionEl){
+if(!selectedPic) return
+const pic=selectedPic.dataset.pic,qIndex=parseInt(questionEl.dataset.index)
+const line=drawLine(selectedPic,questionEl,"gray")
+if(answers[pic]===qIndex){
+line.setAttribute("stroke","green")
+selectedPic.classList.remove("selected");selectedPic.classList.add("matched");questionEl.classList.add("matched")
+selectedPic=null;matched++
+if(matched===6){
+document.getElementById("congratsMessage").classList.remove("hidden");
+setTimeout(()=>{
+document.getElementById("congratsMessage").classList.add("hidden");
+document.getElementById("step2").classList.add("hidden");
+startStep3();
+},2000);
+}
+}else{
+line.setAttribute("stroke","red");setTimeout(()=>{line.remove()},800)
+selectedPic.classList.remove("selected");selectedPic=null
+}
+}
+
+/* STEP 3 DATA */
+const step3data = [
+{
+  row: 2,
+  text: "Because it is made of frozen water (ice crystals). It forms in clouds where the temperature is below 0°C. When snow falls, it takes ___ from the environment and from your body to melt. This transfer of heat makes you feel the cold.",
+  options: ["heat", "hot"],
+  correct: "heat",
+  answer: "Because it is made of frozen water (ice crystals). It forms in clouds where the temperature is below 0°C. When snow falls, it takes heat from the environment and from your body to melt. This transfer of heat makes you feel the cold."
+},
+{
+  row: 3,
+  text: "It is neither hot nor cold because it is not a physical object made of matter. It is an optical ___ made of light. Sunlight passes through raindrops in the air, bends, and splits into different colors. Because it is only light, it has no temperature.",
+  options: ["delusion", "illusion"],
+  correct: "illusion",
+  answer: "It is neither hot nor cold because it is not a physical object made of matter. It is an optical illusion made of light. Sunlight passes through raindrops in the air, bends, and splits into different colors. Because it is only light, it has no temperature."
+},
+{
+  row: 5,
+  text: "Their extra body weight is a key part of their sport. There, the goal is to push your opponent out of the ring or make them touch the ___ . A heavier body is harder to push. They gain weight through a special diet and lifestyle, but they are also very strong athletes with a lot of muscle under the fat.",
+  options: ["ground", "land"],
+  correct: "ground",
+  answer: "Their extra body weight is a key part of their sport. There, the goal is to push your opponent out of the ring or make them touch the ground. A heavier body is harder to push. They gain weight through a special diet and lifestyle, but they are also very strong athletes with a lot of muscle under the fat."
+},
+{
+  row: 4,
+  text: "Nobody has ever done it. Keep it mind – it is not like a normal ocean wave. It is a very fast, powerful wall of water caused by earthquakes or volcanoes. It crashes onto the ___ , destroying everything. You better run away from it.",
+  options: ["land", "Earth"],
+  correct: "land",
+  answer: "Nobody has ever done it. Keep it mind – it is not like a normal ocean wave. It is a very fast, powerful wall of water caused by earthquakes or volcanoes. It crashes onto the land, destroying everything. You better run away from it."
+},
+{
+  row: 1,
+  text: "When you ___ it, it releases a substance called lachrymatory-factor synthase. When a very small amount goes in your eye, it irritates the eye; so our eyes produce tears to wash it away and protect themselves.",
+  options: ["cut", "injure"],
+  correct: "cut",
+  answer: "When you cut it, it releases a substance called lachrymatory-factor synthase. When a very small amount goes in your eye, it irritates the eye; so our eyes produce tears to wash it away and protect themselves."
+},
+{
+  row: 0,
+  text: "Yes. If you travel, you'll notice that you can see different constellations of stars. This is because the ___ of the Earth is curved.",
+  options: ["surface", "top"],
+  correct: "surface",
+  answer: "Yes. If you travel, you'll notice that you can see different constellations of stars. This is because the surface of the Earth is curved."
+}
+];
+let currentStep3=0,waitingForCell=false;
+
+function startStep3(){document.getElementById("step3").classList.remove("hidden");showStory()}
+function showStory(){
+const data=step3data[currentStep3];
+let html=`<div class="story"><p>${data.text}</p><div>`;
+data.options.forEach(opt=>{html+=`<button class="choice" onclick="chooseWord('${opt}')">${opt}</button>`})
+html+=`</div><div id="hint" class="hint"></div></div>`;document.getElementById("storyArea").innerHTML=html;
+}
+function chooseWord(word){
+const data=step3data[currentStep3];
+document.querySelectorAll(".choice").forEach(b=>b.classList.add("disabled"))
+if(word===data.correct){
+waitingForCell=true;
+document.getElementById("hint").innerHTML="<b>Click the correct cell in column 3.</b>";
+document.querySelectorAll(".choice").forEach(b=>{if(b.innerText===word)b.classList.add("correct")})
+
+// Заменяем текст на полный ответ
+const storyPara = document.querySelector(".story p");
+if(storyPara) {
+    storyPara.innerHTML = data.answer;
+}
+}else{
+document.getElementById("hint").innerText="Try again.";
+document.querySelectorAll(".choice").forEach(b=>b.classList.remove("disabled"))
+}
+}
+document.querySelectorAll(".answerCell").forEach(cell=>{
+cell.onclick=()=>{
+if(!waitingForCell) return
+const row=parseInt(cell.dataset.row);
+const data=step3data[currentStep3];
+if(row===data.row){
+cell.innerHTML=data.answer;
+cell.classList.add("correct");
+waitingForCell=false;
+
+currentStep3++;
+if(currentStep3 < step3data.length){
+// Показываем таймер 3 2 1
+const storyArea = document.getElementById("storyArea");
+let timeLeft = 3;
+storyArea.innerHTML = `<div class="story"><div class="timer">${timeLeft}</div></div>`;
+
+const timer = setInterval(() => {
+    timeLeft--;
+    if(timeLeft > 0) {
+        storyArea.innerHTML = `<div class="story"><div class="timer">${timeLeft}</div></div>`;
+    } else {
+        clearInterval(timer);
+        showStory();
+    }
+}, 1000);
+} else {
+// Последний шаг - показываем Activity completed!
+document.getElementById("storyArea").innerHTML = '<div class="story"><div class="completed">Activity completed!</div></div>';
+}
+
+}else{
+cell.classList.add("wrong");
+setTimeout(()=>{cell.classList.remove("wrong")},3000)
+}
+}
+})
+</script>
+</body>
+</html>
