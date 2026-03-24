@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listing Callouts - Drag & Drop Words</title>
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Inter',sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f5f5f5;
+  }
+
+  .main-layout {
+    display: flex;
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+
+  /* Left side: image with callouts */
+  .image-area {
+    flex: 2;
+    min-width: 400px;
+  }
+  .listing-wrapper {
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .listing-wrapper img {
+    width: 100%;
+    display: block;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  /* Callouts (circles) */
+  .callout {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 15%;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+    color: #1f2937;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    z-index: 10;
+  }
+  .callout:hover {
+    transform: scale(1.1);
+  }
+  .callout.drag-over {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.5);
+    opacity: 0.9;
+  }
+  .callout.completed {
+    background-color: #7ca57f;
+    border-color: #266a2a;
+    opacity: 1;
+  }
+
+  /* Category colors for callouts (matching word colors) */
+  .callout-cat1 { background-color: #b8ccdb; border-color: #96b4ca; } /* rooms - blue */
+  .callout-cat2 { background-color: #f2e0ca; border-color: #eacca7; } /* structural - green */
+  .callout-cat3 { background-color: #c0aaa9; border-color: #a58685; } /* furniture - pink */
+
+  /* Right panel: draggable words */
+  .words-panel {
+    flex: 1;
+    min-width: 320px;
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    height: fit-content;
+    max-height: 180vh;
+    overflow-y: auto;
+  }
+  .words-panel h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+  .instruction {
+    font-size: 16px;
+    color: #6b7280;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .words-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .drag-word {
+    padding: 8px 14px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .drag-word:active {
+    cursor: grabbing;
+  }
+  .drag-word.dragging {
+    opacity: 0.4;
+  }
+  .drag-word.dragged-success {
+      
+    cursor: default;
+    opacity: 0.6;
+  }
+  .drag-word.dragged-success:active {
+    cursor: default;
+  }
+
+  /* Category colors for words (before drag) */
+  .word-cat1 { background-color: #b8ccdb; border: 1px solid #96b4ca; }
+  .word-cat2 { background-color: #f2e0ca; border: 1px solid #eacca7; }
+  .word-cat3 { background-color: #c0aaa9; border: 1px solid #a58685; }
+
+  .task-status {
+    margin-top: 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+  .progress-text {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .reset-btn {
+    background: #3b82f6;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 40px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .reset-btn:hover {
+    background: #2563eb;
+  }
+  #feedback {
+    margin-top: 16px;
+    background: #fef9e3;
+    border-left: 4px solid #f59e0b;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: #92400e;
+  }
+
+  @media (max-width: 900px) {
+    .main-layout {
+      flex-direction: column;
+    }
+    .callout {
+      width: 32px;
+      height: 32px;
+      font-size: 12px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="main-layout">
+  <!-- Left: Image with callouts -->
+  <div class="image-area">
+    <div class="listing-wrapper" id="listingWrapper">
+      <img src="https://nyairyg.github.io/verbose-happiness/house.png" alt="Property Listing" draggable="false">
+      <div id="callouts-container"></div>
+    </div>
+  </div>
+
+  <!-- Right: draggable words panel -->
+  <div class="words-panel">
+    <h3>📦 Drag each word to the correct numbered circle</h3>
+    <div class="instruction">
+      → Each word belongs to a specific numbered circle on the image<br>
+      → Colors match the word categories
+    </div>
+    <div id="words-container" class="words-grid"></div>
+  </div>
+</div>
+
+<!-- Status and feedback -->
+<div style="max-width: 1400px; margin: 20px auto 0;">
+  <div class="task-status">
+    <div class="progress-text">🎯 Task Progress</div>
+    <div id="taskStatus">0/0 words placed correctly</div>
+    <button class="reset-btn" id="resetBtn">⟳ Reset Task</button>
+  </div>
+  <div id="feedback">
+    💡 Drag each word onto its matching numbered circle on the image.
+  </div>
+</div>
+
+<script>
+  // ============================================
+  // DEFINE MAPPING: each word -> callout number
+  // ============================================
+  const wordToCalloutMapping = {
+    // Category 1: Rooms (blue) - numbers from your image
+    "a bathroom": 2,
+    "a bedroom": 3,
+    "a dining room": 5,
+    "a garage": 7,
+    "a hall": 8,
+    "a kitchen": 4,
+    "a living room":6,
+    "an office": 1,
+    "a yard": 9,
+    
+    // Category 2: Structural elements (green)
+    "a balcony": 11,
+    "the ceiling": 10,
+    "the floor": 12,
+    "the stairs": 14,
+    "the wall": 13,
+    
+    // Category 3: Furniture & appliances (pink)
+    "an armchair": 15,
+    "a bathtub": 20,
+    "a bed": 21,
+    "a cupboard": 18,
+    "a fireplace": 26,
+    "a lamp": 25,
+    "a light": 18,
+    "a mirror": 30,
+    "a plant": 31,
+    "a fridge": 24,
+    "a rug": 27,
+    "a shelf": 19,
+    "a shower": 17,
+    "a sofa": 28,
+    "a stove": 23,
+    "a toilet": 16,
+    "a washing machine": 29
+  };
+
+  // Define which callout numbers belong to which color category
+  const calloutCategoryMap = {
+    cat1: [1, 2, 3, 4, 5, 6, 7, 8, 9],     // rooms - blue
+    cat2: [10, 11, 12, 13, 14],              // structural - green
+    cat3: [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]  // furniture - pink
+  };
+
+  // Get category for a callout number
+  function getCalloutCategory(number) {
+    if (calloutCategoryMap.cat1.includes(number)) return 'cat1';
+    if (calloutCategoryMap.cat2.includes(number)) return 'cat2';
+    if (calloutCategoryMap.cat3.includes(number)) return 'cat3';
+    return 'cat1'; // default
+  }
+
+  // Get word category for coloring
+  function getWordCategory(wordText) {
+    const number = wordToCalloutMapping[wordText];
+    if (calloutCategoryMap.cat1.includes(number)) return 'cat1';
+    if (calloutCategoryMap.cat2.includes(number)) return 'cat2';
+    if (calloutCategoryMap.cat3.includes(number)) return 'cat3';
+    return 'cat1';
+  }
+
+  const allWords = Object.keys(wordToCalloutMapping);
+  const totalWords = allWords.length;
+  const usedCalloutNumbers = [...new Set(Object.values(wordToCalloutMapping))].sort((a,b) => a-b);
+
+  // ============================================
+  // POSITIONS for each callout number based on your image layout
+  // These are approximate - you can fine-tune by adjusting percentages
+  // ============================================
+  const calloutPositions = {
+    1: { top: "13%", left: "48.5%" },
+    2: { top: "26.5%", left: "25.5%" },
+    3: { top: "26.5%", left: "56%" },
+    4: { top: "51%", left: "4%" },
+    5: { top: "51%", left: "31%" },
+    6: { top: "50.5%", left: "71%" },
+    7: { top: "71%", left: "23%" },
+    8: { top: "71%", left: "61%" },
+    9: { top: "96%", left: "48%" },
+    10: { top: "26.5%", left: "42%" },
+    11: { top: "41.5%", left: "87%" },
+    12: { top: "65.5%", left: "14%" },
+    13: { top: "52.5%", left: "81.5%" },
+    14: { top: "76%", left: "50%" },
+    15: { top: "20%", left: "25%" },
+    16: { top: "39%", left: "16.5%" },
+    17: { top: "36.5%", left: "32.5%" },
+    18: { top: "30%", left: "42%" },
+    19: { top: "34%", left: "47.5%" },
+    20: { top: "41.5%", left: "44.5%" },
+    21: { top: "39%", left: "65%" },
+    22: { top: "61.5%", left: "4.5%" },
+    23: { top: "56.5%", left: "16.5%" },
+    24: { top: "60%", left: "23%" },
+    25: { top: "52%", left: "61%" },
+    26: { top: "59%", left: "73%" },
+    27: { top: "64.5%", left: "75%" },
+    28: { top: "62.5%", left: "86%" },
+    29: { top: "76.3%", left: "38%" },
+    30: { top: "74%", left: "69.5%" },
+    31: { top: "76.5%", left: "78%" }
+  };
+
+  let placedWordsSet = new Set();
+  let placedCount = 0;
+  
+  const wordsContainer = document.getElementById('words-container');
+  const calloutsContainer = document.getElementById('callouts-container');
+  const taskStatusDiv = document.getElementById('taskStatus');
+  const feedbackDiv = document.getElementById('feedback');
+  const resetBtn = document.getElementById('resetBtn');
+  
+  let wordElements = [];
+  let calloutElements = [];
+
+  function updateProgress() {
+    taskStatusDiv.innerHTML = `${placedCount}/${totalWords} words placed correctly`;
+    if (placedCount === totalWords) {
+      taskStatusDiv.innerHTML += `<br><span style="color: #10b981; font-weight: bold;">✅ Perfect! All words matched correctly!</span>`;
+      feedbackDiv.innerHTML = `🎉 Congratulations! You've completed the task!`;
+    }
+  }
+
+  function markWordAsPlaced(wordElement, wordText) {
+    if (placedWordsSet.has(wordText)) return false;
+    placedWordsSet.add(wordText);
+    placedCount++;
+    wordElement.classList.add('dragged-success');
+    wordElement.setAttribute('draggable', 'false');
+    wordElement.style.cursor = 'default';
+    
+    const calloutNumber = wordToCalloutMapping[wordText];
+    const targetCallout = document.querySelector(`.callout[data-callout-number="${calloutNumber}"]`);
+    if (targetCallout) {
+      targetCallout.classList.add('completed');
+    }
+    
+    updateProgress();
+    return true;
+  }
+
+  function resetTask() {
+    placedWordsSet.clear();
+    placedCount = 0;
+    
+    wordElements.forEach(el => {
+      el.classList.remove('dragged-success');
+      el.setAttribute('draggable', 'true');
+      el.style.cursor = 'grab';
+    });
+    
+    calloutElements.forEach(el => {
+      el.classList.remove('completed', 'drag-over');
+    });
+    
+    updateProgress();
+    feedbackDiv.innerHTML = `🔄 Task reset! Drag each word to its matching numbered circle.`;
+    setTimeout(() => {
+      if (feedbackDiv.innerHTML.includes('Task reset')) {
+        feedbackDiv.innerHTML = `💡 Drag each word onto its matching numbered circle on the image.`;
+      }
+    }, 3000);
+  }
+
+  function createDraggableWord(wordText) {
+    const div = document.createElement('div');
+    div.textContent = wordText;
+    div.classList.add('drag-word');
+    
+    const category = getWordCategory(wordText);
+    div.classList.add(`word-${category}`);
+    
+    div.setAttribute('data-word', wordText);
+    div.setAttribute('draggable', 'true');
+    
+    div.addEventListener('dragstart', (e) => {
+      if (div.classList.contains('dragged-success')) {
+        e.preventDefault();
+        return false;
+      }
+      div.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', wordText);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+    
+    div.addEventListener('dragend', (e) => {
+      div.classList.remove('dragging');
+    });
+    
+    return div;
+  }
+
+  function createCallouts() {
+    calloutsContainer.innerHTML = '';
+    calloutElements = [];
+    
+    usedCalloutNumbers.forEach(number => {
+      const position = calloutPositions[number] || { top: "50%", left: "50%" };
+      const callout = document.createElement('div');
+      callout.className = 'callout';
+      
+      const category = getCalloutCategory(number);
+      callout.classList.add(`callout-${category}`);
+      
+      callout.textContent = number;
+      callout.setAttribute('data-callout-number', number);
+      callout.style.top = position.top;
+      callout.style.left = position.left;
+      
+      callout.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+        if (!callout.classList.contains('completed')) {
+          callout.classList.add('drag-over');
+        }
+      });
+      
+      callout.addEventListener('dragleave', () => {
+        callout.classList.remove('drag-over');
+      });
+      
+      callout.addEventListener('drop', (e) => {
+        e.preventDefault();
+        callout.classList.remove('drag-over');
+        
+        const wordText = e.dataTransfer.getData('text/plain');
+        const draggedWord = document.querySelector(`.drag-word[data-word="${wordText}"]`);
+        
+        if (!draggedWord) return;
+        
+        if (placedWordsSet.has(wordText)) {
+          feedbackDiv.innerHTML = `⚠️ "${wordText}" is already placed! Use Reset to try again.`;
+          setTimeout(() => {
+            if (feedbackDiv.innerHTML.includes('already placed')) {
+              feedbackDiv.innerHTML = `💡 Drag each word onto its matching numbered circle on the image.`;
+            }
+          }, 2000);
+          return;
+        }
+        
+        const expectedCalloutNumber = wordToCalloutMapping[wordText];
+        const droppedCalloutNumber = parseInt(callout.getAttribute('data-callout-number'));
+        
+        if (expectedCalloutNumber === droppedCalloutNumber) {
+          markWordAsPlaced(draggedWord, wordText);
+          feedbackDiv.innerHTML = `✅ Correct! "${wordText}" →  ${droppedCalloutNumber}`;
+        } else {
+          feedbackDiv.innerHTML = `❌ "${wordText}" belongs to circle ${expectedCalloutNumber}, not circle ${droppedCalloutNumber}. Try again!`;
+          setTimeout(() => {
+            if (feedbackDiv.innerHTML.includes('belongs to circle')) {
+              feedbackDiv.innerHTML = `💡 Drag each word onto its matching numbered circle on the image.`;
+            }
+          }, 2500);
+        }
+      });
+      
+      calloutsContainer.appendChild(callout);
+      calloutElements.push(callout);
+    });
+  }
+
+  function buildWordsUI() {
+    wordsContainer.innerHTML = '';
+    wordElements = [];
+    
+    allWords.forEach(word => {
+      const wordEl = createDraggableWord(word);
+      wordsContainer.appendChild(wordEl);
+      wordElements.push(wordEl);
+    });
+  }
+
+  function init() {
+    buildWordsUI();
+    createCallouts();
+    resetTask();
+  }
+  
+  window.addEventListener('dragstart', (e) => {
+    if (e.target.tagName === 'IMG') e.preventDefault();
+  });
+  
+  resetBtn.addEventListener('click', resetTask);
+  init();
+</script>
+</body>
+</html>
