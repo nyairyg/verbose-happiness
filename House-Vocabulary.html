@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>House Vocabulary</title>
+<title>Listing Callouts - Drag & Drop Words</title>
 <style>
   * {
     box-sizing: border-box;
@@ -21,6 +21,7 @@
     max-width: 1400px;
     margin: 0 auto;
     flex-wrap: wrap;
+    align-items: flex-start;
   }
 
   /* Left side: image with callouts */
@@ -32,8 +33,8 @@
   }
   .listing-wrapper {
     position: relative;
-    width: 70%;  /* Scale image to 70% */
-    max-width: 480px; /* 600px * 0.8 = 480px */
+    width: 75%;  /* Scale image to 75% */
+    max-width: 450px; /* 600px * 0.75 = 450px */
     margin: 0 auto;
   }
   .listing-wrapper img {
@@ -46,8 +47,8 @@
   /* Callouts (circles) */
   .callout {
     position: absolute;
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     border-radius: 15%;
     border: 2px solid white;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
@@ -83,14 +84,16 @@
   /* Right panel: draggable words */
   .words-panel {
     flex: 1;
-    min-width: 320px;
+    min-width: 400px;
     background: white;
     border-radius: 16px;
     padding: 20px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    height: fit-content;
-    max-height: 180vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
   }
   .words-panel h3 {
     margin-top: 0;
@@ -108,11 +111,12 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    margin-bottom: 24px;
   }
   .drag-word {
     padding: 8px 14px;
     border-radius: 40px;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 500;
     cursor: grab;
     user-select: none;
@@ -138,9 +142,9 @@
   .word-cat2 { background-color: #f2e0ca; border: 1px solid #eacca7; }
   .word-cat3 { background-color: #c0aaa9; border: 1px solid #a58685; }
 
+  /* Task status inside right panel */
   .task-status {
-    margin-top: 20px;
-    background: white;
+    background: #f9fafb;
     border-radius: 12px;
     padding: 15px 20px;
     display: flex;
@@ -148,7 +152,8 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    margin-bottom: 16px;
+    border: 1px solid #e5e7eb;
   }
   .progress-text {
     font-weight: 600;
@@ -167,13 +172,14 @@
   .reset-btn:hover {
     background: #2563eb;
   }
-  #feedback {
-    margin-top: 16px;
+  
+  /* Feedback inside right panel */
+  .feedback-container {
     background: #fef9e3;
     border-left: 4px solid #f59e0b;
     padding: 12px 16px;
     border-radius: 10px;
-    font-size: 11px;
+    font-size: 12px;
     color: #92400e;
   }
 
@@ -203,26 +209,28 @@
     </div>
   </div>
 
-  <!-- Right: draggable words panel -->
+  <!-- Right: draggable words panel with progress and feedback -->
   <div class="words-panel">
     <h3>📦 Drag each word to the correct numbered circle</h3>
     <div class="instruction">
       → Each word belongs to a specific numbered circle on the image<br>
       → Colors match the word categories
     </div>
+    
+    <!-- Task Status inside right panel -->
+    <div class="task-status">
+      <div class="progress-text">🎯 Task Progress</div>
+      <div id="taskStatus">0/0 words placed correctly</div>
+      <button class="reset-btn" id="resetBtn">⟳ Reset Task</button>
+    </div>
+    
+    <!-- Words grid -->
     <div id="words-container" class="words-grid"></div>
-  </div>
-</div>
-
-<!-- Status and feedback -->
-<div style="max-width: 1400px; margin: 20px auto 0;">
-  <div class="task-status">
-    <div class="progress-text">🎯 Task Progress</div>
-    <div id="taskStatus">0/0 words placed correctly</div>
-    <button class="reset-btn" id="resetBtn">⟳ Reset Task</button>
-  </div>
-  <div id="feedback">
-    💡 Drag each word onto its matching numbered circle on the image.
+    
+    <!-- Feedback inside right panel -->
+    <div id="feedback" class="feedback-container">
+      💡 Drag each word onto its matching numbered circle on the image.
+    </div>
   </div>
 </div>
 
@@ -298,7 +306,7 @@
   const usedCalloutNumbers = [...new Set(Object.values(wordToCalloutMapping))].sort((a,b) => a-b);
 
   // ============================================
-  // POSITIONS for each callout number - adjusted for 80% scale
+  // POSITIONS for each callout number - adjusted for 75% scale
   // These percentages remain the same because they're relative to the container
   // ============================================
   const calloutPositions = {
@@ -350,7 +358,7 @@
   function updateProgress() {
     taskStatusDiv.innerHTML = `${placedCount}/${totalWords} words placed correctly`;
     if (placedCount === totalWords) {
-      taskStatusDiv.innerHTML += `<br><span style="color: #10b981; font-weight: bold;">✅ Perfect! All words matched correctly!</span>`;
+      taskStatusDiv.innerHTML += `<br><span style="color: #10b981; font-weight: bold;">✅ Perfect!</span>`;
       feedbackDiv.innerHTML = `🎉 Congratulations! You've completed the task!`;
     }
   }
@@ -479,7 +487,7 @@
           markWordAsPlaced(draggedWord, wordText);
           feedbackDiv.innerHTML = `✅ Correct! "${wordText}" → ${droppedCalloutNumber}`;
         } else {
-          feedbackDiv.innerHTML = `❌ "${wordText}" belongs to circle ${expectedCalloutNumber}, not circle ${droppedCalloutNumber}. Try again!`;
+          feedbackDiv.innerHTML = `❌ Try again!`;
           setTimeout(() => {
             if (feedbackDiv.innerHTML.includes('belongs to circle')) {
               feedbackDiv.innerHTML = `💡 Drag each word onto its matching numbered circle on the image.`;
