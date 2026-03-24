@@ -27,10 +27,13 @@
   .image-area {
     flex: 2;
     min-width: 400px;
+    display: flex;
+    justify-content: center;
   }
   .listing-wrapper {
     position: relative;
-    max-width: 600px;
+    width: 80%;  /* Scale image to 80% */
+    max-width: 480px; /* 600px * 0.8 = 480px */
     margin: 0 auto;
   }
   .listing-wrapper img {
@@ -123,7 +126,6 @@
     opacity: 0.4;
   }
   .drag-word.dragged-success {
-      
     cursor: default;
     opacity: 0.6;
   }
@@ -184,6 +186,9 @@
       height: 32px;
       font-size: 12px;
     }
+    .listing-wrapper {
+      width: 90%;
+    }
   }
 </style>
 </head>
@@ -233,7 +238,7 @@
     "a garage": 7,
     "a hall": 8,
     "a kitchen": 4,
-    "a living room":6,
+    "a living room": 6,
     "an office": 1,
     "a yard": 9,
     
@@ -293,8 +298,8 @@
   const usedCalloutNumbers = [...new Set(Object.values(wordToCalloutMapping))].sort((a,b) => a-b);
 
   // ============================================
-  // POSITIONS for each callout number based on your image layout
-  // These are approximate - you can fine-tune by adjusting percentages
+  // POSITIONS for each callout number - adjusted for 80% scale
+  // These percentages remain the same because they're relative to the container
   // ============================================
   const calloutPositions = {
     1: { top: "13%", left: "48.5%" },
@@ -472,7 +477,7 @@
         
         if (expectedCalloutNumber === droppedCalloutNumber) {
           markWordAsPlaced(draggedWord, wordText);
-          feedbackDiv.innerHTML = `✅ Correct! "${wordText}" →  ${droppedCalloutNumber}`;
+          feedbackDiv.innerHTML = `✅ Correct! "${wordText}" → ${droppedCalloutNumber}`;
         } else {
           feedbackDiv.innerHTML = `❌ "${wordText}" belongs to circle ${expectedCalloutNumber}, not circle ${droppedCalloutNumber}. Try again!`;
           setTimeout(() => {
