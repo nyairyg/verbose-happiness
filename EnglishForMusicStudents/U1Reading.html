@@ -1,0 +1,665 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Music Theory: Comprehensive Reading & Quiz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f4f2ef;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 24px 32px;
+        }
+
+        .dashboard {
+            max-width: 1600px;
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            background: transparent;
+        }
+
+        .reading-column {
+            flex: 1.2;
+            min-width: 340px;
+            background: #fffefc;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #ece4df;
+            height: fit-content;
+        }
+
+        .quiz-column {
+            flex: 1;
+            min-width: 360px;
+            background: #fffefc;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #ece4df;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+
+        .section-header {
+            padding: 24px 28px 12px 28px;
+            border-bottom: 2px solid #f0e7e2;
+        }
+
+        .section-header h2 {
+            font-size: 1.65rem;
+            font-weight: 600;
+            color: #3f2e2a;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h2 i {
+            color: #b28b7a;
+            font-size: 1.5rem;
+        }
+
+        .content-padding {
+            padding: 20px 28px 28px 28px;
+        }
+
+        .passage {
+            font-size: 1rem;
+            line-height: 1.65;
+            color: #2c241f;
+            background: #fefaf8;
+            border-radius: 20px;
+            padding: 4px 0;
+        }
+
+        .passage p {
+            margin-bottom: 1.2rem;
+        }
+
+        .passage img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 16px auto;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .truefalse-list {
+            margin-top: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tf-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+            background: #fefbf9;
+            padding: 10px 16px;
+            border-radius: 60px;
+            transition: background 0.2s;
+            border: 1px solid #f0e3dd;
+        }
+
+        .tf-item:hover {
+            background: #fff7f3;
+        }
+
+        .tf-statement {
+            flex: 1;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #3f2e2a;
+        }
+
+        .tf-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .tf-btn {
+            background: #f1edeb;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 6px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #5f4c44;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        /* Blue selection for True/False */
+        .tf-btn.selected-true {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 6px rgba(59,130,246,0.3);
+        }
+
+        .tf-btn.selected-false {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 6px rgba(59,130,246,0.3);
+        }
+
+        /* Green/Red result highlighting */
+        .tf-item.correct-item {
+            background: #e8f5e9;
+            border-color: #81c784;
+        }
+
+        .tf-item.incorrect-item {
+            background: #ffebee;
+            border-color: #e57373;
+        }
+
+        .mc-question {
+            background: #fefbf9;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            border: 1px solid #efe4df;
+            transition: all 0.15s;
+        }
+
+        .mc-question.correct-mc {
+            background: #e8f5e9;
+            border-color: #81c784;
+        }
+
+        .mc-question.incorrect-mc {
+            background: #ffebee;
+            border-color: #e57373;
+        }
+
+        .mc-question p {
+            font-weight: 600;
+            color: #3f2e2a;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .mc-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .mc-option {
+            background: #f5f0ed;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #4c3a34;
+            font-weight: 500;
+            border: 1px solid #e1d5cf;
+        }
+
+        .mc-option.selected {
+            background: #538e9b;
+            color: white;
+            border-color: #3f727e;
+            box-shadow: 0 2px 6px rgba(83, 142, 155, 0.25);
+        }
+
+        /* Correct/incorrect answer styling for options after check */
+        .mc-option.correct-answer-highlight {
+            background: #4caf50;
+            color: white;
+            border-color: #388e3c;
+        }
+
+        .mc-option.wrong-answer-highlight {
+            background: #f44336;
+            color: white;
+            border-color: #d32f2f;
+            text-decoration: line-through;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 16px;
+            margin: 20px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: #538e9b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3f727e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #d9cdc5;
+            color: #4c3a34;
+        }
+
+        .btn-secondary:hover {
+            background: #cbbbb0;
+        }
+
+        .result-panel {
+            margin-top: 20px;
+            background: #faf7f4;
+            border-radius: 24px;
+            padding: 16px 20px;
+            border-left: 5px solid #b28b7a;
+        }
+
+        .score-text {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .counter-badge {
+            background: #e8e0da;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 16px;
+            color: #4d3730;
+        }
+
+        hr {
+            margin: 18px 0;
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #e2d5ce, transparent);
+        }
+        
+        .section-divider {
+            margin: 12px 0 8px;
+            font-weight: 600;
+            color: #8b6e62;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .indented-list {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+    
+        @media (max-width: 950px) {
+            body {
+                padding: 16px;
+            }
+            .dashboard {
+                flex-direction: column;
+            }
+            .tf-item {
+                flex-wrap: wrap;
+            }
+            .mc-options {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <!-- LEFT COLUMN: Extended reading passage -->
+    <div class="reading-column">
+        <div class="section-header">
+            <h2><i class="fas fa-book-open"></i> Music Notation & Theory</h2>
+        </div>
+        <div class="content-padding">
+            <div class="passage">
+                <p>Music is made up of sounds that can be organised into three main elements: melody, rhythm, and harmony. These elements are passed from one musician to another by music notation, which allows a reader to precisely locate and reproduce any musical sound by a set of symbols that represent both the pitch of a note and its rhythm (placement in time).</p>
+                <p>The foundation of our notation system is a set of five lines called a staff. The position of notes placed on the staff represents relative highness or lowness of the pitches. The higher the pitch, the higher the note is placed on the staff.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u1r1-pic1.png" alt="Music Theory Illustration">
+                <p>Each line and space of the staff may be assigned a note name. These note names are the same as the first seven letters of the alphabet (A, B, C, D, E, F, and G) and together are called the musical alphabet. Despite the large number of notes that can be produced by musical instruments, only seven note names are needed because the eighth note, called the octave, has the same sound as the first, but higher in pitch, and therefore uses the same letter name as the first note. The octave is both the end of the first set of notes and the beginning of the next. So the music alphabet goes from A to G, and then starts over. Different instruments are capable of producing sounds in different ranges of pitch, some in many different octaves and some in only a few, but all of these pitches are notated with the same seven letter names.</p>
+                <p>Because different instruments produce higher or lower ranges of pitch, the staff can be made to represent different ranges of pitch by means of a clef sign. The two most usual clef signs are treble clef, which is used to notate higher-pitched sounds (e.g. the guitar, the right hand of the keyboard), and bass clef, which is used to notate lower-pitched sounds (e.g., the bass, the left hand of the keyboard).</p>
+                <p>The location of the note names is determined by the clef placed at the beginning of the staff. The following example uses the treble clef. The treble clef, also known as the G clef, locates G above ‘middle C’ on the second line of the staff.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u1r1-pic2.png" alt="Music Theory Illustration 2">
+                <p>The bass clef (also called the F clef) locates F below ‘middle C’ on the fourth line of the staff.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u1r1-pic3.png" alt="Music Theory Illustration 3">
+                <p>Because the keyboard uses both the treble and bass clef, the two clefs and two staves are used together, one placed above the other, to form the grand staff (also called the great staff). This way, both the highest and lowest pitches can be seen and played together.</p>
+                <p>There is also another clef used in music notation; the C clef which locates ‘middle C’ on the middle line (or, in some cases, on the fourth line) of the staff.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u1r1-pic4.png" alt="Music Theory Illustration 4">
+                <p>For notes above or below the range of staff, small lines called ledger lines are added to extend the staff. Ledger lines function like the lines of the staff, and notes can be placed on or between the lines just as in the lines and spaces of a staff.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u1r1-pic5.png" alt="Music Theory Illustration 5">
+                <p>Every line or space on the staff represents a white key on the keyboard. What about the other five notes (the black keys)? </p>
+                <p>In order to maintain the integrity of the alphabet, the other five pitches are represented as alterations of the basic seven pitches. The terms used are sharp and flat. Sharp means half step higher, written as #; and flat means half step lower, written as ♭. The sharp and flat signs are placed before the note for reading purposes.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u1r1-pic6.png" alt="Music Theory Illustration 6">
+                <p>Once a sharp or flat has occurred in a measure, there must be a way of cancelling (neutralising) it so that the note reverts to its unaltered condition. The symbol used for this is a natural ( ♮ ). Collectively, sharps, flats and naturals are called accidentals.</p>
+                <p>In certain situations, it may become necessary to raise or lower a pitch by two half steps. The symbols for these purposes are <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u1r1-pic7.png" alt="double sharp symbol" style="display:inline; width:3.5%; height:3.5%; margin:0;"> for a double sharp and 𝄫 for a double flat. These symbols are also called accidentals.</p>
+                <p>The rules for sharps ( # ), flats ( ♭ ), naturals ( ♮ ), double sharps (<img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u1r1-pic7.png" alt="double sharp" style="display:inline; width:3.5%; height:3.5%; margin:0;">), and double flats (𝄫) are:</p>
+                <p class="indented-list"> 1) A natural cancels a sharp or flat.</p>
+                <p class="indented-list">2) A single sharp or flat cancels a double sharp or double flat respectively.</p>
+                <p class="indented-list">3) One natural alone cancels both double sharps and double flats.</p>
+                <p class="indented-list">4) An accidental remains in effect for the duration of the measure it is in, or for the duration of tied pitches, inside a measure or across the bar line.</p>
+                <p class="indented-list">5) To raise a note which has previously been sharped, use a double sharp; to lower a note which has been flatted, use a double flat.</p>
+                <p class="indented-list">6) An accidental only affects a specific note in that octave, in that clef. All other notes of the same name are not affected.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Part 1 + Part 2 -->
+    <div class="quiz-column">
+        <div class="section-header">
+            <h2><i class="fas fa-puzzle-piece"></i> Knowledge Check</h2>
+        </div>
+        <div class="content-padding">
+            <div class="truefalse-list">
+                <div class="section-divider">
+                    <i class="fas fa-check-square" style="color:#b28b7a;"></i> <span style="font-size: 1.2rem; font-weight:600;">Part 1: True or False</span>
+                </div>
+                <div id="tf-container"></div>
+            </div>
+
+            <hr>
+
+            <div class="section-divider" style="margin-top: 4px;">
+                <i class="fas fa-list-ul" style="color:#b28b7a;"></i> <span style="font-size: 1.2rem; font-weight:600;">Part 2: Multiple Choice</span>
+            </div>
+            <div class="counter-badge" id="mc-counter"><i class="fas fa-check-circle"></i> Questions: 0/10 answered</div>
+            <div id="mc-container"></div>
+
+            <div class="action-bar">
+                <button class="btn btn-primary" id="checkAnswersBtn"><i class="fas fa-check-double"></i> Check Answers</button>
+                <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset All</button>
+            </div>
+            <div id="globalResult" class="result-panel" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // DATA
+    const tfStatements = [
+        "The music alphabet is made up of seven letters, and then it starts over.",
+        "Two clefs are used in the grand staff: the G and C clefs.",
+        "The treble clef locates G below ‘middle C’ on the second line of the staff.",
+        "The F clef is used to notate lower-pitched sounds.",
+        "Notes can be placed on or between the ledger lines just like the lines of the staff.",
+        "Sharps and flats represent black keys on the keyboard.",
+        "The sharp and flat signs are written before the note on the staff.",
+        "An accidental remains in effect for the duration of the entire song.",
+        "Sharps and flats only affect a specific note in that octave, in that clef."
+    ];
+    
+    const tfCorrect = [
+        true, false, false, true, true, true, true, false, true
+    ];
+
+    const mcQuestions = [
+        { text: "Musical sounds are organised into all the following elements except …", options: ["melody", "notation", "harmony", "rhythm"], correct: 1 },
+        { text: "The position of notes placed on the staff represents ...", options: ["the duration of notes", "the pitch of notes", "the highness or lowness of notes", "b and c"], correct: 3 },
+        { text: "Which of the following is not true about the music alphabet?", options: ["The note names are the same as the first seven letters of the alphabet.", "It goes from A to G.", "The eighth note has the same name as the first one.", "The eighth note has the same pitch as the first one."], correct: 3 },
+        { text: "The octave ...", options: ["is the eighth note in a set of consecutive notes", "has the same name as the first note", "has the same pitch as the first note", "a and b"], correct: 3 },
+        { text: "Which of the following is not true about the G clef?", options: ["It is used to notate higher-pitched sounds.", "It is used to notate lower-pitched sounds.", "It is one of the clefs used in the grand staff.", "It is also called treble clef."], correct: 1 },
+        { text: "The grand staff is made up of all the following, except ...", options: ["the G clef", "the C clef", "the F clef", "two staves"], correct: 1 },
+        { text: "All the following except … are called accidentals.", options: ["flat", "natural", "octave", "sharp"], correct: 2 },
+        { text: "The symbol ‘𝄫’ is used to indicate a ...", options: ["flat", "sharp", "double flat", "double sharp"], correct: 2 },
+        { text: "The symbol ‘♮’ is used to indicate a ...", options: ["flat", "natural", "sharp", "double sharp"], correct: 1 },
+        { text: "A … is used to raise a note by two half steps.", options: ["flat", "sharp", "double flat", "double sharp"], correct: 3 }
+    ];
+
+    let tfSelections = new Array(9).fill(null);
+    let mcSelections = new Array(10).fill(null);
+    let resultsVisible = false;
+
+    const tfContainer = document.getElementById('tf-container');
+    const mcContainer = document.getElementById('mc-container');
+    const globalResultDiv = document.getElementById('globalResult');
+    const mcCounterSpan = document.getElementById('mc-counter');
+
+    function updateMCCounter() {
+        const answered = mcSelections.filter(s => s !== null).length;
+        mcCounterSpan.innerHTML = `<i class="fas fa-check-circle"></i> Questions: ${answered}/${mcQuestions.length} answered`;
+    }
+    
+    function hideResultPanel() {
+        if (globalResultDiv) globalResultDiv.style.display = 'none';
+        resultsVisible = false;
+    }
+
+    // Clear all result highlighting
+    function clearHighlighting() {
+        document.querySelectorAll('.tf-item').forEach(item => {
+            item.classList.remove('correct-item', 'incorrect-item');
+        });
+        document.querySelectorAll('.mc-question').forEach(q => {
+            q.classList.remove('correct-mc', 'incorrect-mc');
+        });
+        document.querySelectorAll('.mc-option').forEach(opt => {
+            opt.classList.remove('correct-answer-highlight', 'wrong-answer-highlight');
+        });
+    }
+
+    // Render Part 1
+    function renderTrueFalse() {
+        tfContainer.innerHTML = '';
+        tfStatements.forEach((stmt, idx) => {
+            const row = document.createElement('div');
+            row.className = 'tf-item';
+            const statementSpan = document.createElement('div');
+            statementSpan.className = 'tf-statement';
+            statementSpan.innerText = `${idx+1}. ${stmt}`;
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'tf-buttons';
+            
+            const trueBtn = document.createElement('button');
+            trueBtn.innerText = 'T';
+            trueBtn.className = 'tf-btn';
+            const falseBtn = document.createElement('button');
+            falseBtn.innerText = 'F';
+            falseBtn.className = 'tf-btn';
+            
+            if (tfSelections[idx] === 'T') trueBtn.classList.add('selected-true');
+            if (tfSelections[idx] === 'F') falseBtn.classList.add('selected-false');
+            
+            trueBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tfSelections[idx] = 'T';
+                if (resultsVisible) clearHighlighting();
+                resultsVisible = false;
+                hideResultPanel();
+                renderTrueFalse();
+                renderMultipleChoice(); 
+            });
+            falseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tfSelections[idx] = 'F';
+                if (resultsVisible) clearHighlighting();
+                resultsVisible = false;
+                hideResultPanel();
+                renderTrueFalse();
+                renderMultipleChoice();
+            });
+            
+            btnGroup.appendChild(trueBtn);
+            btnGroup.appendChild(falseBtn);
+            row.appendChild(statementSpan);
+            row.appendChild(btnGroup);
+            tfContainer.appendChild(row);
+        });
+    }
+    
+    // Render Part 2
+    function renderMultipleChoice() {
+        mcContainer.innerHTML = '';
+        mcQuestions.forEach((q, qIdx) => {
+            const card = document.createElement('div');
+            card.className = 'mc-question';
+            const questionText = document.createElement('p');
+            questionText.innerHTML = `<strong>${qIdx+1}.</strong> ${q.text}`;
+            card.appendChild(questionText);
+            
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'mc-options';
+            q.options.forEach((opt, optIdx) => {
+                const optSpan = document.createElement('span');
+                optSpan.className = 'mc-option';
+                optSpan.innerText = `${String.fromCharCode(97+optIdx)}) ${opt}`;
+                if (mcSelections[qIdx] === optIdx) optSpan.classList.add('selected');
+                optSpan.addEventListener('click', () => {
+                    mcSelections[qIdx] = optIdx;
+                    if (resultsVisible) clearHighlighting();
+                    resultsVisible = false;
+                    hideResultPanel();
+                    renderMultipleChoice();
+                    updateMCCounter();
+                });
+                optionsDiv.appendChild(optSpan);
+            });
+            card.appendChild(optionsDiv);
+            mcContainer.appendChild(card);
+        });
+        updateMCCounter();
+    }
+    
+    // Apply green/red styling after check (no explanations)
+    
+// Apply green/red styling after check (NO correct answers shown)
+function applyResultStyling() {
+    // Part 1 styling - only color the whole row, not the answer
+    const tfItems = document.querySelectorAll('.tf-item');
+    tfStatements.forEach((_, idx) => {
+        const user = tfSelections[idx];
+        if (user !== null) {
+            const isCorrect = (user === 'T' && tfCorrect[idx] === true) || (user === 'F' && tfCorrect[idx] === false);
+            const itemDiv = tfItems[idx];
+            if (isCorrect) {
+                itemDiv.classList.add('correct-item');
+            } else {
+                itemDiv.classList.add('incorrect-item');
+            }
+        }
+    });
+    
+    // Part 2 styling - ONLY color the card, NOT the correct answer
+    for (let i = 0; i < mcQuestions.length; i++) {
+        const card = document.querySelectorAll('.mc-question')[i];
+        const userIdx = mcSelections[i];
+        
+        if (userIdx !== null) {
+            const isCorrect = (userIdx === mcQuestions[i].correct);
+            if (isCorrect) {
+                card.classList.add('correct-mc');
+            } else {
+                card.classList.add('incorrect-mc');
+            }
+        }
+    }
+}
+    
+    // Check answers: show score, apply green/red, no detailed feedback
+    function checkAnswers() {
+        let tfScore = 0;
+        for (let i = 0; i < tfStatements.length; i++) {
+            const user = tfSelections[i];
+            if (user !== null) {
+                const isCorrect = (user === 'T' && tfCorrect[i] === true) || (user === 'F' && tfCorrect[i] === false);
+                if (isCorrect) tfScore++;
+            }
+        }
+        
+        let mcScore = 0;
+        for (let i = 0; i < mcQuestions.length; i++) {
+            if (mcSelections[i] !== null && mcSelections[i] === mcQuestions[i].correct) mcScore++;
+        }
+        
+        const totalPossible = tfStatements.length + mcQuestions.length;
+        const totalScore = tfScore + mcScore;
+        const percent = Math.round((totalScore / totalPossible) * 100);
+        
+        let allAnswered = true;
+        for (let i = 0; i < tfSelections.length; i++) if (tfSelections[i] === null) allAnswered = false;
+        for (let i = 0; i < mcSelections.length; i++) if (mcSelections[i] === null) allAnswered = false;
+        
+        let message = '';
+        if (totalScore === totalPossible) {
+            message = `<i class="fas fa-trophy"></i> Perfect! ${totalScore}/${totalPossible} (${percent}%) — Excellent!`;
+        } else {
+            message = `<i class="fas fa-chart-line"></i> Your score: ${totalScore}/${totalPossible} (${percent}%)<br>`;
+            message += `<span style="font-size:0.85rem;">✓ Part 1 (T/F): ${tfScore}/${tfStatements.length} &nbsp;|&nbsp; ✓ Part 2 (MC): ${mcScore}/${mcQuestions.length}</span>`;
+        }
+        
+        if (!allAnswered) {
+            message += `<div style="margin-top:8px;"><i class="fas fa-exclamation-triangle"></i> You have unanswered questions. Please answer all before checking for full score.</div>`;
+        }
+        
+        globalResultDiv.innerHTML = `<div class="score-text">${message}</div>`;
+        globalResultDiv.style.display = 'block';
+        
+        // Clear previous styling then apply fresh green/red
+        clearHighlighting();
+        applyResultStyling();
+        resultsVisible = true;
+        globalResultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    function resetAll() {
+        tfSelections = new Array(9).fill(null);
+        mcSelections = new Array(10).fill(null);
+        resultsVisible = false;
+        clearHighlighting();
+        renderTrueFalse();
+        renderMultipleChoice();
+        hideResultPanel();
+        updateMCCounter();
+    }
+    
+    function bindGlobalButtons() {
+        document.getElementById('checkAnswersBtn').addEventListener('click', checkAnswers);
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
+    }
+    
+    function init() {
+        renderTrueFalse();
+        renderMultipleChoice();
+        bindGlobalButtons();
+        updateMCCounter();
+        hideResultPanel();
+    }
+    
+    init();
+</script>
+</body>
+</html>
+```
