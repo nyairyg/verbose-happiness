@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Drag & Drop: Music Theory Vocabulary</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: #fbf9f8;
+            color: #817570;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 900px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #564e4a;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #817570;
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .text-container {
+            flex: 2;
+            min-width: 300px;
+            background-color: #fbf9f8;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #e1e4e8;
+        }
+        
+        .text-header {
+            background-color: #538e9b;
+            color: #fbf9f8;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        .text-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .text-content {
+            padding: 30px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            color: #24292e;
+        }
+        
+        /* Updated question container: flex-start alignment for numbers */
+        .question {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;   /* Align to top-left */
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .question-number {
+            font-weight: 700;
+            color: #564e4a;
+            min-width: 28px;           /* fixed width for consistent alignment */
+            line-height: 1.5;
+            font-size: 1.05rem;
+        }
+        
+        .question-text {
+            flex: 1;
+            min-width: 200px;
+            line-height: 1.5;
+        }
+        
+        /* Drop zone styling - no extra highlighting on dropped item background */
+        .drop-zone {
+            display: inline-block;
+            background-color: #eef2f5;
+            border: 2px dashed #bbcfd7;
+            border-radius: 4px;
+            height: 34px;
+            margin: 0 3px;
+            padding: 0 6px;
+            transition: all 0.2s;
+            vertical-align: middle;
+            position: relative;
+            min-width: 120px;
+            background-clip: padding-box;
+        }
+        
+        .drop-zone.highlight {
+            background-color: #e8f4fd;
+            border-color: #0969da;
+            border-style: solid;
+        }
+        
+        .drop-zone.empty {
+            display: inline-block;
+        }
+        
+        /* Placeholder effect only for empty zones */
+        .drop-zone.empty::after {
+            content: "___________";
+            color: #a0aec0;
+            font-size: 0.85rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        
+        /* Dropped items - clean background, no extra 'highlight' layer inside gap */
+        .dropped-item {
+            display: inline-block;
+            background-color: #80b0bb;
+            color: #fbf9f8;
+            padding: 4px 10px;
+            border-radius: 4px;
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            user-select: none;
+            border: 1px solid #80b0bb;
+            line-height: 1.4;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        
+        .dropped-item:hover {
+            background-color: #538e9b;
+            transform: scale(1.01);
+        }
+        
+        .dropped-item.correct {
+            background-color: #539b60;
+            border-color: #75af7f;
+        }
+        
+        .dropped-item.incorrect {
+            background-color: #c05b6d;
+            border-color: #a84153;
+        }
+        
+        .phrase-bank {
+            flex: 1;
+            min-width: 250px;
+            background-color: #fbf9f8;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #eadfdb;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .phrase-header {
+            background-color: #c4a79b;
+            color: #fbf9f8;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        .phrase-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .phrase-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .drag-item {
+            background-color: #fbf9f8;
+            border: 2px solid #c4a79b;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            cursor: grab;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 500;
+            color: #403a38;
+            user-select: none;
+            line-height: 1.4;
+            font-size: 0.95rem;
+        }
+        
+        .drag-item:hover {
+            background-color: #e8f4fd;
+            border-color: #538e9b;
+        }
+        
+        .drag-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        
+        .drag-item.used {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-style: dashed;
+            background-color: #f0ecea;
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #538e9b;
+        }
+        
+        .feedback h3 {
+            color: #538e9b;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .btn-check {
+            background-color: #539B60;
+            color: #fbf9f8;
+        }
+        
+        .btn-check:hover {
+            background-color: #427c4c;
+        }
+        
+        .btn-reset {
+            background-color: #c05b6d;
+            color: #fbf9f8;
+        }
+        
+        .btn-reset:hover {
+            background-color: #a84153;
+        }
+        
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .result.correct {
+            background-color: rgba(83, 155, 96, 0.1);
+            border-left: 4px solid #427c4c;
+            color: #539b60;
+        }
+        
+        .result.incorrect {
+            background-color: rgba(192, 91, 109, 0.1);
+            border-left: 4px solid #a84153;
+            color: #c05b6d;
+        }
+        
+        .instructions {
+            background-color: #f7f3f1;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border-left: 4px solid #c4a79b;
+        }
+        
+        .instructions h3 {
+            color: #c4a79b;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        
+        .instructions p {
+            font-size: 0.9rem;
+            color: #57606a;
+        }
+        
+        .counter {
+            background-color: #f3eeeb;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: #403a38;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .phrase-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .text-container, .phrase-bank {
+                width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .drop-zone {
+                min-width: 100px;
+                height: 34px;
+            }
+            
+            .dropped-item {
+                padding: 3px 8px;
+                font-size: 0.9rem;
+            }
+            
+            .drag-item {
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+            
+            .text-content {
+                padding: 20px;
+                line-height: 1.6;
+            }
+            
+            .question {
+                gap: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Music Theory Vocabulary: Drag & Drop Exercise</h1>
+        <p>Drag the music theory terms from the bank to complete each definition.</p>
+    </div>
+    
+    <div class="container">
+        <div class="text-container">
+            <div class="text-header">
+                <h2>Music Theory Definitions</h2>
+            </div>
+            <div class="text-content">
+                <div class="question">
+                    <span class="question-number">1.</span>
+                    <span class="question-text">A 
+                        <span class="drop-zone empty" data-correct="half step" data-id="1"></span> 
+                        is equal to one fret on the guitar (notes right next to each other).
+                    </span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">2.</span>
+                    <span class="question-text">When the 
+                        <span class="drop-zone empty" data-correct="natural" data-id="2"></span> 
+                        symbol is placed next to a note, it means to cancel any sharps or flats previously used within that bar of music.
+                    </span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">3.</span>
+                    <span class="question-text">The 
+                        <span class="drop-zone empty" data-correct="staff" data-id="3"></span> 
+                        is comprised of five lines and four spaces. Notes are placed on these lines and spaces.
+                    </span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">4.</span>
+                    <span class="question-text">A 
+                        <span class="drop-zone empty" data-correct="flat" data-id="4"></span> 
+                        lowers a note one half step in pitch.
+                    </span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">5.</span>
+                    <span class="question-text">The bar is a subdivision of time in music. It's one 
+                        <span class="drop-zone empty" data-correct="measure" data-id="5"></span> 
+                        of a piece of music.
+                    </span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">6.</span>
+                    <span class="question-text">A 
+                        <span class="drop-zone empty" data-correct="ledger" data-id="6"></span> 
+                        line is a small line that extends the staff for higher or lower pitches.
+                    </span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">7.</span>
+                    <span class="question-text">A natural will 
+                        <span class="drop-zone empty" data-correct="neutralise" data-id="7"></span> 
+                        a sharp or flat, so that the note reverts to its original position.
+                    </span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">8.</span>
+                    <span class="question-text">The 
+                        <span class="drop-zone empty" data-correct="octave" data-id="8"></span> 
+                        is the eighth note with the same name as the first one, in a set of consecutive notes.
+                    </span>
+                </div>
+                
+                <div class="feedback">
+                    <h3><i class="fas fa-info-circle"></i> Exercise Instructions</h3>
+                    <p>Drag terms from the bank on the right and drop them into the empty spaces in the definitions above. When you're done, click "Check Answers" to see how you did.</p>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-check" onclick="checkAnswers()">
+                        <i class="fas fa-check-circle"></i> Check Answers
+                    </button>
+                    <button class="btn btn-reset" onclick="resetExercise()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                    
+                </div>
+                
+                <div class="result" id="result"></div>
+                
+                <div class="counter">
+                    Terms placed: <span id="counter">0</span> / 8
+                </div>
+            </div>
+        </div>
+        
+        <div class="phrase-bank">
+            <div class="phrase-header">
+                <h2>Term Bank</h2>
+            </div>
+            <div class="phrase-content">
+                <div class="instructions">
+                    <h3><i class="fas fa-hand-pointer"></i> How to use</h3>
+                    <p>Drag and drop these terms into the empty spaces in the definitions.</p>
+                </div>
+                
+                <div class="phrase-grid" id="phrase-container">
+                    <!-- Terms will be loaded here in random order -->
+                </div>
+                
+                <div class="counter">
+                    Terms remaining: <span id="remaining">8</span> / 8
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <script>
+        // Correct answers mapping (id -> correct phrase)
+        const correctAnswers = {
+            1: "half step",
+            2: "natural",
+            3: "staff",
+            4: "flat",
+            5: "measure",
+            6: "ledger",
+            7: "neutralise",
+            8: "octave"
+        };
+        
+        // All term objects with original ids
+        const allPhrases = [
+            { id: 1, text: "half step" },
+            { id: 2, text: "natural" },
+            { id: 3, text: "staff" },
+            { id: 4, text: "flat" },
+            { id: 5, text: "measure" },
+            { id: 6, text: "ledger" },
+            { id: 7, text: "neutralise" },
+            { id: 8, text: "octave" }
+        ];
+        
+        // Track which terms have been used (by original id)
+        let usedPhrases = new Set();
+        let placedCount = 0;
+        
+        // Helper: update counters for placed/remaining
+        function updateCounters() {
+            document.getElementById('counter').textContent = placedCount;
+            document.getElementById('remaining').textContent = 8 - placedCount;
+        }
+        
+        // Mark a term as used (add class and disable drag)
+        function markPhraseAsUsed(id) {
+            const dragItem = document.querySelector(`.drag-item[data-id="${id}"]`);
+            if (dragItem && !dragItem.classList.contains('used')) {
+                dragItem.classList.add('used');
+                dragItem.draggable = false;
+                // remove draggable styling event listeners? but fine: new dragstart will check .used
+            }
+        }
+        
+        // Make term available again (remove used class & re-enable draggable)
+        function markPhraseAsAvailable(id) {
+            const dragItem = document.querySelector(`.drag-item[data-id="${id}"]`);
+            if (dragItem) {
+                dragItem.classList.remove('used');
+                dragItem.draggable = true;
+            }
+        }
+        
+        // Refresh all drag events after shuffle or reset
+        function refreshDragEvents() {
+            const dragItems = document.querySelectorAll('.drag-item');
+            dragItems.forEach(item => {
+                // Remove old listeners to avoid duplicates, but simplest: replace with clone technique? 
+                // Instead we just ensure fresh listeners via re-assignment.
+                item.removeEventListener('dragstart', dragStartHandler);
+                item.removeEventListener('dragend', dragEndHandler);
+                item.addEventListener('dragstart', dragStartHandler);
+                item.addEventListener('dragend', dragEndHandler);
+                // If item is used, draggable false
+                if (item.classList.contains('used')) {
+                    item.draggable = false;
+                } else {
+                    item.draggable = true;
+                }
+            });
+        }
+        
+        // dragstart handler
+        function dragStartHandler(e) {
+            if (this.classList.contains('used')) {
+                e.preventDefault();
+                return false;
+            }
+            this.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', this.dataset.phrase);
+            e.dataTransfer.setData('id', this.dataset.id);
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+        
+        function dragEndHandler(e) {
+            this.classList.remove('dragging');
+        }
+        
+        // Global drag over / drop zone setup
+        function setupDropZones() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                zone.removeEventListener('dragover', dragOverHandler);
+                zone.removeEventListener('dragenter', dragEnterHandler);
+                zone.removeEventListener('dragleave', dragLeaveHandler);
+                zone.removeEventListener('drop', dropHandler);
+                
+                zone.addEventListener('dragover', dragOverHandler);
+                zone.addEventListener('dragenter', dragEnterHandler);
+                zone.addEventListener('dragleave', dragLeaveHandler);
+                zone.addEventListener('drop', dropHandler);
+            });
+        }
+        
+        function dragOverHandler(e) {
+            e.preventDefault();
+        }
+        
+        function dragEnterHandler(e) {
+            e.preventDefault();
+            this.classList.add('highlight');
+            // Do NOT remove empty class during drag — keep empty style only for visual
+        }
+        
+        function dragLeaveHandler() {
+            this.classList.remove('highlight');
+        }
+        
+        function dropHandler(e) {
+            e.preventDefault();
+            this.classList.remove('highlight');
+            
+            const draggedPhrase = e.dataTransfer.getData('text/plain');
+            const draggedId = e.dataTransfer.getData('id');
+            const dropZoneId = this.dataset.id;
+            
+            // Check if target dropzone already has a child (occupied)
+            if (this.children.length > 0) {
+                // Remove existing term: revert it back to available
+                const existingChild = this.firstElementChild;
+                const existingOrigId = existingChild.dataset.originalId;
+                if (existingOrigId) {
+                    markPhraseAsAvailable(existingOrigId);
+                    usedPhrases.delete(existingOrigId);
+                    placedCount--;
+                }
+                this.innerHTML = '';
+                this.classList.add('empty');
+            }
+            
+            // Check if the dragged term is already used elsewhere (prevent duplicate usage)
+            if (usedPhrases.has(draggedId)) {
+                // if dropzone is empty after potential removal, ensure empty class
+                if (this.children.length === 0) this.classList.add('empty');
+                // Provide subtle feedback but no alert to keep clean UX
+                return;
+            }
+            
+            // Create dropped item
+            const droppedSpan = document.createElement('div');
+            droppedSpan.className = 'dropped-item';
+            droppedSpan.textContent = draggedPhrase;
+            droppedSpan.dataset.originalId = draggedId;
+            droppedSpan.dataset.droppedIn = dropZoneId;
+            
+            // Click to remove functionality (detach term)
+            droppedSpan.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const origId = droppedSpan.dataset.originalId;
+                if (origId) {
+                    markPhraseAsAvailable(origId);
+                    usedPhrases.delete(origId);
+                    placedCount--;
+                    const parentZone = droppedSpan.parentElement;
+                    parentZone.innerHTML = '';
+                    parentZone.classList.add('empty');
+                    updateCounters();
+                    // Hide result after manual removal
+                    const resultDiv = document.getElementById('result');
+                    if (resultDiv) resultDiv.style.display = 'none';
+                    // Also remove any stale correct/incorrect styles
+                }
+            });
+            
+            // Clear zone and append
+            this.innerHTML = '';
+            this.appendChild(droppedSpan);
+            this.classList.remove('empty');
+            
+            // Mark phrase as used
+            markPhraseAsUsed(draggedId);
+            usedPhrases.add(draggedId);
+            placedCount++;
+            updateCounters();
+            
+            // Hide result when user modifies answers
+            const resultDiv = document.getElementById('result');
+            if (resultDiv) resultDiv.style.display = 'none';
+        }
+        
+        // Shuffle and populate term bank randomly, reset used statuses
+        function shuffleAndLoadPhrases() {
+            const phraseContainer = document.getElementById('phrase-container');
+            phraseContainer.innerHTML = '';
+            
+            const shuffled = [...allPhrases].sort(() => Math.random() - 0.5);
+            shuffled.forEach(phrase => {
+                const dragDiv = document.createElement('div');
+                dragDiv.className = 'drag-item';
+                dragDiv.draggable = true;
+                dragDiv.dataset.phrase = phrase.text;
+                dragDiv.dataset.id = phrase.id;
+                dragDiv.textContent = phrase.text;
+                phraseContainer.appendChild(dragDiv);
+            });
+            
+            // reset usedPhrases set and placedCount after reloading terms
+            usedPhrases.clear();
+            placedCount = 0;
+            updateCounters();
+            
+            refreshDragEvents();
+        }
+        
+        // Reset exercise completely
+        function resetExercise() {
+            // Clear all drop zones
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                zone.innerHTML = '';
+                zone.classList.add('empty');
+                zone.classList.remove('highlight');
+            });
+            
+            // Reset all drag items: remove 'used' class, ensure draggable true
+            const dragItems = document.querySelectorAll('.drag-item');
+            dragItems.forEach(item => {
+                item.classList.remove('used');
+                item.draggable = true;
+                item.classList.remove('dragging');
+            });
+            
+            usedPhrases.clear();
+            placedCount = 0;
+            updateCounters();
+            
+            const resultDiv = document.getElementById('result');
+            if (resultDiv) resultDiv.style.display = 'none';
+            
+            // Ensure drag events are fresh
+            refreshDragEvents();
+        }
+        
+        // Check answers: compare dropped items with data-correct
+        function checkAnswers() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            let correctCount = 0;
+            let totalFilled = 0;
+            
+            dropZones.forEach(zone => {
+                if (zone.children.length > 0) {
+                    totalFilled++;
+                    const dropped = zone.firstElementChild;
+                    const droppedText = dropped.textContent;
+                    const expected = zone.dataset.correct;
+                    dropped.classList.remove('correct', 'incorrect');
+                    if (droppedText === expected) {
+                        correctCount++;
+                        dropped.classList.add('correct');
+                    } else {
+                        dropped.classList.add('incorrect');
+                    }
+                }
+            });
+            
+            const resultDiv = document.getElementById('result');
+            if (totalFilled < 8) {
+                resultDiv.className = 'result incorrect';
+                resultDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> You filled ${totalFilled} out of 8 blanks. Please fill all blanks before checking.`;
+                resultDiv.style.display = 'block';
+            } else if (correctCount === 8) {
+                resultDiv.className = 'result correct';
+                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Perfect! All ${correctCount} answers are correct!`;
+                resultDiv.style.display = 'block';
+            } else if (correctCount >= 6) {
+                resultDiv.className = 'result correct';
+                resultDiv.innerHTML = `<i class="fas fa-check-circle"></i> Good job! ${correctCount} out of 8 answers are correct.`;
+                resultDiv.style.display = 'block';
+            } else {
+                resultDiv.className = 'result incorrect';
+                resultDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${correctCount} out of 8 answers are correct. Try again.`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        
+        // Initialization on load
+        document.addEventListener('DOMContentLoaded', function() {
+            shuffleAndLoadPhrases();
+            setupDropZones();
+            updateCounters();
+        });
+        
+        // Make functions globally accessible for buttons
+        window.checkAnswers = checkAnswers;
+        window.resetExercise = resetExercise;
+    </script>
+</body>
+</html>
