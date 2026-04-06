@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Health Survey: Sugar & Salt</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+    background: #f0fdf4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.wrapper {
+    width: 100%;
+    max-width: 1000px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #166534;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.instruction {
+    background: #f0fdf4;
+    padding: 15px 20px;
+    border-radius: 16px;
+    border-left: 4px solid #22c55e;
+    margin: 15px 0 20px 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #166534;
+}
+
+.question-card {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.question-text {
+    font-weight: 500;
+    font-size: 1rem;
+    color: #1e293b;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.gap-input {
+    width: 130px;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    margin: 0 5px;
+}
+
+.gap-input:focus {
+    outline: none;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34,197,94,0.2);
+}
+
+.option-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    padding: 10px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 40px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.option-label:hover {
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+
+input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #22c55e;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+button {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 40px;
+    background: #22c55e;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+button:hover {
+    background: #16a34a;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px -6px rgba(34,197,94,0.4);
+}
+
+.btn-secondary {
+    background: #64748b;
+}
+
+.btn-secondary:hover {
+    background: #475569;
+}
+
+.btn-outline {
+    background: white;
+    border: 2px solid #22c55e;
+    color: #166534;
+}
+
+.btn-outline:hover {
+    background: #f0fdf4;
+    transform: translateY(-2px);
+}
+
+.btn-reset {
+    background: #ef4444;
+}
+
+.btn-reset:hover {
+    background: #dc2626;
+}
+
+.hidden {
+    display: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+th {
+    background: #166534;
+    color: white;
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+}
+
+td {
+    padding: 15px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+    background: #fefce8;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+/* Column width adjustments */
+th:first-child, td:first-child {
+    width: 50px;
+    min-width: 50px;
+}
+
+th:nth-child(2), td:nth-child(2) {
+    width: 35%;
+    min-width: 250px;
+}
+
+th:nth-child(3), td:nth-child(3) {
+    width: 30%;
+    min-width: 180px;
+}
+
+th:nth-child(4), td:nth-child(4) {
+    width: 35%;
+    min-width: 200px;
+}
+
+.success-message {
+    background: #dcfce7;
+    border: 2px solid #22c55e;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #166534;
+    margin-top: 20px;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.friend-select {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.friend-option {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 30px;
+    padding: 6px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.friend-option:hover {
+    border-color: #22c55e;
+    background: #f0fdf4;
+}
+
+.friend-option.selected {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: white;
+}
+
+.answer-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    font-weight: 500;
+    color: #166534;
+}
+
+@media (max-width: 768px) {
+    .wrapper { padding: 20px; }
+    h1 { font-size: 1.6rem; }
+    .option-group { gap: 10px; }
+    .option-label { padding: 8px 16px; font-size: 0.85rem; }
+    th, td { padding: 10px; font-size: 0.8rem; }
+    .friend-option { padding: 4px 12px; font-size: 0.8rem; }
+    .gap-input { width: 110px; font-size: 0.85rem; }
+    .nav-buttons { gap: 10px; }
+    button { padding: 8px 16px; font-size: 0.85rem; }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<h1>🍬 How Much Sugar & Salt Do You Have? 🧂</h1>
+
+<!-- PART 1: Fill in the gaps (inline) -->
+<div id="part1">
+<div class="instruction">
+📝 <strong>Part 1: Fill in the gaps</strong><br>
+Type the correct word (<strong>How many / How much / How often</strong>) in each blank space (___).
+</div>
+<div id="questionsArea"></div>
+<div class="nav-buttons">
+    <button id="nextPart1Btn">Next: My Answers →</button>
+    <button class="btn-reset" id="resetPart1Btn">🗑️ Reset Progress</button>
+</div>
+</div>
+
+<!-- PART 2: Student answers -->
+<div id="part2" class="hidden">
+<div class="instruction">
+🧑‍🎓 <strong>Part 2: Your answers</strong><br>
+Choose the option that matches YOUR habits.
+</div>
+<div id="surveyArea"></div>
+<div class="nav-buttons">
+    <button class="btn-outline" id="backPart2Btn">← Back to Part 1</button>
+    <button id="nextPart2Btn">Next: Compare with a Friend →</button>
+    <button class="btn-reset" id="resetPart2Btn">🗑️ Reset Progress</button>
+</div>
+</div>
+
+<!-- PART 3: Table -->
+<div id="part3" class="hidden">
+<div class="instruction">
+👥 <strong>Part 3: Your answers & your friend's answers</strong><br>
+Select what your friend would answer, then click CHECK.
+</div>
+<div id="tableArea"></div>
+<div class="nav-buttons">
+    <button class="btn-outline" id="backPart3Btn">← Back to My Answers</button>
+    <button id="checkBtn">✅ CHECK</button>
+    <button class="btn-reset hidden" id="resetPart3Btn">🗑️ Reset Progress</button>
+</div>
+<div id="finalMessage" class="hidden success-message"></div>
+</div>
+
+</div>
+
+<script>
+// Questions with ___ placeholder
+const questionsData = [
+    { template: "___ spoonfuls of sugar do you have in your tea or coffee?", blankType: "how_many" },
+    { template: "___ cans of soda (or other carbonated drinks) do you drink a day?", blankType: "how_many" },
+    { template: "___ fruit or fruit juice do you have a day?", blankType: "how_much" },
+    { template: "___ cookies do you eat a week?", blankType: "how_many" },
+    { template: "___ do you add salt to your food at the table?", blankType: "how_often" },
+    { template: "___ take-out food do you eat?", blankType: "how_much" },
+    { template: "___ bread do you eat a day?", blankType: "how_much" },
+    { template: "___ cheese do you eat a week?", blankType: "how_much" }
+];
+
+// Full questions (with correct words filled in for parts 2 & 3)
+const fullQuestions = [
+    "How many spoonfuls of sugar do you have in your tea or coffee?",
+    "How many cans of soda (or other carbonated drinks) do you drink a day?",
+    "How much fruit or fruit juice do you have a day?",
+    "How many cookies do you eat a week?",
+    "How often do you add salt to your food at the table?",
+    "How much take-out food do you eat?",
+    "How much bread do you eat a day?",
+    "How much cheese do you eat a week?"
+];
+
+// Options for each question
+const optionsForSurvey = [
+    { a: "two or more", b: "one", c: "none" },
+    { a: "two or more", b: "one", c: "none" },
+    { a: "a lot", b: "not much", c: "none" },
+    { a: "a lot", b: "not many", c: "none" },
+    { a: "always", b: "sometimes", c: "never" },
+    { a: "a lot", b: "not much", c: "none" },
+    { a: "a lot", b: "a little", c: "none" },
+    { a: "a lot", b: "a little", c: "none" }
+];
+
+// Storage keys
+const STORAGE_KEYS = {
+    GAP_ANSWERS: 'sugar_salt_gap_answers',
+    STUDENT_ANSWERS: 'sugar_salt_student_answers',
+    FRIEND_ANSWERS: 'sugar_salt_friend_answers',
+    CURRENT_PART: 'sugar_salt_current_part',
+    CHECKED: 'sugar_salt_checked'
+};
+
+let gapAnswers = new Array(8).fill("");
+let studentAnswers = new Array(8).fill(null);
+let friendAnswers = new Array(8).fill(null);
+let isChecked = false;
+
+// Load saved data
+function loadSavedData() {
+    const savedGaps = localStorage.getItem(STORAGE_KEYS.GAP_ANSWERS);
+    if (savedGaps) {
+        const parsed = JSON.parse(savedGaps);
+        if (Array.isArray(parsed)) gapAnswers = parsed;
+    }
+    
+    const savedStudent = localStorage.getItem(STORAGE_KEYS.STUDENT_ANSWERS);
+    if (savedStudent) {
+        const parsed = JSON.parse(savedStudent);
+        if (Array.isArray(parsed)) studentAnswers = parsed;
+    }
+    
+    const savedFriend = localStorage.getItem(STORAGE_KEYS.FRIEND_ANSWERS);
+    if (savedFriend) {
+        const parsed = JSON.parse(savedFriend);
+        if (Array.isArray(parsed)) friendAnswers = parsed;
+    }
+    
+    const savedChecked = localStorage.getItem(STORAGE_KEYS.CHECKED);
+    isChecked = savedChecked === 'true';
+}
+
+function saveGapAnswers() {
+    localStorage.setItem(STORAGE_KEYS.GAP_ANSWERS, JSON.stringify(gapAnswers));
+}
+
+function saveStudentAnswers() {
+    localStorage.setItem(STORAGE_KEYS.STUDENT_ANSWERS, JSON.stringify(studentAnswers));
+}
+
+function saveFriendAnswers() {
+    localStorage.setItem(STORAGE_KEYS.FRIEND_ANSWERS, JSON.stringify(friendAnswers));
+}
+
+function saveChecked() {
+    localStorage.setItem(STORAGE_KEYS.CHECKED, isChecked);
+}
+
+function resetAllProgress() {
+    if (confirm("⚠️ Are you sure? This will erase ALL your answers (Part 1, Part 2, and Part 3).")) {
+        gapAnswers = new Array(8).fill("");
+        studentAnswers = new Array(8).fill(null);
+        friendAnswers = new Array(8).fill(null);
+        isChecked = false;
+        saveGapAnswers();
+        saveStudentAnswers();
+        saveFriendAnswers();
+        saveChecked();
+        localStorage.removeItem(STORAGE_KEYS.CURRENT_PART);
+        
+        // Go back to part 1
+        document.getElementById("part1").classList.remove("hidden");
+        document.getElementById("part2").classList.add("hidden");
+        document.getElementById("part3").classList.add("hidden");
+        
+        renderPart1();
+        
+        alert("✅ Progress has been reset!");
+    }
+}
+
+// ----- PART 1: Inline gaps -----
+function renderPart1() {
+    const container = document.getElementById("questionsArea");
+    container.innerHTML = "";
+    questionsData.forEach((q, idx) => {
+        const card = document.createElement("div");
+        card.className = "question-card";
+        
+        const parts = q.template.split("___");
+        
+        card.innerHTML = `
+            <div class="question-text">
+                ${parts[0]}
+                <input type="text" class="gap-input" id="gapInput${idx}" value="" autocomplete="off">
+                ${parts[1]}
+            </div>
+        `;
+        container.appendChild(card);
+        
+        const input = document.getElementById(`gapInput${idx}`);
+        
+        // ВОТ ЭТА СТРОКА - восстанавливаем сохранённый ответ
+        if (gapAnswers[idx]) {
+            input.value = gapAnswers[idx];
+        } else {
+            input.value = "";
+        }
+        
+        // Визуальная проверка для подсветки
+        const val = input.value.trim().toLowerCase();
+        const expected = q.blankType === "how_many" ? "how many" : (q.blankType === "how_much" ? "how much" : "how often");
+        if (val === expected) {
+            input.style.borderColor = "#22c55e";
+            input.style.backgroundColor = "#dcfce7";
+        }
+        
+        input.addEventListener("input", (e) => {
+            gapAnswers[idx] = e.target.value.trim();
+            saveGapAnswers();
+            const val = e.target.value.trim().toLowerCase();
+            const expected = q.blankType === "how_many" ? "how many" : (q.blankType === "how_much" ? "how much" : "how often");
+            if (val === expected) {
+                e.target.style.borderColor = "#22c55e";
+                e.target.style.backgroundColor = "#dcfce7";
+            } else {
+                e.target.style.borderColor = "#e2e8f0";
+                e.target.style.backgroundColor = "white";
+            }
+        });
+    });
+}
+
+function validatePart1() {
+    let allOk = true;
+    for (let i = 0; i < questionsData.length; i++) {
+        const val = gapAnswers[i]?.toLowerCase() || "";
+        const expected = questionsData[i].blankType === "how_many" ? "how many" : 
+                        (questionsData[i].blankType === "how_much" ? "how much" : "how often");
+        if (val !== expected) {
+            allOk = false;
+            const input = document.getElementById(`gapInput${i}`);
+            if (input) {
+                input.style.borderColor = "#ef4444";
+                input.style.backgroundColor = "#fee2e2";
+            }
+        } else {
+            const input = document.getElementById(`gapInput${i}`);
+            if (input) {
+                input.style.borderColor = "#22c55e";
+                input.style.backgroundColor = "#dcfce7";
+            }
+        }
+    }
+    return allOk;
+}
+
+function goToPart2() {
+    if (!validatePart1()) {
+        alert("⚠️ Please fill in all blanks correctly: How many / How much / How often");
+        return;
+    }
+    document.getElementById("part1").classList.add("hidden");
+    document.getElementById("part2").classList.remove("hidden");
+    localStorage.setItem(STORAGE_KEYS.CURRENT_PART, "part2");
+    renderPart2();
+}
+
+// ----- PART 2: Student answers -----
+function renderPart2() {
+    const container = document.getElementById("surveyArea");
+    container.innerHTML = "";
+    fullQuestions.forEach((q, idx) => {
+        const opts = optionsForSurvey[idx];
+        const card = document.createElement("div");
+        card.className = "question-card";
+        let optionsHtml = `<div class="question-text"><strong>${idx+1}.</strong> ${q}</div>`;
+        optionsHtml += `<div class="option-group">`;
+        optionsHtml += `<label class="option-label"><input type="radio" name="q${idx}" value="a"> a) ${opts.a}</label>`;
+        optionsHtml += `<label class="option-label"><input type="radio" name="q${idx}" value="b"> b) ${opts.b}</label>`;
+        optionsHtml += `<label class="option-label"><input type="radio" name="q${idx}" value="c"> c) ${opts.c}</label>`;
+        optionsHtml += `</div>`;
+        card.innerHTML = optionsHtml;
+        container.appendChild(card);
+        
+        if (studentAnswers[idx]) {
+            const radio = document.querySelector(`input[name="q${idx}"][value="${studentAnswers[idx]}"]`);
+            if (radio) radio.checked = true;
+        }
+        
+        const radios = document.querySelectorAll(`input[name="q${idx}"]`);
+        radios.forEach(radio => {
+            radio.addEventListener("change", (e) => {
+                studentAnswers[idx] = e.target.value;
+                saveStudentAnswers();
+            });
+        });
+    });
+}
+
+function goToPart3() {
+    let missing = [];
+    for (let i = 0; i < studentAnswers.length; i++) {
+        if (!studentAnswers[i]) missing.push(i+1);
+    }
+    if (missing.length > 0) {
+        alert(`⚠️ Please answer all questions (missing: ${missing.join(", ")})`);
+        return;
+    }
+    document.getElementById("part2").classList.add("hidden");
+    document.getElementById("part3").classList.remove("hidden");
+    localStorage.setItem(STORAGE_KEYS.CURRENT_PART, "part3");
+    renderPart3();
+}
+
+function goBackToPart1() {
+    document.getElementById("part2").classList.add("hidden");
+    document.getElementById("part1").classList.remove("hidden");
+    localStorage.setItem(STORAGE_KEYS.CURRENT_PART, "part1");
+    renderPart1();
+}
+
+function goBackToPart2() {
+    document.getElementById("part3").classList.add("hidden");
+    document.getElementById("part2").classList.remove("hidden");
+    localStorage.setItem(STORAGE_KEYS.CURRENT_PART, "part2");
+    renderPart2();
+}
+
+function getAnswerText(letter, opts) {
+    if (letter === 'a') return `${opts.a} (a)`;
+    if (letter === 'b') return `${opts.b} (b)`;
+    if (letter === 'c') return `${opts.c} (c)`;
+    return "";
+}
+
+// ----- PART 3: Table -----
+function renderPart3() {
+    const container = document.getElementById("tableArea");
+    let html = `<table>
+        <thead>
+            <tr><th>#</th><th>Question</th><th>Your answer</th><th>What about your friend?</th></tr>
+        </thead>
+        <tbody>`;
+    
+    for (let i = 0; i < fullQuestions.length; i++) {
+        const qText = fullQuestions[i];
+        const opts = optionsForSurvey[i];
+        const studentAnswerText = getAnswerText(studentAnswers[i], opts);
+        
+        html += `<tr id="row${i}">
+            <td>${i+1}</td>
+            <td>${qText}</td>
+            <td><span class="answer-badge">${studentAnswerText}</span></td>
+            <td id="friendCell${i}">`;
+        
+        if (isChecked && friendAnswers[i]) {
+            // Show final answer if checked
+            const friendAnswerText = getAnswerText(friendAnswers[i], opts);
+            html += `<span class="answer-badge">${friendAnswerText}</span>`;
+        } else {
+            // Show selection buttons
+            html += `<div class="friend-select" data-qidx="${i}">
+                <div class="friend-option" data-val="a">a) ${opts.a}</div>
+                <div class="friend-option" data-val="b">b) ${opts.b}</div>
+                <div class="friend-option" data-val="c">c) ${opts.c}</div>
+            </div>`;
+        }
+        
+        html += `</td>
+          </tr>`;
+    }
+    html += `</tbody></table>`;
+    container.innerHTML = html;
+    
+    // Only attach event listeners if not checked yet
+    if (!isChecked) {
+        for (let i = 0; i < fullQuestions.length; i++) {
+            const containerDiv = document.querySelector(`.friend-select[data-qidx="${i}"]`);
+            if (!containerDiv) continue;
+            const options = containerDiv.querySelectorAll(".friend-option");
+            options.forEach(opt => {
+                opt.addEventListener("click", () => {
+                    const val = opt.dataset.val;
+                    friendAnswers[i] = val;
+                    saveFriendAnswers();
+                    options.forEach(o => o.classList.remove("selected"));
+                    opt.classList.add("selected");
+                });
+                if (friendAnswers[i] && opt.dataset.val === friendAnswers[i]) {
+                    opt.classList.add("selected");
+                }
+            });
+        }
+    }
+    
+    // Show/hide check button and reset button based on isChecked
+    const checkBtn = document.getElementById("checkBtn");
+    const resetBtn = document.getElementById("resetPart3Btn");
+    const finalMsg = document.getElementById("finalMessage");
+    
+    if (isChecked) {
+        checkBtn.classList.add("hidden");
+        resetBtn.classList.remove("hidden");
+        finalMsg.classList.remove("hidden");
+        finalMsg.innerHTML = `
+            🎉 <strong>Awesome!</strong> <br><br>
+            Now take a SCREENSHOT of this table and put it in our file!
+        `;
+    } else {
+        checkBtn.classList.remove("hidden");
+        resetBtn.classList.add("hidden");
+        finalMsg.classList.add("hidden");
+    }
+}
+
+function checkAll() {
+    let missingFriend = [];
+    for (let i = 0; i < friendAnswers.length; i++) {
+        if (!friendAnswers[i]) missingFriend.push(i+1);
+    }
+    if (missingFriend.length > 0) {
+        alert(`⚠️ Please select your friend's answers for questions: ${missingFriend.join(", ")}`);
+        return;
+    }
+    
+    isChecked = true;
+    saveChecked();
+    
+    // Re-render part 3 to show final state
+    renderPart3();
+}
+
+// Navigation and initialization
+function init() {
+    loadSavedData();
+    renderPart1();
+    
+    const savedPart = localStorage.getItem(STORAGE_KEYS.CURRENT_PART);
+    if (savedPart === "part2") {
+        if (validatePart1()) {
+            document.getElementById("part1").classList.add("hidden");
+            document.getElementById("part2").classList.remove("hidden");
+            renderPart2();
+        } else {
+            document.getElementById("part1").classList.remove("hidden");
+            document.getElementById("part2").classList.add("hidden");
+        }
+    } else if (savedPart === "part3") {
+        if (validatePart1()) {
+            document.getElementById("part1").classList.add("hidden");
+            document.getElementById("part2").classList.remove("hidden");
+            renderPart2();
+            const hasAllStudent = studentAnswers.every(a => a !== null && a !== "");
+            if (hasAllStudent) {
+                document.getElementById("part2").classList.add("hidden");
+                document.getElementById("part3").classList.remove("hidden");
+                renderPart3();
+            }
+        } else {
+            document.getElementById("part1").classList.remove("hidden");
+        }
+    } else {
+        document.getElementById("part1").classList.remove("hidden");
+        document.getElementById("part2").classList.add("hidden");
+        document.getElementById("part3").classList.add("hidden");
+    }
+    
+    document.getElementById("nextPart1Btn").onclick = goToPart2;
+    document.getElementById("backPart2Btn").onclick = goBackToPart1;
+    document.getElementById("nextPart2Btn").onclick = goToPart3;
+    document.getElementById("backPart3Btn").onclick = goBackToPart2;
+    document.getElementById("checkBtn").onclick = checkAll;
+    
+    // Reset buttons
+    document.getElementById("resetPart1Btn").onclick = resetAllProgress;
+    document.getElementById("resetPart2Btn").onclick = resetAllProgress;
+    document.getElementById("resetPart3Btn").onclick = resetAllProgress;
+}
+
+init();
+</script>
+</body>
+</html>
