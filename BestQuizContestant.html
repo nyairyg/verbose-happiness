@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Ken Jennings · Past Simple Quiz</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #fff3e0;   /* warm off-white for contrast */
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* main container – fits any computer screen */
+    .quiz-container {
+      max-width: 1200px;
+      width: 100%;
+      background: #FEF9E6;         /* soft cream inside */
+      border-radius: 2rem;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    /* yellow background as requested (whole card) */
+    .yellow-bg {
+      background-color: ##eae4c3;   /* vibrant yellow */
+      padding: 1.8rem 2.2rem 2.2rem 2.2rem;
+    }
+
+    /* header section with Q & A */
+    .qa-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+      border-bottom: 3px solid rgba(0, 0, 0, 0.2);
+      padding-bottom: 0.75rem;
+    }
+
+    .q-block, .a-block {
+      background: rgba(0,0,0,0.05);
+      padding: 0.3rem 1rem;
+      border-radius: 60px;
+    }
+
+    .q-text {
+      font-size: 2.8rem;          /* bigger */
+      font-weight: 800;           /* bold */
+      color: #B22222;             /* red */
+      letter-spacing: -0.01em;
+      display: inline-block;
+    }
+
+    .a-text {
+      font-size: 2.6rem;          /* bigger */
+      font-weight: 800;
+      color: #1A1A1A;             /* black */
+      display: inline-block;
+    }
+
+    /* instructions row */
+    .instructions {
+      background: #FEF9E6;
+      color: #1a1a1a;
+      padding: 0.8rem 1.5rem;
+      border-radius: 60px;
+      margin-bottom: 2rem;
+      font-weight: 500;
+      font-size: 1.05rem;
+      display: inline-block;
+      width: auto;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.2), 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .instructions strong {
+      color: #1a1a1a;
+      font-weight: 700;
+    }
+
+    /* two-column layout: image + story */
+    .ken-story-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    .image-side {
+      flex: 0 0 280px;
+      text-align: center;
+    }
+
+    .ken-pic {
+      width: 100%;
+      max-width: 260px;
+      border-radius: 32px;
+      box-shadow: 0 12px 22px -8px rgba(0,0,0,0.3);
+      border: 3px solid white;
+      object-fit: cover;
+      aspect-ratio: 1 / 1.1;
+      transition: transform 0.2s ease;
+    }
+
+    .ken-pic:hover {
+      transform: scale(1.01);
+    }
+
+    .caption {
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+      background: #fff3cf;
+      display: inline-block;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      font-weight: 500;
+    }
+
+    .story-side {
+      flex: 1;
+      background: rgba(255, 248, 205, 0.7);
+      backdrop-filter: blur(2px);
+      border-radius: 2rem;
+      padding: 1.2rem 1.8rem;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.05);
+    }
+
+    /* text passage with gaps */
+    .passage {
+      font-size: 1.1rem;
+      line-height: 1.65;
+      color: #1e1e1a;
+    }
+
+    .passage p {
+      margin-bottom: 1rem;
+    }
+
+    .gap-input {
+      display: inline-block;
+      min-width: 100px;
+      width: auto;
+      margin: 0 4px;
+    }
+
+    input.gap-field {
+      font-family: 'Courier New', 'Fira Code', monospace;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 4px 8px;
+      border: 2px solid #d4a200;
+      border-radius: 20px;
+      background-color: #fffef7;
+      text-align: center;
+      transition: 0.1s linear;
+      width: 110px;
+    }
+
+    input.gap-field:focus {
+      outline: none;
+      border-color: #B22222;
+      box-shadow: 0 0 0 2px rgba(178,34,34,0.2);
+    }
+
+    .correct-feedback {
+      background: #1e7e34;
+      color: white;
+      font-size: 0.75rem;
+      border-radius: 30px;
+      padding: 2px 10px;
+      margin-left: 8px;
+      white-space: nowrap;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    .wrong-feedback {
+      background: #a12a2a;
+      color: #ffe0e0;
+      font-size: 0.75rem;
+      border-radius: 30px;
+      padding: 2px 10px;
+      margin-left: 8px;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    /* button area */
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      gap: 1rem;
+    }
+
+    .check-btn, .reset-btn {
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 0.7rem 1.8rem;
+      border: none;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: 0.15s;
+      font-family: inherit;
+      background: #2c2c2c;
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .reset-btn {
+      background: #B22222;
+      color: white;
+    }
+
+    .reset-btn:hover {
+      background: #8b1a1a;
+      transform: scale(0.98);
+    }
+
+    .check-btn {
+      background: #3c6e47;
+    }
+
+    .check-btn:hover {
+      background: #2a5234;
+    }
+
+    .score-area {
+      background: #2b2b28;
+      color: #FFE484;
+      padding: 0.5rem 1.2rem;
+      border-radius: 3rem;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+  
+
+    @media (max-width: 780px) {
+      .yellow-bg {
+        padding: 1.2rem;
+      }
+      .q-text {
+        font-size: 2rem;
+      }
+      .a-text {
+        font-size: 1.9rem;
+      }
+      .story-side {
+        padding: 1rem;
+      }
+      .gap-input {
+        display: inline-block;
+        margin: 4px 2px;
+      }
+      input.gap-field {
+        width: 95px;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="quiz-container">
+  <div class="yellow-bg">   <!-- entire content yellow background as requested -->
+    <!-- Q & A section: red Q bold bigger, black A bold bigger -->
+    <div class="qa-header">
+      <div class="q-block">
+        <span class="q-text">Q</span>
+        <span style="font-size:1.6rem; font-weight:500; color:#bd0912;">&nbsp;Who is the best quiz contestant in the country?</span>
+      </div>
+      <div class="a-block">
+        <span class="a-text">A</span>
+        <span style="font-size:1.6rem; font-weight:600; color:#111;">&nbsp;Ken Jennings</span>
+      </div>
+    </div>
+
+    <!-- instructions -->
+    <div style="margin-bottom: 1rem;">
+      <div class="instructions">
+        📝 <strong>INSTRUCTIONS:</strong> Fill in each blank with the <strong>PAST SIMPLE</strong> form of the verb in brackets. 
+        Use: <em>answer, ask, be, become, get, give, know, play, win</em>. Click "CHECK ANSWERS" to see correctness.
+      </div>
+    </div>
+
+    <!-- image + story -->
+    <div class="ken-story-layout">
+      <div class="image-side">
+        <img class="ken-pic" src="https://hips.hearstapps.com/hmg-prod/images/how-long-was-ken-jennings-on-jeopardy-66607bdd0297c.jpeg" alt="Ken Jennings on Jeopardy! set">
+        <div class="caption">🏆 Ken Jennings • Quiz legend</div>
+      </div>
+      <div class="story-side">
+        <div class="passage" id="passageText">
+          <p>
+            In 2004, Ken Jennings, a 30-year-old software engineer, 
+            <span class="gap-input" data-verb="win">1. <input type="text" class="gap-field" id="gap1"></span> 
+            more games than anybody in US quiz show history. He 
+            <span class="gap-input" data-verb="become">2. <input type="text" class="gap-field" id="gap2"></span> 
+            a 74-game winner on Jeopardy! and won over $2.5 million! 
+            But Jeopardy! 
+            <span class="gap-input" data-verb="be">3. <input type="text" class="gap-field" id="gap3"></span> 
+            not the only quiz show he appeared on. In 2008, Ken competed on Are You Smarter Than a 5th Grader? He 
+            <span class="gap-input" data-verb="answer">4. <input type="text" class="gap-field" id="gap4" ></span> 
+            all the questions except the last one because he wasn't sure he 
+            <span class="gap-input" data-verb="know">5. <input type="text" class="gap-field" id="gap5" ></span> 
+            the answer. He didn't win and had to say, "I'm not smarter than a 5th grader."
+          </p>
+          <p>
+            Ken was never a contestant on Who Wants to Be a Millionaire?, but he was an "expert"—a person with a lot of knowledge. 
+            When contestants needed help, they 
+            <span class="gap-input" data-verb="ask">6. <input type="text" class="gap-field" id="gap6"></span> 
+            Ken.
+          </p>
+          <p>
+            In 2011, Ken 
+            <span class="gap-input" data-verb="play">7. <input type="text" class="gap-field" id="gap7" ></span> 
+            Jeopardy! again. But this time he competed against past Jeopardy! champion Brad Rutter and Watson, an IBM supercomputer. 
+            In a two-game match, Watson beat both Ken and Brad. Ken was second and 
+            <span class="gap-input" data-verb="get">8. <input type="text" class="gap-field" id="gap8" ></span> 
+            $300,000, which he 
+            <span class="gap-input" data-verb="give">9. <input type="text" class="gap-field" id="gap9"></span> 
+            to a charity.
+          </p>
+        </div>
+
+        <div class="action-bar">
+          <button class="check-btn" id="checkBtn">✅ CHECK ANSWERS</button>
+          <button class="reset-btn" id="resetBtn">⟳ RESET FIELDS</button>
+          <div class="score-area" id="scoreDisplay">⚡ 0 / 9 correct</div>
+        </div>
+      
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- CORRECT ANSWERS (past simple) ----------
+  const correctMap = {
+    gap1: "won",       // win
+    gap2: "became",    // become
+    gap3: "was",       // be
+    gap4: "answered",  // answer
+    gap5: "knew",      // know
+    gap6: "asked",     // ask
+    gap7: "played",    // play
+    gap8: "got",       // get
+    gap9: "gave"       // give
+  };
+
+  // get all input elements
+  const inputs = {
+    gap1: document.getElementById("gap1"),
+    gap2: document.getElementById("gap2"),
+    gap3: document.getElementById("gap3"),
+    gap4: document.getElementById("gap4"),
+    gap5: document.getElementById("gap5"),
+    gap6: document.getElementById("gap6"),
+    gap7: document.getElementById("gap7"),
+    gap8: document.getElementById("gap8"),
+    gap9: document.getElementById("gap9")
+  };
+
+  const scoreSpan = document.getElementById("scoreDisplay");
+
+  // Helper: remove any existing inline feedback spans inside .gap-input containers
+  function clearFeedbackSpans() {
+    for (let i = 1; i <= 9; i++) {
+      const gapDiv = document.querySelector(`.gap-input:has(#gap${i})`);
+      if (gapDiv) {
+        const existingSpan = gapDiv.querySelector('.correct-feedback, .wrong-feedback');
+        if (existingSpan) existingSpan.remove();
+      }
+    }
+  }
+
+  // update score and show inline checkmarks / wrong indicators without removing user text
+  function evaluateAnswers() {
+    let correctCount = 0;
+    // clear previous badges
+    clearFeedbackSpans();
+
+    for (let i = 1; i <= 9; i++) {
+      const gapId = `gap${i}`;
+      const inputField = inputs[gapId];
+      const userAnswer = inputField.value.trim().toLowerCase();
+      const correctAnswer = correctMap[gapId];
+      const isCorrect = (userAnswer === correctAnswer);
+      
+      if (isCorrect) correctCount++;
+      
+      // find parent .gap-input element to attach feedback badge
+      const parentSpan = inputField.closest('.gap-input');
+      if (parentSpan) {
+        const badge = document.createElement('span');
+        if (isCorrect) {
+          badge.className = 'correct-feedback';
+          badge.textContent = '✓ correct';
+        } else {
+          badge.className = 'wrong-feedback';
+          // only show expected if not empty? subtle hint but clean
+          if (userAnswer === "") {
+            badge.textContent = '✗ missing';
+          } else {
+            badge.textContent = `✗ expected "${correctAnswer}"`;
+          }
+        }
+        // insert badge after the input field (or after possible existing badge)
+        parentSpan.appendChild(badge);
+      }
+    }
+    
+    // update score display
+    scoreSpan.innerHTML = `🏅 ${correctCount} / 9 correct`;
+    if (correctCount === 9) {
+      scoreSpan.style.background = "#1e5f2b";
+      scoreSpan.style.color = "#FFE484";
+      scoreSpan.innerHTML = `🏆 PERFECT! ${correctCount}/9 🎉`;
+    } else {
+      scoreSpan.style.background = "#2b2b28";
+      scoreSpan.style.color = "#FFE484";
+    }
+    return correctCount;
+  }
+
+  // reset all input fields AND remove all feedback badges
+  function resetAllFields() {
+    for (let i = 1; i <= 9; i++) {
+      const gapId = `gap${i}`;
+      if (inputs[gapId]) {
+        inputs[gapId].value = '';
+      }
+    }
+    clearFeedbackSpans();
+    // reset score display
+    scoreSpan.innerHTML = "⚡ 0 / 9 correct";
+    scoreSpan.style.background = "#2b2b28";
+    scoreSpan.style.color = "#FFE484";
+  }
+
+  // Optional: real-time remove feedback when user starts typing (better UX)
+  function attachTypingCleanup() {
+    for (let i = 1; i <= 9; i++) {
+      const inputField = inputs[`gap${i}`];
+      if (inputField) {
+        inputField.addEventListener('input', function() {
+          // when user edits, remove only the feedback badge belonging to this input's parent
+          const parentSpan = this.closest('.gap-input');
+          if (parentSpan) {
+            const badge = parentSpan.querySelector('.correct-feedback, .wrong-feedback');
+            if (badge) badge.remove();
+          }
+          // also update global score display to show pending? optionally reset score summary to neutral
+          // but we won't auto-recalc until check is pressed again (better user control)
+          // but we can show "not checked" state, but it's fine.
+          const anyBadgesLeft = document.querySelectorAll('.correct-feedback, .wrong-feedback').length;
+          if (anyBadgesLeft === 0) {
+            // if no badges left, reset score text to "not yet checked" style
+            if (scoreSpan.innerHTML.includes("PERFECT") || scoreSpan.innerHTML.includes("/9 correct")) {
+              // only reset if it's not already neutral? 
+              // but keep neutral but show hint
+              if (!scoreSpan.innerHTML.includes("⚡")) {
+                scoreSpan.innerHTML = "⚡ pending check";
+                scoreSpan.style.background = "#2b2b28";
+              }
+            } else {
+              scoreSpan.innerHTML = "⚡ pending check";
+            }
+          }
+        });
+      }
+    }
+  }
+
+  // additional: when hitting check, also trim spaces and normalize
+  function normalizeAndCheck() {
+    // trim all inputs for cleaner comparison
+    for (let i = 1; i <= 9; i++) {
+      const inp = inputs[`gap${i}`];
+      if (inp) inp.value = inp.value.trim();
+    }
+    evaluateAnswers();
+  }
+
+  // event listeners
+  document.getElementById("checkBtn").addEventListener("click", normalizeAndCheck);
+  document.getElementById("resetBtn").addEventListener("click", resetAllFields);
+  
+  // initialize: clear any accidental pre-filled values
+  resetAllFields();
+  attachTypingCleanup();
+
+  // Bonus: pressing Enter in any input triggers check? nice to have
+  for (let i = 1; i <= 9; i++) {
+    const inp = inputs[`gap${i}`];
+    if (inp) {
+      inp.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          normalizeAndCheck();
+        }
+      });
+    }
+  }
+</script>
+</body>
+</html>
