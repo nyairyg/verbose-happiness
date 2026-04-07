@@ -31,6 +31,10 @@
       overflow: hidden;
       transition: all 0.2s;
     }
+    .quiz-container {
+  transform: scale(0.9);
+  transform-origin: top center;
+}
 
     /* yellow background as requested (whole card) */
     .yellow-bg {
@@ -304,38 +308,39 @@
         <div class="caption">🏆 Ken Jennings • Quiz legend</div>
       </div>
       <div class="story-side">
-        <div class="passage" id="passageText">
-          <p>
-            In 2004, Ken Jennings, a 30-year-old software engineer, 
-            <span class="gap-input" data-verb="win">1. <input type="text" class="gap-field" id="gap1"></span> 
-            more games than anybody in US quiz show history. He 
-            <span class="gap-input" data-verb="become">2. <input type="text" class="gap-field" id="gap2"></span> 
-            a 74-game winner on Jeopardy! and won over $2.5 million! 
-            But Jeopardy! 
-            <span class="gap-input" data-verb="be">3. <input type="text" class="gap-field" id="gap3"></span> 
-            not the only quiz show he appeared on. In 2008, Ken competed on Are You Smarter Than a 5th Grader? He 
-            <span class="gap-input" data-verb="answer">4. <input type="text" class="gap-field" id="gap4" ></span> 
-            all the questions except the last one because he wasn't sure he 
-            <span class="gap-input" data-verb="know">5. <input type="text" class="gap-field" id="gap5" ></span> 
-            the answer. He didn't win and had to say, "I'm not smarter than a 5th grader."
-          </p>
-          <p>
-            Ken was never a contestant on Who Wants to Be a Millionaire?, but he was an "expert"—a person with a lot of knowledge. 
-            When contestants needed help, they 
-            <span class="gap-input" data-verb="ask">6. <input type="text" class="gap-field" id="gap6"></span> 
-            Ken.
-          </p>
-          <p>
-            In 2011, Ken 
-            <span class="gap-input" data-verb="play">7. <input type="text" class="gap-field" id="gap7" ></span> 
-            Jeopardy! again. But this time he competed against past Jeopardy! champion Brad Rutter and Watson, an IBM supercomputer. 
-            In a two-game match, Watson beat both Ken and Brad. Ken was second and 
-            <span class="gap-input" data-verb="get">8. <input type="text" class="gap-field" id="gap8" ></span> 
-            $300,000, which he 
-            <span class="gap-input" data-verb="give">9. <input type="text" class="gap-field" id="gap9"></span> 
-            to a charity.
-          </p>
-        </div>
+   <div class="passage" id="passageText">
+  <p>
+    In 2004, Ken Jennings, a 30-year-old software engineer, 
+    <span class="gap-input" data-verb="win"><input type="text" class="gap-field" id="gap1"></span> 
+    more games than anybody in US quiz show history. He 
+    <span class="gap-input" data-verb="become"><input type="text" class="gap-field" id="gap2"></span> 
+    a 74-game winner on <i>Jeopardy!</i> and won over $2.5 million! 
+    </p>
+    <p> But <i>Jeopardy!</i> 
+    <span class="gap-input" data-verb="be"> <input type="text" class="gap-field" id="gap3"></span> 
+    not the only quiz show he appeared on. In 2008, Ken competed on <i>Are You Smarter Than a 5th Grader?</i> He 
+    <span class="gap-input" data-verb="answer"><input type="text" class="gap-field" id="gap4"></span> 
+    all the questions except the last one because he wasn't sure he 
+    <span class="gap-input" data-verb="know"><input type="text" class="gap-field" id="gap5"></span> 
+    the answer. He didn't win and had to say, "I'm not smarter than a 5th grader."
+  </p>
+  <p>
+    Ken was never a contestant on <i>Who Wants to Be a Millionaire?</i>, but he was an "expert"—a person with a lot of knowledge. 
+    When contestants needed help, they 
+    <span class="gap-input" data-verb="ask"><input type="text" class="gap-field" id="gap6"></span> 
+    Ken.
+  </p>
+  <p>
+    In 2011, Ken 
+    <span class="gap-input" data-verb="play"><input type="text" class="gap-field" id="gap7"></span> 
+    <i>Jeopardy!</i> again. But this time he competed against past <i>Jeopardy!</i> champion Brad Rutter and Watson, an IBM supercomputer. 
+    In a two-game match, Watson beat both Ken and Brad. Ken was second and 
+    <span class="gap-input" data-verb="get"><input type="text" class="gap-field" id="gap8"></span> 
+    $300,000, which he 
+    <span class="gap-input" data-verb="give"><input type="text" class="gap-field" id="gap9"></span> 
+    to a charity.
+  </p>
+</div>
 
         <div class="action-bar">
           <button class="check-btn" id="checkBtn">✅ CHECK ANSWERS</button>
