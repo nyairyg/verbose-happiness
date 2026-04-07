@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Matching Task – Part 1</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none; /* better touch experience */
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #f2f4f8;
+            margin: 0;
+            padding: 20px;
+            touch-action: manipulation;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            padding: 20px 24px 32px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin: 0 0 8px 0;
+            color: #1e293b;
+        }
+        .sub {
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+        .task-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .words-col, .defs-col {
+            background: #f8fafc;
+            border-radius: 24px;
+            padding: 8px 0;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 1.3rem;
+            padding: 12px 20px;
+            background: #eef2ff;
+            border-radius: 40px;
+            margin: 0 12px 12px 12px;
+            color: #1e40af;
+        }
+        .word-item, .def-item {
+            background: white;
+            margin: 10px 16px;
+            padding: 16px 18px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            transition: all 0.1s ease;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .word-item {
+            background: #ffffff;
+            color: #0f172a;
+        }
+        .def-item {
+            background: #fefce8;
+            border-left: 6px solid #eab308;
+            font-weight: normal;
+            color: #334155;
+        }
+        .word-item.selected {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+            transform: scale(1.01);
+        }
+        .def-item.matched {
+            background: #dcfce7;
+            border-left: 6px solid #22c55e;
+            text-decoration: line-through;
+            opacity: 0.7;
+            cursor: default;
+            pointer-events: none;
+        }
+        .word-item.matched {
+            background: #cbd5e1;
+            color: #1e293b;
+            text-decoration: line-through;
+            opacity: 0.6;
+            cursor: default;
+            pointer-events: none;
+        }
+        .feedback {
+            margin-top: 24px;
+            padding: 16px;
+            background: #f1f5f9;
+            border-radius: 40px;
+            font-size: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+        button {
+            background: #0f172a;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 500;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: 0.1s linear;
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+        .reset-btn {
+            background: #475569;
+        }
+        .next-btn {
+            background: #059669;
+        }
+        .score {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #0f3b2c;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 16px; }
+            .word-item, .def-item { padding: 14px 16px; font-size: 1rem; margin: 8px 8px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📘 Matching Task — Part 1</h1>
+    <div class="sub">Tap a word → then tap a definition to match</div>
+
+    <div class="task-grid">
+        <div class="words-col">
+            <div class="section-title">🔤 WORDS (Part 1)</div>
+            <div id="words-list"></div>
+        </div>
+        <div class="defs-col">
+            <div class="section-title">📖 DEFINITIONS</div>
+            <div id="defs-list"></div>
+        </div>
+    </div>
+
+    <div class="feedback" id="feedbackMsg">
+        ✨ Tap any word, then tap its matching definition
+    </div>
+    <div class="button-group">
+        <button class="reset-btn" id="resetBtn">⟳ Reset all matches</button>
+    </div>
+    <div id="scoreArea" class="score" style="text-align:center; margin-top: 20px;"></div>
+</div>
+
+<script>
+    // ---------- PART 1 DATA (first 9 words from your files) ----------
+    const wordsData = [
+        { word: "outlandish", def: "extremely different and unexpected" },
+        { word: "adopt", def: "to take and follow an action, to choose a new standard" },
+        { word: "to mock", def: "to make fun of, to ridicule, to belittle" },
+        { word: "to spot", def: "to notice, to recognise" },
+        { word: "multi-national", def: "something that spreads across several countries" },
+        { word: "corporation", def: "a large business that is legally separate and independent of its owners" },
+        { word: "gullible", def: "naive, easily deceived" },
+        { word: "tricks", def: "jokes, pranks" },
+        { word: "to skip", def: "to miss, to pass over" }
+    ];
+
+    let matches = {};     // { wordIndex: defIndex }
+    let reverseMatch = {};// { defIndex: wordIndex }
+    let selectedWord = null;
+
+    function render() {
+        const wordsContainer = document.getElementById('words-list');
+        const defsContainer = document.getElementById('defs-list');
+
+        // render words
+        wordsContainer.innerHTML = '';
+        wordsData.forEach((item, idx) => {
+            const isMatched = matches[idx] !== undefined;
+            const div = document.createElement('div');
+            div.className = 'word-item' + (isMatched ? ' matched' : '');
+            if (!isMatched && selectedWord === idx) div.classList.add('selected');
+            div.innerText = item.word;
+            if (!isMatched) {
+                div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (matches[idx] !== undefined) return;
+                    selectedWord = idx;
+                    render();
+                });
+            }
+            wordsContainer.appendChild(div);
+        });
+
+        // render definitions
+        defsContainer.innerHTML = '';
+        wordsData.forEach((item, idx) => {
+            const isMatched = reverseMatch[idx] !== undefined;
+            const div = document.createElement('div');
+            div.className = 'def-item' + (isMatched ? ' matched' : '');
+            div.innerText = item.def;
+            if (!isMatched) {
+                div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (selectedWord !== null && matches[selectedWord] === undefined && reverseMatch[idx] === undefined) {
+                        // check if correct pair
+                        if (wordsData[selectedWord].def === item.def) {
+                            // CORRECT MATCH
+                            matches[selectedWord] = idx;
+                            reverseMatch[idx] = selectedWord;
+                            selectedWord = null;
+                            document.getElementById('feedbackMsg').innerHTML = '✅ Correct! Good match.';
+                            render();
+                            updateScore();
+                        } else {
+                            document.getElementById('feedbackMsg').innerHTML = '❌ Wrong match. Try again!';
+                            selectedWord = null;
+                            render();
+                            setTimeout(() => {
+                                document.getElementById('feedbackMsg').innerHTML = '✨ Tap a word, then tap its matching definition';
+                            }, 1000);
+                        }
+                    } else {
+                        if(selectedWord === null) 
+                            document.getElementById('feedbackMsg').innerHTML = '👆 First tap a WORD, then tap a definition.';
+                        else 
+                            document.getElementById('feedbackMsg').innerHTML = '⚠️ This word or definition is already matched.';
+                        selectedWord = null;
+                        render();
+                    }
+                });
+            }
+            defsContainer.appendChild(div);
+        });
+
+        const allMatched = Object.keys(matches).length === wordsData.length;
+        if (allMatched && wordsData.length>0) {
+            document.getElementById('feedbackMsg').innerHTML = '🎉 PERFECT! You completed Part 1. Go to Part 2! 🎉';
+        }
+    }
+
+    function updateScore() {
+        const matchedCount = Object.keys(matches).length;
+        const total = wordsData.length;
+        document.getElementById('scoreArea').innerHTML = `🏆 Score Part 1: ${matchedCount} / ${total}`;
+    }
+
+    function resetGame() {
+        matches = {};
+        reverseMatch = {};
+        selectedWord = null;
+        render();
+        updateScore();
+        document.getElementById('feedbackMsg').innerHTML = '🔄 Reset done. Start matching again!';
+    }
+
+    render();
+    updateScore();
+    document.getElementById('resetBtn').addEventListener('click', resetGame);
+</script>
+</body>
+</html>
