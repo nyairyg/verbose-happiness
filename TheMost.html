@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Drag & Drop: Fill in the Blanks</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #f1f4f8;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px 16px;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            padding: 2rem 1.8rem;
+            transition: all 0.2s;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+            color: #1e2a3a;
+            letter-spacing: -0.2px;
+        }
+
+        .sub {
+            color: #4a627a;
+            border-left: 3px solid #9aaebf;
+            padding-left: 14px;
+            margin: 8px 0 24px 0;
+            font-size: 0.9rem;
+            font-weight: 450;
+        }
+
+        .img-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 24px;
+            margin: 16px 0 20px 0;
+            padding: 12px 8px;
+        }
+
+        .img-placeholder {
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 24px;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        .img-placeholder img {
+            width: 150px;
+            height: 80px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .drag-zone {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            margin: 24px 0 32px 0;
+            padding: 16px 12px;
+            background: #f9fbfd;
+            border-radius: 48px;
+            border: 1px solid #e9edf2;
+        }
+
+        .drag-word {
+            background: white;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1f3a5f;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #cad2db;
+            cursor: grab;
+        }
+
+        .drag-word:active {
+            cursor: grabbing;
+        }
+
+        .sentences-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 28px 0 28px;
+        }
+
+        .sentence-item {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 14px 18px;
+            border: 1px solid #eef2f6;
+        }
+
+        .sentence-text {
+            font-size: 1rem;
+            line-height: 1.45;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            font-weight: 470;
+            color: #1e2f3e;
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: 130px;
+            background: #e3f2fd;
+            border-radius: 60px;
+            padding: 6px 14px;
+            text-align: center;
+            font-weight: 600;
+            border: 1px dashed #64b5f6;
+            color: #1565c0;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .gap.filled {
+            background: #e3f2fd;
+            border: 1px solid #64b5f6;
+            color: #1565c0;
+        }
+
+        .gap.correct {
+            background: #e6f4ea;
+            border: 1px solid #8bc34a;
+            color: #2c6e2f;
+        }
+
+        .gap.wrong {
+            background: #fdecea;
+            border: 1px solid #e57373;
+            color: #b71c1c;
+        }
+
+        .reset-btn {
+            background: none;
+            border: 1px solid #cbd5e1;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 60px;
+            cursor: pointer;
+            color: #2c3e66;
+            margin-top: 8px;
+        }
+
+        .status {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            background: #f8fafc;
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 40px;
+            color: #2c3e66;
+            font-weight: 450;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 24px;
+            color: #8ba0b5;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h2>📋 fill in the blanks</h2>
+    <div class="sub">drag the correct word into each gap</div>
+
+    <div class="img-row">
+        <div class="img-placeholder">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Tian%27anmen_from_the_square_%2820200825114150%29.jpg/1280px-Tian%27anmen_from_the_square_%2820200825114150%29.jpg">
+        </div>
+        <div class="img-placeholder">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/3/30/Louvre_Museum_%2827128035747%29.jpg/1200px-Louvre_Museum_%2827128035747%29.jpg">
+        </div>
+        <div class="img-placeholder">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Rush_hour_at_Shinjuku_02.JPG/500px-Rush_hour_at_Shinjuku_02.JPG">
+        </div>
+    </div>
+
+    <div class="drag-zone" id="dragContainer"></div>
+
+    <div class="img-row">
+        <div class="img-placeholder">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Avenida_9_de_Julio_Sur.jpg">
+        </div>
+        <div class="img-placeholder">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Vasco_da_Gama_Bridge.jpg/1280px-Vasco_da_Gama_Bridge.jpg">
+        </div>
+        <div class="img-placeholder">
+            <img src="https://cdn-images.the-express.com/img/dynamic/27/590x/secondary/The-Mask-of-Death-Bolivia-154442.jpg">
+        </div>
+    </div>
+
+    <div class="sentences-list" id="sentencesList"></div>
+
+    <div class="flex-between">
+        <button class="reset-btn" id="resetBtn">check</button>
+        <div class="status" id="statusMsg">✔️ drag a word into any gap</div>
+    </div>
+
+    <footer>💡 minimal & clean — drop the right phrase</footer>
+</div>
+
+<script>
+const sentencesData = [
+    { id: 0, text: "The Louvre is {gap} art gallery in the world.", correct: "the most popular" },
+    { id: 1, text: "Vasco da Gama Bridge is {gap} bridge in Europe.", correct: "the longest" },
+    { id: 2, text: "The Yungas Road is {gap} road in the world.", correct: "the most dangerous" },
+    { id: 3, text: "Tiananmen Square is {gap} square in the world.", correct: "the biggest" },
+    { id: 4, text: "Avenida 9 de Julio is {gap} street in the world.", correct: "the widest" },
+    { id: 5, text: "Shinjuku Station is {gap} train station in the world.", correct: "the busiest" }
+];
+
+const allOptions = [
+    "the busiest",
+    "the widest",
+    "the most popular",
+    "the longest",
+    "the biggest",
+    "the most dangerous"
+];
+
+let fills = {0:null,1:null,2:null,3:null,4:null,5:null};
+let availableWords = [...allOptions];
+
+const dragContainer = document.getElementById('dragContainer');
+const sentencesList = document.getElementById('sentencesList');
+const statusMsg = document.getElementById('statusMsg');
+const resetBtn = document.getElementById('resetBtn');
+
+let draggedItem = null;
+
+function renderDragItems() {
+    dragContainer.innerHTML = '';
+    availableWords.forEach(word => {
+        const el = document.createElement('div');
+        el.className = 'drag-word';
+        el.textContent = word;
+        el.draggable = true;
+
+        el.addEventListener('dragstart', e => {
+            draggedItem = word;
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData('text/plain', word);
+        });
+
+        dragContainer.appendChild(el);
+    });
+}
+
+function renderSentences() {
+    sentencesList.innerHTML = '';
+
+    sentencesData.forEach(s => {
+        const wrap = document.createElement('div');
+        wrap.className = 'sentence-item';
+
+        const parts = s.text.split('{gap}');
+
+        wrap.appendChild(document.createTextNode(parts[0]));
+
+        const gap = document.createElement('span');
+        gap.className = 'gap';
+
+        const filled = fills[s.id];
+
+        if (filled) {
+            gap.textContent = filled;
+            gap.classList.add('filled');
+            gap.onclick = () => {
+                availableWords.push(filled);
+                fills[s.id] = null;
+                renderDragItems();
+                renderSentences();
+            };
+        } else {
+            gap.textContent = '______';
+
+            gap.addEventListener('dragover', e => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            });
+
+            gap.addEventListener('drop', e => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const word = e.dataTransfer.getData('text/plain');
+
+                if (!word) return;
+
+                fills[s.id] = word;
+
+                availableWords = availableWords.filter(w => w !== word);
+
+                renderDragItems();
+                renderSentences();
+            });
+        }
+
+        wrap.appendChild(gap);
+        wrap.appendChild(document.createTextNode(parts[1]));
+
+        sentencesList.appendChild(wrap);
+    });
+}
+
+function checkAnswers() {
+    let correctCount = 0;
+
+    const gaps = document.querySelectorAll('.gap');
+
+    sentencesData.forEach((s, index) => {
+        const gap = gaps[index];
+        gap.classList.remove('correct', 'wrong');
+
+        if (fills[s.id] === s.correct) {
+            gap.classList.add('correct');
+            correctCount++;
+        } else if (fills[s.id]) {
+            gap.classList.add('wrong');
+        }
+    });
+
+    statusMsg.textContent = correctCount + " / " + sentencesData.length + " correct";
+}
+
+resetBtn.onclick = checkAnswers;
+
+renderDragItems();
+renderSentences();
+</script>
+</body>
+</html>
