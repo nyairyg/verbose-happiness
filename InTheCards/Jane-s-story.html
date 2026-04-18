@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Arcane Linguist | Fortune Teller ESL</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 10% 20%, #0a0c12 0%, #03050a 100%);
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1.5rem;
+    }
+
+    .mystic-container {
+      max-width: 800px;
+      width: 100%;
+      background: rgba(10, 14, 23, 0.75);
+      backdrop-filter: blur(2px);
+      border-radius: 2.5rem;
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .mystic-header {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 1rem 2rem;
+      border-bottom: 1px solid rgba(210, 180, 140, 0.3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .title-glow {
+      font-size: 1.5rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #e9d6b0, #b88b4a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+    }
+
+    .progress-steps {
+      background: #0f111acc;
+      padding: 0.4rem 1rem;
+      border-radius: 60px;
+      border: 1px solid #6b4e71;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #ddc9a3;
+    }
+
+    .reset-global {
+      background: none;
+      border: 1px solid #a76e9b;
+      color: #f2e0c9;
+      padding: 0.4rem 1.2rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .reset-global:hover {
+      background: #4a2c4e;
+      border-color: #cba37a;
+      box-shadow: 0 0 8px rgba(203, 163, 122, 0.4);
+    }
+
+    .part-content {
+      padding: 2rem;
+      transition: opacity 0.28s ease-in-out;
+      min-height: 550px;
+    }
+
+    .quiz-card {
+      background: rgba(18, 22, 35, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 2rem;
+      border: 1px solid rgba(170, 120, 200, 0.4);
+      box-shadow: 0 10px 30px -10px black;
+      padding: 1.8rem;
+    }
+
+    .quiz-title {
+      font-size: 1.6rem;
+      font-weight: 500;
+      color: #e8d9b0;
+      border-left: 4px solid #d8a45e;
+      padding-left: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .audio-player {
+      background: #0e1020;
+      padding: 1rem;
+      border-radius: 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid #5b4270;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    audio {
+      filter: drop-shadow(0 0 4px #a469b0);
+      width: 100%;
+      max-width: 320px;
+      background: #1e1a2f;
+      border-radius: 30px;
+    }
+
+    .question-item {
+      background: rgba(0, 0, 0, 0.4);
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border-radius: 1.2rem;
+      border-left: 3px solid #b99274;
+    }
+
+    .question-text {
+      font-weight: 500;
+      margin-bottom: 0.7rem;
+      color: #f0e2c5;
+    }
+
+    .inline-gap {
+      display: inline-block;
+      margin: 0 4px;
+    }
+
+    .inline-gap-input {
+      background: #0c0e1a;
+      border: 1px solid #6d5480;
+      padding: 0.3rem 0.6rem;
+      border-radius: 1rem;
+      color: #f7efda;
+      font-size: 0.9rem;
+      width: auto;
+      min-width: 100px;
+      max-width: 180px;
+      transition: 0.1s;
+      display: inline-block;
+    }
+
+    .inline-gap-input:focus {
+      outline: none;
+      border-color: #e2b87a;
+      box-shadow: 0 0 0 2px rgba(210, 165, 80, 0.4);
+    }
+
+    .sentence-text {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #f0e2c5;
+    }
+
+    input, select {
+      background: #0c0e1a;
+      border: 1px solid #6d5480;
+      padding: 0.6rem 1rem;
+      border-radius: 1.2rem;
+      color: #f7efda;
+      font-size: 0.9rem;
+      width: 100%;
+      max-width: 100%;
+      transition: 0.1s;
+    }
+
+    .feedback-correct {
+      background-color: #1f4a2c !important;
+      border-color: #7ec850 !important;
+      color: #e2ffd6;
+    }
+
+    .feedback-incorrect {
+      background-color: #642c3a !important;
+      border-color: #e06c6c !important;
+      color: #ffcece;
+    }
+
+    .check-btn {
+      background: linear-gradient(95deg, #5f3b6e, #2f2a4a);
+      border: none;
+      padding: 0.8rem 2rem;
+      margin-top: 1.8rem;
+      border-radius: 3rem;
+      font-weight: bold;
+      color: #faeec2;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      border: 1px solid #b99274;
+    }
+
+    .check-btn:hover:not(:disabled) {
+      background: #7a4f8c;
+      transform: scale(0.98);
+      box-shadow: 0 0 10px #b98f60;
+    }
+
+    .done-btn {
+      background: linear-gradient(95deg, #3a5e6e, #2a3a4a);
+    }
+
+    .completion-message {
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0,0,0,0.6);
+      border-radius: 2rem;
+      margin-top: 1rem;
+    }
+
+    .glow-text {
+      font-size: 1.8rem;
+      background: linear-gradient(120deg, #ecd67a, #c99454);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .feedback-message {
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .feedback-success {
+      background: #1a4a2a;
+      border-left: 4px solid #7ec850;
+      color: #c8ffb0;
+    }
+
+    .feedback-error {
+      background: #5a2a3a;
+      border-left: 4px solid #e06c6c;
+      color: #ffc0c0;
+    }
+
+    /* Part 1 styles - VERTICAL LAYOUT: image above words */
+    .part1-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .image-area-vertical {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .listing-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .listing-wrapper img {
+      width: 100%;
+      display: block;
+      border-radius: 20px;
+      border: 1px solid #c6a15b;
+      box-shadow: 0 10px 25px -8px black;
+    }
+
+    .words-panel-vertical {
+      background: rgba(18, 22, 35, 0.85);
+      backdrop-filter: blur(4px);
+      border-radius: 1.8rem;
+      padding: 1.5rem;
+      border: 1px solid #6b4e71;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .words-panel-vertical h3 {
+      color: #e9cf9b;
+      margin-bottom: 0.5rem;
+    }
+
+    .instruction {
+      color: #bcae8a;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .task-status {
+      display: flex;
+      justify-content: space-between;
+      margin: 1rem 0;
+      background: #161c2a;
+      padding: 0.8rem;
+      border-radius: 1.5rem;
+      color: #ddc9a3;
+    }
+
+    .words-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .drag-word {
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: grab;
+      user-select: none;
+      background-color: #2a253f;
+      border: 1px solid #aa88aa;
+      color: #f7e6cf;
+      transition: all 0.2s;
+    }
+
+    .drag-word.dragged-success {
+      opacity: 0.6;
+      cursor: default;
+    }
+
+    .callout {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid #efcd9b;
+      box-shadow: 0 0 6px gold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 12px;
+      background: #1f1b2ecc;
+      color: #ffe0b5;
+      cursor: pointer;
+      transition: transform 0.2s;
+      z-index: 10;
+    }
+
+    .callout:hover {
+      transform: scale(1.1);
+    }
+
+    .callout.completed {
+      background-color: #5d7a4c;
+      border-color: #b9f6a1;
+    }
+
+    .feedback-container {
+      background: #0d0f1a;
+      border-left: 4px solid #c29b6b;
+      padding: 12px;
+      border-radius: 1rem;
+      color: #f3e1bf;
+      font-size: 0.85rem;
+    }
+
+    .homework-box {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      border: 1px dashed #b99274;
+    }
+
+    .homework-title {
+      color: #e8c88a;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="mystic-container" id="appRoot">
+  <div class="mystic-header">
+    <div class="title-glow">✦ FORTUNE TELLER ESL ✦</div>
+    <div class="progress-steps" id="stepIndicator">Part 1 / 5</div>
+    <button class="reset-global" id="globalResetBtn">⟳ Reset All Progress</button>
+  </div>
+  <div id="dynamicPartContainer" class="part-content"></div>
+</div>
+
+<script>
+  // ============================================
+  // GLOBAL STATE
+  // ============================================
+  let currentStep = 1;
+  let answersState = {
+    part1: { placedWords: [], completed: false },
+    part2: { answers: {}, validated: false },
+    part3: { blanks: [], validated: false },
+    part4: { completed: false },
+    part5: { blanks: [], validated: false }
+  };
+  
+  function loadGlobalProgress() {
+    const saved = localStorage.getItem("mystic_esl_fortune");
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        currentStep = data.currentStep || 1;
+        if (data.answersState) {
+          answersState = data.answersState;
+          if (!answersState.part1.placedWords) answersState.part1.placedWords = [];
+          if (!answersState.part4) answersState.part4 = { completed: false };
+        }
+      } catch(e) {}
+    }
+  }
+  
+  function persistProgress() {
+    const toStore = {
+      currentStep: currentStep,
+      answersState: answersState
+    };
+    localStorage.setItem("mystic_esl_fortune", JSON.stringify(toStore));
+  }
+  
+  function resetEverything() {
+    currentStep = 1;
+    answersState = {
+      part1: { placedWords: [], completed: false },
+      part2: { answers: {}, validated: false },
+      part3: { blanks: [], validated: false },
+      part4: { completed: false },
+      part5: { blanks: [], validated: false }
+    };
+    persistProgress();
+    renderCurrentPart();
+  }
+  
+  function isPartCompleted(stepNum) {
+    if (stepNum === 1) return answersState.part1.completed === true;
+    if (stepNum === 2) return answersState.part2.validated === true;
+    if (stepNum === 3) return answersState.part3.validated === true;
+    if (stepNum === 4) return answersState.part4.completed === true;
+    if (stepNum === 5) return answersState.part5.validated === true;
+    return false;
+  }
+  
+  function setPartCompleted(stepNum, completed) {
+    if (stepNum === 1) answersState.part1.completed = completed;
+    if (stepNum === 2) answersState.part2.validated = completed;
+    if (stepNum === 3) answersState.part3.validated = completed;
+    if (stepNum === 4) answersState.part4.completed = completed;
+    if (stepNum === 5) answersState.part5.validated = completed;
+    persistProgress();
+    document.getElementById('stepIndicator').innerText = `Part ${currentStep} / 5`;
+  }
+  
+  function goToStep(step) {
+    if (step < 1 || step > 5) return;
+    for (let i = 1; i < step; i++) {
+      if (!isPartCompleted(i)) return;
+    }
+    currentStep = step;
+    persistProgress();
+    renderCurrentPart();
+  }
+  
+  function showFeedback(element, message, isSuccess) {
+    element.innerHTML = message;
+    element.className = `feedback-message ${isSuccess ? 'feedback-success' : 'feedback-error'}`;
+  }
+  
+  // ============================================
+  // PART 1 - VERTICAL LAYOUT: image above drag words
+  // ============================================
+  function renderPart1(container) {
+    const wordToCalloutMapping = {
+  "become famous": 5,
+  "get a new job": 3,
+  "get married": 2,
+  "be lucky": 6,
+  "travel": 7,
+  "meet somebody new": 4,
+  "fall in love": 1,
+  "get a lot of money": 10,
+  "have a surprise": 9,
+  "move to a new house": 8
+};
+
+const calloutPositions = {
+  1: { top: "5%", left: "4%" },
+  2: { top: "5%", left: "23.5%" },
+  3: { top: "5%", left: "43%" },
+  4: { top: "5%", left: "62.5%" },
+  5: { top: "5%", left: "82%" },
+  6: { top: "50%", left: "4%" },
+  7: { top: "50%", left: "23.5%" },
+  8: { top: "50%", left: "43%" },
+  9: { top: "50%", left: "62.5%" },
+  10: { top: "50%", left: "82%" }
+};
+    const allWords = Object.keys(wordToCalloutMapping);
+    const totalWords = allWords.length;
+    let placedSet = new Set(answersState.part1.placedWords || []);
+    let placedCount = placedSet.size;
+    
+    container.innerHTML = `
+      <div class="part1-vertical">
+        <div class="image-area-vertical">
+          <div class="listing-wrapper">
+            <img src="https://nyairyg.github.io/verbose-happiness/tarot cards.png" alt="Tarot" draggable="false">
+            <div id="callouts-container"></div>
+          </div>
+        </div>
+        <div class="words-panel-vertical">
+          <h3>📜 Drag Words to Circles (1-10)</h3>
+          <div class="instruction">Match each card to the correct numbered circle on the image above</div>
+          <div class="task-status">
+            <span>🏆 Progress</span>
+            <span id="part1Status">${placedCount}/${totalWords}</span>
+            <button id="part1ResetBtn" style="background:#3e2a44; border:none; padding:4px 16px; border-radius:2rem; color:#efdba1; cursor:pointer;">↺ Reset</button>
+          </div>
+          <div id="words-container" class="words-grid"></div>
+          <div id="feedback-part1" class="feedback-container">💡 Drag each word onto its matching numbered circle on the image above</div>
+          <button id="part1CheckBtn" class="check-btn">✨ Check & Unlock Next ✨</button>
+        </div>
+      </div>
+    `;
+    
+    const wordsContainerDiv = document.getElementById('words-container');
+    const calloutsContainerDiv = document.getElementById('callouts-container');
+    const statusSpan = document.getElementById('part1Status');
+    const feedbackDiv = document.getElementById('feedback-part1');
+    const resetBtn = document.getElementById('part1ResetBtn');
+    const checkBtn = document.getElementById('part1CheckBtn');
+    
+    function updateProgress() {
+      statusSpan.innerHTML = `${placedCount}/${totalWords}`;
+      if (placedCount === totalWords) {
+        feedbackDiv.innerHTML = "✅ All words matched! Press Check to continue.";
+      }
+    }
+    
+    function markWordAsPlaced(wordText, wordElement) {
+      if (placedSet.has(wordText)) return false;
+      placedSet.add(wordText);
+      placedCount++;
+      wordElement.classList.add('dragged-success');
+      wordElement.setAttribute('draggable', 'false');
+      wordElement.style.cursor = 'default';
+      const calloutNumber = wordToCalloutMapping[wordText];
+      const targetCallout = document.querySelector(`.callout[data-number="${calloutNumber}"]`);
+      if (targetCallout) targetCallout.classList.add('completed');
+      answersState.part1.placedWords = Array.from(placedSet);
+      persistProgress();
+      updateProgress();
+      return true;
+    }
+    
+    function createDraggableWord(wordText) {
+      const div = document.createElement('div');
+      div.textContent = wordText;
+      div.classList.add('drag-word');
+      div.setAttribute('data-word', wordText);
+      div.setAttribute('draggable', 'true');
+      if (placedSet.has(wordText)) {
+        div.classList.add('dragged-success');
+        div.setAttribute('draggable', 'false');
+        div.style.opacity = '0.6';
+      }
+      div.addEventListener('dragstart', (e) => {
+        if (div.classList.contains('dragged-success')) { e.preventDefault(); return false; }
+        e.dataTransfer.setData('text/plain', wordText);
+      });
+      return div;
+    }
+    
+    function createCallouts() {
+      calloutsContainerDiv.innerHTML = '';
+      [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].forEach(number => {
+        const position = calloutPositions[number];
+        const callout = document.createElement('div');
+        callout.className = 'callout';
+        callout.textContent = number;
+        callout.setAttribute('data-number', number);
+        callout.style.top = position.top;
+        callout.style.left = position.left;
+        const matchedWord = Object.keys(wordToCalloutMapping).find(key => wordToCalloutMapping[key] === number);
+        if (matchedWord && placedSet.has(matchedWord)) callout.classList.add('completed');
+        callout.addEventListener('dragover', (e) => { e.preventDefault(); if (!callout.classList.contains('completed')) callout.style.boxShadow = '0 0 0 3px rgba(210, 180, 140, 0.7)'; });
+        callout.addEventListener('dragleave', () => { callout.style.boxShadow = ''; });
+        callout.addEventListener('drop', (e) => {
+          e.preventDefault();
+          callout.style.boxShadow = '';
+          const wordText = e.dataTransfer.getData('text/plain');
+          const draggedWord = document.querySelector(`.drag-word[data-word="${wordText}"]`);
+          if (!draggedWord || placedSet.has(wordText)) { feedbackDiv.innerHTML = `⚠️ Already placed!`; return; }
+          const expectedNumber = wordToCalloutMapping[wordText];
+          const droppedNumber = parseInt(callout.getAttribute('data-number'));
+          if (expectedNumber === droppedNumber) {
+            markWordAsPlaced(wordText, draggedWord);
+            feedbackDiv.innerHTML = `Correct!`;
+          } else {
+            feedbackDiv.innerHTML = `❌ Try again!`;
+          }
+        });
+        calloutsContainerDiv.appendChild(callout);
+      });
+    }
+    
+    function buildWordsUI() {
+      wordsContainerDiv.innerHTML = '';
+      allWords.forEach(word => { wordsContainerDiv.appendChild(createDraggableWord(word)); });
+    }
+    
+    function resetPart1() {
+      placedSet.clear(); placedCount = 0;
+      answersState.part1.placedWords = []; answersState.part1.completed = false;
+      persistProgress();
+      buildWordsUI(); createCallouts(); updateProgress();
+      feedbackDiv.innerHTML = "🔄 Task reset! Drag words onto the circles above.";
+    }
+    
+    function validateAndComplete() {
+      if (placedCount === totalWords) {
+        setPartCompleted(1, true);
+        feedbackDiv.innerHTML = "🌟 Perfect! Part 1 complete. Unlocking next part...";
+        setTimeout(() => { if (currentStep === 1) goToStep(2); }, 800);
+      } else {
+        feedbackDiv.innerHTML = `⚠️ You placed ${placedCount}/${totalWords} words. Match all words first!`;
+      }
+    }
+    
+    buildWordsUI(); createCallouts(); updateProgress();
+    resetBtn.addEventListener('click', resetPart1);
+    checkBtn.addEventListener('click', validateAndComplete);
+    window.addEventListener('dragstart', (e) => { if (e.target.tagName === 'IMG') e.preventDefault(); });
+  }
+  
+  // ============================================
+  // PART 2 - Multiple Choice (no popup)
+  // ============================================
+  function renderPart2(container) {
+    container.innerHTML = `
+      <div class="quiz-card">
+        <div class="quiz-title">🔮 Part 2</div>
+        <div class="audio-player">
+          <audio controls src="https://nyairyg.github.io/verbose-happiness/14 Track 14.mp3"></audio>
+          <span style="color:#cfc5a5;">Listen to the audio. This is the first part of the story about Jane. <br> Answer the questions below.</span>
+        </div>
+        <div class="question-item">
+          <div class="question-text">1. Who does Jane want to see?</div>
+          <select id="q2_1" class="answer-select">
+            <option value="">-- Select --</option>
+            <option value="1">her boyfriend</option>
+            <option value="2">Jim</option>
+            <option value="3">Madam Yolanda</option>
+          </select>
+        </div>
+        <div class="question-item">
+          <div class="question-text">2. Who is going to tell her about her future?</div>
+          <select id="q2_2" class="answer-select">
+            <option value="">-- Select --</option>
+            <option value="1">The fortune-teller</option>
+            <option value="2">The husband</option>
+            <option value="3">The colleague</option>
+          </select>
+        </div>
+        <div class="question-item">
+          <div class="question-text">3. Why couldn't she see the man very well?</div>
+          <select id="q2_3" class="answer-select">
+            <option value="">-- Select --</option>
+            <option value="1">Because it was very dark</option>
+            <option value="2">Because it was very cloudy</option>
+            <option value="3">Because she forgot her glasses at home</option>
+          </select>
+        </div>
+        <div id="part2Feedback" class="feedback-message" style="margin-top: 1rem;"></div>
+        <button id="part2Check" class="check-btn">🔮 Check Answers</button>
+      </div>
+    `;
+    
+    const checkBtn = document.getElementById('part2Check');
+    const feedbackDiv = document.getElementById('part2Feedback');
+    
+    checkBtn.onclick = () => {
+      const ans1 = document.getElementById('q2_1').value;
+      const ans2 = document.getElementById('q2_2').value;
+      const ans3 = document.getElementById('q2_3').value;
+      
+      const correct1 = (ans1 === '3');
+      const correct2 = (ans2 === '1');
+      const correct3 = (ans3 === '1');
+      
+      const el1 = document.getElementById('q2_1');
+      const el2 = document.getElementById('q2_2');
+      const el3 = document.getElementById('q2_3');
+      
+      el1.classList.toggle('feedback-correct', correct1);
+      el1.classList.toggle('feedback-incorrect', !correct1 && ans1 !== '');
+      el2.classList.toggle('feedback-correct', correct2);
+      el2.classList.toggle('feedback-incorrect', !correct2 && ans2 !== '');
+      el3.classList.toggle('feedback-correct', correct3);
+      el3.classList.toggle('feedback-incorrect', !correct3 && ans3 !== '');
+      
+      if (correct1 && correct2 && correct3) {
+        setPartCompleted(2, true);
+        showFeedback(feedbackDiv, "Perfect! Part 2 complete. Moving to Part 3...", true);
+        setTimeout(() => goToStep(3), 1200);
+      } else {
+        let msg = "❌ Some answers are incorrect. ";
+     
+        showFeedback(feedbackDiv, msg, false);
+      }
+    };
+  }
+  
+  // ============================================
+  // PART 3 - Inline gaps
+  // ============================================
+  function renderPart3(container) {
+    container.innerHTML = `
+      <div class="quiz-card">
+        <div class="quiz-title">📝 Part 3</div>
+        <div class="audio-player">
+          <audio controls src="https://nyairyg.github.io/verbose-happiness/15 Track 15.mp3"></audio>
+           <span style="color:#cfc5a5;">Listen to the audio. This is the next part of the story about Jane. <br> Fill in the gaps. Write 1 or 2 words or a number.</span>
+        
+        </div>
+        <div class="question-item">
+          <div class="sentence-text">1. Jane has a problem with her <input type="text" id="gap1" class="inline-gap-input" placeholder="______">.</div>
+        </div>
+        <div class="question-item">
+          <div class="sentence-text">2. She chooses <input type="text" id="gap2" class="inline-gap-input" placeholder="______"> cards.</div>
+        </div>
+        <div class="question-item">
+          <div class="sentence-text">3. Her first card means she's going to be <input type="text" id="gap3" class="inline-gap-input" placeholder="______">.</div>
+        </div>
+        <div class="question-item">
+          <div class="sentence-text">4. Jane asks the fortune-teller if she's going to <input type="text" id="gap4" class="inline-gap-input" placeholder="______"> with her boyfriend.</div>
+        </div>
+        <div id="part3Feedback" class="feedback-message" style="margin-top: 1rem;"></div>
+        <button id="part3Check" class="check-btn">🔍 Validate Answers</button>
+      </div>
+    `;
+    
+    const checkBtn = document.getElementById('part3Check');
+    const feedbackDiv = document.getElementById('part3Feedback');
+    
+    checkBtn.onclick = () => {
+      const g1 = document.getElementById('gap1').value.trim().toLowerCase();
+      const g2 = document.getElementById('gap2').value.trim().toLowerCase();
+      const g3 = document.getElementById('gap3').value.trim().toLowerCase();
+      const g4 = document.getElementById('gap4').value.trim().toLowerCase();
+      
+      const correct1 = (g1 === 'boyfriend');
+      const correct2 = (g2 === '5' || g2 === 'five');
+      const correct3 = (g3 === 'very lucky');
+      const correct4 = (g4 === 'stay');
+      
+      const el1 = document.getElementById('gap1');
+      const el2 = document.getElementById('gap2');
+      const el3 = document.getElementById('gap3');
+      const el4 = document.getElementById('gap4');
+      
+      el1.classList.toggle('feedback-correct', correct1);
+      el1.classList.toggle('feedback-incorrect', !correct1 && g1 !== '');
+      el2.classList.toggle('feedback-correct', correct2);
+      el2.classList.toggle('feedback-incorrect', !correct2 && g2 !== '');
+      el3.classList.toggle('feedback-correct', correct3);
+      el3.classList.toggle('feedback-incorrect', !correct3 && g3 !== '');
+      el4.classList.toggle('feedback-correct', correct4);
+      el4.classList.toggle('feedback-incorrect', !correct4 && g4 !== '');
+      
+      if (correct1 && correct2 && correct3 && correct4) {
+        setPartCompleted(3, true);
+        showFeedback(feedbackDiv, "Perfect! Part 3 complete. Moving to Part 4...", true);
+        setTimeout(() => goToStep(4), 1200);
+      } else {
+        let msg = "❌ Incorrect answers.";
+        showFeedback(feedbackDiv, msg, false);
+      }
+    };
+  }
+  
+  // ============================================
+  // PART 4 - Homework style (no answer input, just Done button)
+  // ============================================
+  function renderPart4(container) {
+    container.innerHTML = `
+      <div class="quiz-card">
+        <div class="quiz-title">📚 Part 4</div>
+        <div class="audio-player">
+          <audio controls src="https://nyairyg.github.io/verbose-happiness/16 Track 16.mp3"></audio>
+          <span style="color:#cfc5a5;">Listen to the audio. This is the next part of the story about Jane. </span>
+        </div>
+        <div class="homework-box">
+          <div class="homework-title">✨ Answer these questions in your homework file ✨</div>
+          <div class="question-item" style="background: transparent;">
+            <div class="question-text">1. What's the second card? What does it mean?</div>
+          </div>
+          <div class="question-item" style="background: transparent;">
+            <div class="question-text">2. Why is this a problem for Jane?</div>
+          </div>
+          <div class="question-item" style="background: transparent;">
+            <div class="question-text">3. What's her third card? What does it mean?</div>
+          </div>
+          <div class="question-item" style="background: transparent;">
+            <div class="question-text">4. Who's Jim? Where did Jane meet him?</div>
+          </div>
+          <div class="question-item" style="background: transparent;">
+            <div class="question-text">5. What do you think the fourth card is going to be?</div>
+          </div>
+        </div>
+        <div id="part4Feedback" class="feedback-message" style="margin-top: 1rem;"></div>
+        <button id="part4Done" class="check-btn done-btn">✓ I've answered in my homework file - Done ✓</button>
+      </div>
+    `;
+    
+    const doneBtn = document.getElementById('part4Done');
+    const feedbackDiv = document.getElementById('part4Feedback');
+    
+    doneBtn.onclick = () => {
+      setPartCompleted(4, true);
+      showFeedback(feedbackDiv, "Great! Part 4 complete. Moving to final part...", true);
+      setTimeout(() => goToStep(5), 1200);
+    };
+  }
+  
+  // ============================================
+  // PART 5 - Inline gaps (final)
+  // ============================================
+  function renderPart5(container) {
+    container.innerHTML = `
+      <div class="quiz-card">
+        <div class="quiz-title">🃏 Part 5</div>
+        <div class="audio-player">
+          <audio controls src="https://nyairyg.github.io/verbose-happiness/17 Track 17.mp3"></audio>
+        <span style="color:#cfc5a5;">Listen to the audio. This is the next part of the story about Jane. <br> Fill in the gaps. Write 1 or 2 words or a number.</span>
+        </div>
+        <div class="question-item">
+          <div class="sentence-text">1. Her fourth card means she is going to <input type="text" id="gap5_1" class="inline-gap-input" placeholder="______"> her boyfriend and go away with Jim to <input type="text" id="gap5_2" class="inline-gap-input" placeholder="______">.</div>
+        </div>
+        <div class="question-item">
+          <div class="sentence-text">2. Very soon they are going to <input type="text" id="gap5_3" class="inline-gap-input" placeholder="______">.</div>
+        </div>
+        <div class="question-item">
+          <div class="sentence-text">3. Jane asks if she is going to be <input type="text" id="gap5_4" class="inline-gap-input" placeholder="______"> and the fortune-teller says yes.</div>
+        </div>
+        <div class="question-item">
+          <div class="sentence-text">4. She pays the fortune-teller $ <input type="text" id="gap5_5" class="inline-gap-input" placeholder="______" style="width: 70px;">.</div>
+        </div>
+        <div id="part5Feedback" class="feedback-message" style="margin-top: 1rem;"></div>
+        <button id="part5Check" class="check-btn">🏆 Complete Quest</button>
+        <div id="finalMessage" style="margin-top: 1rem; text-align: center;"></div>
+      </div>
+    `;
+    
+    const checkBtn = document.getElementById('part5Check');
+    const feedbackDiv = document.getElementById('part5Feedback');
+    
+    checkBtn.onclick = () => {
+      const g1 = document.getElementById('gap5_1').value.trim().toLowerCase();
+      const g2 = document.getElementById('gap5_2').value.trim().toLowerCase();
+      const g3 = document.getElementById('gap5_3').value.trim().toLowerCase();
+      const g4 = document.getElementById('gap5_4').value.trim().toLowerCase();
+      const g5 = document.getElementById('gap5_5').value.trim();
+      
+      const correct1 = (g1 === 'leave');
+      const correct2 = (g2 === 'another country');
+      const correct3 = (g3 === 'get married');
+      const correct4 = (g4 === 'happy' || g4 === 'very happy');
+      const correct5 = (g5 === '50' || g5 === 'fifty');
+      
+      const el1 = document.getElementById('gap5_1');
+      const el2 = document.getElementById('gap5_2');
+      const el3 = document.getElementById('gap5_3');
+      const el4 = document.getElementById('gap5_4');
+      const el5 = document.getElementById('gap5_5');
+      
+      el1.classList.toggle('feedback-correct', correct1);
+      el1.classList.toggle('feedback-incorrect', !correct1 && g1 !== '');
+      el2.classList.toggle('feedback-correct', correct2);
+      el2.classList.toggle('feedback-incorrect', !correct2 && g2 !== '');
+      el3.classList.toggle('feedback-correct', correct3);
+      el3.classList.toggle('feedback-incorrect', !correct3 && g3 !== '');
+      el4.classList.toggle('feedback-correct', correct4);
+      el4.classList.toggle('feedback-incorrect', !correct4 && g4 !== '');
+      el5.classList.toggle('feedback-correct', correct5);
+      el5.classList.toggle('feedback-incorrect', !correct5 && g5 !== '');
+      
+      if (correct1 && correct2 && correct3 && correct4 && correct5) {
+        setPartCompleted(5, true);
+        document.getElementById('finalMessage').innerHTML = `
+          <div class="completion-message">
+            <span class="glow-text">🏆 ALL DONE! 🏆</span><br>
+            <span style="color: #e8d9b0;">You have completed 5 parts out of 6! <br>Jane's future is clear now... or is it? <br> You are going to listen to the ending in class! </span>
+          </div>
+        `;
+        showFeedback(feedbackDiv, "✨ CONGRATULATIONS! You've mastered the Fortune Teller Quest! ✨", true);
+      } else {
+        let msg = "❌ Incorrect";
+        showFeedback(feedbackDiv, msg, false);
+      }
+    };
+  }
+  
+  // ============================================
+  // RENDER CONTROLLER
+  // ============================================
+  function renderCurrentPart() {
+    const container = document.getElementById('dynamicPartContainer');
+    container.style.opacity = '0';
+    setTimeout(() => {
+      if (currentStep === 1) renderPart1(container);
+      else if (currentStep === 2) renderPart2(container);
+      else if (currentStep === 3) renderPart3(container);
+      else if (currentStep === 4) renderPart4(container);
+      else if (currentStep === 5) renderPart5(container);
+      document.getElementById('stepIndicator').innerText = `Part ${currentStep} / 5`;
+      container.style.opacity = '1';
+    }, 30);
+  }
+  
+  // ============================================
+  // INIT
+  // ============================================
+  loadGlobalProgress();
+  renderCurrentPart();
+  document.getElementById('globalResetBtn').addEventListener('click', () => {
+    if (confirm("Reset all progress? All answers will be cleared.")) resetEverything();
+  });
+</script>
+</body>
+</html>
