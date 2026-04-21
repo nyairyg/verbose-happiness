@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Elegant Planner | Tuesday – Saturday</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #e9eef3 0%, #dfe4ea 100%);
+            font-family: 'Inter', -apple-system, 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            margin: 0;
+        }
+
+        /* container with horizontal scroll for narrow windows, but table is compact */
+        .table-wrapper {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.4);
+            border-radius: 2.5rem;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+            overflow-x: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* elegant table */
+        .planner-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #ffffffdd;
+            backdrop-filter: blur(0px);
+            border-radius: 1.8rem;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            font-size: 0.9rem;
+        }
+
+        /* headers */
+        .planner-table th {
+            background: #f8fafd;
+            font-weight: 600;
+            font-size: 1rem;
+            letter-spacing: 0.02em;
+            padding: 1rem 0.8rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e2f3e;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        /* first column (time) */
+        .planner-table td:first-child,
+        .planner-table th:first-child {
+            background: #fefcf5;
+            font-weight: 500;
+            color: #2c3e4e;
+            border-right: 1px solid #e9edf2;
+            text-align: center;
+            font-family: 'JetBrains Mono', 'SF Mono', monospace;
+            letter-spacing: 0;
+        }
+
+        .planner-table td:first-child {
+            font-weight: 600;
+            background: #fbfaf7;
+            font-size: 0.85rem;
+        }
+
+        /* cells */
+        .planner-table td {
+            background: #ffffff;
+            padding: 0.9rem 0.6rem;
+            border-bottom: 1px solid #edf2f7;
+            border-right: 1px solid #eff3f8;
+            vertical-align: middle;
+            transition: all 0.2s ease;
+            min-width: 130px;
+        }
+
+        /* last column without right border */
+        .planner-table td:last-child,
+        .planner-table th:last-child {
+            border-right: none;
+        }
+
+        /* occupied cells (long dash) — locked style */
+        .filled-slot {
+            background: #f1f5f9;
+            color: #475569;
+            text-align: center;
+            font-weight: 500;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            position: relative;
+            cursor: default;
+            user-select: none;
+        }
+
+        .filled-slot::before {
+            content: "—";
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #94a3b8;
+        }
+
+        .filled-slot span {
+            display: none;
+        }
+
+        /* empty gaps — editable */
+        .editable-gap {
+            background: #ffffff;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.1s;
+            position: relative;
+        }
+
+        .editable-gap:hover {
+            background: #fff7e5;
+            box-shadow: inset 0 0 0 2px #f0d9a8;
+        }
+
+        /* cell content style */
+        .cell-content {
+            display: block;
+            width: 100%;
+            min-height: 2.2rem;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #1e2a3a;
+            word-break: break-word;
+            white-space: normal;
+            outline: none;
+            font-weight: 450;
+        }
+
+        /* while editing */
+        .editable-gap[contenteditable="true"] {
+            background: #fffef7;
+            box-shadow: inset 0 0 0 2px #cbd5e1;
+            border-radius: 12px;
+        }
+
+        .cell-content:empty:before {
+            content: "✎ add plan";
+            color: #a0afbf;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 0.75rem;
+        }
+
+        /* subtle caption */
+        .table-caption {
+            text-align: right;
+            padding: 0.8rem 1.2rem 0.5rem;
+            font-size: 0.7rem;
+            color: #6c7a8e;
+            background: #fefcf8;
+            border-top: 1px solid #eef3fa;
+            letter-spacing: 0.3px;
+            border-radius: 0 0 1.8rem 1.8rem;
+        }
+
+        /* horizontal scroll fix for small laptops */
+        @media (max-width: 950px) {
+            .planner-table td {
+                min-width: 110px;
+                padding: 0.7rem 0.4rem;
+            }
+            .planner-table th {
+                padding: 0.8rem 0.4rem;
+                font-size: 0.75rem;
+            }
+            body {
+                padding: 1rem;
+            }
+        }
+
+        /* scrollbar styling (webkit) */
+        .table-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 12px;
+        }
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #b9c3d0;
+            border-radius: 12px;
+        }
+
+        /* subtle click effect on gaps */
+        .editable-gap:active {
+            transform: scale(0.99);
+        }
+
+        /* hint badge */
+        .info-note {
+            display: inline-block;
+            margin-left: 12px;
+            font-size: 0.7rem;
+            background: #eef2f9;
+            padding: 2px 8px;
+            border-radius: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="table-wrapper">
+    <table class="planner-table" id="weekPlanner">
+        <thead>
+            <tr>
+                <th>⏰ TIME</th>
+                <th>TUESDAY</th>
+                <th>WEDNESDAY</th>
+                <th>THURSDAY</th>
+                <th>FRIDAY</th>
+                <th>SATURDAY</th>
+            </tr>
+        </thead>
+        <tbody id="plannerBody">
+            <!-- content will be injected dynamically -->
+        </tbody>
+    </table>
+    <div class="table-caption">
+        ✨ Click on any empty cell (light) — add your task. Occupied slots (<span style="color:#6c7a8e;">—</span>) are pre-filled.
+        <span class="info-note">interactive planning</span>
+    </div>
+</div>
+
+<script>
+    // ----- Time slots -----
+    const timeSlots = [
+        "07 00", "09 00", "11 00", "13 30", "15 40", "17 00", "18 10", "20 00", "22 40"
+    ];
+
+    // Days (order matters)
+    const days = ["tuesday", "wednesday", "thursday", "friday", "saturday"];
+    // Display names
+    const dayNames = {
+        tuesday: "TUESDAY",
+        wednesday: "WEDNESDAY",
+        thursday: "THURSDAY",
+        friday: "FRIDAY",
+        saturday: "SATURDAY"
+    };
+
+    // ---- Occupied slots (long dash) per requirements ----
+    // Tuesday: 07 00, 09 00, 17 00
+    // Wednesday: 09 00, 13 30, 22 40
+    // Thursday: 07 00, 11 00, 15 40
+    // Friday: 15 40, 18 10
+    // Saturday: 07 00, 13 30, 17 00
+
+    const occupiedMap = {
+        tuesday: new Set(["07 00", "09 00", "17 00"]),
+        wednesday: new Set(["09 00", "13 30", "22 40"]),
+        thursday: new Set(["07 00", "11 00", "15 40"]),
+        friday: new Set(["15 40", "18 10"]),
+        saturday: new Set(["07 00", "13 30", "17 00"])
+    };
+
+    // Storage for user-entered text: key "day|time" -> text
+    let userData = new Map();
+
+    // Load from localStorage
+    function loadFromStorage() {
+        const stored = localStorage.getItem("elegantPlannerData");
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                if (parsed && typeof parsed === "object") {
+                    for (const [key, value] of Object.entries(parsed)) {
+                        userData.set(key, value);
+                    }
+                }
+            } catch(e) { console.warn(e); }
+        }
+    }
+
+    // Save to localStorage
+    function saveToStorage() {
+        const obj = Object.fromEntries(userData);
+        localStorage.setItem("elegantPlannerData", JSON.stringify(obj));
+    }
+
+    // Render table
+    function renderTable() {
+        const tbody = document.getElementById("plannerBody");
+        if (!tbody) return;
+
+        tbody.innerHTML = "";
+
+        for (let tIdx = 0; tIdx < timeSlots.length; tIdx++) {
+            const timeValue = timeSlots[tIdx];
+            const row = document.createElement("tr");
+
+            // Time cell (first column)
+            const timeCell = document.createElement("td");
+            timeCell.textContent = timeValue;
+            timeCell.style.fontWeight = "500";
+            timeCell.style.background = "#fbfaf7";
+            row.appendChild(timeCell);
+
+            // For each day create a cell
+            for (let dIdx = 0; dIdx < days.length; dIdx++) {
+                const dayKey = days[dIdx];
+                const isOccupied = occupiedMap[dayKey]?.has(timeValue) || false;
+                const cell = document.createElement("td");
+                const cellKey = `${dayKey}|${timeValue}`;
+
+                if (isOccupied) {
+                    // OCCUPIED - long dash (non-editable)
+                    cell.className = "filled-slot";
+                    cell.setAttribute("data-filled", "true");
+                    cell.removeAttribute("contenteditable");
+                    cell.innerHTML = "";
+                    cell.title = "Pre-scheduled event (long dash)";
+                } 
+                else {
+                    // GAP — editable cell
+                    cell.className = "editable-gap";
+                    cell.setAttribute("contenteditable", "true");
+                    let savedText = userData.get(cellKey) || "";
+                    
+                    const contentSpan = document.createElement("div");
+                    contentSpan.className = "cell-content";
+                    contentSpan.innerText = savedText;
+                    cell.innerHTML = "";
+                    cell.appendChild(contentSpan);
+                    
+                    cell.addEventListener("blur", (function(key, day, time) {
+                        return function(event) {
+                            const innerDiv = event.currentTarget.querySelector(".cell-content");
+                            if (innerDiv) {
+                                const newValue = innerDiv.innerText.trim();
+                                if (newValue === "") {
+                                    userData.delete(key);
+                                } else {
+                                    userData.set(key, newValue);
+                                }
+                                saveToStorage();
+                                event.currentTarget.style.background = "#ffffff";
+                            }
+                        };
+                    })(cellKey, dayKey, timeValue));
+                    
+                    cell.addEventListener("focus", (e) => {
+                        const div = e.currentTarget.querySelector(".cell-content");
+                        if (div && div.innerText.trim() === "") {
+                            // just visual
+                        }
+                        e.currentTarget.style.background = "#fffef0";
+                    });
+                    
+                    cell.addEventListener("keydown", (e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            document.execCommand('insertLineBreak');
+                        }
+                    });
+                }
+                row.appendChild(cell);
+            }
+            tbody.appendChild(row);
+        }
+
+        // Safety: ensure filled-slots have no inner text
+        const filledCells = document.querySelectorAll(".filled-slot");
+        filledCells.forEach(cell => {
+            cell.innerHTML = "";
+        });
+    }
+
+    // Reset all user plans (only editable fields)
+    function resetAllUserPlans() {
+        if (confirm("Reset all added plans? Pre-filled slots (—) will remain unchanged.")) {
+            userData.clear();
+            saveToStorage();
+            renderTable();
+        }
+    }
+    
+    // Add reset button to caption
+    function addResetButton() {
+        const captionDiv = document.querySelector(".table-caption");
+        if (captionDiv && !document.getElementById("customResetBtn")) {
+            const resetSpan = document.createElement("span");
+            resetSpan.id = "customResetBtn";
+            resetSpan.style.cssText = "float: right; cursor: pointer; background: #eef2fa; padding: 2px 10px; border-radius: 40px; font-size: 0.7rem; margin-left: 12px; color: #4b5e77; transition: all 0.2s;";
+            resetSpan.innerHTML = "🗑 clear plans";
+            resetSpan.title = "Delete all your entered tasks (only typed text)";
+            resetSpan.onclick = (e) => {
+                e.stopPropagation();
+                resetAllUserPlans();
+            };
+            resetSpan.onmouseenter = () => { resetSpan.style.background = "#e1e8f2"; };
+            resetSpan.onmouseleave = () => { resetSpan.style.background = "#eef2fa"; };
+            captionDiv.appendChild(resetSpan);
+        }
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        loadFromStorage();
+        renderTable();
+        addResetButton();
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .filled-slot {
+                text-align: center;
+                vertical-align: middle;
+                position: relative;
+            }
+            .filled-slot::before {
+                content: "—";
+                font-size: 1.3rem;
+                font-weight: 400;
+                letter-spacing: 1px;
+                color: #7e8b9c;
+                display: block;
+                line-height: 1.2;
+            }
+            .filled-slot:active {
+                transform: none;
+                background: #f1f5f9;
+            }
+            .editable-gap[contenteditable="true"]:focus {
+                background: #fffcf0;
+                outline: none;
+            }
+            .cell-content:empty:before {
+                content: "✎ add plan";
+                font-size: 0.72rem;
+                color: #9aaebf;
+                font-style: normal;
+                font-weight: 400;
+            }
+            .cell-content {
+                white-space: pre-wrap;
+                word-break: break-word;
+            }
+            .editable-gap:hover .cell-content:empty:before {
+                color: #c0a26b;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        document.querySelectorAll('.editable-gap').forEach(cell => {
+            cell.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    document.execCommand('insertLineBreak');
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
