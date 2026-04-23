@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>Испанский язык: страны и национальности | Интерактивная таблица</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #f1f5f9;
+      font-family: system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Helvetica, 'Noto Sans', sans-serif;
+      padding: 1rem;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+
+    /* главный контейнер — без вертикального скролла на iPad (1024x768) */
+    .table-container {
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      /* адаптив: на маленьких экранах скролл по горизонтали, но на iPad всё помещается */
+    }
+
+    /* сама таблица */
+    .language-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 1rem;
+      min-width: 580px;
+    }
+
+    /* ячейки и заголовки */
+    .language-table th,
+    .language-table td {
+      padding: 1rem 0.9rem;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+
+    .language-table th {
+      background-color: #f8fafc;
+      font-weight: 600;
+      color: #0f172a;
+      font-size: 1rem;
+      letter-spacing: -0.2px;
+      border-bottom: 2px solid #cbd5e1;
+    }
+
+    /* колонка país чуть шире */
+    .language-table td:first-child,
+    .language-table th:first-child {
+      font-weight: 500;
+      background-color: #ffffff;
+    }
+
+    /* поля ввода */
+    .input-nac {
+      width: 100%;
+      padding: 0.85rem 0.75rem;
+      font-size: 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 1rem;
+      background: white;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      touch-action: manipulation;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .input-nac:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    /* правильный / неправильный статус */
+    .correct-input {
+      background-color: #e6f7e6;
+      border-color: #2e7d32;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .incorrect-input {
+      background-color: #ffe6e5;
+      border-color: #c62828;
+      transition: background 0.2s;
+    }
+
+    /* кнопки */
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1.8rem;
+      margin-bottom: 0.5rem;
+      padding: 0 1rem 1rem 1rem;
+    }
+
+    .btn {
+      border: none;
+      padding: 0.9rem 1.8rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 2.5rem;
+      background: white;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+      touch-action: manipulation;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      flex: 0 0 auto;
+    }
+
+    .btn-primary {
+      background: #1e3a8a;
+      color: white;
+      border: none;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+      background: #1e40af;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.97);
+      background: #e2e8f0;
+    }
+
+    /* анимация при проверке (легкое подрагивание для неверных? нет, но добавим кратковременный эффект) */
+    @keyframes gentleFlash {
+      0% { background-color: rgba(59,130,246,0.2); }
+      100% { background-color: transparent; }
+    }
+
+    .flash-animation td {
+      animation: gentleFlash 0.3s ease-out;
+    }
+
+    /* стиль для отображения мужской/женской формы, если она уже заполнена (readonly) */
+    .readonly-text {
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 500;
+      border: 1.5px solid #e2e8f0;
+      cursor: default;
+      border-radius: 1rem;
+      padding: 0.85rem 0.75rem;
+      width: 100%;
+      display: inline-block;
+    }
+
+    /* адаптив: для iPad и больших телефонов увеличиваем таргет */
+    @media (max-width: 780px) {
+      .language-table th,
+      .language-table td {
+        padding: 0.8rem 0.6rem;
+      }
+      .input-nac, .readonly-text {
+        padding: 0.7rem 0.6rem;
+        font-size: 0.9rem;
+      }
+      .btn {
+        padding: 0.7rem 1.4rem;
+        font-size: 1rem;
+      }
+    }
+
+    /* исключаем вертикальный скролл у body на iPad (1024px по высоте) */
+    @media (min-height: 1024px) and (max-height: 1024px) {
+      body {
+        padding: 0.75rem;
+      }
+      .table-container {
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+      }
+      /* но на самом деле мы стремимся без скролла — подгоняем паддинги */
+    }
+
+    /* делаем так, чтобы на стандартном iPad Air (1024x768) всё влезало */
+    @media (orientation: landscape) and (max-height: 800px) {
+      .language-table th, .language-table td {
+        padding: 0.65rem 0.8rem;
+      }
+      .button-group {
+        margin-top: 1rem;
+      }
+    }
+
+    /* простой footer необязателен */
+    .info-note {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #64748b;
+      margin-top: 0.8rem;
+      margin-bottom: 0.2rem;
+    }
+  </style>
+</head>
+<body>
+
+<div style="width: 100%;">
+  <div class="table-container">
+    <table class="language-table" id="nationalityTable">
+      <thead>
+        <tr>
+          <th>País (страна)</th>
+          <th>Nacionalidad (masculino)</th>
+          <th>Nacionalidad (femenino)</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- данные будут вставлены через JS, чтобы контролировать логику пустых/заполненных полей -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="button-group">
+    <button class="btn btn-primary" id="checkBtn">Comprobar / Проверить</button>
+    <button class="btn btn-secondary" id="resetBtn">Reiniciar / Сбросить</button>
+  </div>
+  <div class="info-note">
+    ✏️ Введи недостающую форму (муж. или жен.). 
+  </div>
+</div>
+
+<script>
+  // ---------- ДАННЫЕ СТРАН И НАЦИОНАЛЬНОСТЕЙ ----------
+  // Для каждой страны: país, masculino, femenino
+  // Логика: в каждой строке одно из полей (masculino или femenino) будет исходно заполнено, другое — пустой input.
+  // Случайным образом? Но по заданию: либо мужская форма заполнена, а женская пустая, либо наоборот.
+  // Чтобы было разнообразие и интерес, для разных стран я выбираю какое поле предзаполнено.
+  // Список стран: базовые + доп (Colombia, México, Portugal) например
+  const countriesData = [
+    { pais: "Alemania", masculino: "alemán", femenino: "alemana", prefill: "masculino" },   // муж предзаполнен
+    { pais: "España", masculino: "español", femenino: "española", prefill: "femenino" },    // жен предзаполнена
+    { pais: "Brasil", masculino: "brasileño", femenino: "brasileña", prefill: "masculino" },
+    { pais: "Francia", masculino: "francés", femenino: "francesa", prefill: "femenino" },
+    { pais: "Italia", masculino: "italiano", femenino: "italiana", prefill: "masculino" },
+    { pais: "Rusia", masculino: "ruso", femenino: "rusa", prefill: "femenino" },
+        { pais: "Bielorrusia", masculino: "bielorruso", femenino: "bielorrusa", prefill: "femenino" },
+{ pais: "Chile", masculino: "chileno", femenino: "chilena", prefill: "masculino" },
+    { pais: "Argentina", masculino: "argentino", femenino: "argentina", prefill: "femenino" },
+    { pais: "Perú", masculino: "peruano", femenino: "peruana", prefill: "masculino" },
+    // дополнительные страны:
+    { pais: "Colombia", masculino: "colombiano", femenino: "colombiana", prefill: "masculino" },
+    { pais: "México", masculino: "mexicano", femenino: "mexicana", prefill: "femenino" },
+    { pais: "Portugal", masculino: "portugués", femenino: "portuguesa", prefill: "masculino" }
+  ];
+
+  // Функция нормализации: удаляем акценты, диакритику, приводим к нижнему регистру
+  function normalizeString(str) {
+    if (!str) return "";
+    return str
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")  // убираем диакритику (а́, é, и т.д.)
+      .replace(/ñ/g, 'n')               // специально заменяем ñ на n
+      .replace(/ü/g, 'u');              // для полноты (в немецком нет, но для ü)
+  }
+
+  // сравнение двух строк, игнорируя регистр и акценты
+  function isEqualNormalized(input, correct) {
+    if (!input && !correct) return true;
+    if (!input || !correct) return false;
+    return normalizeString(input) === normalizeString(correct);
+  }
+
+  // Глобальная ссылка на тело таблицы
+  const tbody = document.getElementById('tableBody');
+  let currentRows = [];   // будем хранить объекты строк с DOM-элементами и метаданными
+
+  // Построение таблицы: создаём строки, в каждой строке либо поле masculino как input, либо femenino как input
+  function buildTable() {
+    tbody.innerHTML = '';
+    currentRows = [];
+
+    countriesData.forEach((country, idx) => {
+      const row = document.createElement('tr');
+      
+      // Ячейка страны
+      const cellPais = document.createElement('td');
+      cellPais.textContent = country.pais;
+      row.appendChild(cellPais);
+
+      // Ячейка masculino
+      const cellMasc = document.createElement('td');
+      // Ячейка femenino
+      const cellFem = document.createElement('td');
+
+      // Определяем, какое поле будет редактируемым, а какое — предзаполненным (readonly стиль)
+      const prefillType = country.prefill; // "masculino" или "femenino"
+      
+      let mascInputElement = null;
+      let femInputElement = null;
+      
+      // Создадим контейнеры для значений
+      if (prefillType === 'masculino') {
+        // мужская форма предзаполнена (readonly текст), женская — input (пустой)
+        const mascSpan = document.createElement('div');
+        mascSpan.className = 'readonly-text';
+        mascSpan.textContent = country.masculino;
+        cellMasc.appendChild(mascSpan);
+        
+        const femInput = document.createElement('input');
+        femInput.type = 'text';
+        femInput.placeholder = 'Escribe femenino';
+        femInput.className = 'input-nac';
+        femInput.value = '';
+        femInput.setAttribute('data-gender', 'femenino');
+        femInput.setAttribute('data-country-idx', idx);
+        cellFem.appendChild(femInput);
+        
+        femInputElement = femInput;
+        mascInputElement = null; // нет инпута
+      } 
+      else { // prefillType === 'femenino'
+        // женская форма предзаполнена (readonly), мужская — input пустой
+        const femSpan = document.createElement('div');
+        femSpan.className = 'readonly-text';
+        femSpan.textContent = country.femenino;
+        cellFem.appendChild(femSpan);
+        
+        const mascInput = document.createElement('input');
+        mascInput.type = 'text';
+        mascInput.placeholder = 'Escribe masculino';
+        mascInput.className = 'input-nac';
+        mascInput.value = '';
+        mascInput.setAttribute('data-gender', 'masculino');
+        mascInput.setAttribute('data-country-idx', idx);
+        cellMasc.appendChild(mascInput);
+        
+        mascInputElement = mascInput;
+        femInputElement = null;
+      }
+      
+      row.appendChild(cellMasc);
+      row.appendChild(cellFem);
+      tbody.appendChild(row);
+      
+      // Сохраняем информацию о строке для удобства проверки и сброса
+      currentRows.push({
+        idx: idx,
+        country: country,
+        mascInput: mascInputElement,
+        femInput: femInputElement,
+        prefillType: prefillType,
+        // также сохраним ссылки на ячейки для анимации
+        rowElement: row
+      });
+    });
+  }
+
+  // Функция сброса: очищаем все поля ввода, убираем классы correct/incorrect
+  function resetTable() {
+    for (let row of currentRows) {
+      if (row.mascInput) {
+        row.mascInput.value = '';
+        row.mascInput.classList.remove('correct-input', 'incorrect-input');
+      }
+      if (row.femInput) {
+        row.femInput.value = '';
+        row.femInput.classList.remove('correct-input', 'incorrect-input');
+      }
+    }
+    // удаляем всплывающие сообщения? нет, просто сброс подсветки
+    // Дополнительно: убираем возможную анимацию флеш
+  }
+
+  // Функция проверки всех ответов
+  function checkAnswers() {
+    let anyIncorrect = false;
+    for (let row of currentRows) {
+      const country = row.country;
+      const prefill = row.prefillType;
+      
+      let userAnswer = '';
+      let correctAnswer = '';
+      let inputElement = null;
+      
+      if (prefill === 'masculino') {
+        // мужчина предзаполнен, проверяем женский input
+        inputElement = row.femInput;
+        if (inputElement) {
+          userAnswer = inputElement.value.trim();
+          correctAnswer = country.femenino;
+        }
+      } else {
+        // prefill femenino -> проверяем мужской input
+        inputElement = row.mascInput;
+        if (inputElement) {
+          userAnswer = inputElement.value.trim();
+          correctAnswer = country.masculino;
+        }
+      }
+      
+      if (inputElement) {
+        const isCorrect = isEqualNormalized(userAnswer, correctAnswer);
+        // Устанавливаем классы
+        inputElement.classList.remove('correct-input', 'incorrect-input');
+        if (isCorrect && userAnswer !== "") {
+          inputElement.classList.add('correct-input');
+        } else if (!isCorrect && userAnswer !== "") {
+          inputElement.classList.add('incorrect-input');
+          anyIncorrect = true;
+        } else if (userAnswer === "") {
+          // пустое поле - не правильно, но можно подсветить нейтрально? По заданию: либо красный, либо зеленый.
+          // для пустых полей лучше подсветить как неправильные (требуется ввод)
+          inputElement.classList.add('incorrect-input');
+          anyIncorrect = true;
+        }
+      }
+    }
+    
+    // легкая анимация: добавим класс flash на всю таблицу, затем уберем
+    const table = document.querySelector('.language-table');
+    table.classList.add('flash-animation');
+    setTimeout(() => {
+      table.classList.remove('flash-animation');
+    }, 300);
+    
+    // можно легкий тактильный фидбек (вибрация отсутствует, но просто анимация)
+  }
+
+  // Дополнительная функция для корректного поведения тач, улучшаем реакцию
+  // Также поддерживаем повторную попытку: пользователь может исправить, снова нажать "Проверить"
+  
+  // Инициализация обработчиков
+  function init() {
+    buildTable();
+    const checkButton = document.getElementById('checkBtn');
+    const resetButton = document.getElementById('resetBtn');
+    
+    checkButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      checkAnswers();
+    });
+    
+    resetButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      resetTable();
+      // Дополнительно, если нужно снять все классы (reset уже снимает классы инпутов)
+      // также можно очистить любые сообщения, которых нет.
+    });
+    
+    // Небольшой фикс: при вводе в поля на тач-устройствах убираем стандартное увеличение шрифта (не критично)
+    // а также обработка для улучшения UX - при повторной проверке повторно подсвечивает.
+  }
+  
+  // Стартуем
+  init();
+</script>
+</body>
+</html>
