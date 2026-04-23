@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Español — учебные материалы</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* убирает серое выделение на iPad */
+        }
+
+        body {
+            /* off-white фон с легким розоватым подтоном */
+            background-color: #fefaf7;
+            font-family: 'Roboto', system-ui, -apple-system, "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+            padding: 28px 20px 60px 20px;
+            color: #2d2a2e;
+            line-height: 1.4;
+        }
+
+        /* подключаем Roboto через Google Fonts — легко и быстро */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap');
+
+        /* главный контейнер — ограничиваем ширину для комфортного чтения */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* основной заголовок — розово-бордовая гамма */
+        .page-title {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            color: #7a2e4a;      /* приглушенный бордово-розовый */
+            border-left: 6px solid #c55a6f; /* нежный розово-бордовый акцент */
+            padding-left: 20px;
+            line-height: 1.2;
+        }
+
+        .sub {
+            font-size: 1rem;
+            color: #aa7b8c;       /* теплый розовато-серый */
+            margin-bottom: 2rem;
+            padding-left: 26px;
+            font-weight: 400;
+            border-bottom: 1px solid #f2e2e8;
+            padding-bottom: 0.75rem;
+        }
+
+        /* блок месяца */
+        .month-section {
+            margin-bottom: 2.5rem;
+            background: transparent;
+        }
+
+        .month-title {
+            font-size: 1.9rem;
+            font-weight: 600;
+            color: #8b3c5c;       /* насыщенный, но мягкий бордово-розовый */
+            margin-bottom: 1rem;
+            padding-bottom: 0.25rem;
+            display: inline-block;
+            letter-spacing: -0.3px;
+            background: linear-gradient(120deg, #fdf5f0, transparent);
+            padding: 0 0.5rem 0 0;
+        }
+
+        /* список-контейнер */
+        .material-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* КАРТОЧКА / КНОПКА — вся строка кликабельна */
+        .material-card {
+            display: block;
+            background: #ffffffec;  /* почти белый с легкой мягкостью */
+            border-radius: 20px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(90, 40, 55, 0.05);
+            transition: all 0.2s ease;
+            border: 1px solid #f7e6ed;
+            text-decoration: none;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        /* текст внутри карточки */
+        .card-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #3c2a33;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        /* дата — в розово-бордовом тоне */
+        .date {
+            font-weight: 600;
+            color: #b1455f;           /* мягкий карминно-розовый */
+            background: #fef1f4;       /* светлый розовый фон */
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            letter-spacing: -0.2px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* название задания: испанский + русский — приятная бордовая гамма */
+        .title-es {
+            font-weight: 600;
+            color: #7e3c55;           /* дымчатый бордовый */
+        }
+
+        .title-ru {
+            font-weight: 400;
+            color: #a26c7e;           /* спокойный розовато-серый */
+        }
+
+        .separator {
+            color: #d9aebe;
+            font-weight: 400;
+            margin: 0 2px;
+        }
+
+        /* Эффект нажатия (тач / hover) — с розовым акцентом */
+        .material-card:active {
+            background-color: #faf0f2;
+            transform: scale(0.98);
+            transition: 0.05s linear;
+            border-color: #e7cdd6;
+            box-shadow: 0 1px 5px rgba(160, 70, 100, 0.08);
+        }
+
+        /* для мыши тоже приятно */
+        @media (hover: hover) {
+            .material-card:hover {
+                background-color: #fffbfd;
+                border-color: #efdae2;
+                box-shadow: 0 8px 18px rgba(120, 50, 70, 0.05);
+            }
+        }
+
+        /* небольшая адаптация: на совсем маленьких экранах текст чуть мельче,
+           но на iPad 11/13 дюймов 1.2rem отлично читается */
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 16px 50px;
+            }
+            .page-title {
+                font-size: 2.5rem;
+            }
+            .card-text {
+                font-size: 1rem;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+            }
+            .date {
+                font-size: 0.8rem;
+                padding: 3px 10px;
+            }
+            .material-card {
+                padding: 14px 16px;
+            }
+            .month-title {
+                font-size: 1.7rem;
+            }
+        }
+
+        /* отдельная стилизация для ссылки, чтобы никогда не было подчёркивания */
+        .material-card,
+        .material-card:link,
+        .material-card:visited,
+        .material-card:hover,
+        .material-card:active {
+            text-decoration: none;
+        }
+
+        /* чтобы добавить новый месяц / элемент было удобно — оставляем чистые стили */
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #bf8f9f;        /* розовато-бордовый подтон */
+            border-top: 1px solid #f1e2e8;
+            padding-top: 2rem;
+            font-weight: 400;
+        }
+
+        /* обеспечиваем отступы для крупных пальцев */
+        .material-card {
+            cursor: pointer;
+        }
+
+        /* сreate spacing для удобства */
+        .month-section:last-child {
+            margin-bottom: 0;
+        }
+
+        /* легкий розовый акцент для выделения элементов по желанию */
+        .month-title::before {
+            content: "•";
+            color: #cd7b92;
+            font-weight: 400;
+            display: inline-block;
+            margin-right: 6px;
+            font-size: 1.8rem;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1 class="page-title">Español</h1>
+    <div class="sub">материалы и упражнения</div>
+
+    <!-- БЛОК: АПРЕЛЬ -->
+    <div class="month-section">
+        <h2 class="month-title">Abril</h2>
+        <div class="material-list">
+            <!-- 23 апреля -->
+            <a href="https://nyairyg.github.io/verbose-happiness/esp/Nacionalidades.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">23.04</span>
+                    <span class="title-es">País y nacionalidad</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Страна и национальность</span>
+                </div>
+         </a>
+            <!--  
+            <a href="presentarse.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">25.04</span>
+                    <span class="title-es">Saludos y presentaciones</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Приветствия и представления</span>
+                </div>
+            </a>
+         
+            <a href="numeros_edades.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">28.04</span>
+                    <span class="title-es">Números y edades</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Числа и возраст</span>
+                </div>
+            </a>
+            
+            <a href="alfabeto.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">30.04</span>
+                    <span class="title-es">El alfabeto español</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Испанский алфавит</span>
+                </div>
+            </a> -->
+        </div>
+    </div>
+
+    <!-- 
+    <div class="month-section">
+        <h2 class="month-title">Mayo</h2>
+        <div class="material-list">
+            <a href="familia.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">05.05</span>
+                    <span class="title-es">La familia</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Семья</span>
+                </div>
+            </a>
+            <a href="profesiones.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">12.05</span>
+                    <span class="title-es">Profesiones y oficios</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Профессии и занятия</span>
+                </div>
+            </a>
+            <a href="verbos_regulares.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">19.05</span>
+                    <span class="title-es">Verbos regulares (-ar, -er, -ir)</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Правильные глаголы</span>
+                </div>
+            </a>
+            <a href="comida.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">26.05</span>
+                    <span class="title-es">Comida y bebida</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Еда и напитки</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+
+    <div class="month-section">
+        <h2 class="month-title">Junio</h2>
+        <div class="material-list">
+            <a href="mi_casa.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">02.06</span>
+                    <span class="title-es">Mi casa / habitaciones</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Мой дом / комнаты</span>
+                </div>
+            </a>
+            <a href="ropa_colores.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">09.06</span>
+                    <span class="title-es">Ropa y colores</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Одежда и цвета</span>
+                </div>
+            </a>
+            <a href="horario_diario.html" class="material-card">
+                <div class="card-text">
+                    <span class="date">16.06</span>
+                    <span class="title-es">Rutina diaria</span>
+                    <span class="separator">/</span>
+                    <span class="title-ru">Распорядок дня</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+-->
+    <!-- ДЛЯ ЛЁГКОГО ДОБАВЛЕНИЯ НОВЫХ МЕСЯЦЕВ:
+         Скопируйте блок .month-section, измените заголовок (Abril, Mayo и т.д.)
+         Внутрь .material-list добавляйте блоки:
+         <a href="имя_файла.html" class="material-card">
+            <div class="card-text">
+                <span class="date">ДД.ММ</span>
+                <span class="title-es">Título en español</span>
+                <span class="separator">/</span>
+                <span class="title-ru">Русский перевод</span>
+            </div>
+         </a>
+    -->
+
+    <footer>
+        📘 Toque en cualquier tarjeta para abrir el ejercicio
+    </footer>
+</div>
+</body>
+</html>
