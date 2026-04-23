@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Music Theory: Major Scales & Key Signatures | Reading & Quiz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f4f2ef;
+            height: 100vh;
+            overflow: hidden;
+            padding: 24px 32px;
+        }
+
+        .dashboard {
+            max-width: 1600px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            background: transparent;
+        }
+
+        /* LEFT COLUMN - scrollable */
+        .reading-column {
+            flex: 1.2;
+            min-width: 340px;
+            background: #fffefc;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #ece4df;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .reading-column .content-padding {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 28px 28px 28px;
+        }
+
+        /* RIGHT COLUMN - scrollable */
+        .quiz-column {
+            flex: 1;
+            min-width: 360px;
+            background: #fffefc;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #ece4df;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .quiz-column .content-padding {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 28px 28px 28px;
+        }
+
+        .section-header {
+            padding: 24px 28px 12px 28px;
+            border-bottom: 2px solid #f0e7e2;
+            flex-shrink: 0;
+        }
+
+        .section-header h2 {
+            font-size: 1.65rem;
+            font-weight: 600;
+            color: #3f2e2a;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h2 i {
+            color: #b28b7a;
+            font-size: 1.5rem;
+        }
+
+        .passage {
+            font-size: 1rem;
+            line-height: 1.65;
+            color: #2c241f;
+            background: #fefaf8;
+            border-radius: 20px;
+            padding: 4px 0;
+        }
+
+        .passage p {
+            margin-bottom: 1.2rem;
+        }
+
+        .passage img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 16px auto;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .truefalse-list {
+            margin-top: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tf-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+            background: #fefbf9;
+            padding: 10px 16px;
+            border-radius: 60px;
+            transition: background 0.2s;
+            border: 1px solid #f0e3dd;
+        }
+
+        .tf-item:hover {
+            background: #fff7f3;
+        }
+
+        .tf-statement {
+            flex: 1;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #3f2e2a;
+        }
+
+        .tf-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .tf-btn {
+            background: #f1edeb;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 6px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #5f4c44;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .tf-btn.selected-true {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 6px rgba(59,130,246,0.3);
+        }
+
+        .tf-btn.selected-false {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 6px rgba(59,130,246,0.3);
+        }
+
+        .tf-item.correct-item {
+            background: #e8f5e9;
+            border-color: #81c784;
+        }
+
+        .tf-item.incorrect-item {
+            background: #ffebee;
+            border-color: #e57373;
+        }
+
+        .mc-question {
+            background: #fefbf9;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            border: 1px solid #efe4df;
+            transition: all 0.15s;
+        }
+
+        .mc-question.correct-mc {
+            background: #e8f5e9;
+            border-color: #81c784;
+        }
+
+        .mc-question.incorrect-mc {
+            background: #ffebee;
+            border-color: #e57373;
+        }
+
+        .mc-question p {
+            font-weight: 600;
+            color: #3f2e2a;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .mc-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .mc-option {
+            background: #f5f0ed;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #4c3a34;
+            font-weight: 500;
+            border: 1px solid #e1d5cf;
+        }
+
+        .mc-option.selected {
+            background: #538e9b;
+            color: white;
+            border-color: #3f727e;
+            box-shadow: 0 2px 6px rgba(83, 142, 155, 0.25);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 16px;
+            margin: 20px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: #538e9b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3f727e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #d9cdc5;
+            color: #4c3a34;
+        }
+
+        .btn-secondary:hover {
+            background: #cbbbb0;
+        }
+
+        .result-panel {
+            margin-top: 20px;
+            background: #faf7f4;
+            border-radius: 24px;
+            padding: 16px 20px;
+            border-left: 5px solid #b28b7a;
+        }
+
+        .score-text {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .counter-badge {
+            background: #e8e0da;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 16px;
+            color: #4d3730;
+        }
+
+        hr {
+            margin: 18px 0;
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #e2d5ce, transparent);
+        }
+        
+        .section-divider {
+            margin: 12px 0 8px;
+            font-weight: 600;
+            color: #8b6e62;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .indented-list {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .passage .music-def {
+            background: #f8f2ed;
+            border-left: 3px solid #b28b7a;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-style: normal;
+        }
+
+        /* Custom scrollbar */
+        .content-padding::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content-padding::-webkit-scrollbar-track {
+            background: #f0e7e2;
+            border-radius: 10px;
+        }
+
+        .content-padding::-webkit-scrollbar-thumb {
+            background: #c4a79b;
+            border-radius: 10px;
+        }
+
+        .content-padding::-webkit-scrollbar-thumb:hover {
+            background: #b28b7a;
+        }
+
+        @media (max-width: 950px) {
+            body {
+                padding: 16px;
+                height: 100vh;
+            }
+            .dashboard {
+                flex-direction: column;
+            }
+            .reading-column, .quiz-column {
+                min-height: 45vh;
+                height: auto;
+                flex: none;
+            }
+            body {
+                overflow: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <!-- LEFT COLUMN: NEW reading passage about Major Scales -->
+    <div class="reading-column">
+        <div class="section-header">
+            <h2><i class="fas fa-chart-line"></i> Major Scales & Key Signatures</h2>
+        </div>
+        <div class="content-padding">
+            <div class="passage">
+                <p>Popular music, and almost all music anywhere in the world, is <strong>tonal</strong>; that is, its melodies and harmonies tend to be centred around a single musical pitch called a <strong>tonic</strong>. A group of pitches arranged in steps around a tonic is called a <strong>scale</strong>, and the scale that forms the basis of most melodies is the <strong>major scale</strong>. The major scale is also known as a <strong>diatonic scale</strong>, meaning that it contains all seven notes of the music alphabet (called scale degrees or steps), arranged in a specific pattern above the tonic. The pattern, or formula, for the major scale is made up of an ascending series of <strong>whole steps</strong> (the equivalent of a two-fret distance on a guitar or bass, or two keys on a keyboard) and <strong>half steps</strong> (the distance of one fret or one key). This formula never varies, regardless of the tonic on which it begins.</p>
+                
+                <p>The formula for the major scale, showing the distance from each note of the scale to the next, is as follows:</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u2r1-pic1.png" alt="Major scale formula diagram" style="width:90%; height:auto; margin:8px auto;">
+                <p>Notice that the half steps occur between the third and fourth degrees and the seventh and eighth degrees of the scale. This formula is the same regardless of the letter name of the tonic, or key, on which the scale is built. So the scale can be moved, or <strong>transposed</strong>, to any key and still have the same sound.</p>
+                
+                <p>Applying the major scale formula to the key of C, the resulting scale looks like this:</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u2r1-pic2.png" alt="C major scale" style="width:60%; height:auto;">
+                <p>In C major, the half steps occur between the notes E-F and B-C. These are called <strong>naturally occurring half steps</strong>, because the distance between these notes is naturally a half step, while the distance between all of the other notes is naturally a whole step. You can easily see this on a keyboard because these pairs of notes have no black key between them. Since the key of C major can be played on the keyboard using only white keys, it is the easiest key to see and play on that instrument.</p>
+                
+                <p>If a major scale starts on a tonic other than C, the major scale formula will require that modifications be made to the notes of the musical alphabet. To see why this is, we begin a major scale on the tonic G, and build the scale step by step according to the major scale formula (W-W-H-W-W-W-H).</p>
+                <p>The formula states that there must be a whole step between the sixth and seventh degrees, and a half step between the seventh degree and the octave, but the naturally occurring half step between E and F causes a mismatch. The solution is to raise the seventh degree, F, by a half step in pitch, thereby increasing its distance from E and decreasing its distance from G, the octave. This is done by using a sharp sign in front of F. When F is raised to F#, the G scale fits the major scale formula. This means that a G major must always contain an F#.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u2r1-pic3.png" alt="G major scale with F sharp" style="width:60%; height:auto;">
+                
+                <p>Because each of these scales (other than C major) requires the use of one or more sharps or flats in its construction, for convenience, the sharps and flats are collected at the beginning of a piece of music next to the clef sign. This is called the <strong>key signature</strong>. Placing the key signature at the beginning indicates that sharps or flats are to be automatically applied throughout the piece in all octaves. This saves the time that would otherwise be spent writing the accidentals in front of each individual note. The reader, before reading the music, will look at the key signature and notice the accidentals to be used for all the affected notes. The accidentals in a key signature are written on the staff in a specific octave and order, which never varies.</p>
+                
+                <p>To be logically sequenced, the building of key signatures follows the <strong>cycle of fifths</strong>. The placement and position of the flats in a key signature follows the cycle down in fifths: B♭, E♭, A♭, D♭, G♭, C♭, and F♭.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u2r1-pic4.png" alt="Cycle of fifths flats" style="width:90%; height:auto;">
+                <p>The placement and position of the sharps in a key signature follows the cycle up in fifths: F#, C#, G#, D#, A#, E#, and B#.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u2r1-pic5.png" alt="Cycle of fifths sharps" style="width:90%; height:auto;">
+                
+                <p>To be immediately recognisable, key signatures must always be placed consistently on the staff. The best way to recognise any key is to know the number of sharps or flats used for it. Another way to recognise the key signature is:</p>
+                <p class="indented-list">1) For flat keys, the key is represented by the <strong>flat before the last flat</strong>.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u2r1-pic6.png" alt="Key signature recognition" style="width:60%; height:auto;">
+                <p class="indented-list">2) For sharp keys, the key is a <strong>half step above the last sharp</strong>.</p>
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u2r1-pic7.png" alt="Key signature recognition" style="width:60%; height:auto;">
+                <p class="indented-list">3) The key signature of one flat is F major. The key signature of no sharps or flats is C major.</p>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Updated True/False + Multiple Choice -->
+    <div class="quiz-column">
+        <div class="section-header">
+            <h2><i class="fas fa-puzzle-piece"></i> Knowledge Check</h2>
+        </div>
+        <div class="content-padding">
+            <div class="truefalse-list">
+                <div class="section-divider">
+                    <i class="fas fa-check-square" style="color:#b28b7a;"></i> <span style="font-size: 1.2rem; font-weight:600;">Part 1: True or False</span>
+                </div>
+                <div id="tf-container"></div>
+            </div>
+
+            <hr>
+
+            <div class="section-divider" style="margin-top: 4px;">
+                <i class="fas fa-list-ul" style="color:#b28b7a;"></i> <span style="font-size: 1.2rem; font-weight:600;">Part 2: Multiple Choice</span>
+            </div>
+            <div class="counter-badge" id="mc-counter"><i class="fas fa-check-circle"></i> Questions: 0/9 answered</div>
+            <div id="mc-container"></div>
+
+            <div class="action-bar">
+                <button class="btn btn-primary" id="checkAnswersBtn"><i class="fas fa-check-double"></i> Check Answers</button>
+                <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset All</button>
+            </div>
+            <div id="globalResult" class="result-panel" style="display: none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // NEW DATA: TRUE/FALSE (11 items) based on required statements
+    const tfStatements = [
+        "Tonal means melodies and harmonies tend to be centred around a single note called a tonic.",
+        "The major scale is also known as chromatic scale.",
+        "A whole step equals the distance of one fret on the guitar or one key on the keyboard.",
+        "The major scale formula varies if beginning on a tonic other than C.",
+        "In C major, the half steps are naturally occurring half steps.",
+        "The key of C major uses only white keys when being played on the keyboard.",
+        "If a major scale starts on a tonic other than C, that scale will require the use of sharps or flats.",
+        "The G major scale will require a sharp to fit the major scale formula.",
+        "The placement of the sharps in a key signature follows the cycle down in fifths.",
+        "For flat keys, the key is represented by the last flat.",
+        "For sharp keys, the key is a semitone above the last sharp."
+    ];
+    
+    const tfCorrect = [
+        true,   // 1: tonal definition correct
+        false,  // 2: major scale is NOT chromatic (diatonic)
+        false,  // 3: whole step = two frets/two keys, not one
+        false,  // 4: formula never varies
+        true,   // 5: E-F and B-C natural half steps in C major
+        true,   // 6: C major uses only white keys
+        true,   // 7: other tonics require sharps/flats
+        true,   // 8: G major requires F#
+        false,  // 9: sharps follow cycle UP in fifths, not down
+        false,  // 10: flat key = flat BEFORE the last flat
+        true    // 11: sharp key = half step above last sharp
+    ];
+    
+    const mcQuestions = [
+        { text: "Which of the following is not true about the major scale?", options: ["It’s also known as diatonic scale.", "Its formula never varies, regardless of the tonic on which it begins.", "Half steps occur between the third and fourth degrees and the sixth and seventh degrees of the scale.", "The scale can be moved, or transposed, to any key."], correct: 2 },
+        { text: "A scale is a group of pitches arranged around a ________.", options: ["degree", "tonic", "whole step", "half step"], correct: 1 },
+        { text: "In a major scale, the half steps occur between ________.", options: ["second and third degrees", "third and fourth degrees", "seventh and eighth degrees", "b and c"], correct: 3 },
+        { text: "Which of the following is not true about the key signatures?", options: ["The sharps or flats are written at the beginning of a song before the clef sign.", "The sharps or flats are applied throughout the piece in all octaves.", "The sharps and flats are written on the staff in a specific octave and order, which never varies.", "The building of key signatures follows the cycle of fifths."], correct: 0 },
+        { text: "The building of the key signatures ________.", options: ["follows the cycle down in fifths", "follows the cycle up in fifths", "follows the cycle of fifths", "b and c"], correct: 2 },
+        { text: "The key signature of one flat is ________.", options: ["C major", "A major", "F major", "G major"], correct: 2 },
+        { text: "The placement and position of the flats in a key signature ________.", options: ["follows the cycle down in fifths", "follows the cycle up in fifths", "is: Bb, Eb, Ab, Db, Gb, Cb, and Fb.", "a and c"], correct: 3 },
+        { text: "To recognise the key signature of a sharp key, the key is ________.", options: ["the last sharp", "the sharp before the last sharp", "a half step below the last sharp", "a half step above the last sharp"], correct: 3 },
+        { text: "The key signature of no sharps or flats is ________.", options: ["C major", "A major", "F major", "G major"], correct: 0 }
+    ];
+    
+    let tfSelections = new Array(tfStatements.length).fill(null);
+    let mcSelections = new Array(mcQuestions.length).fill(null);
+    let resultsVisible = false;
+
+    const tfContainer = document.getElementById('tf-container');
+    const mcContainer = document.getElementById('mc-container');
+    const globalResultDiv = document.getElementById('globalResult');
+    const mcCounterSpan = document.getElementById('mc-counter');
+
+    function updateMCCounter() {
+        const answered = mcSelections.filter(s => s !== null).length;
+        mcCounterSpan.innerHTML = `<i class="fas fa-check-circle"></i> Questions: ${answered}/${mcQuestions.length} answered`;
+    }
+    
+    function hideResultPanel() {
+        if (globalResultDiv) globalResultDiv.style.display = 'none';
+        resultsVisible = false;
+    }
+
+    function clearHighlighting() {
+        document.querySelectorAll('.tf-item').forEach(item => {
+            item.classList.remove('correct-item', 'incorrect-item');
+        });
+        document.querySelectorAll('.mc-question').forEach(q => {
+            q.classList.remove('correct-mc', 'incorrect-mc');
+        });
+    }
+
+    function renderTrueFalse() {
+        tfContainer.innerHTML = '';
+        tfStatements.forEach((stmt, idx) => {
+            const row = document.createElement('div');
+            row.className = 'tf-item';
+            const statementSpan = document.createElement('div');
+            statementSpan.className = 'tf-statement';
+            statementSpan.innerText = `${idx+1}. ${stmt}`;
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'tf-buttons';
+            
+            const trueBtn = document.createElement('button');
+            trueBtn.innerText = 'T';
+            trueBtn.className = 'tf-btn';
+            const falseBtn = document.createElement('button');
+            falseBtn.innerText = 'F';
+            falseBtn.className = 'tf-btn';
+            
+            if (tfSelections[idx] === 'T') trueBtn.classList.add('selected-true');
+            if (tfSelections[idx] === 'F') falseBtn.classList.add('selected-false');
+            
+            trueBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tfSelections[idx] = 'T';
+                if (resultsVisible) clearHighlighting();
+                resultsVisible = false;
+                hideResultPanel();
+                renderTrueFalse();
+                renderMultipleChoice(); 
+            });
+            falseBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tfSelections[idx] = 'F';
+                if (resultsVisible) clearHighlighting();
+                resultsVisible = false;
+                hideResultPanel();
+                renderTrueFalse();
+                renderMultipleChoice();
+            });
+            
+            btnGroup.appendChild(trueBtn);
+            btnGroup.appendChild(falseBtn);
+            row.appendChild(statementSpan);
+            row.appendChild(btnGroup);
+            tfContainer.appendChild(row);
+        });
+    }
+    
+    function renderMultipleChoice() {
+        mcContainer.innerHTML = '';
+        mcQuestions.forEach((q, qIdx) => {
+            const card = document.createElement('div');
+            card.className = 'mc-question';
+            const questionText = document.createElement('p');
+            questionText.innerHTML = `<strong>${qIdx+1}.</strong> ${q.text}`;
+            card.appendChild(questionText);
+            
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'mc-options';
+            q.options.forEach((opt, optIdx) => {
+                const optSpan = document.createElement('span');
+                optSpan.className = 'mc-option';
+                optSpan.innerText = `${String.fromCharCode(97+optIdx)}) ${opt}`;
+                if (mcSelections[qIdx] === optIdx) optSpan.classList.add('selected');
+                optSpan.addEventListener('click', () => {
+                    mcSelections[qIdx] = optIdx;
+                    if (resultsVisible) clearHighlighting();
+                    resultsVisible = false;
+                    hideResultPanel();
+                    renderMultipleChoice();
+                    updateMCCounter();
+                });
+                optionsDiv.appendChild(optSpan);
+            });
+            card.appendChild(optionsDiv);
+            mcContainer.appendChild(card);
+        });
+        updateMCCounter();
+    }
+    
+    function applyResultStyling() {
+        const tfItems = document.querySelectorAll('.tf-item');
+        tfStatements.forEach((_, idx) => {
+            const user = tfSelections[idx];
+            if (user !== null) {
+                const isCorrect = (user === 'T' && tfCorrect[idx] === true) || (user === 'F' && tfCorrect[idx] === false);
+                const itemDiv = tfItems[idx];
+                if (isCorrect) {
+                    itemDiv.classList.add('correct-item');
+                } else {
+                    itemDiv.classList.add('incorrect-item');
+                }
+            }
+        });
+        
+        for (let i = 0; i < mcQuestions.length; i++) {
+            const card = document.querySelectorAll('.mc-question')[i];
+            const userIdx = mcSelections[i];
+            if (userIdx !== null) {
+                const isCorrect = (userIdx === mcQuestions[i].correct);
+                if (isCorrect) {
+                    card.classList.add('correct-mc');
+                } else {
+                    card.classList.add('incorrect-mc');
+                }
+            }
+        }
+    }
+    
+    function checkAnswers() {
+        let tfScore = 0;
+        for (let i = 0; i < tfStatements.length; i++) {
+            const user = tfSelections[i];
+            if (user !== null) {
+                const isCorrect = (user === 'T' && tfCorrect[i] === true) || (user === 'F' && tfCorrect[i] === false);
+                if (isCorrect) tfScore++;
+            }
+        }
+        
+        let mcScore = 0;
+        for (let i = 0; i < mcQuestions.length; i++) {
+            if (mcSelections[i] !== null && mcSelections[i] === mcQuestions[i].correct) mcScore++;
+        }
+        
+        const totalPossible = tfStatements.length + mcQuestions.length;
+        const totalScore = tfScore + mcScore;
+        const percent = Math.round((totalScore / totalPossible) * 100);
+        
+        let allAnswered = true;
+        for (let i = 0; i < tfSelections.length; i++) if (tfSelections[i] === null) allAnswered = false;
+        for (let i = 0; i < mcSelections.length; i++) if (mcSelections[i] === null) allAnswered = false;
+        
+        let message = '';
+        if (totalScore === totalPossible) {
+            message = `<i class="fas fa-trophy"></i> Perfect! ${totalScore}/${totalPossible} (${percent}%) — Outstanding mastery!`;
+        } else {
+            message = `<i class="fas fa-chart-line"></i> Your score: ${totalScore}/${totalPossible} (${percent}%)<br>`;
+            message += `<span style="font-size:0.85rem;">✓ True/False: ${tfScore}/${tfStatements.length} &nbsp;|&nbsp; ✓ Multiple Choice: ${mcScore}/${mcQuestions.length}</span>`;
+        }
+        
+        if (!allAnswered) {
+            message += `<div style="margin-top:8px;"><i class="fas fa-exclamation-triangle"></i> You have unanswered questions. Please answer all before checking for full score.</div>`;
+        }
+        
+        globalResultDiv.innerHTML = `<div class="score-text">${message}</div>`;
+        globalResultDiv.style.display = 'block';
+        
+        clearHighlighting();
+        applyResultStyling();
+        resultsVisible = true;
+        globalResultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    function resetAll() {
+        tfSelections = new Array(tfStatements.length).fill(null);
+        mcSelections = new Array(mcQuestions.length).fill(null);
+        resultsVisible = false;
+        clearHighlighting();
+        renderTrueFalse();
+        renderMultipleChoice();
+        hideResultPanel();
+        updateMCCounter();
+    }
+    
+    function bindGlobalButtons() {
+        document.getElementById('checkAnswersBtn').addEventListener('click', checkAnswers);
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
+    }
+    
+    function init() {
+        renderTrueFalse();
+        renderMultipleChoice();
+        bindGlobalButtons();
+        updateMCCounter();
+        hideResultPanel();
+    }
+    
+    init();
+</script>
+</body>
+</html>
