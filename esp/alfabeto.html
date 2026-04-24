@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Испанский алфавит | Alfabeto español — аккордеон по карточке</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding: 32px 24px;
+        }
+
+        .poster {
+            width: 1100px;
+            max-width: 100%;
+            background: #ffffff;
+            border-radius: 44px;
+            box-shadow: 0 28px 44px -16px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .content {
+            padding: 34px 40px 42px 40px;
+        }
+
+        .title-section {
+            border-bottom: 3px solid #cf8aa4;
+            padding-bottom: 18px;
+            margin-bottom: 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        h1 {
+            font-size: 34px;
+            font-weight: 720;
+            color: #1e2f3f;
+            letter-spacing: -0.3px;
+        }
+        h1 span {
+            font-size: 24px;
+            font-weight: 480;
+            color: #5a6b89;
+        }
+        .subhead {
+            font-size: 12px;
+            font-weight: 570;
+            color: #9b7f8c;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            background: #fbf0f5;
+            padding: 6px 14px;
+            border-radius: 60px;
+        }
+
+        .two-columns {
+            display: flex;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* карточка буквы — кликабельный контейнер */
+        .letter-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 16px 18px 16px 18px;
+            transition: all 0.2s ease;
+            border: 1px solid #f1e2e9;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            cursor: pointer;
+            user-select: none;
+        }
+        .letter-card:hover {
+            background: #fefafc;
+            border-color: #e2c0d0;
+            box-shadow: 0 6px 12px -8px rgba(0,0,0,0.1);
+        }
+
+        .letter-line {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+            pointer-events: none;
+        }
+        .capital-letter {
+            font-size: 38px;
+            font-weight: 800;
+            color: #bc6f8c;
+            background: #fef4f8;
+            width: 60px;
+            height: 60px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 32px;
+            line-height: 1;
+            font-family: 'Courier New', monospace;
+        }
+
+        .russian-reading {
+            font-size: 14px;
+            font-weight: 600;
+            background: #f4ecef;
+            padding: 6px 18px;
+            border-radius: 40px;
+            color: #2c3e5c;
+        }
+        .russian-reading span {
+            font-weight: 800;
+            color: #bc6f8c;
+        }
+
+        /* панель с примерами — скрыта по умолчанию */
+        .examples-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            background: #fefafc;
+            border-radius: 20px;
+            margin-top: 0;
+            pointer-events: auto;
+        }
+        .examples-panel.show {
+            max-height: 420px;   /* достаточно для нескольких примеров */
+            margin-top: 16px;
+        }
+        .example-block {
+            background: #f9f1f6;
+            border-radius: 18px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            border-left: 4px solid #ddb0c2;
+        }
+        .example-block:last-child {
+            margin-bottom: 0;
+        }
+        .spanish-word {
+            font-weight: 800;
+            font-size: 17px;
+            color: #1f2d44;
+            display: inline-block;
+            margin-right: 12px;
+        }
+        .reading-phonetic {
+            background: #ece2e8;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 520;
+            color: #2d3a5e;
+            display: inline-block;
+        }
+        .translation {
+            color: #697a9e;
+            font-size: 13px;
+            margin-top: 8px;
+            border-top: 1px solid #f0e3ea;
+            padding-top: 7px;
+        }
+        .subnote {
+            font-size: 12px;
+            color: #b28ba0;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        .footer-note {
+            margin-top: 42px;
+            border-top: 1px solid #e6d8df;
+            padding-top: 16px;
+            text-align: center;
+            font-size: 9px;
+            color: #cabec4;
+        }
+
+        @media (max-width: 800px) {
+            .two-columns {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .content {
+                padding: 24px;
+            }
+            .capital-letter {
+                width: 52px;
+                height: 52px;
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="poster">
+    <div class="content">
+        <div class="title-section">
+            <h1>Alfabeto español<br><span>испанский алфавит</span></h1>
+            <div class="subhead">LETRAS · PRONUNCIACIÓN · EJEMPLOS (нажми на букву)</div>
+        </div>
+
+        <div class="two-columns">
+            <!-- ЛЕВАЯ КОЛОНКА: A – M + LL (LL и M находятся здесь) -->
+            <div class="col">
+                <!-- A -->
+                <div class="letter-card" data-panel="panelA">
+                    <div class="letter-line">
+                        <div class="capital-letter">A</div>
+                        <div class="russian-reading"><span>А</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelA">
+                        <div class="example-block">
+                            <div><span class="spanish-word">amigo</span> <span class="reading-phonetic">[амИго]</span></div>
+                            <div class="translation">друг</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B -->
+                <div class="letter-card" data-panel="panelB">
+                    <div class="letter-line">
+                        <div class="capital-letter">B</div>
+                        <div class="russian-reading"><span>Б</span> (звонко)</div>
+                    </div>
+                    <div class="examples-panel" id="panelB">
+                        <div class="example-block">
+                            <div><span class="spanish-word">bueno</span> <span class="reading-phonetic">[буЭно]</span></div>
+                            <div class="translation">хороший</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- C: объединены правила "К" / перед e,i "С" + CH как "Ч" -->
+                <div class="letter-card" data-panel="panelC">
+                    <div class="letter-line">
+                        <div class="capital-letter">C</div>
+                        <div class="russian-reading"><span>К</span> / перед e,i — <span>С</span> · C+H → <span>Ч</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelC">
+                        <div class="example-block">
+                            <div><span class="spanish-word">casa</span> <span class="reading-phonetic">[кАса]</span></div>
+                            <div class="translation">дом</div>
+                            <div class="subnote">C перед a,o,u → [К]</div>
+                        </div>
+                        <div class="example-block">
+                            <div><span class="spanish-word">cine</span> <span class="reading-phonetic">[сИне]</span></div>
+                            <div class="translation">кино</div>
+                            <div class="subnote">C перед e,i → [С]</div>
+                        </div>
+                        <div class="example-block">
+                            <div><span class="spanish-word">chocolate</span> <span class="reading-phonetic">[чоколАте]</span></div>
+                            <div class="translation">шоколад</div>
+                            <div class="subnote">C+H → [Ч] (диграф)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- D -->
+                <div class="letter-card" data-panel="panelD">
+                    <div class="letter-line">
+                        <div class="capital-letter">D</div>
+                        <div class="russian-reading"><span>Д</span> (мягче)</div>
+                    </div>
+                    <div class="examples-panel" id="panelD">
+                        <div class="example-block">
+                            <div><span class="spanish-word">día</span> <span class="reading-phonetic">[дИа]</span></div>
+                            <div class="translation">день</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- E -->
+                <div class="letter-card" data-panel="panelE">
+                    <div class="letter-line">
+                        <div class="capital-letter">E</div>
+                        <div class="russian-reading"><span>Э</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelE">
+                        <div class="example-block">
+                            <div><span class="spanish-word">estrella</span> <span class="reading-phonetic">[эстрЭйа]</span></div>
+                            <div class="translation">звезда</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- F -->
+                <div class="letter-card" data-panel="panelF">
+                    <div class="letter-line">
+                        <div class="capital-letter">F</div>
+                        <div class="russian-reading"><span>Ф</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelF">
+                        <div class="example-block">
+                            <div><span class="spanish-word">flor</span> <span class="reading-phonetic">[флор]</span></div>
+                            <div class="translation">цветок</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- G: перед a,o,u Г; перед e,i Х -->
+                <div class="letter-card" data-panel="panelG">
+                    <div class="letter-line">
+                        <div class="capital-letter">G</div>
+                        <div class="russian-reading"><span>Г</span> / перед e,i — <span>Х</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelG">
+                        <div class="example-block">
+                            <div><span class="spanish-word">gato</span> <span class="reading-phonetic">[гАто]</span></div>
+                            <div class="translation">кот</div>
+                            <div class="subnote">G перед a,o,u → [Г]</div>
+                        </div>
+                        <div class="example-block">
+                            <div><span class="spanish-word">gente</span> <span class="reading-phonetic">[хЭнтэ]</span></div>
+                            <div class="translation">люди</div>
+                            <div class="subnote">G перед e,i → [Х] (как J)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- H (немая) -->
+                <div class="letter-card" data-panel="panelH">
+                    <div class="letter-line">
+                        <div class="capital-letter">H</div>
+                        <div class="russian-reading">не читается</div>
+                    </div>
+                    <div class="examples-panel" id="panelH">
+                        <div class="example-block">
+                            <div><span class="spanish-word">hola</span> <span class="reading-phonetic">[Ола]</span></div>
+                            <div class="translation">привет</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- I -->
+                <div class="letter-card" data-panel="panelI">
+                    <div class="letter-line">
+                        <div class="capital-letter">I</div>
+                        <div class="russian-reading"><span>И</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelI">
+                        <div class="example-block">
+                            <div><span class="spanish-word">isla</span> <span class="reading-phonetic">[Исла]</span></div>
+                            <div class="translation">остров</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- J -->
+                <div class="letter-card" data-panel="panelJ">
+                    <div class="letter-line">
+                        <div class="capital-letter">J</div>
+                        <div class="russian-reading"><span>Х</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelJ">
+                        <div class="example-block">
+                            <div><span class="spanish-word">jardín</span> <span class="reading-phonetic">[хардИн]</span></div>
+                            <div class="translation">сад</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- K -->
+                <div class="letter-card" data-panel="panelK">
+                    <div class="letter-line">
+                        <div class="capital-letter">K</div>
+                        <div class="russian-reading"><span>К</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelK">
+                        <div class="example-block">
+                            <div><span class="spanish-word">kárate</span> <span class="reading-phonetic">[кАратэ]</span></div>
+                            <div class="translation">карате</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- L -->
+                <div class="letter-card" data-panel="panelL">
+                    <div class="letter-line">
+                        <div class="capital-letter">L</div>
+                        <div class="russian-reading"><span>Л</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelL">
+                        <div class="example-block">
+                            <div><span class="spanish-word">luna</span> <span class="reading-phonetic">[лУна]</span></div>
+                            <div class="translation">луна</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LL (перенесён в первый столбец) -->
+                <div class="letter-card" data-panel="panelLL">
+                    <div class="letter-line">
+                        <div class="capital-letter">LL</div>
+                        <div class="russian-reading"><span>Й</span> или <span>ЛЬ</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelLL">
+                        <div class="example-block">
+                            <div><span class="spanish-word">llave</span> <span class="reading-phonetic">[йАве]</span></div>
+                            <div class="translation">ключ</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- M (перенесён в первый столбец) -->
+                <div class="letter-card" data-panel="panelM">
+                    <div class="letter-line">
+                        <div class="capital-letter">M</div>
+                        <div class="russian-reading"><span>М</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelM">
+                        <div class="example-block">
+                            <div><span class="spanish-word">mano</span> <span class="reading-phonetic">[мАно]</span></div>
+                            <div class="translation">рука</div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- левая колонка (A — M + LL) -->
+
+            <!-- ПРАВАЯ КОЛОНКА: N, Ñ, O, P, Q, R, S, T, U, V, W, X, Y, Z -->
+            <div class="col">
+                <!-- N -->
+                <div class="letter-card" data-panel="panelN">
+                    <div class="letter-line">
+                        <div class="capital-letter">N</div>
+                        <div class="russian-reading"><span>Н</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelN">
+                        <div class="example-block">
+                            <div><span class="spanish-word">noche</span> <span class="reading-phonetic">[нОче]</span></div>
+                            <div class="translation">ночь</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ñ -->
+                <div class="letter-card" data-panel="panelÑ">
+                    <div class="letter-line">
+                        <div class="capital-letter">Ñ</div>
+                        <div class="russian-reading"><span>НЬ</span> (мягкая)</div>
+                    </div>
+                    <div class="examples-panel" id="panelÑ">
+                        <div class="example-block">
+                            <div><span class="spanish-word">niño</span> <span class="reading-phonetic">[нИньо]</span></div>
+                            <div class="translation">мальчик / ребёнок</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- O -->
+                <div class="letter-card" data-panel="panelO">
+                    <div class="letter-line">
+                        <div class="capital-letter">O</div>
+                        <div class="russian-reading"><span>О</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelO">
+                        <div class="example-block">
+                            <div><span class="spanish-word">oro</span> <span class="reading-phonetic">[Оро]</span></div>
+                            <div class="translation">золото</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- P -->
+                <div class="letter-card" data-panel="panelP">
+                    <div class="letter-line">
+                        <div class="capital-letter">P</div>
+                        <div class="russian-reading"><span>П</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelP">
+                        <div class="example-block">
+                            <div><span class="spanish-word">padre</span> <span class="reading-phonetic">[пАдрэ]</span></div>
+                            <div class="translation">отец</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q -->
+                <div class="letter-card" data-panel="panelQ">
+                    <div class="letter-line">
+                        <div class="capital-letter">Q</div>
+                        <div class="russian-reading"><span>К</span> (всегда + u)</div>
+                    </div>
+                    <div class="examples-panel" id="panelQ">
+                        <div class="example-block">
+                            <div><span class="spanish-word">queso</span> <span class="reading-phonetic">[кЭсо]</span></div>
+                            <div class="translation">сыр</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- R (без слова "дрожащая") -->
+                <div class="letter-card" data-panel="panelR">
+                    <div class="letter-line">
+                        <div class="capital-letter">R</div>
+                        <div class="russian-reading"><span>Р</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelR">
+                        <div class="example-block">
+                            <div><span class="spanish-word">rosa</span> <span class="reading-phonetic">[рОса]</span></div>
+                            <div class="translation">роза</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- S -->
+                <div class="letter-card" data-panel="panelS">
+                    <div class="letter-line">
+                        <div class="capital-letter">S</div>
+                        <div class="russian-reading"><span>С</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelS">
+                        <div class="example-block">
+                            <div><span class="spanish-word">sol</span> <span class="reading-phonetic">[соль]</span></div>
+                            <div class="translation">солнце</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- T -->
+                <div class="letter-card" data-panel="panelT">
+                    <div class="letter-line">
+                        <div class="capital-letter">T</div>
+                        <div class="russian-reading"><span>Т</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelT">
+                        <div class="example-block">
+                            <div><span class="spanish-word">taza</span> <span class="reading-phonetic">[тАса]</span></div>
+                            <div class="translation">чашка</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- U -->
+                <div class="letter-card" data-panel="panelU">
+                    <div class="letter-line">
+                        <div class="capital-letter">U</div>
+                        <div class="russian-reading"><span>У</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelU">
+                        <div class="example-block">
+                            <div><span class="spanish-word">uva</span> <span class="reading-phonetic">[Ува]</span></div>
+                            <div class="translation">виноград</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- V -->
+                <div class="letter-card" data-panel="panelV">
+                    <div class="letter-line">
+                        <div class="capital-letter">V</div>
+                        <div class="russian-reading"><span>среднее между Б/В</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelV">
+                        <div class="example-block">
+                            <div><span class="spanish-word">vino</span> <span class="reading-phonetic">[бИно]</span></div>
+                            <div class="translation">вино</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- W (без "в заимств.") -->
+                <div class="letter-card" data-panel="panelW">
+                    <div class="letter-line">
+                        <div class="capital-letter">W</div>
+                        <div class="russian-reading"><span>У</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelW">
+                        <div class="example-block">
+                            <div><span class="spanish-word">wifi</span> <span class="reading-phonetic">[уИфи]</span></div>
+                            <div class="translation">вайфай</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- X -->
+                <div class="letter-card" data-panel="panelX">
+                    <div class="letter-line">
+                        <div class="capital-letter">X</div>
+                        <div class="russian-reading"><span>КС</span> или <span>С</span> (Мексика — Х)</div>
+                    </div>
+                    <div class="examples-panel" id="panelX">
+                        <div class="example-block">
+                            <div><span class="spanish-word">taxi</span> <span class="reading-phonetic">[тАкси]</span></div>
+                            <div class="translation">такси</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Y -->
+                <div class="letter-card" data-panel="panelY">
+                    <div class="letter-line">
+                        <div class="capital-letter">Y</div>
+                        <div class="russian-reading"><span>Й</span> или <span>И</span></div>
+                    </div>
+                    <div class="examples-panel" id="panelY">
+                        <div class="example-block">
+                            <div><span class="spanish-word">yo</span> <span class="reading-phonetic">[йо]</span></div>
+                            <div class="translation">я</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Z (шепелявый) -->
+                <div class="letter-card" data-panel="panelZ">
+                    <div class="letter-line">
+                        <div class="capital-letter">Z</div>
+                        <div class="russian-reading"><span>С</span> (шепелявый)</div>
+                    </div>
+                    <div class="examples-panel" id="panelZ">
+                        <div class="example-block">
+                            <div><span class="spanish-word">zapato</span> <span class="reading-phonetic">[сапАто]</span></div>
+                            <div class="translation">туфля / ботинок</div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- правая колонка -->
+        </div>
+
+        <div class="footer-note"></div>
+    </div>
+</div>
+
+<script>
+    // аккордеон: открытие/закрытие примеров при клике на карточку целиком
+    // разрешено держать несколько панелей открытыми одновременно
+    const cards = document.querySelectorAll('.letter-card');
+    
+    cards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Ищем панель с примерами внутри текущей карточки
+            const panel = this.querySelector('.examples-panel');
+            if (!panel) return;
+            
+            // Переключаем класс show — плавное открытие/закрытие
+            if (panel.classList.contains('show')) {
+                panel.classList.remove('show');
+            } else {
+                panel.classList.add('show');
+            }
+        });
+    });
+</script>
+</body>
+</html>
