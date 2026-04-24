@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>Matching: Аудио и страны | Испанские диалоги</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #f4edeef0;
+            background-image: radial-gradient(circle at 10% 30%, rgba(239, 210, 220, 0.2) 2%, transparent 2.5%);
+            background-size: 28px 28px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding: 28px 20px;
+        }
+
+        .poster {
+            width: 1100px;
+            max-width: 100%;
+            background: #ffffffec;
+            backdrop-filter: blur(0px);
+            border-radius: 48px;
+            box-shadow: 0 28px 48px -20px rgba(0, 0, 0, 0.25), 0 10px 28px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .content {
+            padding: 34px 36px 44px 36px;
+        }
+
+        .title-section {
+            border-bottom: 3px solid #d9a2b8;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 720;
+            color: #2b2b3b;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #3e2a36, #6c4b5e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .badge-round {
+            background: #f9eef3;
+            padding: 8px 18px;
+            border-radius: 80px;
+            font-weight: 570;
+            font-size: 14px;
+            color: #a5607c;
+            box-shadow: inset 0 0 0 1px #f3d9e4;
+        }
+
+        .subhead {
+            font-size: 13px;
+            font-weight: 600;
+            color: #b38398;
+            background: #fef4f9;
+            padding: 8px 18px;
+            border-radius: 60px;
+            letter-spacing: 0.3px;
+        }
+
+        .two-columns {
+            display: flex;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .col-header {
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.8px;
+            color: #8f6f82;
+            padding-left: 8px;
+            margin-bottom: 6px;
+        }
+
+        .match-item {
+            background: #ffffff;
+            border-radius: 28px;
+            padding: 14px 20px;
+            transition: all 0.18s ease;
+            border: 1.5px solid #f2e2ea;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
+            cursor: pointer;
+            touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 82px;
+        }
+
+        .match-item.selected {
+            background: #fef0f7;
+            border-color: #cf8aa4;
+            box-shadow: 0 8px 18px -10px rgba(190, 100, 130, 0.2);
+            transform: scale(0.99);
+        }
+
+        .match-item.paired {
+            background: #eaeef5;
+            border-color: #bbbfcf;
+            opacity: 0.85;
+            cursor: default;
+            pointer-events: none;
+            filter: saturate(0.96);
+        }
+
+        .match-item.correct-highlight {
+            background: #cfe9d6;
+            border-color: #2e7d64;
+            box-shadow: 0 0 0 2px rgba(55, 155, 100, 0.3);
+        }
+
+        .match-item.wrong-highlight {
+            background: #ffe3e3;
+            border-color: #cf6f6f;
+            box-shadow: 0 0 0 2px rgba(210, 70, 70, 0.2);
+        }
+
+        .audio-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 2;
+            pointer-events: none;
+        }
+
+        .audio-icon {
+            background: #f6e9ef;
+            width: 56px;
+            height: 56px;
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #bb6b8a;
+        }
+
+        .audio-info {
+            font-weight: 540;
+            font-size: 18px;
+            color: #2d3a4b;
+        }
+
+        .play-indicator {
+            background: #e8d9e1;
+            padding: 10px 20px;
+            border-radius: 60px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #5a3f4b;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            pointer-events: none;
+        }
+
+        .country-name {
+            font-weight: 700;
+            padding: 14.9px 20px;
+            font-size: 20px;
+            color: #2b3b4c;
+            letter-spacing: -0.2px;
+            word-break: break-word;
+            flex: 1;
+        }
+
+        .action-button {
+            background: #efe2e9;
+            border: none;
+            padding: 16px 28px;
+            border-radius: 60px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #4c3542;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+            width: 100%;
+            margin-top: 16px;
+            touch-action: manipulation;
+        }
+
+        .action-button:active {
+            transform: scale(0.97);
+            background: #e0cfd9;
+        }
+
+        .primary-btn {
+            background: #cf8aa4;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .primary-btn:active {
+            background: #b96f8e;
+        }
+
+        .danger-btn {
+            background: #e0c4c4;
+            color: #8b5e5e;
+        }
+
+        .result-panel {
+            margin-top: 28px;
+            background: #fbf5f8;
+            border-radius: 40px;
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            color: #3b2a33;
+        }
+
+        .round-info {
+            background: #f4e9ef;
+            border-radius: 60px;
+            padding: 8px 18px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: #9f637e;
+            margin-bottom: 24px;
+            display: inline-block;
+            width: auto;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .button-group .action-button {
+            margin-top: 0;
+            flex: 1;
+        }
+
+        .final-screen {
+            text-align: center;
+            padding: 28px;
+        }
+
+        button {
+            font-family: inherit;
+        }
+
+        @media (max-width: 780px) {
+            .two-columns {
+                flex-direction: column;
+                gap: 32px;
+            }
+            .content {
+                padding: 24px;
+            }
+            .match-item {
+                padding: 14px 18px;
+            }
+            .country-name {
+                font-size: 18px;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+
+        .speaking {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; background: #f0d9e4; }
+        }
+    </style>
+</head>
+<body>
+<div class="poster" id="appRoot">
+    <div class="content">
+        <div class="title-section">
+            <div>
+                <h1>🎧 Соотнеси аудио и страну</h1>
+                <div class="badge-round" style="margin-top: 8px;">испанский · живые диалоги</div>
+            </div>
+            <div class="subhead">👆 Нажми на аудио — услышишь диалог</div>
+        </div>
+
+        <div id="roundIndicator" class="round-info">Раунд 1 / 3</div>
+
+        <div class="two-columns">
+            <div class="col">
+                <div class="col-header">🎙️ Аудио с диалогами</div>
+                <div id="audioListContainer" style="display: flex; flex-direction: column; gap: 16px;"></div>
+            </div>
+            <div class="col">
+                <div class="col-header">🇪🇸 Страны на испанском</div>
+                <div id="countriesListContainer" style="display: flex; flex-direction: column; gap: 16px;"></div>
+            </div>
+        </div>
+
+        <div id="actionPanel" style="margin-top: 36px;">
+            <button id="checkBtn" class="action-button primary-btn">✅ Comprobar / Проверить</button>
+            <div id="resultArea" class="result-panel" style="display: none;"></div>
+            <div class="button-group" id="roundButtons" style="display: none;">
+                <button id="nextRoundBtn" class="action-button">➡️ La próxima ronda / Следующий раунд</button>
+                <button id="retryRoundBtn" class="action-button danger-btn">🔄 Rehacer la ronda / Переделать раунд</button>
+            </div>
+        </div>
+        <div class="footer-note" style="margin-top: 32px; text-align: center; font-size: 12px;">💡 Нажми на аудио → услышишь диалог → нажми на страну → соедини</div>
+    </div>
+</div>
+
+<script>
+    // ДИАЛОГИ ДЛЯ ВСЕХ РАУНДОВ
+    const DIALOGS = {
+        // Раунд 1
+        "Inglaterra": ["¿De dónde eres?", "Yo soy de Inglaterra"],
+        "España": ["¿De dónde eres tú?", "Soy español"],
+        "Italia": ["¿De dónde es él?", "Él es italiano"],
+        "Francia": ["¿De dónde son ustedes?", "Nosotros somos de Francia"],
+        "Alemania": ["¿De dónde son ellos?", "De Alemania"],
+        
+        // Раунд 2
+        "los Estados Unidos": ["¿Tú eres de los Estados Unidos?", "Sí, soy estadounidense"],
+        "Canadá": ["¿Eres canadiense?", "Sí, soy de Canadá"],
+        "Jamaica": ["¿Ella es del Caribe?", "Sí, nació en Jamaica"],
+        "Trinidad y Tobago": ["¿De dónde es su familia?", "Su familia es de Trinidad y Tobago"],
+        "México": ["¿Dónde naciste?", "Nací en México"],
+        
+        // Раунд 3
+        "Panamá": ["¿Dónde nació él?", "Él nació en Panamá"],
+        "Brasil": ["¿Dónde viven ustedes?", "Nosotros vivimos en Brasil"],
+        "Costa Rica": ["¿Dónde creciste?", "Crecí en Costa Rica"],
+        "Filipinas": ["¿De dónde es?", "De Filipinas"],
+        "Nicaragua": ["¿Dónde vives?", "Vivo en Nicaragua"]
+    };
+
+    // Данные раундов
+    const ROUNDS_DATA = [
+        {   
+            name: "Раунд 1 ",
+            countries: ["Inglaterra", "España", "Alemania", "Francia", "Italia"]
+        },
+        {   
+            name: "Раунд 2 · ",
+            countries: ["los Estados Unidos", "Jamaica", "Trinidad y Tobago", "México", "Canadá"]
+        },
+        {   
+            name: "Раунд 3 · Мир",
+            countries: ["Panamá", "Nicaragua", "Filipinas", "Brasil", "Costa Rica"]
+        }
+    ];
+
+    // Глобальное состояние
+    let currentRoundIdx = 0;
+    let currentRoundData = null;
+    let shuffledCountries = [];
+    let audioItems = [];
+    let pairedMap = new Map();
+    let reversePaired = new Map();
+    let selectedAudioId = null;
+    let gameActive = true;
+    let roundChecked = false;
+    let availableVoices = [];
+
+    // DOM элементы
+    const audioContainer = document.getElementById('audioListContainer');
+    const countriesContainer = document.getElementById('countriesListContainer');
+    const checkBtn = document.getElementById('checkBtn');
+    const nextRoundBtn = document.getElementById('nextRoundBtn');
+    const retryRoundBtn = document.getElementById('retryRoundBtn');
+    const roundButtons = document.getElementById('roundButtons');
+    const resultArea = document.getElementById('resultArea');
+    const roundIndicator = document.getElementById('roundIndicator');
+
+    // Загрузка голосов
+    function loadVoices() {
+        return new Promise((resolve) => {
+            if (window.speechSynthesis.getVoices().length) {
+                availableVoices = window.speechSynthesis.getVoices();
+                resolve();
+            } else {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    availableVoices = window.speechSynthesis.getVoices();
+                    resolve();
+                };
+            }
+        });
+    }
+
+    // Функция для диалога с разными голосами
+    function speakDialog(question, answer) {
+        if (!window.speechSynthesis) {
+            console.warn("Speech synthesis not supported");
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        // Находим подходящие голоса
+        const spanishVoiceMale = availableVoices.find(v => v.lang === 'es-ES' && 
+            (v.name.includes('Jorge') || v.name.includes('Carlos') || v.name.includes('Juan') || v.name.toLowerCase().includes('male')));
+        const spanishVoiceFemale = availableVoices.find(v => v.lang === 'es-ES' && 
+            (v.name.includes('Monica') || v.name.includes('Mónica') || v.name.includes('Maria') || v.name.toLowerCase().includes('female')));
+        const defaultSpanish = availableVoices.find(v => v.lang === 'es-ES');
+        const anyVoice = availableVoices[0];
+
+        // Вопрос (женский голос)
+        const utterance1 = new SpeechSynthesisUtterance(question);
+        utterance1.voice = spanishVoiceFemale || defaultSpanish || anyVoice;
+        utterance1.lang = 'es-ES';
+        utterance1.rate = 0.85;
+        utterance1.pitch = 1.15;
+
+        // Ответ (мужской голос)
+        const utterance2 = new SpeechSynthesisUtterance(answer);
+        utterance2.voice = spanishVoiceMale || defaultSpanish || anyVoice;
+        utterance2.lang = 'es-ES';
+        utterance2.rate = 0.85;
+        utterance2.pitch = 0.9;
+
+        // Воспроизводим последовательно
+        utterance1.onend = () => {
+            setTimeout(() => {
+                window.speechSynthesis.speak(utterance2);
+            }, 350);
+        };
+        
+        window.speechSynthesis.speak(utterance1);
+    }
+
+    // Анимация воспроизведения
+    function animatePlay(cardElement) {
+        cardElement.classList.add('speaking');
+        setTimeout(() => {
+            cardElement.classList.remove('speaking');
+        }, 500);
+    }
+
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // Сброс раунда (переделать)
+    function resetRound() {
+        pairedMap.clear();
+        reversePaired.clear();
+        selectedAudioId = null;
+        gameActive = true;
+        roundChecked = false;
+        
+        const originalCountries = [...currentRoundData.countries];
+        let countriesWithId = originalCountries.map((name, idx) => ({ id: idx, name: name, originalIdx: idx }));
+        shuffledCountries = shuffleArray([...countriesWithId]);
+        
+        audioItems.forEach(audio => {
+            audio.pairedCountryId = null;
+        });
+        
+        resultArea.style.display = 'none';
+        resultArea.innerHTML = '';
+        checkBtn.disabled = false;
+        checkBtn.style.display = 'block';
+        roundButtons.style.display = 'none';
+        
+        renderUI();
+    }
+
+    // Инициализация раунда
+    function initRound(roundIndex) {
+        selectedAudioId = null;
+        pairedMap.clear();
+        reversePaired.clear();
+        gameActive = true;
+        roundChecked = false;
+        resultArea.style.display = 'none';
+        resultArea.innerHTML = '';
+        checkBtn.disabled = false;
+        checkBtn.style.display = 'block';
+        roundButtons.style.display = 'none';
+
+        currentRoundData = ROUNDS_DATA[roundIndex];
+        const originalCountries = [...currentRoundData.countries];
+        let countriesWithId = originalCountries.map((name, idx) => ({ id: idx, name: name, originalIdx: idx }));
+        shuffledCountries = shuffleArray([...countriesWithId]);
+
+        audioItems = [];
+        for (let i = 0; i < currentRoundData.countries.length; i++) {
+            audioItems.push({
+                id: i,
+                label: `Аудио ${i+1}`,
+                correctCountryName: currentRoundData.countries[i],
+                pairedCountryId: null,
+            });
+        }
+
+        renderUI();
+        updateRoundIndicator();
+    }
+
+    function updateRoundIndicator() {
+    roundIndicator.innerHTML = `🎙️ Раунд ${currentRoundIdx+1} / 3`;
+}
+
+    // Обработка нажатия на аудио (воспроизведение + выделение)
+    function handleAudioClick(audio, cardElement) {
+        if (!gameActive || roundChecked) return;
+        if (audio.pairedCountryId !== null) return;
+        
+        // Воспроизводим диалог
+        const dialog = DIALOGS[audio.correctCountryName];
+        if (dialog) {
+            speakDialog(dialog[0], dialog[1]);
+        } else {
+            // fallback
+            const utterance = new SpeechSynthesisUtterance(audio.correctCountryName);
+            utterance.lang = 'es-ES';
+            window.speechSynthesis.speak(utterance);
+        }
+        animatePlay(cardElement);
+        
+        // Выделение
+        if (selectedAudioId === audio.id) {
+            selectedAudioId = null;
+        } else {
+            selectedAudioId = audio.id;
+        }
+        renderUI();
+    }
+
+    function renderUI() {
+        // Левая колонка
+        audioContainer.innerHTML = '';
+        audioItems.forEach(audio => {
+            const isPaired = audio.pairedCountryId !== null;
+            const isSelected = (selectedAudioId === audio.id);
+            const card = document.createElement('div');
+            card.className = `match-item ${isPaired ? 'paired' : ''} ${isSelected ? 'selected' : ''}`;
+            
+            if (!isPaired && gameActive && !roundChecked) {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    handleAudioClick(audio, card);
+                });
+            } else {
+                card.style.cursor = 'default';
+            }
+
+            const leftDiv = document.createElement('div');
+            leftDiv.className = 'audio-left';
+            leftDiv.innerHTML = `
+                <div class="audio-icon">🎙️</div>
+                <div class="audio-info">${audio.label}</div>
+            `;
+            
+            const playIndicator = document.createElement('div');
+            playIndicator.className = 'play-indicator';
+            playIndicator.innerHTML = '💬 Диалог';
+            
+            card.appendChild(leftDiv);
+            card.appendChild(playIndicator);
+            audioContainer.appendChild(card);
+        });
+
+        // Правая колонка
+        countriesContainer.innerHTML = '';
+        shuffledCountries.forEach(country => {
+            const isPaired = reversePaired.has(country.id);
+            const isDisabled = isPaired || roundChecked || !gameActive;
+            const card = document.createElement('div');
+            card.className = `match-item ${isPaired ? 'paired' : ''}`;
+            
+            if (!isDisabled) {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (!gameActive || roundChecked) return;
+                    if (selectedAudioId === null) return;
+
+                    const selectedAudio = audioItems.find(a => a.id === selectedAudioId);
+                    if (!selectedAudio || selectedAudio.pairedCountryId !== null) {
+                        selectedAudioId = null;
+                        renderUI();
+                        return;
+                    }
+                    if (reversePaired.has(country.id)) {
+                        selectedAudioId = null;
+                        renderUI();
+                        return;
+                    }
+
+                    selectedAudio.pairedCountryId = country.id;
+                    pairedMap.set(selectedAudio.id, country.id);
+                    reversePaired.set(country.id, selectedAudio.id);
+                    selectedAudioId = null;
+                    renderUI();
+                });
+            } else {
+                card.style.cursor = 'default';
+            }
+            
+            const countryDiv = document.createElement('div');
+            countryDiv.style.flex = '1';
+            countryDiv.style.display = 'flex';
+            countryDiv.style.alignItems = 'center';
+            countryDiv.style.justifyContent = 'space-between';
+            countryDiv.style.width = '100%';
+            
+            // Показываем флаг эмодзи для разнообразия
+            const flagEmojis = {
+                "los Estados Unidos": "🇺🇸", "Jamaica": "🇯🇲", "Trinidad y Tobago": "🇹🇹", "México": "🇲🇽", "Canadá": "🇨🇦",
+                "Panamá": "🇵🇦", "Nicaragua": "🇳🇮", "Filipinas": "🇵🇭", "Brasil": "🇧🇷", "Costa Rica": "🇨🇷",
+                "Inglaterra": "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "España": "🇪🇸", "Alemania": "🇩🇪", "Francia": "🇫🇷", "Italia": "🇮🇹"
+            };
+            const flag = flagEmojis[country.name] || "🌍";
+            
+            countryDiv.innerHTML = `<span class="country-name">${flag} ${country.name}</span>`;
+            card.appendChild(countryDiv);
+            countriesContainer.appendChild(card);
+        });
+    }
+
+    // Проверка с подсветкой
+    function checkMatching() {
+        if (!gameActive || roundChecked) return;
+        
+        const pairedCount = audioItems.filter(a => a.pairedCountryId !== null).length;
+        if (pairedCount !== 5) {
+            resultArea.style.display = 'block';
+            resultArea.innerHTML = `⚠️ Соедини все 5 пар (сейчас ${pairedCount} из 5) перед проверкой.`;
+            return;
+        }
+
+        let correctCount = 0;
+        const audioResults = [];
+        
+        for (let audio of audioItems) {
+            const countryObj = shuffledCountries.find(c => c.id === audio.pairedCountryId);
+            const isCorrect = (countryObj && countryObj.name === audio.correctCountryName);
+            if (isCorrect) correctCount++;
+            audioResults.push({ audioId: audio.id, isCorrect, countryId: audio.pairedCountryId });
+        }
+
+        if (!window.globalScores) window.globalScores = new Array(3).fill(null);
+        window.globalScores[currentRoundIdx] = correctCount;
+
+        roundChecked = true;
+        gameActive = false;
+
+        renderUIWithHighlights(audioResults);
+        
+        resultArea.style.display = 'block';
+        const isPerfect = correctCount === 5;
+        resultArea.innerHTML = `🎯 <strong>Правильно: ${correctCount} из 5</strong><br>${isPerfect ? '🎉 ¡Perfecto! Отлично! 🎉' : '❌ Есть ошибки. Нажмите "Переделать раунд" чтобы попробовать снова!'}`;
+        checkBtn.disabled = true;
+        checkBtn.style.display = 'none';
+        
+        roundButtons.style.display = 'flex';
+        
+        if (currentRoundIdx + 1 >= ROUNDS_DATA.length) {
+            nextRoundBtn.innerText = '🏆 Итоговый результат';
+        } else {
+            nextRoundBtn.innerText = '➡️ Следующий раунд';
+        }
+    }
+
+    function renderUIWithHighlights(audioResults) {
+        renderUI();
+        
+        setTimeout(() => {
+            const audioDivs = document.querySelectorAll('#audioListContainer .match-item');
+            const countryDivs = document.querySelectorAll('#countriesListContainer .match-item');
+            
+            for (let res of audioResults) {
+                const audioElement = audioDivs[res.audioId];
+                if (audioElement) {
+                    audioElement.classList.add(res.isCorrect ? 'correct-highlight' : 'wrong-highlight');
+                }
+                
+                const countryInPair = audioItems.find(a => a.id === res.audioId)?.pairedCountryId;
+                if (countryInPair !== undefined && countryInPair !== null) {
+                    const countryIndex = shuffledCountries.findIndex(c => c.id === countryInPair);
+                    if (countryIndex !== -1 && countryDivs[countryIndex]) {
+                        countryDivs[countryIndex].classList.add(res.isCorrect ? 'correct-highlight' : 'wrong-highlight');
+                    }
+                }
+            }
+        }, 10);
+    }
+
+    function goToNextRound() {
+        if (currentRoundIdx + 1 < ROUNDS_DATA.length) {
+            currentRoundIdx++;
+            initRound(currentRoundIdx);
+        } else {
+            showFinalResult();
+        }
+    }
+
+    function showFinalResult() {
+        if (!window.globalScores) window.globalScores = new Array(3).fill(null);
+        let total = 0;
+        for (let i = 0; i < window.globalScores.length; i++) {
+            if (window.globalScores[i] !== null) total += window.globalScores[i];
+        }
+        
+        audioContainer.innerHTML = '';
+        countriesContainer.innerHTML = '';
+        resultArea.style.display = 'block';
+        resultArea.style.fontSize = '20px';
+        resultArea.style.padding = '32px';
+        resultArea.innerHTML = `<div class="final-screen">
+            <strong>🏆 ИТОГОВЫЙ РЕЗУЛЬТАТ 🏆</strong><br><br>
+            <div style="font-size: 48px; margin: 20px 0;">${total}/15</div>
+            <div style="font-size: 18px; margin-bottom: 20px;">
+                ${total === 15 ? '🌟 ¡Excelente! Ты мастер испанских диалогов! 🌟' : 
+                  total >= 12 ? '👍 ¡Muy bien! Очень хороший результат!' :
+                  '💪 ¡Buen intento! Хорошая попытка, продолжай практиковаться!'}
+            </div>
+            <div style="background: #f4e9ef; border-radius: 30px; padding: 15px; margin: 15px 0; font-size: 14px;">
+                📊 По раундам:<br>
+                Раунд 1 (Европа): ${window.globalScores[0] !== null ? window.globalScores[0] : 0}/5<br>
+                Раунд 2 (Америка): ${window.globalScores[1] !== null ? window.globalScores[1] : 0}/5<br>
+                Раунд 3 (Мир): ${window.globalScores[2] !== null ? window.globalScores[2] : 0}/5
+            </div>
+            <button id="restartBtn" class="action-button primary-btn" style="margin-top: 20px;">🔄 Начать заново</button>
+        </div>`;
+        checkBtn.style.display = 'none';
+        roundButtons.style.display = 'none';
+        
+        const restartBtn = document.getElementById('restartBtn');
+        if (restartBtn) {
+            restartBtn.addEventListener('click', () => {
+                window.globalScores = new Array(3).fill(null);
+                currentRoundIdx = 0;
+                initRound(0);
+                checkBtn.style.display = 'block';
+                resultArea.style.display = 'none';
+            });
+        }
+    }
+
+    // Запуск
+    async function setup() {
+        await loadVoices();
+        window.globalScores = new Array(3).fill(null);
+        initRound(0);
+        
+        checkBtn.onclick = () => { if (!roundChecked && gameActive) checkMatching(); };
+        nextRoundBtn.onclick = () => { if (roundChecked) goToNextRound(); };
+        retryRoundBtn.onclick = () => { resetRound(); };
+    }
+
+    setup();
+</script>
+</body>
+</html>
