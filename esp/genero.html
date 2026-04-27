@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Правило определения рода в испанском языке</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #F5EFED;  /* пудрово-нюдовый фон */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 30px;
+        }
+        .rule-card {
+            max-width: 900px;
+            width: 100%;
+            background: #FFFCFA;  /* очень мягкий кремово-пудровый */
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(140, 90, 100, 0.12);
+            overflow: hidden;
+        }
+        .rule-inner {
+            padding: 2rem 2.2rem 2rem 2.2rem;
+        }
+        .gender-header {
+            border-left: 6px solid #EAD5CF;
+            padding-left: 1.2rem;
+            margin-bottom: 1.8rem;
+        }
+        .gender-header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #A57C7A;
+            letter-spacing: -0.3px;
+        }
+        .gender-header p {
+            color: #C7A09C;
+            font-size: 0.85rem;
+            margin-top: 6px;
+            font-weight: 450;
+        }
+        .rule-block {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #F0E3E0;
+            padding-bottom: 1.4rem;
+        }
+        .rule-block:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .rule-title {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        .gender-icon {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: #F9F2EF;
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 60px;
+        }
+        .mas .gender-icon { background: #F5E6E2; color: #C29590; }
+        .fem .gender-icon { background: #F5E6E2; color: #C29590; }
+        .rule-title h2 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: #B28B86;
+        }
+        .ending-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 15px 0 12px 0;
+        }
+        .ending-badge {
+            background: #F7EFEC;
+            font-family: 'Fira Code', monospace;
+            font-weight: 700;
+            padding: 6px 15px;
+            border-radius: 40px;
+            font-size: 1rem;
+            color: #C2A09B;
+        }
+        .exception-grid {
+            background: #FDF8F6;
+            border-radius: 24px;
+            margin-top: 18px;
+            padding: 1rem 1.4rem;
+            border-left: 4px solid #EAD5CF;
+        }
+        .exception-title {
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #C9A3A0;
+            margin-bottom: 12px;
+        }
+        .word-example {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 12px;
+            padding: 6px 0;
+            border-bottom: 1px solid #F0E3E0;
+        }
+        .word-example:last-child {
+            border-bottom: none;
+        }
+        .span-gender {
+            font-weight: 700;
+            font-size: 1.05rem;
+            min-width: 110px;
+            color: #B6918C;
+        }
+        .expl {
+            color: #D4B2AE;
+            font-size: 0.85rem;
+        }
+        .rule-note {
+            background: #FDF8F6;
+            border-radius: 20px;
+            padding: 0.7rem 1.2rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: #CAA7A3;
+        }
+        hr {
+            margin: 1rem 0;
+            border-color: #F0E3E0;
+        }
+        footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #D9BDB8;
+            border-top: 1px solid #F0E3E0;
+            padding-top: 1.2rem;
+        }
+        @media (max-width: 650px) {
+            .rule-inner { padding: 1.5rem; }
+            .rule-title h2 { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="rule-card">
+    <div class="rule-inner">
+        <div class="gender-header">
+            <h1>Género gramatical<br>masculino / femenino</h1>
+            <p>Определение рода существительных в испанском языке</p>
+        </div>
+
+        <!-- MASCULINO -->
+        <div class="rule-block mas">
+            <div class="rule-title">
+                <span class="gender-icon">♂</span>
+                <h2>Masculino (мужской род)</h2>
+            </div>
+            <div class="ending-list">
+                <span class="ending-badge">-o</span>
+                <span class="ending-badge">-e</span>
+                <span class="ending-badge">-ma</span>
+                <span class="ending-badge">-ta</span>
+                <span class="ending-badge">-pa</span>
+                <span class="ending-badge">-aje</span>
+                <span class="ending-badge">-or</span>
+                <span class="ending-badge">-és</span>
+                <span class="ending-badge">-án</span>
+                <span class="ending-badge">-ín</span>
+            </div>
+            <div class="exception-grid">
+                <div class="exception-title">✧ Исключения (femenino)</div>
+                <div class="word-example"><span class="span-gender">mano</span><span class="expl">(рука) — жен. род</span></div>
+                <div class="word-example"><span class="span-gender">foto</span><span class="expl">(фото) — жен. род</span></div>
+                <div class="word-example"><span class="span-gender">moto</span><span class="expl">(мотоцикл) — жен. род</span></div>
+                <div class="word-example"><span class="span-gender">radio</span><span class="expl">(радио) — жен. род</span></div>
+                <div class="word-example"><span class="span-gender">modelo</span><span class="expl">(модель) — чаще жен. род</span></div>
+            </div>
+            <div class="rule-note">
+                ✅ Слова на <strong>-ma, -pa, -ta</strong> греческого происхождения — мужского рода.<br>
+                ✅ <strong>Día</strong> (день) — мужской род.
+            </div>
+        </div>
+
+        <!-- FEMENINO -->
+        <div class="rule-block fem">
+            <div class="rule-title">
+                <span class="gender-icon">♀</span>
+                <h2>Femenino (женский род)</h2>
+            </div>
+            <div class="ending-list">
+                <span class="ending-badge">-a</span>
+                <span class="ending-badge">-ción</span>
+                <span class="ending-badge">-sión</span>
+                <span class="ending-badge">-dad</span>
+                <span class="ending-badge">-tad</span>
+                <span class="ending-badge">-ez</span>
+                <span class="ending-badge">-eza</span>
+                <span class="ending-badge">-ia</span>
+                <span class="ending-badge">-ncia</span>
+                <span class="ending-badge">-nza</span>
+                <span class="ending-badge">-itis</span>
+            </div>
+            <div class="exception-grid">
+                <div class="exception-title">✧ Исключения (masculino)</div>
+                <div class="word-example"><span class="span-gender">día</span><span class="expl">(день) — муж. род</span></div>
+                <div class="word-example"><span class="span-gender">mapa</span><span class="expl">(карта) — муж. род</span></div>
+                <div class="word-example"><span class="span-gender">clima</span><span class="expl">(климат) — муж. род</span></div>
+                <div class="word-example"><span class="span-gender">problema</span><span class="expl">(проблема) — муж. род</span></div>
+                <div class="word-example"><span class="span-gender">sistema</span><span class="expl">(система) — муж. род</span></div>
+                <div class="word-example"><span class="span-gender">poeta</span><span class="expl">(поэт) — муж. род</span></div>
+            </div>
+            <div class="rule-note">
+                📌 Абстрактные существительные на <strong>-ción, -sión, -dad, -tad</strong> — женского рода.<br>
+                📌 Исключения из -a: <strong>el día, el mapa, el planeta, el sofá, el cura</strong>.
+            </div>
+        </div>
+
+        <!-- ДОПОЛНИТЕЛЬНЫЕ ПРАВИЛА -->
+        <div class="rule-block">
+            <div class="rule-title">
+                <span class="gender-icon" style="background:#F9F2EF;">⚖</span>
+                <h2 style="font-size:1.3rem;">Особые случаи</h2>
+            </div>
+            <div class="ending-list" style="gap:8px;">
+                <span class="ending-badge">-ista → общий род</span>
+                <span class="ending-badge">-ante → общий род</span>
+                <span class="ending-badge">-ente → общий род</span>
+            </div>
+            <div class="exception-grid" style="border-left-color:#EAD5CF;">
+                <div class="exception-title">🔁 Существительные с двойным родом</div>
+                <div class="word-example"><span class="span-gender">el capital</span><span class="expl">(капитал)</span> <span class="span-gender">la capital</span><span class="expl">(столица)</span></div>
+                <div class="word-example"><span class="span-gender">el corte</span><span class="expl">(разрез)</span> <span class="span-gender">la corte</span><span class="expl">(двор)</span></div>
+                <div class="word-example"><span class="span-gender">el orden</span><span class="expl">(порядок)</span> <span class="span-gender">la orden</span><span class="expl">(приказ)</span></div>
+                <div class="word-example"><span class="span-gender">el frente</span><span class="expl">(фронт)</span> <span class="span-gender">la frente</span><span class="expl">(лоб)</span></div>
+            </div>
+            <div class="rule-note">
+                💡 <strong>-o</strong> → мужской род (искл: mano, radio, foto, moto).<br>
+                💡 <strong>-a</strong> → женский род (искл: día, mapa, problema, sistema, tema, clima, poeta).<br>
+                💡 Неизменяемые: <strong>el/la estudiante, el/la artista, el/la periodista</strong>.
+            </div>
+        </div>
+        <footer>
+            REGLAS DE GÉNERO · ESPAÑOL · EXCEPCIONES INCLUIDAS
+        </footer>
+    </div>
+</div>
+</body>
+</html>
