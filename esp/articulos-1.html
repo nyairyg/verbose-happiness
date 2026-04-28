@@ -1,0 +1,713 @@
+Конечно! Вот обновлённый код с вашим новым набором слов. Все слова соответствуют правилам женского рода (оканчиваются на -a, -ción, -sión, -dad, -tad, -eza, -ia, -nza и т.д.), так что тренажёр будет работать идеально.
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>el / la — artículos</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #FBFBFA;
+      font-family: 'Bitter', 'Georgia', 'Times New Roman', serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .trainer-container {
+      max-width: 700px;
+      width: 100%;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .progress-section {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #6B6B6B;
+      background: transparent;
+      letter-spacing: 0.3px;
+    }
+
+    .progress-badge {
+      background: #FFFFFF;
+      padding: 8px 20px;
+      border-radius: 40px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+      border: 1px solid #E9E9E6;
+      font-family: 'Bitter', monospace;
+      font-weight: 500;
+    }
+
+    .article-buttons {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      width: 100%;
+      margin: 0.5rem 0 0.2rem;
+      flex-wrap: wrap;
+    }
+
+    .article-btn {
+      font-size: 2.5rem;
+      font-weight: 700;
+      padding: 0.9rem 1.8rem;
+      min-width: 150px;
+      background: #FFFFFF;
+      border: 2px solid #E9E9E6;
+      border-radius: 28px;
+      cursor: pointer;
+      color: #2B2B2B;
+      transition: all 0.2s ease;
+      font-family: 'Bitter', 'Georgia', serif;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+      text-transform: lowercase;
+    }
+
+    .article-btn:hover {
+      background: #F5F5F3;
+      transform: translateY(-2px);
+      border-color: #DCDCD6;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .article-btn:active {
+      transform: translateY(1px);
+    }
+
+    .article-btn.disabled-btn {
+      pointer-events: none;
+      opacity: 0.65;
+      transform: none;
+    }
+
+    .article-btn.correct-btn-highlight {
+      background-color: #C7DDCA !important;
+      border-color: #9EBF9E !important;
+      transition: background 0.15s;
+    }
+
+    .article-btn.wrong-btn-highlight {
+      background-color: #E9C1C1 !important;
+      border-color: #D4A0A0 !important;
+      transition: background 0.15s;
+    }
+
+    /* 3D карточка с переворотом */
+    .card-flip-container {
+      perspective: 1200px;
+      width: 100%;
+      max-width: 540px;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .flipper {
+      position: relative;
+      width: 100%;
+      height: auto;
+      transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-style: preserve-3d;
+    }
+
+    .flipped .flipper {
+      transform: rotateY(180deg);
+    }
+
+    .front-card, .back-card {
+      background: #FFFFFF;
+      width: 100%;
+      padding: 3rem 1.8rem;
+      text-align: center;
+      border-radius: 28px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
+      border: 1px solid #E9E9E6;
+      backface-visibility: hidden;
+      transition: background-color 0.2s ease;
+    }
+
+    .front-card {
+      transform: rotateY(0deg);
+    }
+
+    .back-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100%;
+    }
+
+    .word-display {
+      font-size: 3.2rem;
+      font-weight: 600;
+      color: #2B2B2B;
+      word-break: break-word;
+      letter-spacing: -0.2px;
+      font-family: 'Bitter', 'Georgia', serif;
+    }
+
+    .translation-display {
+      font-size: 2.4rem;
+      font-weight: 500;
+      color: #2B2B2B;
+      font-family: 'Bitter', serif;
+      word-break: break-word;
+    }
+
+    .translation-label {
+      font-size: 0.9rem;
+      color: #6B6B6B;
+      margin-bottom: 1rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* подсветка карточки (зелёная/красная) применяется к front-card */
+    .correct-highlight-card .front-card {
+      background-color: #C7DDCA;
+    }
+
+    .wrong-highlight-card .front-card {
+      background-color: #E9C1C1;
+    }
+
+    /* кнопка "показать перевод" */
+    .translation-btn {
+      background: #F5F5F3;
+      border: 1px solid #E9E9E6;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 60px;
+      cursor: pointer;
+      color: #2B2B2B;
+      transition: all 0.2s;
+      font-family: 'Bitter', serif;
+      margin-top: 16px;
+      width: auto;
+      display: inline-block;
+    }
+
+    .translation-btn:hover {
+      background: #EDE7DE;
+      transform: translateY(-1px);
+    }
+
+    .translation-btn:active {
+      transform: translateY(1px);
+    }
+
+    .translation-btn.hidden-btn {
+      display: none;
+    }
+
+    .feedback-msg {
+      min-height: 50px;
+      font-size: 0.95rem;
+      color: #6B6B6B;
+      text-align: center;
+      margin-top: 12px;
+      font-weight: 500;
+      font-family: 'Bitter', system-ui, serif;
+    }
+
+    .completion-screen {
+      background: #FFFFFF;
+      border-radius: 32px;
+      padding: 2rem 2rem 2rem;
+      text-align: center;
+      border: 1px solid #E9E9E6;
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.06);
+      width: 100%;
+    }
+
+    .completion-screen h2 {
+      color: #2B2B2B;
+      font-size: 1.9rem;
+      margin-bottom: 1rem;
+      font-family: 'Bitter', serif;
+      font-weight: 600;
+    }
+
+    .completion-screen p {
+      color: #6B6B6B;
+      margin-bottom: 1.8rem;
+      font-size: 1.1rem;
+    }
+
+    .restart-btn {
+      background: #FBFBFA;
+      border: 1px solid #E9E9E6;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 48px;
+      cursor: pointer;
+      color: #2B2B2B;
+      transition: all 0.2s;
+      font-family: 'Bitter', serif;
+    }
+
+    .restart-btn:hover {
+      background: #F5F5F3;
+      transform: scale(0.98);
+      border-color: #DCDCD6;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .action-bar {
+      display: flex;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 810px) and (min-width: 600px) {
+      .article-btn {
+        font-size: 2.3rem;
+        min-width: 140px;
+        padding: 0.8rem 1.4rem;
+      }
+      .word-display {
+        font-size: 3rem;
+      }
+      .front-card, .back-card {
+        padding: 2.5rem 1.5rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .article-btn {
+        font-size: 2rem;
+        min-width: 120px;
+        padding: 0.7rem 1rem;
+      }
+      .word-display {
+        font-size: 2.5rem;
+      }
+      .translation-display {
+        font-size: 1.8rem;
+      }
+      .front-card, .back-card {
+        padding: 2rem 1rem;
+      }
+      .article-buttons {
+        gap: 1.2rem;
+      }
+    }
+
+    .article-btn {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+
+<div class="trainer-container" id="trainerRoot">
+  <div class="progress-section">
+    <div class="progress-badge" id="progressText">0 / 0</div>
+  </div>
+
+  <div id="gamePanel">
+    <div class="article-buttons">
+      <button class="article-btn" data-article="EL">el</button>
+      <button class="article-btn" data-article="LA">la</button>
+    </div>
+
+    <!-- Карточка с 3D переворотом -->
+    <div class="card-flip-container" id="cardFlipContainer">
+      <div class="flipper" id="flipper">
+        <!-- Передняя сторона (испанское слово) -->
+        <div class="front-card" id="frontCard">
+          <div class="word-display" id="wordDisplay">cargando...</div>
+        </div>
+        <!-- Задняя сторона (перевод на русский) -->
+        <div class="back-card" id="backCard">
+          <div class="translation-label">🇪🇸 → 🇷🇺</div>
+          <div class="translation-display" id="translationDisplay">---</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="translation-btn" id="showTranslationBtn">📖 показать перевод</button>
+    </div>
+    <div class="feedback-msg" id="feedbackMsg"></div>
+  </div>
+
+  <div id="completionPanel" class="completion-screen hidden">
+    <h2>✨ ¡Completado! ✨</h2>
+    <p>Has practicado todos los artículos.<br>Sigue así con el & la.</p>
+    <button class="restart-btn" id="restartCompletionBtn">⟳ Repetir lista</button>
+  </div>
+</div>
+
+<script>
+  // ------------------------------------------------------------------
+  // НОВЫЙ СЛОВАРЬ A1 (только LA, все слова соответствуют правилам женского рода)
+  // ------------------------------------------------------------------
+  const cardsData = [
+    { word: "abuela", article: "LA", translation: "бабушка" },
+    { word: "aplicación", article: "LA", translation: "приложение" },
+    { word: "banana", article: "LA", translation: "банан" },
+    { word: "belleza", article: "LA", translation: "красота" },
+    { word: "cabra", article: "LA", translation: "коза" },
+    { word: "cama", article: "LA", translation: "кровать" },
+    { word: "canción", article: "LA", translation: "песня" },
+    { word: "cara", article: "LA", translation: "лицо" },
+    { word: "carne", article: "LA", translation: "мясо" },
+    { word: "carta", article: "LA", translation: "письмо" },
+    { word: "casa", article: "LA", translation: "дом" },
+    { word: "cebolla", article: "LA", translation: "лук" },
+    { word: "cereza", article: "LA", translation: "вишня" },
+    { word: "ciudad", article: "LA", translation: "город" },
+    { word: "cocina", article: "LA", translation: "кухня" },
+    { word: "comida", article: "LA", translation: "еда" },
+    { word: "contraseña", article: "LA", translation: "пароль" },
+    { word: "decisión", article: "LA", translation: "решение" },
+    { word: "ensalada", article: "LA", translation: "салат" },
+    { word: "escuela", article: "LA", translation: "школа" },
+    { word: "esperanza", article: "LA", translation: "надежда" },
+    { word: "familia", article: "LA", translation: "семья" },
+    { word: "foto", article: "LA", translation: "фото" },
+    { word: "fruta", article: "LA", translation: "фрукт" },
+    { word: "gallina", article: "LA", translation: "курица" },
+    { word: "guitarra", article: "LA", translation: "гитара" },
+    { word: "hermana", article: "LA", translation: "сестра" },
+    { word: "hija", article: "LA", translation: "дочь" },
+    { word: "idea", article: "LA", translation: "идея" },
+    { word: "importancia", article: "LA", translation: "важность" },
+    { word: "información", article: "LA", translation: "информация" },
+    { word: "lección", article: "LA", translation: "урок" },
+    { word: "leona", article: "LA", translation: "львица" },
+    { word: "libertad", article: "LA", translation: "свобода" },
+    { word: "llave", article: "LA", translation: "ключ" },
+    { word: "madre", article: "LA", translation: "мать" },
+    { word: "manzana", article: "LA", translation: "яблоко" },
+    { word: "mesa", article: "LA", translation: "стол" },
+    { word: "música", article: "LA", translation: "музыка" },
+    { word: "nación", article: "LA", translation: "нация" },
+    { word: "nieve", article: "LA", translation: "снег" },
+    { word: "oreja", article: "LA", translation: "ухо" },
+    { word: "oveja", article: "LA", translation: "овца" },
+    { word: "página", article: "LA", translation: "страница" },
+    { word: "pantalla", article: "LA", translation: "экран" },
+    { word: "pasta", article: "LA", translation: "паста" },
+    { word: "pera", article: "LA", translation: "груша" },
+    { word: "pizza", article: "LA", translation: "пицца" },
+    { word: "playa", article: "LA", translation: "пляж" },
+    { word: "policía", article: "LA", translation: "полиция" },
+    { word: "puerta", article: "LA", translation: "дверь" },
+    { word: "rana", article: "LA", translation: "лягушка" },
+    { word: "red", article: "LA", translation: "сеть" },
+    { word: "ropa", article: "LA", translation: "одежда" },
+    { word: "silla", article: "LA", translation: "стул" },
+    { word: "sopa", article: "LA", translation: "суп" },
+    { word: "tarta", article: "LA", translation: "торт" },
+    { word: "taza", article: "LA", translation: "чашка" },
+    { word: "tendencia", article: "LA", translation: "тенденция" },
+    { word: "universidad", article: "LA", translation: "университет" },
+    { word: "vaca", article: "LA", translation: "корова" }
+  ];
+
+  // ------------------------------------------------------------------
+  // ТРЕНАЖЁР + ПЕРЕВОРОТ
+  // ------------------------------------------------------------------
+  class ArticleTrainer {
+    constructor(originalCards, gamePanelEl, completionPanelEl, progressSpan, wordDisplaySpan, translationDisplaySpan, feedbackSpan, flipContainer, flipperEl, frontCardEl, backCardEl) {
+      this.originalCards = [...originalCards];
+      this.activeCards = [];
+      this.currentIndex = 0;
+      this.waitingForNext = false;
+      this.errorLock = false;
+      this.correctArticleForError = null;
+
+      // DOM элементы
+      this.gamePanel = gamePanelEl;
+      this.completionPanel = completionPanelEl;
+      this.progressSpan = progressSpan;
+      this.wordDisplaySpan = wordDisplaySpan;
+      this.translationDisplaySpan = translationDisplaySpan;
+      this.feedbackSpan = feedbackSpan;
+      this.flipContainer = flipContainer;
+      this.flipperEl = flipperEl;
+      this.frontCardEl = frontCardEl;
+      this.backCardEl = backCardEl;
+
+      // Кнопки
+      this.btnEL = document.querySelector('.article-btn[data-article="EL"]');
+      this.btnLA = document.querySelector('.article-btn[data-article="LA"]');
+      this.translationBtn = document.getElementById('showTranslationBtn');
+
+      // Привязка событий
+      this.btnEL.addEventListener('click', () => this.onArticleClick('EL'));
+      this.btnLA.addEventListener('click', () => this.onArticleClick('LA'));
+      this.translationBtn.addEventListener('click', () => this.toggleTranslation());
+    }
+
+    shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    initGame() {
+      this.activeCards = this.shuffleArray([...this.originalCards]);
+      this.currentIndex = 0;
+      this.waitingForNext = false;
+      this.errorLock = false;
+      this.correctArticleForError = null;
+      
+      // Сброс переворота карточки
+      this.flipContainer.classList.remove('flipped');
+      this.clearCardHighlights();
+      this.clearAllButtonsHighlight();
+      this.enableButtons(true);
+      this.feedbackSpan.innerText = '';
+      this.renderCurrentCard();
+      this.updateProgress();
+      this.gamePanel.classList.remove('hidden');
+      this.completionPanel.classList.add('hidden');
+      
+      // Показываем кнопку перевода
+      this.translationBtn.classList.remove('hidden-btn');
+    }
+
+    updateProgress() {
+      const total = this.activeCards.length;
+      const current = this.currentIndex + 1;
+      if (total > 0) {
+        this.progressSpan.innerText = `${Math.min(current, total)} / ${total}`;
+      } else {
+        this.progressSpan.innerText = `0 / 0`;
+      }
+    }
+
+    renderCurrentCard() {
+      if (!this.activeCards.length) return;
+      if (this.currentIndex >= this.activeCards.length) {
+        this.finishGame();
+        return;
+      }
+      const card = this.activeCards[this.currentIndex];
+      this.wordDisplaySpan.innerText = card.word;
+      this.translationDisplaySpan.innerText = card.translation;
+      
+      // при смене карточки всегда сбрасываем переворот
+      if (this.flipContainer.classList.contains('flipped')) {
+        this.flipContainer.classList.remove('flipped');
+      }
+    }
+
+    clearCardHighlights() {
+      this.frontCardEl.parentElement.classList.remove('correct-highlight-card', 'wrong-highlight-card');
+    }
+
+    highlightCardAsCorrect() {
+      this.clearCardHighlights();
+      this.frontCardEl.parentElement.classList.add('correct-highlight-card');
+    }
+
+    highlightCardAsWrong() {
+      this.clearCardHighlights();
+      this.frontCardEl.parentElement.classList.add('wrong-highlight-card');
+    }
+
+    clearAllButtonsHighlight() {
+      this.btnEL.classList.remove('correct-btn-highlight', 'wrong-btn-highlight');
+      this.btnLA.classList.remove('correct-btn-highlight', 'wrong-btn-highlight');
+      this.btnEL.style.removeProperty('background-color');
+      this.btnLA.style.removeProperty('background-color');
+    }
+
+    highlightCorrectButton(article) {
+      this.clearAllButtonsHighlight();
+      const correctBtn = article === 'EL' ? this.btnEL : this.btnLA;
+      correctBtn.classList.add('correct-btn-highlight');
+    }
+
+    highlightWrongButton(article) {
+      this.clearAllButtonsHighlight();
+      const wrongBtn = article === 'EL' ? this.btnEL : this.btnLA;
+      wrongBtn.classList.add('wrong-btn-highlight');
+    }
+
+    enableButtons(enabled) {
+      if (enabled) {
+        this.btnEL.classList.remove('disabled-btn');
+        this.btnLA.classList.remove('disabled-btn');
+      } else {
+        this.btnEL.classList.add('disabled-btn');
+        this.btnLA.classList.add('disabled-btn');
+      }
+    }
+
+    toggleTranslation() {
+      if (this.waitingForNext) return;
+      this.flipContainer.classList.toggle('flipped');
+    }
+
+    // ПРАВИЛЬНЫЙ ОТВЕТ
+    correctAnswer(selectedArticle) {
+      this.highlightCardAsCorrect();
+      this.highlightCorrectButton(selectedArticle);
+      this.feedbackSpan.innerText = '';
+      
+      this.waitingForNext = true;
+      this.enableButtons(false);
+      
+      setTimeout(() => {
+        this.currentIndex++;
+        this.waitingForNext = false;
+        this.errorLock = false;
+        this.correctArticleForError = null;
+        this.clearCardHighlights();
+        this.clearAllButtonsHighlight();
+        this.feedbackSpan.innerText = '';
+        
+        if (this.currentIndex < this.activeCards.length) {
+          this.renderCurrentCard();
+          this.updateProgress();
+          this.enableButtons(true);
+        } else {
+          this.finishGame();
+        }
+      }, 750);
+    }
+    
+    // НЕПРАВИЛЬНЫЙ ОТВЕТ
+    wrongAnswer(selectedArticle, correctArticle) {
+      this.highlightCardAsWrong();
+      this.highlightWrongButton(selectedArticle);
+      this.feedbackSpan.innerText = '❌ Inténtalo de nuevo';
+      
+      this.correctArticleForError = correctArticle;
+      this.errorLock = true;
+    }
+    
+    // ИСПРАВЛЕНИЕ ОШИБКИ
+    fixErrorAfterWrong(correctArticle) {
+      this.highlightCardAsCorrect();
+      this.highlightCorrectButton(correctArticle);
+      this.feedbackSpan.innerText = '';
+      
+      this.waitingForNext = true;
+      this.enableButtons(false);
+      this.errorLock = false;
+      
+      setTimeout(() => {
+        this.currentIndex++;
+        this.waitingForNext = false;
+        this.correctArticleForError = null;
+        this.clearCardHighlights();
+        this.clearAllButtonsHighlight();
+        this.feedbackSpan.innerText = '';
+        
+        if (this.currentIndex < this.activeCards.length) {
+          this.renderCurrentCard();
+          this.updateProgress();
+          this.enableButtons(true);
+        } else {
+          this.finishGame();
+        }
+      }, 750);
+    }
+    
+    onArticleClick(selected) {
+      if (this.waitingForNext) return;
+      
+      const currentCard = this.activeCards[this.currentIndex];
+      const correctArticle = currentCard.article;
+      
+      if (this.errorLock) {
+        if (selected !== this.correctArticleForError) {
+          this.feedbackSpan.innerText = '❌ Elige el otro artículo';
+          return;
+        } else {
+          this.fixErrorAfterWrong(correctArticle);
+        }
+        return;
+      }
+      
+      if (selected === correctArticle) {
+        this.correctAnswer(selected);
+      } else {
+        this.wrongAnswer(selected, correctArticle);
+      }
+    }
+    
+    finishGame() {
+      this.gamePanel.classList.add('hidden');
+      this.completionPanel.classList.remove('hidden');
+      this.waitingForNext = false;
+      this.errorLock = false;
+      this.enableButtons(true);
+      this.clearCardHighlights();
+      this.clearAllButtonsHighlight();
+      this.feedbackSpan.innerText = '';
+    }
+    
+    restartGame() {
+      this.initGame();
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // ЗАПУСК
+  // ------------------------------------------------------------------
+  document.addEventListener('DOMContentLoaded', () => {
+    const gamePanel = document.getElementById('gamePanel');
+    const completionPanel = document.getElementById('completionPanel');
+    const progressSpan = document.getElementById('progressText');
+    const wordDisplaySpan = document.getElementById('wordDisplay');
+    const translationDisplaySpan = document.getElementById('translationDisplay');
+    const feedbackSpan = document.getElementById('feedbackMsg');
+    const flipContainer = document.getElementById('cardFlipContainer');
+    const flipperEl = document.getElementById('flipper');
+    const frontCardEl = document.getElementById('frontCard');
+    const backCardEl = document.getElementById('backCard');
+    const restartCompletionBtn = document.getElementById('restartCompletionBtn');
+    
+    const trainer = new ArticleTrainer(
+      cardsData, gamePanel, completionPanel, progressSpan, 
+      wordDisplaySpan, translationDisplaySpan, feedbackSpan,
+      flipContainer, flipperEl, frontCardEl, backCardEl
+    );
+    trainer.initGame();
+    
+    restartCompletionBtn.addEventListener('click', () => {
+      trainer.restartGame();
+    });
+  });
+</script>
+</body>
+</html>
+```
