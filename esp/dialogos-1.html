@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Práctica de Diálogos · 20 conversaciones en español</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding: 32px 24px;
+        }
+
+        .poster {
+            width: 1100px;
+            max-width: 100%;
+            background: #ffffff;
+            border-radius: 44px;
+            box-shadow: 0 28px 44px -16px rgba(0, 0, 0, 0.2), 0 8px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .content {
+            padding: 34px 40px 42px 40px;
+        }
+
+        .title-section {
+            border-bottom: 3px solid #cf8aa4;
+            padding-bottom: 18px;
+            margin-bottom: 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        h1 {
+            font-size: 34px;
+            font-weight: 720;
+            color: #1e2f3f;
+            letter-spacing: -0.3px;
+        }
+        h1 span {
+            font-size: 24px;
+            font-weight: 480;
+            color: #5a6b89;
+        }
+        .subhead {
+            font-size: 12px;
+            font-weight: 570;
+            color: #9b7f8c;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            background: #fbf0f5;
+            padding: 6px 14px;
+            border-radius: 60px;
+        }
+
+        .two-columns {
+            display: flex;
+            gap: 48px;
+            flex-wrap: wrap;
+        }
+
+        .col {
+            flex: 1;
+            min-width: 260px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .dialog-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 16px 18px 16px 18px;
+            transition: all 0.2s ease;
+            border: 1px solid #f1e2e9;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            cursor: pointer;
+            user-select: none;
+        }
+        .dialog-card:hover {
+            background: #fefafc;
+            border-color: #e2c0d0;
+            box-shadow: 0 6px 12px -8px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            pointer-events: none;
+        }
+        .dialog-number {
+            font-size: 32px;
+            font-weight: 750;
+            color: #bc6f8c;
+            background: #fef4f8;
+            width: 64px;
+            height: 64px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 32px;
+            line-height: 1;
+            font-family: monospace;
+            letter-spacing: -0.5px;
+        }
+        .dialog-tag {
+            font-size: 15px;
+            font-weight: 600;
+            background: #f4ecef;
+            padding: 6px 20px;
+            border-radius: 40px;
+            color: #2c3e5c;
+        }
+        .dialog-tag span {
+            font-weight: 800;
+            color: #bc6f8c;
+        }
+
+        .examples-panel {
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.33, 1, 0.68, 1);
+            max-height: 0;
+            background: #fefafc;
+            border-radius: 20px;
+            margin-top: 0;
+            pointer-events: auto;
+        }
+        .examples-panel.show {
+            max-height: var(--target-height, 500px);
+            margin-top: 16px;
+        }
+
+        /* horizontal row for example blocks – cada bloque muestra un diálogo */
+        .examples-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            background: #fefafc;
+            border-radius: 18px;
+            padding: 2px;
+        }
+        .dialog-block {
+            flex: 1;
+            min-width: 210px;
+            background: #f9f1f6;
+            border-radius: 20px;
+            padding: 14px 16px;
+            border-left: 3px solid #ddb0c2;
+            transition: 0.1s ease;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+        .dialog-text {
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-line;
+            color: #1f2d44;
+            letter-spacing: -0.1px;
+        }
+        .dialog-text strong {
+            color: #bc6f8c;
+            font-weight: 700;
+        }
+        .conversation-badge {
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #b7889e;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f3e6ed;
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 30px;
+        }
+
+        .footer-note {
+            margin-top: 42px;
+            border-top: 1px solid #e6d8df;
+            padding-top: 16px;
+            text-align: center;
+            font-size: 9px;
+            color: #cabec4;
+        }
+
+        @media (max-width: 800px) {
+            .two-columns {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .content {
+                padding: 24px;
+            }
+            .dialog-number {
+                width: 52px;
+                height: 52px;
+                font-size: 28px;
+            }
+            .examples-row {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .dialog-block {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="poster">
+    <div class="content">
+        <div class="title-section">
+            <h1>Cuaderno de diálogos <span>· 20 conversaciones en español</span></h1>
+            <div class="subhead">🗣️ practica con diálogos cotidianos · haz clic para ver cada conversación</div>
+        </div>
+
+        <div class="two-columns" id="columnsContainer">
+            <!-- Columnas dinámicas: izquierda Diálogo 1 al 10, derecha Diálogo 11 al 20 -->
+        </div>
+        <div class="footer-note">
+            ✨ Haz clic en cualquier tarjeta para leer el diálogo completo. Diseño claro, line breaks originales.
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- DIÁLOGOS COMPLETOS (1 al 20) preservando saltos de línea originales ----------
+    const allDialogues = [
+        { id: 1, text: "A: Hola.\nB: Hola.\nA: ¿Cómo te llamas?\nB: Me llamo Ana. ¿Y tú?\nA: Me llamo Luis.\nB: Mucho gusto.\nA: Igualmente." },
+        { id: 2, text: "A: Hola, ¿cómo estás?\nB: Estoy bien, gracias. ¿Y tú?\nA: Estoy bien.\nB: ¿Cómo te llamas?\nA: Me llamo Marta." },
+        { id: 3, text: "A: ¿Qué es esto?\nB: Esto es un libro.\nA: ¿Es interesante?\nB: Sí, es interesante." },
+        { id: 4, text: "A: Hola.\nB: Hola. ¿Qué quieres?\nA: Un café, por favor.\nB: Aquí tienes.\nA: Gracias.\nB: De nada." },
+        { id: 5, text: "A: ¿Qué haces hoy?\nB: Estudio español.\nA: ¿Es difícil?\nB: Un poco, pero es interesante.\nA: Sí, es interesante." },
+        { id: 6, text: "A: Hola.\nB: Hola.\nA: ¿Cuál es tu nacionalidad?\nB: Mi nacionalidad es italiana.\nA: Ah, interesante.\nB: ¿Y tú?\nA: Soy rusa." },
+        { id: 7, text: "A: ¿Qué es esto?\nB: Esto es una universidad.\nA: ¿Es buena?\nB: Sí, es muy buena." },
+        { id: 8, text: "A: ¿Cuál es tu profesión?\nB: Soy estudiante.\nA: ¿En la universidad?\nB: Sí, en la universidad.\nA: Yo soy profesor." },
+        { id: 9, text: "A: ¿Qué idiomas hablas?\nB: Hablo inglés y alemán.\nA: ¿Hablas español?\nB: Sí, pero poco.\nA: Yo también." },
+        { id: 10, text: "A: ¿Dónde estás?\nB: Estoy en el centro.\nA: ¿Hay un museo?\nB: Sí, hay un museo nacional." },
+        { id: 11, text: "A: ¿Qué es esto?\nB: Esto es un producto.\nA: ¿Es natural?\nB: Sí, es natural." },
+        { id: 12, text: "A: ¿Tienes teléfono?\nB: Sí, tengo un teléfono moderno.\nA: ¿Usas internet?\nB: Sí, uso internet todos los días.\nA: ¿Para estudiar?\nB: Sí, para estudiar español." },
+        { id: 13, text: "A: ¿Qué es esto?\nB: Esto es un problema.\nA: ¿Es serio?\nB: Sí, es serio." },
+        { id: 14, text: "A: ¿Estudias en la universidad?\nB: Sí, estudio en la universidad.\nA: ¿Qué estudias?\nB: Estudio economía.\nA: Ah, es una carrera interesante." },
+        { id: 15, text: "A: ¿Te gusta la música?\nB: Sí, me gusta mucho.\nA: ¿Qué tipo de música?\nB: Música clásica y música moderna.\nA: Yo prefiero la música clásica." },
+        { id: 16, text: "A: Hola.\nB: Hola. ¿Quiere el menú?\nA: Sí, gracias.\nB: Tenemos pizza y pasta.\nA: Quiero una pizza.\nB: Perfecto." },
+        { id: 17, text: "A: Hola.\nB: Buenos días. Hotel 'Mar'. ¿Tiene una reserva?\nA: Sí, tengo una reserva.\nB: ¿A nombre de quién?\nA: A nombre de María López.\nB: Perfecto." },
+        { id: 18, text: "A: ¿Te gusta la música?\nB: Sí, me gusta la música.\nA: ¿Qué música te gusta?\nB: Me gusta la música clásica." },
+        { id: 19, text: "A: ¿Te gustan los filmes?\nB: Sí, me gustan.\nA: ¿Qué filmes te gustan?\nB: Me gustan los filmes de acción." },
+        { id: 20, text: "A: ¿Te gusta el deporte?\nB: Sí, me gusta.\nA: ¿Qué deporte te gusta?\nB: Me gusta el fútbol." }
+    ];
+
+    // Usamos los 20 diálogos completos
+    const dialoguesList = allDialogues; // 1 al 20
+
+    // Función para dar formato al texto: resaltar A: y B: con negrita, respetando saltos de línea.
+    function formatDialogText(rawText) {
+        let formatted = rawText.replace(/A:/g, '<strong>A:</strong>').replace(/B:/g, '<strong>B:</strong>');
+        // Convertir saltos de línea a <br> para mantener el formato visual tipo 'line break'
+        return formatted.replace(/\n/g, '<br>');
+    }
+
+    // Crear tarjeta independiente para cada diálogo (cada tarjeta contiene UN diálogo completo)
+    function createDialogCard(dialog) {
+        const card = document.createElement('div');
+        card.className = 'dialog-card';
+        
+        // Header con el número de diálogo y etiqueta
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'card-header';
+        
+        const numberSpan = document.createElement('span');
+        numberSpan.className = 'dialog-number';
+        numberSpan.innerText = `${dialog.id}`;
+        
+        const tagSpan = document.createElement('span');
+        tagSpan.className = 'dialog-tag';
+        tagSpan.innerHTML = `<span>🗣️ Diálogo ${dialog.id}</span> · conversación`;
+        
+        headerDiv.appendChild(numberSpan);
+        headerDiv.appendChild(tagSpan);
+        
+        // Panel que se despliega con el contenido del diálogo
+        const panel = document.createElement('div');
+        panel.className = 'examples-panel';
+        
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'examples-row';
+        
+        // Bloque único de diálogo (como cada tarjeta tiene un solo diálogo, creamos un solo bloque)
+        const dialogBlock = document.createElement('div');
+        dialogBlock.className = 'dialog-block';
+        
+        const badgeSpan = document.createElement('div');
+        badgeSpan.className = 'conversation-badge';
+        badgeSpan.innerText = '💬 texto completo';
+        
+        const dialogTextDiv = document.createElement('div');
+        dialogTextDiv.className = 'dialog-text';
+        dialogTextDiv.innerHTML = formatDialogText(dialog.text);
+        
+        dialogBlock.appendChild(badgeSpan);
+        dialogBlock.appendChild(dialogTextDiv);
+        rowDiv.appendChild(dialogBlock);
+        
+        panel.appendChild(rowDiv);
+        card.appendChild(headerDiv);
+        card.appendChild(panel);
+        
+        // Toggle: clic expande / colapsa el diálogo
+        card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isShown = panel.classList.contains('show');
+            if (!isShown) {
+                // Calcular altura real para la transición fluida
+                const scrollHeight = panel.scrollHeight;
+                panel.style.setProperty('--target-height', scrollHeight + 'px');
+                panel.classList.add('show');
+            } else {
+                panel.classList.remove('show');
+                setTimeout(() => {
+                    if (!panel.classList.contains('show')) {
+                        panel.style.removeProperty('--target-height');
+                    }
+                }, 400);
+            }
+        });
+        
+        return card;
+    }
+    
+    // Dividir los diálogos en dos columnas: primeros 10 a la izquierda, siguientes 10 a la derecha (1-10 y 11-20)
+    const leftDialogs = dialoguesList.slice(0, 10);   // Diálogo 1 .. 10
+    const rightDialogs = dialoguesList.slice(10, 20); // Diálogo 11 .. 20
+    
+    function renderColumns() {
+        const container = document.getElementById('columnsContainer');
+        if (!container) return;
+        
+        // Limpiar y crear estructura de columnas
+        container.innerHTML = '';
+        const leftCol = document.createElement('div');
+        leftCol.className = 'col';
+        leftCol.id = 'leftCol';
+        const rightCol = document.createElement('div');
+        rightCol.className = 'col';
+        rightCol.id = 'rightCol';
+        container.appendChild(leftCol);
+        container.appendChild(rightCol);
+        
+        // Llenar izquierda (diálogos 1 al 10)
+        leftDialogs.forEach(dialog => {
+            leftCol.appendChild(createDialogCard(dialog));
+        });
+        
+        // Llenar derecha (diálogos 11 al 20)
+        rightDialogs.forEach(dialog => {
+            rightCol.appendChild(createDialogCard(dialog));
+        });
+    }
+    
+    // Abrir el primer diálogo por defecto para mostrar interactividad (Diálogo 1)
+    window.addEventListener('DOMContentLoaded', () => {
+        renderColumns();
+        
+        // Pequeño timeout para que el DOM esté listo y abrir el primer diálogo de la izquierda (mejor UX)
+        setTimeout(() => {
+            const firstCard = document.querySelector('#leftCol .dialog-card');
+            if (firstCard) {
+                const panel = firstCard.querySelector('.examples-panel');
+                if (panel && !panel.classList.contains('show')) {
+                    const scrollHeight = panel.scrollHeight;
+                    panel.style.setProperty('--target-height', scrollHeight + 'px');
+                    panel.classList.add('show');
+                }
+            }
+        }, 200);
+    });
+    
+    // Ajuste responsive: si se redimensiona la ventana mientras algunos paneles están abiertos,
+    // recalculamos la altura dinámica para que la transición no se rompa.
+    window.addEventListener('resize', () => {
+        document.querySelectorAll('.examples-panel.show').forEach(panel => {
+            const newHeight = panel.scrollHeight;
+            panel.style.setProperty('--target-height', newHeight + 'px');
+        });
+    });
+</script>
+</body>
+</html>
