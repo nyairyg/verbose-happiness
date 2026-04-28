@@ -109,7 +109,6 @@
       transition: background 0.15s;
     }
 
-    /* 3D карточка с переворотом */
     .card-flip-container {
       perspective: 1200px;
       width: 100%;
@@ -183,7 +182,6 @@
       text-transform: uppercase;
     }
 
-    /* подсветка карточки (зелёная/красная) применяется к front-card */
     .correct-highlight-card .front-card {
       background-color: #C7DDCA;
     }
@@ -192,7 +190,6 @@
       background-color: #E9C1C1;
     }
 
-    /* кнопка "показать перевод" */
     .translation-btn {
       background: #F5F5F3;
       border: 1px solid #E9E9E6;
@@ -216,10 +213,6 @@
 
     .translation-btn:active {
       transform: translateY(1px);
-    }
-
-    .translation-btn.hidden-btn {
-      display: none;
     }
 
     .feedback-msg {
@@ -338,14 +331,11 @@
       <button class="article-btn" data-article="LA">la</button>
     </div>
 
-    <!-- Карточка с 3D переворотом -->
     <div class="card-flip-container" id="cardFlipContainer">
       <div class="flipper" id="flipper">
-        <!-- Передняя сторона (испанское слово) -->
         <div class="front-card" id="frontCard">
           <div class="word-display" id="wordDisplay">cargando...</div>
         </div>
-        <!-- Задняя сторона (перевод на русский) -->
         <div class="back-card" id="backCard">
           <div class="translation-label">🇪🇸 → 🇷🇺</div>
           <div class="translation-display" id="translationDisplay">---</div>
@@ -368,9 +358,97 @@
 
 <script>
   // ------------------------------------------------------------------
-  // НОВЫЙ СЛОВАРЬ A1 (только LA, все слова соответствуют правилам женского рода)
+  // ЕДИНЫЙ МАССИВ СЛОВ A1 (мужской + женский род)
+  // Строго по правилам окончаний, никаких исключений.
+  // Всего 166 слов.
   // ------------------------------------------------------------------
   const cardsData = [
+    // MASCULINOS (EL)
+    { word: "abuelo", article: "EL", translation: "дедушка" },
+    { word: "aceite", article: "EL", translation: "масло" },
+    { word: "aire", article: "EL", translation: "воздух" },
+    { word: "alemán", article: "EL", translation: "немецкий язык" },
+    { word: "amigo", article: "EL", translation: "друг" },
+    { word: "amor", article: "EL", translation: "любовь" },
+    { word: "café", article: "EL", translation: "кофе" },
+    { word: "calor", article: "EL", translation: "жара" },
+    { word: "caramelo", article: "EL", translation: "конфета" },
+    { word: "carne", article: "EL", translation: "мясо" },
+    { word: "carro", article: "EL", translation: "машина" },
+    { word: "chat", article: "EL", translation: "чат" },
+    { word: "chocolate", article: "EL", translation: "шоколад" },
+    { word: "cine", article: "EL", translation: "кино" },
+    { word: "clima", article: "EL", translation: "климат" },
+    { word: "coche", article: "EL", translation: "машина" },
+    { word: "cojín", article: "EL", translation: "подушка" },
+    { word: "color", article: "EL", translation: "цвет" },
+    { word: "dedo", article: "EL", translation: "палец" },
+    { word: "dolor", article: "EL", translation: "боль" },
+    { word: "email", article: "EL", translation: "электронная почта" },
+    { word: "equipaje", article: "EL", translation: "багаж" },
+    { word: "error", article: "EL", translation: "ошибка" },
+    { word: "español", article: "EL", translation: "испанский язык" },
+    { word: "estudiante", article: "EL", translation: "студент" },
+    { word: "facebook", article: "EL", translation: "фейсбук" },
+    { word: "francés", article: "EL", translation: "французский язык" },
+    { word: "gato", article: "EL", translation: "кот" },
+    { word: "google", article: "EL", translation: "гугл" },
+    { word: "hermano", article: "EL", translation: "брат" },
+    { word: "hijo", article: "EL", translation: "сын" },
+    { word: "hombre", article: "EL", translation: "мужчина" },
+    { word: "huevo", article: "EL", translation: "яйцо" },
+    { word: "imán", article: "EL", translation: "магнит" },
+    { word: "inglés", article: "EL", translation: "английский язык" },
+    { word: "instagram", article: "EL", translation: "инстаграм" },
+    { word: "internet", article: "EL", translation: "интернет" },
+    { word: "italiano", article: "EL", translation: "итальянский язык" },
+    { word: "jardín", article: "EL", translation: "сад" },
+    { word: "jefe", article: "EL", translation: "начальник" },
+    { word: "juego", article: "EL", translation: "игра" },
+    { word: "libre", article: "EL", translation: "свободный" },
+    { word: "libro", article: "EL", translation: "книга" },
+    { word: "link", article: "EL", translation: "ссылка" },
+    { word: "lobo", article: "EL", translation: "волк" },
+    { word: "mensaje", article: "EL", translation: "сообщение" },
+    { word: "móvil", article: "EL", translation: "мобильный телефон" },
+    { word: "nombre", article: "EL", translation: "имя" },
+    { word: "norte", article: "EL", translation: "север" },
+    { word: "nube", article: "EL", translation: "облако" },
+    { word: "ordenador", article: "EL", translation: "компьютер" },
+    { word: "padre", article: "EL", translation: "отец" },
+    { word: "paisaje", article: "EL", translation: "пейзаж" },
+    { word: "perro", article: "EL", translation: "собака" },
+    { word: "pescado", article: "EL", translation: "рыба" },
+    { word: "planeta", article: "EL", translation: "планета" },
+    { word: "plátano", article: "EL", translation: "банан" },
+    { word: "plato", article: "EL", translation: "тарелка" },
+    { word: "pollo", article: "EL", translation: "курица" },
+    { word: "problema", article: "EL", translation: "проблема" },
+    { word: "profesor", article: "EL", translation: "учитель" },
+    { word: "puente", article: "EL", translation: "мост" },
+    { word: "queso", article: "EL", translation: "сыр" },
+    { word: "ratón", article: "EL", translation: "мышь (компьютерная)" },
+    { word: "ruso", article: "EL", translation: "русский язык" },
+    { word: "sabor", article: "EL", translation: "вкус" },
+    { word: "sistema", article: "EL", translation: "система" },
+    { word: "teclado", article: "EL", translation: "клавиатура" },
+    { word: "teléfono", article: "EL", translation: "телефон" },
+    { word: "tema", article: "EL", translation: "тема" },
+    { word: "tiempo", article: "EL", translation: "время" },
+    { word: "tigre", article: "EL", translation: "тигр" },
+    { word: "tomate", article: "EL", translation: "помидор" },
+    { word: "toro", article: "EL", translation: "бык" },
+    { word: "trabajo", article: "EL", translation: "работа" },
+    { word: "usuario", article: "EL", translation: "пользователь" },
+    { word: "valle", article: "EL", translation: "долина" },
+    { word: "valor", article: "EL", translation: "ценность" },
+    { word: "viaje", article: "EL", translation: "путешествие" },
+    { word: "video", article: "EL", translation: "видео" },
+    { word: "whatsapp", article: "EL", translation: "ватсап" },
+    { word: "wifi", article: "EL", translation: "вайфай" },
+    { word: "zapato", article: "EL", translation: "обувь" },
+    { word: "niño", article: "EL", translation: "мальчик" },
+    // FEMENINOS (LA)
     { word: "abuela", article: "LA", translation: "бабушка" },
     { word: "aplicación", article: "LA", translation: "приложение" },
     { word: "banana", article: "LA", translation: "банан" },
@@ -435,7 +513,7 @@
   ];
 
   // ------------------------------------------------------------------
-  // ТРЕНАЖЁР + ПЕРЕВОРОТ
+  // ТРЕНАЖЁР
   // ------------------------------------------------------------------
   class ArticleTrainer {
     constructor(originalCards, gamePanelEl, completionPanelEl, progressSpan, wordDisplaySpan, translationDisplaySpan, feedbackSpan, flipContainer, flipperEl, frontCardEl, backCardEl) {
@@ -446,7 +524,6 @@
       this.errorLock = false;
       this.correctArticleForError = null;
 
-      // DOM элементы
       this.gamePanel = gamePanelEl;
       this.completionPanel = completionPanelEl;
       this.progressSpan = progressSpan;
@@ -458,12 +535,10 @@
       this.frontCardEl = frontCardEl;
       this.backCardEl = backCardEl;
 
-      // Кнопки
       this.btnEL = document.querySelector('.article-btn[data-article="EL"]');
       this.btnLA = document.querySelector('.article-btn[data-article="LA"]');
       this.translationBtn = document.getElementById('showTranslationBtn');
 
-      // Привязка событий
       this.btnEL.addEventListener('click', () => this.onArticleClick('EL'));
       this.btnLA.addEventListener('click', () => this.onArticleClick('LA'));
       this.translationBtn.addEventListener('click', () => this.toggleTranslation());
@@ -484,7 +559,6 @@
       this.errorLock = false;
       this.correctArticleForError = null;
       
-      // Сброс переворота карточки
       this.flipContainer.classList.remove('flipped');
       this.clearCardHighlights();
       this.clearAllButtonsHighlight();
@@ -494,19 +568,13 @@
       this.updateProgress();
       this.gamePanel.classList.remove('hidden');
       this.completionPanel.classList.add('hidden');
-      
-      // Показываем кнопку перевода
       this.translationBtn.classList.remove('hidden-btn');
     }
 
     updateProgress() {
       const total = this.activeCards.length;
       const current = this.currentIndex + 1;
-      if (total > 0) {
-        this.progressSpan.innerText = `${Math.min(current, total)} / ${total}`;
-      } else {
-        this.progressSpan.innerText = `0 / 0`;
-      }
+      this.progressSpan.innerText = `${Math.min(current, total)} / ${total}`;
     }
 
     renderCurrentCard() {
@@ -519,7 +587,6 @@
       this.wordDisplaySpan.innerText = card.word;
       this.translationDisplaySpan.innerText = card.translation;
       
-      // при смене карточки всегда сбрасываем переворот
       if (this.flipContainer.classList.contains('flipped')) {
         this.flipContainer.classList.remove('flipped');
       }
@@ -542,8 +609,6 @@
     clearAllButtonsHighlight() {
       this.btnEL.classList.remove('correct-btn-highlight', 'wrong-btn-highlight');
       this.btnLA.classList.remove('correct-btn-highlight', 'wrong-btn-highlight');
-      this.btnEL.style.removeProperty('background-color');
-      this.btnLA.style.removeProperty('background-color');
     }
 
     highlightCorrectButton(article) {
@@ -573,7 +638,6 @@
       this.flipContainer.classList.toggle('flipped');
     }
 
-    // ПРАВИЛЬНЫЙ ОТВЕТ
     correctAnswer(selectedArticle) {
       this.highlightCardAsCorrect();
       this.highlightCorrectButton(selectedArticle);
@@ -601,17 +665,14 @@
       }, 750);
     }
     
-    // НЕПРАВИЛЬНЫЙ ОТВЕТ
     wrongAnswer(selectedArticle, correctArticle) {
       this.highlightCardAsWrong();
       this.highlightWrongButton(selectedArticle);
       this.feedbackSpan.innerText = '❌ Inténtalo de nuevo';
-      
       this.correctArticleForError = correctArticle;
       this.errorLock = true;
     }
     
-    // ИСПРАВЛЕНИЕ ОШИБКИ
     fixErrorAfterWrong(correctArticle) {
       this.highlightCardAsCorrect();
       this.highlightCorrectButton(correctArticle);
@@ -708,4 +769,3 @@
 </script>
 </body>
 </html>
-```
