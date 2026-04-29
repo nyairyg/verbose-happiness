@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanish Adjective Gender Practice</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffe1e1 0%, #ffc2c2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .round-info {
+            color: #f5576c;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .noun-phrase {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #333;
+            margin: 20px 0 10px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .hint {
+            color: #888;
+            margin: 0 0 20px 0;
+            font-size: 1.1rem;
+            font-style: italic;
+        }
+
+        .input-group {
+            margin: 30px 0;
+        }
+
+        #answerInput {
+            width: 200px;
+            padding: 15px;
+            font-size: 1.5rem;
+            text-align: center;
+            border: 3px solid #e0e0e0;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #answerInput:focus {
+            border-color: #f5576c;
+            box-shadow: 0 0 15px rgba(245, 87, 108, 0.3);
+        }
+
+        #answerInput.correct {
+            border-color: #48c774;
+            background-color: #f0fff0;
+        }
+
+        #answerInput.incorrect {
+            border-color: #f14668;
+            background-color: #fff0f0;
+        }
+
+        .check-btn {
+            background: #f5576c;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 20px;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.4);
+        }
+
+        .check-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .message {
+            min-height: 30px;
+            margin: 20px 0;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .next-btn {
+            background: #48c774;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: none;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(72, 199, 116, 0.4);
+        }
+
+        .result-screen {
+            display: none;
+        }
+
+        .result-screen.active {
+            display: block;
+        }
+
+        .game-screen {
+            display: block;
+        }
+
+        .game-screen.hidden {
+            display: none;
+        }
+
+        .stats {
+            margin: 40px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .stats p {
+            color: #f5576c;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .restart-btn {
+            background: #f5576c;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Game Screen -->
+        <div id="gameScreen" class="game-screen">
+            <div class="round-info" id="roundInfo">Раунд 1 из 10</div>
+            <div class="noun-phrase" id="nounPhrase">el gato</div>
+            <div class="hint" id="hintText">(белый)</div>
+            
+            <div class="input-group">
+                <input type="text" id="answerInput" placeholder="..." autocomplete="off">
+            </div>
+
+            <div class="message" id="message"></div>
+            
+            <button class="check-btn" id="checkBtn">Проверить / Comprobar </button>
+            <button class="next-btn" id="nextBtn">Дальше / Sigue →</button>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="result-screen">
+            <div class="noun-phrase" style="font-size: 4rem;">🎉</div>
+            <div class="hint">¡Todo hecho!</div>
+            
+            <div class="stats">
+                <p>Tu resultado</p>
+                <div class="stats-number" id="scoreDisplay">0/10</div>
+            </div>
+            
+            <button class="restart-btn" id="restartBtn">Intentar otra vez</button>
+        </div>
+    </div>
+
+    <script>
+        // 10 простых пар для уровня A0
+        const allExercises = [
+            { nounPhrase: 'el gato', hint: 'белый', answer: 'blanco' },
+            { nounPhrase: 'la casa', hint: 'красивый', answer: 'bonita' },
+            { nounPhrase: 'el perro', hint: 'чёрный', answer: 'negro' },
+            { nounPhrase: 'la flor', hint: 'красный', answer: 'roja' },
+            { nounPhrase: 'la flor', hint: 'белый', answer: 'blanca' },
+            { nounPhrase: 'la flor', hint: 'новый', answer: 'nueva' },
+            { nounPhrase: 'el libro', hint: 'новый', answer: 'nuevo' },
+            { nounPhrase: 'la casa', hint: 'маленький', answer: 'pequeña' },
+            { nounPhrase: 'el teléfono', hint: 'большой', answer: 'grande' },
+                        { nounPhrase: 'el teléfono', hint: 'современный', answer: 'moderno' },
+            { nounPhrase: 'la chica', hint: 'умный', answer: 'inteligente' },
+             { nounPhrase: 'la gata', hint: 'белый', answer: 'blanca' },
+    { nounPhrase: 'la universidad', hint: 'хороший', answer: 'buena' },
+    { nounPhrase: 'la escuela', hint: 'хороший', answer: 'buena' },
+    { nounPhrase: 'la escuela', hint: 'большой', answer: 'grande' },
+    { nounPhrase: 'la universidad', hint: 'национальный', answer: 'nacional' },
+    { nounPhrase: 'la profesión', hint: 'интересный', answer: 'interesante' },
+    { nounPhrase: 'la profesión', hint: 'современный', answer: 'moderna' },
+    { nounPhrase: 'la profesión', hint: 'классический', answer: 'clásica' },
+    { nounPhrase: 'la música', hint: 'классический', answer: 'clásica' },
+    { nounPhrase: 'la escuela', hint: 'современный', answer: 'moderna' },
+    { nounPhrase: 'el perro', hint: 'серьёзный', answer: 'serio' }
+        ];
+
+        const ROUNDS_PER_GAME = 10;
+        
+        // Game state
+        let gameExercises = [];
+        let currentRound = 0;
+        let score = 0;
+
+        // DOM elements
+        const gameScreen = document.getElementById('gameScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const roundInfo = document.getElementById('roundInfo');
+        const nounPhrase = document.getElementById('nounPhrase');
+        const hintText = document.getElementById('hintText');
+        const answerInput = document.getElementById('answerInput');
+        const message = document.getElementById('message');
+        const checkBtn = document.getElementById('checkBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+
+        function initGame() {
+            // Перемешиваем и берём 10 упражнений
+            gameExercises = [...allExercises].sort(() => Math.random() - 0.5).slice(0, ROUNDS_PER_GAME);
+            currentRound = 0;
+            score = 0;
+            
+            gameScreen.classList.remove('hidden');
+            resultScreen.classList.remove('active');
+            
+            loadRound();
+        }
+
+        function loadRound() {
+            message.textContent = '';
+            answerInput.value = '';
+            answerInput.classList.remove('correct', 'incorrect');
+            answerInput.disabled = false;
+            
+            nounPhrase.textContent = gameExercises[currentRound].nounPhrase;
+            hintText.textContent = `(${gameExercises[currentRound].hint})`;
+            roundInfo.textContent = `Ronda ${currentRound + 1} / ${ROUNDS_PER_GAME}`;
+            
+            checkBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+            checkBtn.disabled = false;
+            
+            answerInput.focus();
+        }
+
+        function normalizeText(text) {
+    return text
+        .toLowerCase()
+        .trim()
+        .normalize('NFD')                    // раскладываем буквы с диакритикой на основу + диакритический знак
+        .replace(/[\u0300-\u036f]/g, '')     // удаляем все диакритические знаки (ударения)
+        .replace(/ñ/g, 'n')                  // заменяем ñ на n (после NFD ñ не раскладывается)
+        .replace(/ü/g, 'u');                 // на всякий случай и ü
+}
+
+function checkAnswer() {
+    const userAnswer = answerInput.value.trim();
+    const correctAnswer = gameExercises[currentRound].answer;
+    
+    if (!userAnswer) {
+        message.textContent = 'Напиши прилагательное / Escriba el adjetivo';
+        return;
+    }
+
+    const normalizedUser = normalizeText(userAnswer);
+    const normalizedCorrect = normalizeText(correctAnswer);
+
+    if (normalizedUser === normalizedCorrect) {
+        message.textContent = '✓ ¡Perfecto!';
+        answerInput.classList.add('correct');
+        score++;
+        
+        if (currentRound < ROUNDS_PER_GAME - 1) {
+            nextBtn.style.display = 'inline-block';
+            checkBtn.style.display = 'none';
+        } else {
+            message.textContent = '✓ ¡Bien hecho!';
+            checkBtn.disabled = true;
+            answerInput.disabled = true;
+            setTimeout(showResults, 1500);
+        }
+    } else {
+        message.textContent = `✗ Respuesta incorrecta`;
+        answerInput.classList.add('incorrect');
+        
+        if (currentRound < ROUNDS_PER_GAME - 1) {
+            nextBtn.style.display = 'inline-block';
+            checkBtn.style.display = 'none';
+        } else {
+            checkBtn.disabled = true;
+            answerInput.disabled = true;
+            setTimeout(showResults, 1500);
+        }
+    }
+}
+
+        function nextRound() {
+            if (currentRound < ROUNDS_PER_GAME - 1) {
+                currentRound++;
+                loadRound();
+            }
+        }
+
+        function showResults() {
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.add('active');
+            scoreDisplay.textContent = `${score}/${ROUNDS_PER_GAME}`;
+        }
+
+        // Event listeners
+        checkBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextRound);
+        restartBtn.addEventListener('click', initGame);
+
+        answerInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (checkBtn.style.display !== 'none' && !checkBtn.disabled) {
+                    checkAnswer();
+                } else if (nextBtn.style.display !== 'none') {
+                    nextRound();
+                }
+            }
+        });
+
+        nextBtn.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                nextRound();
+            }
+        });
+
+        // Start the game
+        initGame();
+    </script>
+</body>
+</html>
