@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>números · español</title>
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #F7EFEC;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 2rem 1.5rem;
+    }
+
+    .infographic {
+      max-width: 780px;
+      width: 100%;
+      background: #F9F2EF;
+      border-radius: 40px;
+      padding: 2.5rem 2.2rem;
+      box-shadow: 0 20px 35px rgba(181, 140, 140, 0.08), 0 6px 12px rgba(165, 124, 122, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 2.8rem;
+      backdrop-filter: blur(2px);
+      transition: all 0.2s ease;
+    }
+
+    .title-section {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      border-bottom: 1px solid #EAD5CF;
+      padding-bottom: 1.2rem;
+    }
+
+    .title {
+      font-weight: 500;
+      font-size: 2.1rem;
+      letter-spacing: -0.5px;
+      color: #B28B86;
+      line-height: 1.1;
+    }
+
+    .sub {
+      font-weight: 350;
+      font-size: 1rem;
+      color: #A57C7A;
+      letter-spacing: 0.3px;
+      background: #F0E3E0;
+      padding: 0.35rem 1.2rem;
+      border-radius: 30px;
+    }
+
+    .grid-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.8rem;
+      align-items: start; /* чтобы колонки начинались с одной линии */
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .column-header {
+      font-weight: 500;
+      font-size: 0.9rem;
+      letter-spacing: 0.4px;
+      color: #B28B86;
+      text-transform: lowercase;
+      font-variant: small-caps;
+      margin-bottom: 0.2rem;
+      padding-left: 0.3rem;
+      border-left: 2px solid #EAD5CF;
+      padding-left: 0.8rem;
+    }
+
+    .number-item {
+      background: transparent;
+      border-radius: 20px;
+      padding: 0.7rem 1.2rem;
+      font-weight: 420;
+      font-size: 1.35rem;
+      letter-spacing: -0.2px;
+      color: #5C4A4A;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.2s, color 0.2s;
+      line-height: 1.4;
+      border: 1.5px solid transparent;
+      background: #F9F2EF;
+    }
+
+    .outline-item {
+      border: 1.5px solid #EAD5CF;
+      background: #F7EFEC;
+      font-weight: 450;
+    }
+
+    .no-border-item {
+      border: 1.5px solid transparent;
+      background: #F0E3E0;
+      font-weight: 450;
+    }
+
+    .number-item span:first-child {
+      font-weight: 500;
+      color: #B28B86;
+      font-size: 1rem;
+      min-width: 2.2rem;
+      display: inline-block;
+    }
+
+    .number-item span:last-child {
+      font-weight: 470;
+      color: #3E3232;
+      letter-spacing: -0.2px;
+      text-align: right;
+    }
+
+    /* ПРОЗРАЧНЫЙ ТЕКСТ — сохраняет размеры, но невидим */
+    .invisible-text {
+      color: transparent !important;
+      user-select: none;
+      pointer-events: none;
+      border-color: transparent !important;
+      background: transparent !important;
+    }
+
+    .invisible-text span:first-child,
+    .invisible-text span:last-child {
+      color: transparent !important;
+    }
+
+    .simple-number {
+      justify-content: flex-start;
+      gap: 1rem;
+    }
+
+    .simple-number span:first-child {
+      font-weight: 500;
+      color: #B28B86;
+      width: 2rem;
+    }
+
+    .simple-number span:last-child {
+      font-weight: 470;
+      color: #3E3232;
+    }
+
+    @media (max-width: 550px) {
+      .infographic {
+        padding: 1.8rem 1.2rem;
+        gap: 2rem;
+        border-radius: 30px;
+      }
+      .grid-two-col {
+        gap: 1rem;
+      }
+      .number-item {
+        padding: 0.6rem 0.9rem;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="infographic">
+    
+    <div class="title-section">
+      <div class="title">números</div>
+      <div class="sub">español</div>
+    </div>
+
+    <!-- 0-9 | 10-19 -->
+    <div class="grid-two-col">
+      <div class="column">
+        <div class="column-header">0 – 9</div>
+        <div class="number-item outline-item simple-number"><span>0</span><span>cero</span></div>
+        <div class="number-item no-border-item simple-number"><span>1</span><span>uno</span></div>
+        <div class="number-item outline-item simple-number"><span>2</span><span>dos</span></div>
+        <div class="number-item no-border-item simple-number"><span>3</span><span>tres</span></div>
+        <div class="number-item outline-item simple-number"><span>4</span><span>cuatro</span></div>
+        <div class="number-item no-border-item simple-number"><span>5</span><span>cinco</span></div>
+        <div class="number-item outline-item simple-number"><span>6</span><span>seis</span></div>
+        <div class="number-item no-border-item simple-number"><span>7</span><span>siete</span></div>
+        <div class="number-item outline-item simple-number"><span>8</span><span>ocho</span></div>
+        <div class="number-item no-border-item simple-number"><span>9</span><span>nueve</span></div>
+      </div>
+
+      <div class="column">
+        <div class="column-header">10 – 19</div>
+        <div class="number-item no-border-item simple-number"><span>10</span><span>diez</span></div>
+        <div class="number-item outline-item simple-number"><span>11</span><span>once</span></div>
+        <div class="number-item no-border-item simple-number"><span>12</span><span>doce</span></div>
+        <div class="number-item outline-item simple-number"><span>13</span><span>trece</span></div>
+        <div class="number-item no-border-item simple-number"><span>14</span><span>catorce</span></div>
+        <div class="number-item outline-item simple-number"><span>15</span><span>quince</span></div>
+        <div class="number-item no-border-item simple-number"><span>16</span><span>dieciséis</span></div>
+        <div class="number-item outline-item simple-number"><span>17</span><span>diecisiete</span></div>
+        <div class="number-item no-border-item simple-number"><span>18</span><span>dieciocho</span></div>
+        <div class="number-item outline-item simple-number"><span>19</span><span>diecinueve</span></div>
+      </div>
+    </div>
+
+    <!-- 20-24 | 25-29 -->
+    <div class="grid-two-col">
+      <div class="column">
+        <div class="column-header">20 – 24</div>
+        <div class="number-item outline-item simple-number"><span>20</span><span>veinte</span></div>
+        <div class="number-item no-border-item simple-number"><span>21</span><span>veintiuno</span></div>
+        <div class="number-item outline-item simple-number"><span>22</span><span>veintidós</span></div>
+        <div class="number-item no-border-item simple-number"><span>23</span><span>veintitrés</span></div>
+        <div class="number-item outline-item simple-number"><span>24</span><span>veinticuatro</span></div>
+      </div>
+
+      <div class="column">
+        <div class="column-header">25 – 29</div>
+        <div class="number-item no-border-item simple-number"><span>25</span><span>veinticinco</span></div>
+        <div class="number-item outline-item simple-number"><span>26</span><span>veintiséis</span></div>
+        <div class="number-item no-border-item simple-number"><span>27</span><span>veintisiete</span></div>
+        <div class="number-item outline-item simple-number"><span>28</span><span>veintiocho</span></div>
+        <div class="number-item no-border-item simple-number"><span>29</span><span>veintinueve</span></div>
+      </div>
+    </div>
+
+    <!-- десятки и составные числа -->
+    <div class="grid-two-col">
+      <div class="column">
+        <div class="column-header">decenas · cien</div>
+        <div class="number-item outline-item"><span>30</span><span>treinta</span></div>
+        <!-- ДВА ПРОПУСКА с прозрачным текстом-заполнителем -->
+        <div class="number-item invisible-text"><span>--</span><span>placeholder</span></div>
+        <div class="number-item invisible-text"><span>--</span><span>placeholder</span></div>
+        <div class="number-item no-border-item"><span>40</span><span>cuarenta</span></div>
+        <div class="number-item outline-item"><span>50</span><span>cincuenta</span></div>
+        <div class="number-item no-border-item"><span>60</span><span>sesenta</span></div>
+        <div class="number-item outline-item"><span>70</span><span>setenta</span></div>
+        <div class="number-item no-border-item"><span>80</span><span>ochenta</span></div>
+        <div class="number-item outline-item"><span>90</span><span>noventa</span></div>
+        <div class="number-item no-border-item"><span>100</span><span>cien</span></div>
+      </div>
+
+      <div class="column">
+        <div class="column-header">compuestos</div>
+        <div class="number-item no-border-item"><span>31</span><span>treinta y uno</span></div>
+        <div class="number-item outline-item"><span>32</span><span>treinta y dos</span></div>
+        <div class="number-item no-border-item"><span>33</span><span>treinta y tres</span></div>
+        <div class="number-item outline-item"><span>44</span><span>cuarenta y cuatro</span></div>
+        <div class="number-item no-border-item"><span>55</span><span>cincuenta y cinco</span></div>
+        <div class="number-item outline-item"><span>66</span><span>sesenta y seis</span></div>
+        <div class="number-item no-border-item"><span>77</span><span>setenta y siete</span></div>
+        <div class="number-item outline-item"><span>88</span><span>ochenta y ocho</span></div>
+        <div class="number-item no-border-item"><span>99</span><span>noventa y nueve</span></div>
+        <!-- пропуск с прозрачным текстом -->
+        <div class="number-item invisible-text"><span>--</span><span>placeholder</span></div>
+      </div>
+    </div>
+
+    <div style="height: 2px; background: linear-gradient(to right, #EAD5CF, transparent); width: 40%; margin-top: 0.2rem;"></div>
+  </div>
+</body>
+</html>
