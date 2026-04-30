@@ -70,7 +70,7 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1.8rem;
-      align-items: start; /* чтобы колонки начинались с одной линии */
+      align-items: start;
     }
 
     .column {
@@ -136,7 +136,6 @@
       text-align: right;
     }
 
-    /* ПРОЗРАЧНЫЙ ТЕКСТ — сохраняет размеры, но невидим */
     .invisible-text {
       color: transparent !important;
       user-select: none;
@@ -190,38 +189,49 @@
       <div class="sub">español</div>
     </div>
 
-    <!-- 0-9 | 10-19 -->
+    <!-- БЛОК 1: 0-4 | 5-9 -->
     <div class="grid-two-col">
       <div class="column">
-        <div class="column-header">0 – 9</div>
+        <div class="column-header">0 – 4</div>
         <div class="number-item outline-item simple-number"><span>0</span><span>cero</span></div>
         <div class="number-item no-border-item simple-number"><span>1</span><span>uno</span></div>
         <div class="number-item outline-item simple-number"><span>2</span><span>dos</span></div>
         <div class="number-item no-border-item simple-number"><span>3</span><span>tres</span></div>
         <div class="number-item outline-item simple-number"><span>4</span><span>cuatro</span></div>
+      </div>
+
+      <div class="column">
+        <div class="column-header">5 – 9</div>
         <div class="number-item no-border-item simple-number"><span>5</span><span>cinco</span></div>
         <div class="number-item outline-item simple-number"><span>6</span><span>seis</span></div>
         <div class="number-item no-border-item simple-number"><span>7</span><span>siete</span></div>
         <div class="number-item outline-item simple-number"><span>8</span><span>ocho</span></div>
         <div class="number-item no-border-item simple-number"><span>9</span><span>nueve</span></div>
       </div>
+    </div>
+
+    <!-- БЛОК 2: 10-14 | 15-19 -->
+    <div class="grid-two-col">
+      <div class="column">
+        <div class="column-header">10 – 14</div>
+        <div class="number-item outline-item simple-number"><span>10</span><span>diez</span></div>
+        <div class="number-item no-border-item simple-number"><span>11</span><span>once</span></div>
+        <div class="number-item outline-item simple-number"><span>12</span><span>doce</span></div>
+        <div class="number-item no-border-item simple-number"><span>13</span><span>trece</span></div>
+        <div class="number-item outline-item simple-number"><span>14</span><span>catorce</span></div>
+      </div>
 
       <div class="column">
-        <div class="column-header">10 – 19</div>
-        <div class="number-item no-border-item simple-number"><span>10</span><span>diez</span></div>
-        <div class="number-item outline-item simple-number"><span>11</span><span>once</span></div>
-        <div class="number-item no-border-item simple-number"><span>12</span><span>doce</span></div>
-        <div class="number-item outline-item simple-number"><span>13</span><span>trece</span></div>
-        <div class="number-item no-border-item simple-number"><span>14</span><span>catorce</span></div>
-        <div class="number-item outline-item simple-number"><span>15</span><span>quince</span></div>
-        <div class="number-item no-border-item simple-number"><span>16</span><span>dieciséis</span></div>
-        <div class="number-item outline-item simple-number"><span>17</span><span>diecisiete</span></div>
-        <div class="number-item no-border-item simple-number"><span>18</span><span>dieciocho</span></div>
-        <div class="number-item outline-item simple-number"><span>19</span><span>diecinueve</span></div>
+        <div class="column-header">15 – 19</div>
+        <div class="number-item no-border-item simple-number"><span>15</span><span>quince</span></div>
+        <div class="number-item outline-item simple-number"><span>16</span><span>dieciséis</span></div>
+        <div class="number-item no-border-item simple-number"><span>17</span><span>diecisiete</span></div>
+        <div class="number-item outline-item simple-number"><span>18</span><span>dieciocho</span></div>
+        <div class="number-item no-border-item simple-number"><span>19</span><span>diecinueve</span></div>
       </div>
     </div>
 
-    <!-- 20-24 | 25-29 -->
+    <!-- БЛОК 3: 20-24 | 25-29 (без изменений) -->
     <div class="grid-two-col">
       <div class="column">
         <div class="column-header">20 – 24</div>
@@ -242,12 +252,11 @@
       </div>
     </div>
 
-    <!-- десятки и составные числа -->
+    <!-- БЛОК 4: десятки и составные числа (без изменений) -->
     <div class="grid-two-col">
       <div class="column">
         <div class="column-header">decenas · cien</div>
         <div class="number-item outline-item"><span>30</span><span>treinta</span></div>
-        <!-- ДВА ПРОПУСКА с прозрачным текстом-заполнителем -->
         <div class="number-item invisible-text"><span>--</span><span>placeholder</span></div>
         <div class="number-item invisible-text"><span>--</span><span>placeholder</span></div>
         <div class="number-item no-border-item"><span>40</span><span>cuarenta</span></div>
@@ -270,7 +279,6 @@
         <div class="number-item no-border-item"><span>77</span><span>setenta y siete</span></div>
         <div class="number-item outline-item"><span>88</span><span>ochenta y ocho</span></div>
         <div class="number-item no-border-item"><span>99</span><span>noventa y nueve</span></div>
-        <!-- пропуск с прозрачным текстом -->
         <div class="number-item invisible-text"><span>--</span><span>placeholder</span></div>
       </div>
     </div>
