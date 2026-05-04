@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Music Theory: Vocabulary Matching</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
+body{background:#f8fafc;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:15px 20px;}
+.wrapper{position:relative;width:1100px;display:flex;justify-content:center;gap:150px;margin-top:10px;align-items:flex-start;}
+.column{width:48%;display:flex;flex-direction:column;}
+.item{
+  background:#f8fafc;
+  border:2px solid #e2e8f0;
+  border-radius:6px;
+  padding:10px 15px;
+  margin-bottom:8px;
+  cursor:pointer;
+  font-weight:600;
+  font-size: 17px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  word-wrap: break-word;
+  white-space: normal;
+  min-height: 60px;
+  transition: all 0.2s ease;
+}
+.item:hover:not(.used){
+  border-color:#a0aec0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.item.used{opacity:.4;pointer-events:none}
+.item.active{background:#e8f4fd;border-color:#538e9b;transform: scale(1.02);}
+.item.shake{animation:shake .4s}
+
+.left-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+}
+
+.term-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.term-number {
+  font-size: 16px;
+  color: #64748b;
+  font-weight: 500;
+  min-width: 25px;
+}
+
+.term-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.right-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  width: 100%;
+  padding: 0 10px;
+  gap: 10px;
+}
+
+.definition-letter {
+  font-size: 16px;
+  font-weight: 700;
+  color: #538e9b;
+  min-width: 25px;
+  flex-shrink: 0;
+}
+
+.definition-text {
+  font-size: 15px;
+  font-weight: 500;
+  text-align: left;
+  line-height: 1.3;
+  color: #334155;
+}
+
+@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#message{margin-top:10px;font-size:1.1rem;font-weight:600;color:#538e9b}
+
+h2 {
+  font-size: 1.6rem;
+  color: #1e293b;
+  margin-bottom: 5px;
+}
+
+.instructions {
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  color: #475569;
+  margin-bottom: 5px;
+}
+
+.reset-button {
+  margin-top: 10px;
+  padding: 10px 25px;
+  background: #538e9b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: none;
+}
+
+.reset-button:hover {
+  background: #427080;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(83, 142, 155, 0.3);
+}
+
+.reset-button.show {
+  display: inline-block;
+}
+</style>
+</head>
+<body>
+
+<h2>🎵 Music English: Vocabulary Matching</h2>
+<p class="instructions">
+Match each musical term with its correct definition.
+</p>
+
+<div class="wrapper" id="wrapper">
+  <svg id="lines"></svg>
+  <div class="column" id="left"></div>
+  <div class="column" id="right"></div>
+</div>
+
+<div id="message"></div>
+<button class="reset-button" id="resetBtn">🔄 Try Again</button>
+
+<script>
+// ========== MUSIC VOCABULARY DATA (14 terms from user) ==========
+const allPairs = [
+  { id: 1, term: "tonic",          number: "1", letter: "k", definition: "the first note in a scale" },
+  { id: 2, term: "chromatic",      number: "2", letter: "m", definition: "relating to the twelve notes that make up a scale using all the semitones of the octave" },
+  { id: 3, term: "ascending",      number: "3", letter: "l", definition: "rising; moving upwards" },
+  { id: 4, term: "key signature",  number: "4", letter: "a", definition: "any of the combinations of sharps or flats after the clef at the beginning of a staff, indicating the key of a song" },
+  { id: 5, term: "require",        number: "5", letter: "d", definition: "need; necessitate" },
+  { id: 6, term: "apply",          number: "6", letter: "e", definition: "make use of; be relevant" },
+  { id: 7, term: "throughout",     number: "7", letter: "h", definition: "all over; from the beginning to the end" },
+  { id: 8, term: "transpose",      number: "8", letter: "b", definition: "change the key of a piece of music to a different key" },
+  { id: 9, term: "scale",          number: "9", letter: "i", definition: "a series of notes ascending or descending by fixed intervals" },
+  { id: 10, term: "modification",  number: "10", letter: "c", definition: "alteration; change" },
+  { id: 11, term: "recognise",     number: "11", letter: "n", definition: "identify; distinguish" },
+  { id: 12, term: "regardless",    number: "12", letter: "f", definition: "despite; without considering" },
+  { id: 13, term: "cycle",         number: "13", letter: "j", definition: "sequence; a series of events" },
+  { id: 14, term: "solution",      number: "14", letter: "g", definition: "an answer to a problem" }
+];
+
+let selected = null;
+let correctCount = 0;
+const totalPairs = allPairs.length;
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function initGame() {
+  const left = document.getElementById('left');
+  const right = document.getElementById('right');
+  const lines = document.getElementById('lines');
+  const message = document.getElementById('message');
+  const resetBtn = document.getElementById('resetBtn');
+  
+  left.innerHTML = "";
+  right.innerHTML = "";
+  lines.innerHTML = "";
+  correctCount = 0;
+  selected = null;
+  message.textContent = "Connect each term with its definition";
+  resetBtn.classList.remove('show');
+  
+  // Shuffle definitions for right column (letters a-n assigned based on shuffled order)
+  const shuffledRight = shuffle([...allPairs]);
+  // Alphabet letters a through n (14 letters)
+  const letters = 'abcdefghijklmn'.split('');
+  
+  // Create left items (terms in original order 1-14)
+  const leftItems = allPairs.map(p => createItem(
+    `<div class='left-item'><div class='term-wrapper'><span class='term-number'>${p.number}.</span><span class='term-text'>${p.term}</span></div></div>`,
+    p.id,
+    "left"
+  ));
+  
+  // Create right items (shuffled definitions with letters a,b,c... in order)
+  const rightItems = shuffledRight.map((p, index) => createItem(
+    `<div class='right-item'><span class='definition-letter'>${letters[index]}.</span><span class='definition-text'>${p.definition}</span></div>`,
+    p.id,
+    "right"
+  ));
+  
+  leftItems.forEach(item => left.appendChild(item));
+  rightItems.forEach(item => right.appendChild(item));
+  
+  // Align card heights for visual consistency
+  setTimeout(() => {
+    const leftItemsList = Array.from(left.children);
+    const rightItemsList = Array.from(right.children);
+    for (let i = 0; i < totalPairs; i++) {
+      const maxH = Math.max(
+        leftItemsList[i]?.offsetHeight || 60,
+        rightItemsList[i]?.offsetHeight || 60
+      );
+      if (leftItemsList[i]) leftItemsList[i].style.minHeight = maxH + "px";
+      if (rightItemsList[i]) rightItemsList[i].style.minHeight = maxH + "px";
+    }
+  }, 100);
+}
+
+function createItem(html, id, side) {
+  const d = document.createElement("div");
+  d.className = "item " + side;
+  d.dataset.id = id;
+  d.dataset.side = side;
+  d.innerHTML = html;
+  d.onclick = () => selectItem(d);
+  return d;
+}
+
+function anchor(el) {
+  const r = el.getBoundingClientRect();
+  const w = wrapper.getBoundingClientRect();
+  return el.dataset.side === "left"
+    ? { x: r.right - w.left, y: r.top + r.height / 2 - w.top }
+    : { x: r.left - w.left, y: r.top + r.height / 2 - w.top };
+}
+
+function selectItem(el) {
+  if (el.classList.contains("used")) return;
+  
+  // No selected card yet
+  if (!selected) {
+    selected = el;
+    el.classList.add("active");
+    return;
+  }
+  
+  // Same side: switch selection
+  if (selected.dataset.side === el.dataset.side) {
+    selected.classList.remove("active");
+    selected = el;
+    el.classList.add("active");
+    return;
+  }
+  
+  // Different sides: attempt match
+  const p1 = anchor(selected);
+  const p2 = anchor(el);
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", p1.x);
+  line.setAttribute("y1", p1.y);
+  line.setAttribute("x2", p2.x);
+  line.setAttribute("y2", p2.y);
+  line.setAttribute("stroke-width", "3");
+  document.getElementById('lines').appendChild(line);
+  
+  // Check if term and definition match (same id)
+  if (selected.dataset.id === el.dataset.id) {
+    // Correct match
+    line.setAttribute("stroke", "#cae3d2");
+    selected.classList.add("used");
+    el.classList.add("used");
+    correctCount++;
+    
+    if (correctCount === totalPairs) {
+      document.getElementById('message').textContent = "🎉 Perfect! All terms matched correctly!";
+      document.getElementById('resetBtn').classList.add('show');
+    } else {
+      document.getElementById('message').textContent = `✓ Good match! (${correctCount}/${totalPairs}) completed.`;
+    }
+  } else {
+    // Wrong match
+    line.setAttribute("stroke", "#eccdd3");
+    selected.classList.add("shake");
+    el.classList.add("shake");
+    document.getElementById('message').textContent = "✗ Not a match! Try again.";
+    setTimeout(() => {
+      line.remove();
+      selected.classList.remove("shake");
+      el.classList.remove("shake");
+    }, 400);
+  }
+  
+  selected.classList.remove("active");
+  selected = null;
+}
+
+// Reset button handler
+document.getElementById('resetBtn').addEventListener('click', () => {
+  initGame();
+});
+
+// Start the game
+initGame();
+</script>
+</body>
+</html>
