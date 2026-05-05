@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Los colores · español</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #F5F2EF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 40px 20px;
+        }
+
+        .color-card {
+            max-width: 960px;
+            width: 100%;
+            background: #FEFCFA;
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(100, 80, 70, 0.08);
+        }
+
+        .card-inner {
+            padding: 2rem 2rem 2rem 2rem;
+        }
+
+        .color-header {
+            margin-bottom: 1.8rem;
+            border-left: 5px solid #E2D4CE;
+            padding-left: 1rem;
+        }
+
+        .color-header h1 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: #A18780;
+            letter-spacing: -0.2px;
+        }
+
+        .colors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1.2rem;
+        }
+
+        /* карточка цвета */
+        .color-item {
+            background: #FFFFFF;
+            border-radius: 1.2rem;
+            border: 1px solid #F0E7E3;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+
+        /* область с цветом — увеличил высоту */
+        .color-swatch-wrapper {
+            position: relative;
+            cursor: pointer;
+            height: 130px;
+        }
+
+        .color-swatch {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+        }
+
+        /* оверлей — полностью покрывает цветную зону */
+        .examples-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(3px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s;
+            border-radius: 0;
+            z-index: 5;
+        }
+
+        .color-item.active .examples-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .example-row {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 5px 8px;
+            border-radius: 12px;
+            width: 85%;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .example-phrase {
+            font-weight: 500;
+            font-size: 0.7rem;
+            color: #5D4038;
+        }
+
+        .example-gender {
+            font-size: 0.55rem;
+            color: #9B7A70;
+            background: #F0E4DE;
+            padding: 2px 6px;
+            border-radius: 30px;
+            display: inline-block;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .color-name {
+            padding: 0.8rem 0.5rem;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #6F554C;
+            background: #FFFFFF;
+            border-top: 1px solid #F5EDE8;
+        }
+
+        .color-item:hover {
+            box-shadow: 0 8px 20px -8px rgba(90, 65, 55, 0.15);
+            border-color: #EADDD6;
+        }
+
+        @media (max-width: 550px) {
+            .card-inner { padding: 1.3rem; }
+            .color-swatch-wrapper { height: 110px; }
+            .color-name { font-size: 0.8rem; padding: 0.6rem 0.4rem; }
+            .example-phrase { font-size: 0.65rem; }
+            .example-gender { font-size: 0.5rem; }
+            .example-row { padding: 4px 6px; width: 90%; }
+        }
+    </style>
+</head>
+<body>
+<div class="color-card">
+    <div class="card-inner">
+        <div class="color-header">
+            <h1>Los colores</h1>
+        </div>
+
+        <div class="colors-grid" id="colorsGrid">
+            <!-- rojo -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #E1523D;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el carro rojo</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la flor roja</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">rojo</div>
+            </div>
+
+            <!-- azul -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #2F6F9F;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el libro azul</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la chaqueta azul</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">azul</div>
+            </div>
+
+            <!-- amarillo -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #EEC643;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el sol amarillo</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la casa amarilla</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">amarillo</div>
+            </div>
+
+            <!-- verde -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #568C5E;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el árbol verde</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la hoja verde</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">verde</div>
+            </div>
+
+            <!-- naranja -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #E7814A;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el jugo naranja</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la bufanda naranja</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">naranja</div>
+            </div>
+
+            <!-- rosa -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #E6A7B4;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el vestido rosa</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la rosa rosa</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">rosa</div>
+            </div>
+
+            <!-- morado -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #8F6B9C;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el cuadro morado</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la cortina morada</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">morado</div>
+            </div>
+
+            <!-- gris -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #A9A6A0;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el elefante gris</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la nube gris</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">gris</div>
+            </div>
+
+            <!-- negro -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #3A3532;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el gato negro</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la noche negra</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">negro</div>
+            </div>
+
+            <!-- blanco -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #F0EBE5; border-bottom: 0.5px solid #E2D6D0;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el papel blanco</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la nieve blanca</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">blanco</div>
+            </div>
+
+            <!-- marrón -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #8B5A42;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el chocolate marrón</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la tierra marrón</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">marrón</div>
+            </div>
+
+            <!-- beige -->
+            <div class="color-item">
+                <div class="color-swatch-wrapper">
+                    <div class="color-swatch" style="background: #E7DACB;"></div>
+                    <div class="examples-overlay">
+                        <div class="example-row">
+                            <div class="example-phrase">el sofá beige</div>
+                            <div class="example-gender">masculino</div>
+                        </div>
+                        <div class="example-row">
+                            <div class="example-phrase">la lámpara beige</div>
+                            <div class="example-gender">femenino</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="color-name">beige</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const colorItems = document.querySelectorAll('.color-item');
+
+    colorItems.forEach(item => {
+        const swatchWrapper = item.querySelector('.color-swatch-wrapper');
+        
+        swatchWrapper.addEventListener('click', (e) => {
+            e.stopPropagation();
+            
+            colorItems.forEach(other => {
+                if (other !== item && other.classList.contains('active')) {
+                    other.classList.remove('active');
+                }
+            });
+            
+            item.classList.toggle('active');
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.color-item')) {
+            colorItems.forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+    });
+</script>
+</body>
+</html>
