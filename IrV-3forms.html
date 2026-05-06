@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Irregular Verbs - Past Simple & Past Participle</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 550px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .round-info {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .verb-title {
+            font-size: 4rem;
+            font-weight: 700;
+            color: #333;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .input-group {
+            margin: 30px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-field {
+            width: 100%;
+        }
+
+        .input-field label {
+            display: block;
+            font-size: 0.85rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        .input-field input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 3px solid #e0e0e0;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-field input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .input-field input.correct {
+            border-color: #48c774;
+            background-color: #f0fff0;
+        }
+
+        .input-field input.incorrect {
+            border-color: #f14668;
+            background-color: #fff0f0;
+        }
+
+        .check-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .check-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .message {
+            min-height: 60px;
+            margin: 20px 0;
+            font-weight: 500;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .next-btn {
+            background: #48c774;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            display: none;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(72, 199, 116, 0.4);
+        }
+
+        .result-screen {
+            display: none;
+        }
+
+        .result-screen.active {
+            display: block;
+        }
+
+        .game-screen {
+            display: block;
+        }
+
+        .game-screen.hidden {
+            display: none;
+        }
+
+        .stats {
+            margin: 40px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .stats p {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .restart-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Game Screen -->
+        <div id="gameScreen" class="game-screen">
+            <div class="round-info" id="roundInfo">Round 1 of 20</div>
+            <div class="verb-title" id="verbDisplay">go</div>
+            <div class="subtitle">Enter Past Simple and Past Participle</div>
+            
+            <div class="input-group">
+                <div class="input-field">
+                    <label>Past Simple (V2)</label>
+                    <input type="text" id="secondInput" placeholder="..." autocomplete="off">
+                </div>
+                <div class="input-field">
+                    <label>Past Participle (V3)</label>
+                    <input type="text" id="thirdInput" placeholder="..." autocomplete="off">
+                </div>
+            </div>
+
+            <div class="message" id="message"></div>
+            
+            <button class="check-btn" id="checkBtn">Check</button>
+            <button class="next-btn" id="nextBtn">Next →</button>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="resultScreen" class="result-screen">
+            <div class="verb-title">🏆</div>
+            <div class="subtitle">Practice Complete!</div>
+            
+            <div class="stats">
+                <p>Your score</p>
+                <div class="stats-number" id="scoreDisplay">0/20</div>
+            </div>
+            
+            <button class="restart-btn" id="restartBtn">Practice Again</button>
+        </div>
+    </div>
+
+    <script>
+        const allVerbs = [
+            { first: 'put', second: 'put', third: 'put' },
+            { first: 'quit', second: 'quit', third: 'quit' },
+            { first: 'read', second: 'read', third: 'read' },
+            { first: 'cut', second: 'cut', third: 'cut' },
+            { first: 'find', second: 'found', third: 'found' },
+            { first: 'have', second: 'had', third: 'had' },
+            { first: 'hear', second: 'heard', third: 'heard' },
+            { first: 'make', second: 'made', third: 'made' },
+            { first: 'pay', second: 'paid', third: 'paid' },
+            { first: 'say', second: 'said', third: 'said' },
+            { first: 'sell', second: 'sold', third: 'sold' },
+            { first: 'send', second: 'sent', third: 'sent' },
+            { first: 'tell', second: 'told', third: 'told' },
+            { first: 'understand', second: 'understood', third: 'understood' },
+            { first: 'bring', second: 'brought', third: 'brought' },
+            { first: 'buy', second: 'bought', third: 'bought' },
+            { first: 'catch', second: 'caught', third: 'caught' },
+            { first: 'fight', second: 'fought', third: 'fought' },
+            { first: 'teach', second: 'taught', third: 'taught' },
+            { first: 'think', second: 'thought', third: 'thought' },
+            { first: 'feel', second: 'felt', third: 'felt' },
+            { first: 'keep', second: 'kept', third: 'kept' },
+            { first: 'leave', second: 'left', third: 'left' },
+            { first: 'mean', second: 'meant', third: 'meant' },
+            { first: 'meet', second: 'met', third: 'met' },
+            { first: 'lose', second: 'lost', third: 'lost' },
+            { first: 'blow', second: 'blew', third: 'blown' },
+            { first: 'draw', second: 'drew', third: 'drawn' },
+            { first: 'fly', second: 'flew', third: 'flown' },
+            { first: 'know', second: 'knew', third: 'known' },
+            { first: 'begin', second: 'began', third: 'begun' },
+            { first: 'drink', second: 'drank', third: 'drunk' },
+            { first: 'sing', second: 'sang', third: 'sung' },
+            { first: 'swim', second: 'swam', third: 'swum' },
+            { first: 'break', second: 'broke', third: 'broken' },
+            { first: 'choose', second: 'chose', third: 'chosen' },
+            { first: 'drive', second: 'drove', third: 'driven' },
+            { first: 'eat', second: 'ate', third: 'eaten' },
+            { first: 'give', second: 'gave', third: 'given' },
+            { first: 'ride', second: 'rode', third: 'ridden' },
+            { first: 'rise', second: 'rose', third: 'risen' },
+            { first: 'speak', second: 'spoke', third: 'spoken' },
+            { first: 'write', second: 'wrote', third: 'written' },
+            { first: 'take', second: 'took', third: 'taken' },
+            { first: 'see', second: 'saw', third: 'seen' },
+            { first: 'go', second: 'went', third: 'gone' },
+            { first: 'forget', second: 'forgot', third: 'forgotten' },
+            { first: 'get', second: 'got', third: 'gotten' },
+            { first: 'fall', second: 'fell', third: 'fallen' },
+            { first: 'become', second: 'became', third: 'become' },
+            { first: 'come', second: 'came', third: 'come' },
+            { first: 'run', second: 'ran', third: 'run' },
+            { first: 'build', second: 'built', third: 'built' },
+            { first: 'cost', second: 'cost', third: 'cost' },
+            { first: 'do', second: 'did', third: 'done' },
+            { first: 'forgive', second: 'forgave', third: 'forgiven' },
+            { first: 'grow', second: 'grew', third: 'grown' },
+            { first: 'hit', second: 'hit', third: 'hit' },
+            { first: 'hide', second: 'hid', third: 'hidden' },
+            { first: 'stand', second: 'stood', third: 'stood' }
+        ];
+
+        const ROUNDS_PER_GAME = 20;
+        
+        let gameVerbs = [];
+        let currentRound = 0;
+        let score = 0;
+        let answerChecked = false;
+
+        // DOM elements
+        const gameScreen = document.getElementById('gameScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const roundInfo = document.getElementById('roundInfo');
+        const verbDisplay = document.getElementById('verbDisplay');
+        const secondInput = document.getElementById('secondInput');
+        const thirdInput = document.getElementById('thirdInput');
+        const message = document.getElementById('message');
+        const checkBtn = document.getElementById('checkBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+
+        function initGame() {
+            gameVerbs = [...allVerbs].sort(() => Math.random() - 0.5).slice(0, ROUNDS_PER_GAME);
+            currentRound = 0;
+            score = 0;
+            answerChecked = false;
+            
+            gameScreen.classList.remove('hidden');
+            resultScreen.classList.remove('active');
+            
+            loadRound();
+        }
+
+        function loadRound() {
+            message.textContent = '';
+            secondInput.value = '';
+            thirdInput.value = '';
+            secondInput.classList.remove('correct', 'incorrect');
+            thirdInput.classList.remove('correct', 'incorrect');
+            secondInput.disabled = false;
+            thirdInput.disabled = false;
+            answerChecked = false;
+            
+            verbDisplay.textContent = gameVerbs[currentRound].first;
+            roundInfo.textContent = `Round ${currentRound + 1} of ${ROUNDS_PER_GAME}`;
+            
+            checkBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+            checkBtn.disabled = false;
+            
+            secondInput.focus();
+        }
+
+        function checkAnswer() {
+            if (answerChecked) return;
+            
+            const userSecond = secondInput.value.trim().toLowerCase();
+            const userThird = thirdInput.value.trim().toLowerCase();
+            const correctSecond = gameVerbs[currentRound].second;
+            const correctThird = gameVerbs[currentRound].third;
+            
+            if (!userSecond || !userThird) {
+                message.textContent = '⚠️ Please fill in both fields';
+                return;
+            }
+
+            const isSecondCorrect = (userSecond === correctSecond);
+            const isThirdCorrect = (userThird === correctThird);
+            
+            if (isSecondCorrect && isThirdCorrect) {
+                message.textContent = '✓ Correct! Well done!';
+                secondInput.classList.add('correct');
+                thirdInput.classList.add('correct');
+                score++;
+                
+                if (currentRound < ROUNDS_PER_GAME - 1) {
+                    nextBtn.style.display = 'inline-block';
+                    checkBtn.style.display = 'none';
+                } else {
+                    message.textContent = '✓ Perfect! You completed all rounds!';
+                    checkBtn.disabled = true;
+                    secondInput.disabled = true;
+                    thirdInput.disabled = true;
+                    setTimeout(showResults, 1500);
+                }
+                answerChecked = true;
+            } else {
+                let errorMsg = '✗ Incorrect.\n';
+                if (!isSecondCorrect) errorMsg += `Past Simple: "${correctSecond}"\n`;
+                if (!isThirdCorrect) errorMsg += `Past Participle: "${correctThird}"`;
+                message.textContent = errorMsg;
+                
+                if (!isSecondCorrect) secondInput.classList.add('incorrect');
+                if (!isThirdCorrect) thirdInput.classList.add('incorrect');
+                
+                secondInput.value = '';
+                thirdInput.value = '';
+                secondInput.focus();
+            }
+        }
+
+        function nextRound() {
+            if (currentRound < ROUNDS_PER_GAME - 1) {
+                currentRound++;
+                loadRound();
+            }
+        }
+
+        function showResults() {
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.add('active');
+            scoreDisplay.textContent = `${score}/${ROUNDS_PER_GAME}`;
+        }
+
+        // Event listeners
+        checkBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextRound);
+        restartBtn.addEventListener('click', initGame);
+
+        // Enter key handling
+        secondInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (!answerChecked && thirdInput.value.trim()) {
+                    checkAnswer();
+                } else if (!thirdInput.value.trim()) {
+                    thirdInput.focus();
+                }
+            }
+        });
+        
+        thirdInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (!answerChecked) {
+                    checkAnswer();
+                }
+            }
+        });
+
+        nextBtn.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                nextRound();
+            }
+        });
+
+        initGame();
+    </script>
+</body>
+</html>
