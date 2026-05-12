@@ -88,6 +88,11 @@
             animation: subtlePulse 1.2s infinite;
         }
 
+        .mic-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         @keyframes subtlePulse {
             0% { opacity: 0.9; }
             50% { opacity: 0.65; }
@@ -242,8 +247,6 @@
     let currentIdx = 0;
     let recognition = null;
     let isListening = false;
-    let retryCount = 0;
-    let retryTimeout = null;
 
     const promptWordsSpan = document.getElementById("promptWords");
     const micBtn = document.getElementById("micButton");
@@ -295,19 +298,7 @@
         resultArea.classList.remove("result-correct", "result-wrong");
         sentenceCounterSpan.innerText = currentIdx + 1;
         
-        if (recognition && isListening) {
-            try { recognition.abort(); } catch(e) {}
-            isListening = false;
-            micBtn.classList.remove("listening");
-            micBtn.innerHTML = "🎙️";
-        }
-        
-        // clear any pending retry
-        if (retryTimeout) {
-            clearTimeout(retryTimeout);
-            retryTimeout = null;
-        }
-        retryCount = 0;
+        stopListening();
     }
 
     function setFeedback(correctFlag, spokenText, expectedText) {
@@ -322,7 +313,35 @@
         }
     }
 
-    function createRecognition() {
+    function stopListening() {
+        if (recognition) {
+            try {
+                recognition.abort();
+            } catch(e) {}
+            try {
+                recognition.stop();
+            } catch(e) {}
+        }
+        isListening = false;
+        micBtn.classList.remove("listening");
+        micBtn.innerHTML = "🎙️";
+        micBtn.disabled = false;
+    }
+
+    function destroyRecognition() {
+        if (recognition) {
+            try {
+                recognition.abort();
+            } catch(e) {}
+            recognition = null;
+        }
+        isListening = false;
+        micBtn.classList.remove("listening");
+        micBtn.innerHTML = "🎙️";
+        micBtn.disabled = false;
+    }
+
+    function initRecognition() {
         const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecog) {
             resultArea.innerHTML = `<span class="status-dot"></span> browser does not support speech recognition`;
@@ -335,77 +354,38 @@
         recog.continuous = false;
         recog.interimResults = false;
         recog.lang = "en-US";
-        
-        // CRITICAL: these prevent network/timeout errors
         recog.maxAlternatives = 1;
-        recog.audioSampleRate = 44100;  // not standard but helps in some impl
-        // These properties help with stability
-        if ('speechRecognition' in window) {
-            // Some browsers need these
-            try {
-                recog.interimResults = false;
-            } catch(e) {}
-        }
         
         recog.onstart = () => {
+            console.log("Recognition started");
             isListening = true;
             micBtn.classList.add("listening");
             micBtn.innerHTML = "🔴";
             resultArea.innerHTML = `<span class="status-dot"></span> listening... speak now`;
             resultArea.classList.remove("result-correct", "result-wrong");
-            retryCount = 0; // reset retry counter on successful start
         };
         
         recog.onerror = (event) => {
-            console.error("Speech error:", event.error);
+            console.log("Recognition error:", event.error);
             
-            // Handle network error specifically - retry automatically
-            if (event.error === "network" || event.error === "service-not-allowed") {
-                if (retryCount < 3) {
-                    retryCount++;
-                    resultArea.innerHTML = `<span class="status-dot"></span> retrying... (${retryCount}/3)`;
-                    // Auto retry after short delay
-                    if (retryTimeout) clearTimeout(retryTimeout);
-                    retryTimeout = setTimeout(() => {
-                        if (!isListening) {
-                            try {
-                                recognition.start();
-                            } catch(e) {
-                                resultArea.innerHTML = `<span class="status-dot"></span> click mic to try again`;
-                                micBtn.classList.remove("listening");
-                                micBtn.innerHTML = "🎙️";
-                                isListening = false;
-                            }
-                        }
-                    }, 800);
-                } else {
-                    resultArea.innerHTML = `<span class="status-dot"></span> mic error: ${event.error}. click again`;
-                    retryCount = 0;
-                    isListening = false;
-                    micBtn.classList.remove("listening");
-                    micBtn.innerHTML = "🎙️";
-                }
-                return;
-            }
-            
-            // Other errors
-            isListening = false;
-            micBtn.classList.remove("listening");
-            micBtn.innerHTML = "🎙️";
+            // Don't auto-retry - just show error and let user click again
+            stopListening();
             
             if (event.error === "not-allowed") {
-                resultArea.innerHTML = `<span class="status-dot"></span> microphone access denied — allow in browser`;
+                resultArea.innerHTML = `<span class="status-dot"></span> allow microphone access in browser`;
             } else if (event.error === "no-speech") {
                 resultArea.innerHTML = `<span class="status-dot"></span> no speech detected — press mic and speak clearly`;
             } else if (event.error === "audio-capture") {
                 resultArea.innerHTML = `<span class="status-dot"></span> no microphone found — check device`;
+            } else if (event.error === "network") {
+                resultArea.innerHTML = `<span class="status-dot"></span> connection issue — press mic again`;
             } else {
-                resultArea.innerHTML = `<span class="status-dot"></span> ${event.error} — press mic again`;
+                resultArea.innerHTML = `<span class="status-dot"></span> press mic again to speak`;
             }
-            resultArea.classList.remove("result-correct", "result-wrong");
         };
         
         recog.onresult = (event) => {
+            console.log("Result received");
             const lastResult = event.results[event.results.length - 1];
             const spoken = lastResult[0].transcript.trim();
             const currentCorrect = sentences[currentIdx].correct;
@@ -414,113 +394,71 @@
             let displaySpoken = spoken.length > 45 ? spoken.substring(0, 42) + "..." : spoken;
             setFeedback(isCorrect, displaySpoken, currentCorrect);
             
-            isListening = false;
-            micBtn.classList.remove("listening");
-            micBtn.innerHTML = "🎙️";
-            retryCount = 0;
+            stopListening();
         };
         
         recog.onend = () => {
-            if (isListening) {
-                // If ended without result and no error was processed
-                if (retryCount === 0) {
-                    // Brief timeout to see if another result arrives
-                    setTimeout(() => {
-                        if (isListening) {
-                            isListening = false;
-                            micBtn.classList.remove("listening");
-                            micBtn.innerHTML = "🎙️";
-                            if (!resultArea.innerHTML.includes("✓") && !resultArea.innerHTML.includes("✗")) {
-                                resultArea.innerHTML = `<span class="status-dot"></span> say the sentence — press mic`;
-                            }
-                        }
-                    }, 100);
-                } else {
-                    isListening = false;
-                    micBtn.classList.remove("listening");
-                    micBtn.innerHTML = "🎙️";
-                }
-            }
+            console.log("Recognition ended, isListening:", isListening);
+            stopListening();
         };
         
         return recog;
     }
 
     function startListening() {
-        // Clean up any pending retries
-        if (retryTimeout) {
-            clearTimeout(retryTimeout);
-            retryTimeout = null;
-        }
-        
-        // Re-initialize if needed (fixes stuck states)
-        if (!recognition) {
-            recognition = createRecognition();
-            if (!recognition) return;
-        }
-        
-        // If already listening, stop and restart fresh
+        // If already listening, stop and restart clean
         if (isListening) {
-            try {
-                recognition.abort();
-            } catch(e) {}
-            isListening = false;
-            micBtn.classList.remove("listening");
-            micBtn.innerHTML = "🎙️";
-            // Short delay before restart
+            stopListening();
+            // Small delay before restart
             setTimeout(() => {
                 startListening();
-            }, 150);
+            }, 200);
             return;
         }
         
-        try {
-            retryCount = 0;
-            recognition.lang = "en-US";
-            recognition.start();
-        } catch(e) {
-            console.error("Start error:", e);
-            resultArea.innerHTML = `<span class="status-dot"></span> click again to speak`;
-            // If error, destroy and recreate
-            recognition = null;
-        }
+        // Destroy old and create fresh instance every time (most reliable)
+        destroyRecognition();
+        
+        // Small delay to ensure clean state
+        setTimeout(() => {
+            recognition = initRecognition();
+            if (!recognition) return;
+            
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Start failed:", e);
+                resultArea.innerHTML = `<span class="status-dot"></span> click again to speak`;
+                recognition = null;
+                isListening = false;
+                micBtn.classList.remove("listening");
+                micBtn.innerHTML = "🎙️";
+            }
+        }, 50);
     }
     
     function prevSentence() {
-        if (retryTimeout) clearTimeout(retryTimeout);
-        if (isListening && recognition) {
-            try { recognition.abort(); } catch(e) {}
-            isListening = false;
-            micBtn.classList.remove("listening");
-            micBtn.innerHTML = "🎙️";
-        }
+        destroyRecognition();
         currentIdx = (currentIdx - 1 + sentences.length) % sentences.length;
         loadSentence();
-        recognition = createRecognition(); // fresh instance
     }
     
     function nextSentence() {
-        if (retryTimeout) clearTimeout(retryTimeout);
-        if (isListening && recognition) {
-            try { recognition.abort(); } catch(e) {}
-            isListening = false;
-            micBtn.classList.remove("listening");
-            micBtn.innerHTML = "🎙️";
-        }
+        destroyRecognition();
         currentIdx = (currentIdx + 1) % sentences.length;
         loadSentence();
-        recognition = createRecognition(); // fresh instance
     }
     
-    // Initialize
-    recognition = createRecognition();
-    loadSentence();
+    // Event listeners
+    micBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        startListening();
+    });
     
-    micBtn.addEventListener("click", startListening);
     prevBtn.addEventListener("click", prevSentence);
     nextBtn.addEventListener("click", nextSentence);
     
-    // Mobile touch fix
+    // Mobile touch
     if ('ontouchstart' in window) {
         micBtn.addEventListener("touchstart", (e) => {
             e.preventDefault();
@@ -528,14 +466,11 @@
         });
     }
     
-    // Fallback for browsers that need user interaction first
-    document.body.addEventListener('click', function initMicrophone() {
-        // This helps activate audio context on some browsers
-        if (recognition) {
-            // Just a dummy action to warm up
-            document.body.removeEventListener('click', initMicrophone);
-        }
-    }, { once: true });
+    // Initial load
+    loadSentence();
+    
+    // Warm up - create first instance but don't start
+    recognition = initRecognition();
 </script>
 </body>
 </html>
