@@ -13,7 +13,7 @@
         }
 
         body {
-            background-color: #faf8f5;  /* offwhite */
+            background-color: #faf8f5;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             display: flex;
@@ -23,21 +23,18 @@
             color: #1a1a1a;
         }
 
-        /* swiss-style container — clean, rigid grid, good spacing */
         .container {
             max-width: 780px;
             width: 100%;
             margin: 0 auto;
         }
 
-        /* main card — minimal, no shadows, just subtle border */
         .exercise {
             background: #fefcf9;
             border: 1px solid #e8e3da;
             padding: 2.5rem 2rem;
         }
 
-        /* sentence prompt area */
         .prompt {
             background: transparent;
             text-align: center;
@@ -56,13 +53,6 @@
             line-height: 1.3;
         }
 
-        .words span {
-            background: #f2efe9;
-            padding: 0.1rem 0.2rem;
-            display: inline-block;
-        }
-
-        /* mic row */
         .mic-area {
             display: flex;
             justify-content: center;
@@ -73,15 +63,15 @@
             background: #1a1a1a;
             border: none;
             border-radius: 0;
-            width: 72px;
-            height: 72px;
+            width: 80px;
+            height: 80px;
             cursor: pointer;
             transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #faf8f5;
-            font-size: 2.2rem;
+            font-size: 2.4rem;
             box-shadow: none;
         }
 
@@ -104,7 +94,6 @@
             100% { opacity: 0.9; }
         }
 
-        /* result area — clean typography */
         .result {
             text-align: center;
             padding: 1rem 0.5rem;
@@ -125,7 +114,6 @@
             color: #b33b2c;
         }
 
-        /* progress & nav — swiss minimal */
         .progress {
             display: flex;
             justify-content: space-between;
@@ -169,7 +157,6 @@
             transform: translateY(1px);
         }
 
-        /* tiny hint without labels */
         .status-dot {
             display: inline-block;
             width: 6px;
@@ -185,7 +172,6 @@
             margin: 0.6rem 0;
         }
 
-        /* no extra captions, just function */
         @media (max-width: 550px) {
             .exercise {
                 padding: 1.5rem;
@@ -194,9 +180,9 @@
                 font-size: 1.6rem;
             }
             .mic-btn {
-                width: 64px;
-                height: 64px;
-                font-size: 1.9rem;
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
             }
         }
     </style>
@@ -204,26 +190,22 @@
 <body>
 <div class="container">
     <div class="exercise">
-        <!-- prompt area: words with slash -->
         <div class="prompt">
             <div class="words" id="promptWords">my mother / be / a nice woman</div>
         </div>
 
-        <!-- mic button -->
         <div class="mic-area">
             <button class="mic-btn" id="micButton">🎙️</button>
         </div>
 
-        <!-- feedback result line -->
         <div class="result" id="resultArea">
-            <span class="status-dot"></span> speak the full sentence
+            <span class="status-dot"></span> press mic and speak
         </div>
 
-        <!-- progress + navigation -->
         <div class="progress">
             <span class="counter" id="sentenceCounter">1</span>
             <span> / 20</span>
-            <span style="font-size: 0.75rem;">⏺ say exactly</span>
+            <span style="font-size: 0.75rem;">⏺ say full sentence</span>
         </div>
         <div class="nav-buttons">
             <button class="nav-btn" id="prevBtn">← previous</button>
@@ -234,7 +216,6 @@
 </div>
 
 <script>
-    // ----- 20 A2 sentence patterns (subject / verb / complement)
     const sentences = [
         { chunks: "my mother / be / a nice woman",          correct: "my mother is a nice woman" },
         { chunks: "they / be / at home",                    correct: "they are at home" },
@@ -258,11 +239,12 @@
         { chunks: "he / be / a good teacher",               correct: "he is a good teacher" }
     ];
 
-    let currentIdx = 0;          // 0-index
+    let currentIdx = 0;
     let recognition = null;
     let isListening = false;
+    let retryCount = 0;
+    let retryTimeout = null;
 
-    // DOM elements
     const promptWordsSpan = document.getElementById("promptWords");
     const micBtn = document.getElementById("micButton");
     const resultArea = document.getElementById("resultArea");
@@ -270,7 +252,6 @@
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    // ---- helper: normalize string for fuzzy comparison (A2 friendly)
     function normalizeForCompare(str) {
         return str.toLowerCase()
             .replace(/[^\w\s']/g, '')
@@ -278,34 +259,21 @@
             .trim();
     }
 
-    // ---- check correctness: must contain main verb forms + key words (smart but not strict)
-    // we compare normalized correct vs spoken, but also allow small missing articles? for A2 we require full idea
-    // but for learner: if spoken contains most of the core words we mark correct? let's do proper comparison
-    // because "my mother is a nice woman" vs "my mother be nice woman" -> no. we will compare normalized and also check primary structure.
-    // better: compute similarity via word set intersection? but simpler: compare normalized strings with tolerance for extra 'a'?
-    // Let's do: spoken normalized vs correct normalized, plus check that "is/are/am" matches expected form.
     function isAnswerCorrect(spokenRaw, correctRaw) {
         const spokenNorm = normalizeForCompare(spokenRaw);
         const correctNorm = normalizeForCompare(correctRaw);
         
-        // exact match (after cleanup) - best for A2
         if (spokenNorm === correctNorm) return true;
         
-        // if not exact but very close: remove one common word 'a' / 'the' difference?
-        // e.g., "my mother is nice woman" vs "my mother is a nice woman" -> acceptable? we'll be lenient but only if major words match.
         const spokenWords = spokenNorm.split(/\s+/);
         const correctWords = correctNorm.split(/\s+/);
         
-        // For A2 we consider correct if at least 85% of correct words appear in spoken and order similar?
-        // but simpler: check key verb presence and subject.
-        // get subject (first 1-2 words) and main verb (is/are/am/has/have/can/works etc)
-        // we'll do intersection threshold: 80% of correct words must be in spoken.
         let matchCount = 0;
         for (let cw of correctWords) {
             if (spokenWords.includes(cw)) matchCount++;
         }
         const ratio = matchCount / correctWords.length;
-        // also verb form must match the expected auxiliary if it's crucial (is/are/am/has)
+        
         const hasCorrectBe = /\b(am|are|is)\b/.test(correctNorm);
         if (hasCorrectBe) {
             const hasSpokenBe = /\b(am|are|is)\b/.test(spokenNorm);
@@ -313,77 +281,126 @@
             if (!hasSpokenBe && correctNorm.includes("are") && !spokenNorm.includes("are")) return false;
             if (!hasSpokenBe && correctNorm.includes("am") && !spokenNorm.includes("am")) return false;
         }
-        // special for has got / have got
+        
         if (correctNorm.includes("has got") && !spokenNorm.includes("has got")) return false;
         if (correctNorm.includes("have got") && !spokenNorm.includes("have got") && !spokenNorm.includes("have")) return false;
         
-        return ratio >= 0.75;   // 75% match lenient for A2
+        return ratio >= 0.75;
     }
 
-    // ---- update UI with current sentence
     function loadSentence() {
         const sentence = sentences[currentIdx];
         promptWordsSpan.innerText = sentence.chunks;
-        // reset result area (no extra captions)
-        resultArea.innerHTML = `<span class="status-dot"></span> speak the full sentence`;
+        resultArea.innerHTML = `<span class="status-dot"></span> press mic and speak`;
         resultArea.classList.remove("result-correct", "result-wrong");
         sentenceCounterSpan.innerText = currentIdx + 1;
         
-        // stop any ongoing recognition
         if (recognition && isListening) {
             try { recognition.abort(); } catch(e) {}
             isListening = false;
             micBtn.classList.remove("listening");
             micBtn.innerHTML = "🎙️";
         }
+        
+        // clear any pending retry
+        if (retryTimeout) {
+            clearTimeout(retryTimeout);
+            retryTimeout = null;
+        }
+        retryCount = 0;
     }
 
-    // feedback display for correction
     function setFeedback(correctFlag, spokenText, expectedText) {
         if (correctFlag) {
-            resultArea.innerHTML = `✓ “${spokenText}”`;
+            resultArea.innerHTML = `<span class="status-dot"></span> ✓ "${spokenText}"`;
             resultArea.classList.add("result-correct");
             resultArea.classList.remove("result-wrong");
         } else {
-            resultArea.innerHTML = `✗ “${spokenText}”<br><span style="font-size:0.85rem; opacity:0.8;">→ ${expectedText}</span>`;
+            resultArea.innerHTML = `<span class="status-dot"></span> ✗ "${spokenText}"<br><span style="font-size:0.85rem; opacity:0.8;">→ ${expectedText}</span>`;
             resultArea.classList.add("result-wrong");
             resultArea.classList.remove("result-correct");
         }
     }
 
-    // ---- speech recognition init
-    function initSpeechRecognition() {
+    function createRecognition() {
         const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!SpeechRecog) {
-            resultArea.innerHTML = `⚠️ browser doesn't support speech recognition`;
+            resultArea.innerHTML = `<span class="status-dot"></span> browser does not support speech recognition`;
             micBtn.disabled = true;
             micBtn.style.opacity = "0.5";
             return null;
         }
+        
         const recog = new SpeechRecog();
         recog.continuous = false;
         recog.interimResults = false;
         recog.lang = "en-US";
         
+        // CRITICAL: these prevent network/timeout errors
+        recog.maxAlternatives = 1;
+        recog.audioSampleRate = 44100;  // not standard but helps in some impl
+        // These properties help with stability
+        if ('speechRecognition' in window) {
+            // Some browsers need these
+            try {
+                recog.interimResults = false;
+            } catch(e) {}
+        }
+        
         recog.onstart = () => {
             isListening = true;
             micBtn.classList.add("listening");
             micBtn.innerHTML = "🔴";
-            resultArea.innerHTML = `<span class="status-dot"></span> listening...`;
+            resultArea.innerHTML = `<span class="status-dot"></span> listening... speak now`;
             resultArea.classList.remove("result-correct", "result-wrong");
+            retryCount = 0; // reset retry counter on successful start
         };
         
         recog.onerror = (event) => {
-            console.warn(event.error);
+            console.error("Speech error:", event.error);
+            
+            // Handle network error specifically - retry automatically
+            if (event.error === "network" || event.error === "service-not-allowed") {
+                if (retryCount < 3) {
+                    retryCount++;
+                    resultArea.innerHTML = `<span class="status-dot"></span> retrying... (${retryCount}/3)`;
+                    // Auto retry after short delay
+                    if (retryTimeout) clearTimeout(retryTimeout);
+                    retryTimeout = setTimeout(() => {
+                        if (!isListening) {
+                            try {
+                                recognition.start();
+                            } catch(e) {
+                                resultArea.innerHTML = `<span class="status-dot"></span> click mic to try again`;
+                                micBtn.classList.remove("listening");
+                                micBtn.innerHTML = "🎙️";
+                                isListening = false;
+                            }
+                        }
+                    }, 800);
+                } else {
+                    resultArea.innerHTML = `<span class="status-dot"></span> mic error: ${event.error}. click again`;
+                    retryCount = 0;
+                    isListening = false;
+                    micBtn.classList.remove("listening");
+                    micBtn.innerHTML = "🎙️";
+                }
+                return;
+            }
+            
+            // Other errors
             isListening = false;
             micBtn.classList.remove("listening");
             micBtn.innerHTML = "🎙️";
+            
             if (event.error === "not-allowed") {
-                resultArea.innerHTML = `✗ microphone access denied`;
+                resultArea.innerHTML = `<span class="status-dot"></span> microphone access denied — allow in browser`;
             } else if (event.error === "no-speech") {
-                resultArea.innerHTML = `<span class="status-dot"></span> no speech — try again`;
+                resultArea.innerHTML = `<span class="status-dot"></span> no speech detected — press mic and speak clearly`;
+            } else if (event.error === "audio-capture") {
+                resultArea.innerHTML = `<span class="status-dot"></span> no microphone found — check device`;
             } else {
-                resultArea.innerHTML = `<span class="status-dot"></span> error: ${event.error}`;
+                resultArea.innerHTML = `<span class="status-dot"></span> ${event.error} — press mic again`;
             }
             resultArea.classList.remove("result-correct", "result-wrong");
         };
@@ -394,47 +411,83 @@
             const currentCorrect = sentences[currentIdx].correct;
             
             const isCorrect = isAnswerCorrect(spoken, currentCorrect);
-            
-            // show spoken & correct feedback
             let displaySpoken = spoken.length > 45 ? spoken.substring(0, 42) + "..." : spoken;
             setFeedback(isCorrect, displaySpoken, currentCorrect);
             
             isListening = false;
             micBtn.classList.remove("listening");
             micBtn.innerHTML = "🎙️";
+            retryCount = 0;
         };
         
         recog.onend = () => {
             if (isListening) {
-                // ended without result
-                isListening = false;
-                micBtn.classList.remove("listening");
-                micBtn.innerHTML = "🎙️";
-                if (!resultArea.innerHTML.includes("✓") && !resultArea.innerHTML.includes("✗")) {
-                    resultArea.innerHTML = `<span class="status-dot"></span> say the full sentence`;
+                // If ended without result and no error was processed
+                if (retryCount === 0) {
+                    // Brief timeout to see if another result arrives
+                    setTimeout(() => {
+                        if (isListening) {
+                            isListening = false;
+                            micBtn.classList.remove("listening");
+                            micBtn.innerHTML = "🎙️";
+                            if (!resultArea.innerHTML.includes("✓") && !resultArea.innerHTML.includes("✗")) {
+                                resultArea.innerHTML = `<span class="status-dot"></span> say the sentence — press mic`;
+                            }
+                        }
+                    }, 100);
+                } else {
+                    isListening = false;
+                    micBtn.classList.remove("listening");
+                    micBtn.innerHTML = "🎙️";
                 }
             }
         };
+        
         return recog;
     }
 
-    // start listening action
     function startListening() {
+        // Clean up any pending retries
+        if (retryTimeout) {
+            clearTimeout(retryTimeout);
+            retryTimeout = null;
+        }
+        
+        // Re-initialize if needed (fixes stuck states)
         if (!recognition) {
-            recognition = initSpeechRecognition();
+            recognition = createRecognition();
             if (!recognition) return;
         }
-        if (isListening) return;
+        
+        // If already listening, stop and restart fresh
+        if (isListening) {
+            try {
+                recognition.abort();
+            } catch(e) {}
+            isListening = false;
+            micBtn.classList.remove("listening");
+            micBtn.innerHTML = "🎙️";
+            // Short delay before restart
+            setTimeout(() => {
+                startListening();
+            }, 150);
+            return;
+        }
+        
         try {
+            retryCount = 0;
             recognition.lang = "en-US";
             recognition.start();
         } catch(e) {
+            console.error("Start error:", e);
             resultArea.innerHTML = `<span class="status-dot"></span> click again to speak`;
+            // If error, destroy and recreate
+            recognition = null;
         }
     }
     
-    // navigation
     function prevSentence() {
+        if (retryTimeout) clearTimeout(retryTimeout);
         if (isListening && recognition) {
             try { recognition.abort(); } catch(e) {}
             isListening = false;
@@ -443,9 +496,11 @@
         }
         currentIdx = (currentIdx - 1 + sentences.length) % sentences.length;
         loadSentence();
+        recognition = createRecognition(); // fresh instance
     }
     
     function nextSentence() {
+        if (retryTimeout) clearTimeout(retryTimeout);
         if (isListening && recognition) {
             try { recognition.abort(); } catch(e) {}
             isListening = false;
@@ -454,24 +509,33 @@
         }
         currentIdx = (currentIdx + 1) % sentences.length;
         loadSentence();
+        recognition = createRecognition(); // fresh instance
     }
     
-    // ---- events
+    // Initialize
+    recognition = createRecognition();
+    loadSentence();
+    
     micBtn.addEventListener("click", startListening);
     prevBtn.addEventListener("click", prevSentence);
     nextBtn.addEventListener("click", nextSentence);
     
-    // initial load
-    recognition = initSpeechRecognition();
-    loadSentence();
-    
-    // small fallback for any ios quirk: touch start
+    // Mobile touch fix
     if ('ontouchstart' in window) {
         micBtn.addEventListener("touchstart", (e) => {
             e.preventDefault();
             startListening();
         });
     }
+    
+    // Fallback for browsers that need user interaction first
+    document.body.addEventListener('click', function initMicrophone() {
+        // This helps activate audio context on some browsers
+        if (recognition) {
+            // Just a dummy action to warm up
+            document.body.removeEventListener('click', initMicrophone);
+        }
+    }, { once: true });
 </script>
 </body>
 </html>
