@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>A2 Speak: Make Sentences</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #faf8f5;  /* offwhite */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1.5rem;
+            color: #1a1a1a;
+        }
+
+        /* swiss-style container — clean, rigid grid, good spacing */
+        .container {
+            max-width: 780px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* main card — minimal, no shadows, just subtle border */
+        .exercise {
+            background: #fefcf9;
+            border: 1px solid #e8e3da;
+            padding: 2.5rem 2rem;
+        }
+
+        /* sentence prompt area */
+        .prompt {
+            background: transparent;
+            text-align: center;
+            padding: 2rem 1rem;
+            border-bottom: 1px solid #e2dcd3;
+            border-top: 1px solid #e2dcd3;
+            margin-bottom: 2rem;
+        }
+
+        .words {
+            font-size: 2.2rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: #2c2c2c;
+            word-break: break-word;
+            line-height: 1.3;
+        }
+
+        .words span {
+            background: #f2efe9;
+            padding: 0.1rem 0.2rem;
+            display: inline-block;
+        }
+
+        /* mic row */
+        .mic-area {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0 1.8rem;
+        }
+
+        .mic-btn {
+            background: #1a1a1a;
+            border: none;
+            border-radius: 0;
+            width: 72px;
+            height: 72px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #faf8f5;
+            font-size: 2.2rem;
+            box-shadow: none;
+        }
+
+        .mic-btn:hover {
+            background: #2e2e2e;
+        }
+
+        .mic-btn:active {
+            transform: scale(0.96);
+        }
+
+        .mic-btn.listening {
+            background: #b33b2c;
+            animation: subtlePulse 1.2s infinite;
+        }
+
+        @keyframes subtlePulse {
+            0% { opacity: 0.9; }
+            50% { opacity: 0.65; }
+            100% { opacity: 0.9; }
+        }
+
+        /* result area — clean typography */
+        .result {
+            text-align: center;
+            padding: 1rem 0.5rem;
+            margin: 1.2rem 0;
+            font-size: 1rem;
+            font-weight: 400;
+            color: #5a5a5a;
+            min-height: 85px;
+            border-top: 1px solid #ece6df;
+        }
+
+        .result-correct {
+            color: #2c6e2f;
+            font-weight: 500;
+        }
+
+        .result-wrong {
+            color: #b33b2c;
+        }
+
+        /* progress & nav — swiss minimal */
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 1.8rem;
+            font-size: 0.85rem;
+            color: #7e7a72;
+            letter-spacing: 0.3px;
+            font-weight: 450;
+        }
+
+        .counter {
+            font-weight: 600;
+            color: #2c2c2c;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.2rem;
+        }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid #d6cfc4;
+            padding: 0.6rem 1.6rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s linear;
+            color: #2c2c2c;
+        }
+
+        .nav-btn:hover {
+            background: #eee9e2;
+            border-color: #bfb6a8;
+        }
+
+        .nav-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* tiny hint without labels */
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #cbc3b7;
+            border-radius: 0;
+            margin-right: 8px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e8e2d9;
+            margin: 0.6rem 0;
+        }
+
+        /* no extra captions, just function */
+        @media (max-width: 550px) {
+            .exercise {
+                padding: 1.5rem;
+            }
+            .words {
+                font-size: 1.6rem;
+            }
+            .mic-btn {
+                width: 64px;
+                height: 64px;
+                font-size: 1.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="exercise">
+        <!-- prompt area: words with slash -->
+        <div class="prompt">
+            <div class="words" id="promptWords">my mother / be / a nice woman</div>
+        </div>
+
+        <!-- mic button -->
+        <div class="mic-area">
+            <button class="mic-btn" id="micButton">🎙️</button>
+        </div>
+
+        <!-- feedback result line -->
+        <div class="result" id="resultArea">
+            <span class="status-dot"></span> speak the full sentence
+        </div>
+
+        <!-- progress + navigation -->
+        <div class="progress">
+            <span class="counter" id="sentenceCounter">1</span>
+            <span> / 20</span>
+            <span style="font-size: 0.75rem;">⏺ say exactly</span>
+        </div>
+        <div class="nav-buttons">
+            <button class="nav-btn" id="prevBtn">← previous</button>
+            <button class="nav-btn" id="nextBtn">next →</button>
+        </div>
+        <hr />
+    </div>
+</div>
+
+<script>
+    // ----- 20 A2 sentence patterns (subject / verb / complement)
+    const sentences = [
+        { chunks: "my mother / be / a nice woman",          correct: "my mother is a nice woman" },
+        { chunks: "they / be / at home",                    correct: "they are at home" },
+        { chunks: "she / have got / a new bag",             correct: "she has got a new bag" },
+        { chunks: "we / want / some coffee",                correct: "we want some coffee" },
+        { chunks: "he / can / play the guitar",             correct: "he can play the guitar" },
+        { chunks: "my sister / work / in a hospital",       correct: "my sister works in a hospital" },
+        { chunks: "i / be / very happy today",              correct: "i am very happy today" },
+        { chunks: "they / like / pizza",                    correct: "they like pizza" },
+        { chunks: "tom / go / to school every day",         correct: "tom goes to school every day" },
+        { chunks: "we / be / good friends",                 correct: "we are good friends" },
+        { chunks: "she / do / her homework",                correct: "she does her homework" },
+        { chunks: "you / be / a great student",             correct: "you are a great student" },
+        { chunks: "my father / drive / a black car",        correct: "my father drives a black car" },
+        { chunks: "it / be / a sunny day",                  correct: "it is a sunny day" },
+        { chunks: "peter and anna / live / in Berlin",      correct: "peter and anna live in berlin" },
+        { chunks: "i / have / two brothers",                correct: "i have two brothers" },
+        { chunks: "the cat / sleep / on the sofa",          correct: "the cat sleeps on the sofa" },
+        { chunks: "you / can / help me",                    correct: "you can help me" },
+        { chunks: "we / need / to buy milk",                correct: "we need to buy milk" },
+        { chunks: "he / be / a good teacher",               correct: "he is a good teacher" }
+    ];
+
+    let currentIdx = 0;          // 0-index
+    let recognition = null;
+    let isListening = false;
+
+    // DOM elements
+    const promptWordsSpan = document.getElementById("promptWords");
+    const micBtn = document.getElementById("micButton");
+    const resultArea = document.getElementById("resultArea");
+    const sentenceCounterSpan = document.getElementById("sentenceCounter");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    // ---- helper: normalize string for fuzzy comparison (A2 friendly)
+    function normalizeForCompare(str) {
+        return str.toLowerCase()
+            .replace(/[^\w\s']/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    // ---- check correctness: must contain main verb forms + key words (smart but not strict)
+    // we compare normalized correct vs spoken, but also allow small missing articles? for A2 we require full idea
+    // but for learner: if spoken contains most of the core words we mark correct? let's do proper comparison
+    // because "my mother is a nice woman" vs "my mother be nice woman" -> no. we will compare normalized and also check primary structure.
+    // better: compute similarity via word set intersection? but simpler: compare normalized strings with tolerance for extra 'a'?
+    // Let's do: spoken normalized vs correct normalized, plus check that "is/are/am" matches expected form.
+    function isAnswerCorrect(spokenRaw, correctRaw) {
+        const spokenNorm = normalizeForCompare(spokenRaw);
+        const correctNorm = normalizeForCompare(correctRaw);
+        
+        // exact match (after cleanup) - best for A2
+        if (spokenNorm === correctNorm) return true;
+        
+        // if not exact but very close: remove one common word 'a' / 'the' difference?
+        // e.g., "my mother is nice woman" vs "my mother is a nice woman" -> acceptable? we'll be lenient but only if major words match.
+        const spokenWords = spokenNorm.split(/\s+/);
+        const correctWords = correctNorm.split(/\s+/);
+        
+        // For A2 we consider correct if at least 85% of correct words appear in spoken and order similar?
+        // but simpler: check key verb presence and subject.
+        // get subject (first 1-2 words) and main verb (is/are/am/has/have/can/works etc)
+        // we'll do intersection threshold: 80% of correct words must be in spoken.
+        let matchCount = 0;
+        for (let cw of correctWords) {
+            if (spokenWords.includes(cw)) matchCount++;
+        }
+        const ratio = matchCount / correctWords.length;
+        // also verb form must match the expected auxiliary if it's crucial (is/are/am/has)
+        const hasCorrectBe = /\b(am|are|is)\b/.test(correctNorm);
+        if (hasCorrectBe) {
+            const hasSpokenBe = /\b(am|are|is)\b/.test(spokenNorm);
+            if (!hasSpokenBe && correctNorm.includes("is") && !spokenNorm.includes("is")) return false;
+            if (!hasSpokenBe && correctNorm.includes("are") && !spokenNorm.includes("are")) return false;
+            if (!hasSpokenBe && correctNorm.includes("am") && !spokenNorm.includes("am")) return false;
+        }
+        // special for has got / have got
+        if (correctNorm.includes("has got") && !spokenNorm.includes("has got")) return false;
+        if (correctNorm.includes("have got") && !spokenNorm.includes("have got") && !spokenNorm.includes("have")) return false;
+        
+        return ratio >= 0.75;   // 75% match lenient for A2
+    }
+
+    // ---- update UI with current sentence
+    function loadSentence() {
+        const sentence = sentences[currentIdx];
+        promptWordsSpan.innerText = sentence.chunks;
+        // reset result area (no extra captions)
+        resultArea.innerHTML = `<span class="status-dot"></span> speak the full sentence`;
+        resultArea.classList.remove("result-correct", "result-wrong");
+        sentenceCounterSpan.innerText = currentIdx + 1;
+        
+        // stop any ongoing recognition
+        if (recognition && isListening) {
+            try { recognition.abort(); } catch(e) {}
+            isListening = false;
+            micBtn.classList.remove("listening");
+            micBtn.innerHTML = "🎙️";
+        }
+    }
+
+    // feedback display for correction
+    function setFeedback(correctFlag, spokenText, expectedText) {
+        if (correctFlag) {
+            resultArea.innerHTML = `✓ “${spokenText}”`;
+            resultArea.classList.add("result-correct");
+            resultArea.classList.remove("result-wrong");
+        } else {
+            resultArea.innerHTML = `✗ “${spokenText}”<br><span style="font-size:0.85rem; opacity:0.8;">→ ${expectedText}</span>`;
+            resultArea.classList.add("result-wrong");
+            resultArea.classList.remove("result-correct");
+        }
+    }
+
+    // ---- speech recognition init
+    function initSpeechRecognition() {
+        const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecog) {
+            resultArea.innerHTML = `⚠️ browser doesn't support speech recognition`;
+            micBtn.disabled = true;
+            micBtn.style.opacity = "0.5";
+            return null;
+        }
+        const recog = new SpeechRecog();
+        recog.continuous = false;
+        recog.interimResults = false;
+        recog.lang = "en-US";
+        
+        recog.onstart = () => {
+            isListening = true;
+            micBtn.classList.add("listening");
+            micBtn.innerHTML = "🔴";
+            resultArea.innerHTML = `<span class="status-dot"></span> listening...`;
+            resultArea.classList.remove("result-correct", "result-wrong");
+        };
+        
+        recog.onerror = (event) => {
+            console.warn(event.error);
+            isListening = false;
+            micBtn.classList.remove("listening");
+            micBtn.innerHTML = "🎙️";
+            if (event.error === "not-allowed") {
+                resultArea.innerHTML = `✗ microphone access denied`;
+            } else if (event.error === "no-speech") {
+                resultArea.innerHTML = `<span class="status-dot"></span> no speech — try again`;
+            } else {
+                resultArea.innerHTML = `<span class="status-dot"></span> error: ${event.error}`;
+            }
+            resultArea.classList.remove("result-correct", "result-wrong");
+        };
+        
+        recog.onresult = (event) => {
+            const lastResult = event.results[event.results.length - 1];
+            const spoken = lastResult[0].transcript.trim();
+            const currentCorrect = sentences[currentIdx].correct;
+            
+            const isCorrect = isAnswerCorrect(spoken, currentCorrect);
+            
+            // show spoken & correct feedback
+            let displaySpoken = spoken.length > 45 ? spoken.substring(0, 42) + "..." : spoken;
+            setFeedback(isCorrect, displaySpoken, currentCorrect);
+            
+            isListening = false;
+            micBtn.classList.remove("listening");
+            micBtn.innerHTML = "🎙️";
+        };
+        
+        recog.onend = () => {
+            if (isListening) {
+                // ended without result
+                isListening = false;
+                micBtn.classList.remove("listening");
+                micBtn.innerHTML = "🎙️";
+                if (!resultArea.innerHTML.includes("✓") && !resultArea.innerHTML.includes("✗")) {
+                    resultArea.innerHTML = `<span class="status-dot"></span> say the full sentence`;
+                }
+            }
+        };
+        return recog;
+    }
+
+    // start listening action
+    function startListening() {
+        if (!recognition) {
+            recognition = initSpeechRecognition();
+            if (!recognition) return;
+        }
+        if (isListening) return;
+        try {
+            recognition.lang = "en-US";
+            recognition.start();
+        } catch(e) {
+            resultArea.innerHTML = `<span class="status-dot"></span> click again to speak`;
+        }
+    }
+    
+    // navigation
+    function prevSentence() {
+        if (isListening && recognition) {
+            try { recognition.abort(); } catch(e) {}
+            isListening = false;
+            micBtn.classList.remove("listening");
+            micBtn.innerHTML = "🎙️";
+        }
+        currentIdx = (currentIdx - 1 + sentences.length) % sentences.length;
+        loadSentence();
+    }
+    
+    function nextSentence() {
+        if (isListening && recognition) {
+            try { recognition.abort(); } catch(e) {}
+            isListening = false;
+            micBtn.classList.remove("listening");
+            micBtn.innerHTML = "🎙️";
+        }
+        currentIdx = (currentIdx + 1) % sentences.length;
+        loadSentence();
+    }
+    
+    // ---- events
+    micBtn.addEventListener("click", startListening);
+    prevBtn.addEventListener("click", prevSentence);
+    nextBtn.addEventListener("click", nextSentence);
+    
+    // initial load
+    recognition = initSpeechRecognition();
+    loadSentence();
+    
+    // small fallback for any ios quirk: touch start
+    if ('ontouchstart' in window) {
+        micBtn.addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            startListening();
+        });
+    }
+</script>
+</body>
+</html>
