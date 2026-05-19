@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Music Vocab Quiz: Synonyms & Antonyms</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: #fbf9f8;
+            color: #817570;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #564e4a;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #817570;
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+        
+        .quiz-container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .quiz-card {
+            flex: 1;
+            min-width: 300px;
+            background-color: #fbf9f8;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #e1e4e8;
+        }
+        
+        .card-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e1e4e8;
+        }
+        
+        .synonyms-header {
+            background-color: #538e9b;
+            color: #fbf9f8;
+        }
+        
+        .antonyms-header {
+            background-color: #c4a79b;
+            color: #fbf9f8;
+        }
+        
+        .card-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-content {
+            padding: 25px;
+        }
+        
+        .question-item {
+            background-color: #fefcfb;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid #eadfdb;
+            transition: all 0.2s;
+        }
+        
+        .question-item:hover {
+            border-color: #c4a79b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+        
+        .question-stem {
+            font-weight: 700;
+            color: #564e4a;
+            font-size: 1.1rem;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .question-text {
+            background-color: #f3eeeb;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #564e4a;
+        }
+        
+        /* Fixed 2x2 grid for options: two columns, two rows automatically */
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        /* Option as clickable card */
+        .option {
+            background-color: #f7f3f1;
+            padding: 12px 8px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #eadfdb;
+            font-size: 0.95rem;
+            color: #403a38;
+            text-align: center;
+            font-weight: 500;
+            user-select: none;
+        }
+        
+        .option:hover {
+            background-color: #e8f4fd;
+            border-color: #538e9b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Selected state matches header color for each section */
+        .syn-option.selected {
+            background-color: #538e9b;
+            border-color: #3d6f7a;
+            color: white;
+            box-shadow: 0 2px 6px rgba(83, 142, 155, 0.3);
+        }
+        
+        .anto-option.selected {
+            background-color: #c4a79b;
+            border-color: #a8897c;
+            color: white;
+            box-shadow: 0 2px 6px rgba(196, 167, 155, 0.3);
+        }
+        
+        /* Hide radio buttons */
+        .option input {
+            display: none;
+        }
+        
+        /* Feedback per question - only correct/wrong */
+        .feedback-individual {
+            margin-top: 14px;
+            font-size: 0.85rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .feedback-individual.correct-fb {
+            background-color: rgba(83, 155, 96, 0.12);
+            color: #2d6a3b;
+            border-left: 3px solid #539b60;
+            display: flex;
+        }
+        
+        .feedback-individual.incorrect-fb {
+            background-color: rgba(192, 91, 109, 0.12);
+            color: #b13e52;
+            border-left: 3px solid #c05b6d;
+            display: flex;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+        
+        .btn-check {
+            background-color: #539B60;
+            color: #fbf9f8;
+        }
+        
+        .btn-check:hover {
+            background-color: #427c4c;
+            transform: translateY(-1px);
+        }
+        
+        .btn-reset {
+            background-color: #c05b6d;
+            color: #fbf9f8;
+        }
+        
+        .btn-reset:hover {
+            background-color: #a84153;
+            transform: translateY(-1px);
+        }
+        
+        .result-banner {
+            margin-top: 25px;
+            padding: 18px;
+            border-radius: 12px;
+            display: none;
+            font-weight: 600;
+            font-size: 1rem;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .result-banner.correct {
+            background-color: rgba(83, 155, 96, 0.12);
+            border-left: 4px solid #427c4c;
+            color: #2d5a3b;
+        }
+        
+        .result-banner.incorrect {
+            background-color: rgba(192, 91, 109, 0.12);
+            border-left: 4px solid #a84153;
+            color: #9b3b4b;
+        }
+        
+        .score-badge {
+            background-color: #f3eeeb;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: #564e4a;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .instructions {
+            background-color: #f7f3f1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c4a79b;
+            font-size: 0.9rem;
+            color: #564e4a;
+        }
+        
+        @media (max-width: 550px) {
+            .options {
+                grid-template-columns: 1fr; /* on very small screens, stack vertically */
+                gap: 8px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .option {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .card-content {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-language"></i> Music Vocabulary Quiz</h1>
+        <p>Synonyms & Antonyms: click on the answer card. Each question has 4 options arranged in a 2x2 grid.</p>
+    </div>
+    
+    <div class="quiz-container">
+        <!-- Synonyms Section -->
+        <div class="quiz-card">
+            <div class="card-header synonyms-header">
+                <h2><i class="fas fa-exchange-alt"></i> Synonyms</h2>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    <i class="fas fa-lightbulb"></i> Choose the word that means the SAME as the given word.
+                </div>
+                
+                <div id="synonyms-questions"></div>
+                
+                <div class="score-badge" id="syn-score">
+                    <i class="fas fa-check-circle"></i> Synonyms: <span id="syn-correct-count">0</span>/4
+                </div>
+            </div>
+        </div>
+        
+        <!-- Antonyms Section -->
+        <div class="quiz-card">
+            <div class="card-header antonyms-header">
+                <h2><i class="fas fa-balance-scale"></i> Antonyms</h2>
+            </div>
+            <div class="card-content">
+                <div class="instructions">
+                    <i class="fas fa-lightbulb"></i> Choose the word that means the OPPOSITE of the given word.
+                </div>
+                
+                <div id="antonyms-questions"></div>
+                
+                <div class="score-badge" id="anto-score">
+                    <i class="fas fa-check-circle"></i> Antonyms: <span id="anto-correct-count">0</span>/4
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="btn btn-check" onclick="checkAllAnswers()">
+            <i class="fas fa-check-double"></i> Check Answers
+        </button>
+        <button class="btn btn-reset" onclick="resetAllQuizzes()">
+            <i class="fas fa-undo-alt"></i> Reset All
+        </button>
+    </div>
+    
+    <div class="result-banner" id="global-result"></div>
+    
+    <div class="score-badge" style="margin-top: 5px; background-color: #e8f4fd;">
+        <i class="fas fa-chart-line"></i> Total Score: <span id="total-score">0</span>/8
+    </div>
+    
+    <script>
+        // ---------- QUESTION DATA ----------
+        const synonymsData = [
+            { word: "alteration", correct: "variation", options: ["equal", "condition", "variation", "duration"] },
+            { word: "assign", correct: "allocate", options: ["allocate", "extend", "remain", "restore"] },
+            { word: "represent", correct: "signify", options: ["return", "create", "signify", "clarify"] },
+            { word: "semitone", correct: "half step", options: ["whole step", "half step", "octave", "bar"] }
+        ];
+        
+        const antonymsData = [
+            { word: "vary", correct: "conform", options: ["extend", "alter", "differ", "conform"] },
+            { word: "descending", correct: "rising", options: ["changing", "falling", "rising", "altering"] },
+            { word: "convenience", correct: "difficulty", options: ["comfort", "difficulty", "ease", "simplicity"] },
+            { word: "ascending", correct: "falling", options: ["rising", "varying", "moving", "falling"] }
+        ];
+        
+        // Store user selections
+        let synSelections = new Array(synonymsData.length).fill(null);
+        let antSelections = new Array(antonymsData.length).fill(null);
+        
+        // For tracking if feedback has been shown
+        let synFeedbackTriggered = new Array(synonymsData.length).fill(false);
+        let antFeedbackTriggered = new Array(antonymsData.length).fill(false);
+        
+        // Helper: render Synonyms with 2x2 grid
+        function renderSynonyms() {
+            const container = document.getElementById('synonyms-questions');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            synonymsData.forEach((item, idx) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-item';
+                questionDiv.dataset.qidx = idx;
+                questionDiv.dataset.type = 'syn';
+                
+                // Stem
+                const stemDiv = document.createElement('div');
+                stemDiv.className = 'question-stem';
+                stemDiv.innerHTML = `<span><i class="fas fa-quote-left"></i> ${item.word}</span> <span class="question-text">means the same as...</span>`;
+                
+                // Options container with grid (2x2)
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                // Ensure we have exactly 4 options - preserve order but display in grid flow
+                // Grid layout will automatically arrange them: first two in first row, next two in second row
+                item.options.forEach(opt => {
+                    const optionCard = document.createElement('div');
+                    optionCard.className = 'option syn-option';
+                    if (synSelections[idx] === opt) optionCard.classList.add('selected');
+                    optionCard.textContent = opt;
+                    optionCard.setAttribute('data-value', opt);
+                    
+                    // Click handler on entire card
+                    optionCard.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        // Remove selected class from siblings
+                        const siblings = optionsDiv.querySelectorAll('.option');
+                        siblings.forEach(sib => sib.classList.remove('selected'));
+                        optionCard.classList.add('selected');
+                        // Store selection
+                        synSelections[idx] = opt;
+                        // Reset feedback flag for this question
+                        synFeedbackTriggered[idx] = false;
+                        // Hide any existing feedback for this question
+                        const existingFb = questionDiv.querySelector('.feedback-individual');
+                        if (existingFb) {
+                            existingFb.classList.remove('correct-fb', 'incorrect-fb');
+                            existingFb.style.display = 'none';
+                        }
+                        // Hide global result when user modifies
+                        hideGlobalResult();
+                        updateSynScoreDisplay();
+                        updateTotalScoreDisplay();
+                    });
+                    
+                    optionsDiv.appendChild(optionCard);
+                });
+                
+                questionDiv.appendChild(stemDiv);
+                questionDiv.appendChild(optionsDiv);
+                
+                // Feedback area (only shows correct/wrong)
+                const feedbackSpan = document.createElement('div');
+                feedbackSpan.className = 'feedback-individual';
+                questionDiv.appendChild(feedbackSpan);
+                
+                container.appendChild(questionDiv);
+            });
+        }
+        
+        function renderAntonyms() {
+            const container = document.getElementById('antonyms-questions');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            antonymsData.forEach((item, idx) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-item';
+                questionDiv.dataset.qidx = idx;
+                questionDiv.dataset.type = 'ant';
+                
+                const stemDiv = document.createElement('div');
+                stemDiv.className = 'question-stem';
+                stemDiv.innerHTML = `<span><i class="fas fa-quote-right"></i> ${item.word}</span> <span class="question-text">opposite of...</span>`;
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+                
+                item.options.forEach(opt => {
+                    const optionCard = document.createElement('div');
+                    optionCard.className = 'option anto-option';
+                    if (antSelections[idx] === opt) optionCard.classList.add('selected');
+                    optionCard.textContent = opt;
+                    optionCard.setAttribute('data-value', opt);
+                    
+                    optionCard.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const siblings = optionsDiv.querySelectorAll('.option');
+                        siblings.forEach(sib => sib.classList.remove('selected'));
+                        optionCard.classList.add('selected');
+                        antSelections[idx] = opt;
+                        antFeedbackTriggered[idx] = false;
+                        const existingFb = questionDiv.querySelector('.feedback-individual');
+                        if (existingFb) {
+                            existingFb.classList.remove('correct-fb', 'incorrect-fb');
+                            existingFb.style.display = 'none';
+                        }
+                        hideGlobalResult();
+                        updateAntScoreDisplay();
+                        updateTotalScoreDisplay();
+                    });
+                    
+                    optionsDiv.appendChild(optionCard);
+                });
+                
+                questionDiv.appendChild(stemDiv);
+                questionDiv.appendChild(optionsDiv);
+                
+                const feedbackSpan = document.createElement('div');
+                feedbackSpan.className = 'feedback-individual';
+                questionDiv.appendChild(feedbackSpan);
+                
+                container.appendChild(questionDiv);
+            });
+        }
+        
+        // Score updaters
+        function updateSynScoreDisplay() {
+            let correct = 0;
+            for (let i = 0; i < synonymsData.length; i++) {
+                if (synSelections[i] !== null && synSelections[i] === synonymsData[i].correct) {
+                    correct++;
+                }
+            }
+            const synSpan = document.getElementById('syn-correct-count');
+            if (synSpan) synSpan.textContent = correct;
+            return correct;
+        }
+        
+        function updateAntScoreDisplay() {
+            let correct = 0;
+            for (let i = 0; i < antonymsData.length; i++) {
+                if (antSelections[i] !== null && antSelections[i] === antonymsData[i].correct) {
+                    correct++;
+                }
+            }
+            const antSpan = document.getElementById('anto-correct-count');
+            if (antSpan) antSpan.textContent = correct;
+            return correct;
+        }
+        
+        function updateTotalScoreDisplay() {
+            const synCorrect = updateSynScoreDisplay();
+            const antCorrect = updateAntScoreDisplay();
+            const totalSpan = document.getElementById('total-score');
+            if (totalSpan) totalSpan.textContent = `${synCorrect + antCorrect}/8`;
+            return synCorrect + antCorrect;
+        }
+        
+        function hideGlobalResult() {
+            const resultDiv = document.getElementById('global-result');
+            if (resultDiv) resultDiv.style.display = 'none';
+        }
+        
+        // Show ONLY correct/wrong feedback (no extra hints)
+        function showIndividualFeedback() {
+            // Process synonyms
+            for (let i = 0; i < synonymsData.length; i++) {
+                const questionDivs = document.querySelectorAll('#synonyms-questions .question-item');
+                if (questionDivs[i]) {
+                    const fbDiv = questionDivs[i].querySelector('.feedback-individual');
+                    const selected = synSelections[i];
+                    const correctAnswer = synonymsData[i].correct;
+                    
+                    if (selected !== null) {
+                        if (selected === correctAnswer) {
+                            fbDiv.innerHTML = `<i class="fas fa-check-circle"></i> Correct`;
+                            fbDiv.classList.add('correct-fb');
+                            fbDiv.classList.remove('incorrect-fb');
+                            fbDiv.style.display = 'flex';
+                        } else {
+                            fbDiv.innerHTML = `<i class="fas fa-times-circle"></i> Wrong`;
+                            fbDiv.classList.add('incorrect-fb');
+                            fbDiv.classList.remove('correct-fb');
+                            fbDiv.style.display = 'flex';
+                        }
+                        synFeedbackTriggered[i] = true;
+                    } else {
+                        // No answer selected
+                        fbDiv.innerHTML = `<i class="fas fa-question-circle"></i> No answer selected`;
+                        fbDiv.classList.add('incorrect-fb');
+                        fbDiv.classList.remove('correct-fb');
+                        fbDiv.style.display = 'flex';
+                    }
+                }
+            }
+            
+            // Process antonyms
+            for (let i = 0; i < antonymsData.length; i++) {
+                const questionDivs = document.querySelectorAll('#antonyms-questions .question-item');
+                if (questionDivs[i]) {
+                    const fbDiv = questionDivs[i].querySelector('.feedback-individual');
+                    const selected = antSelections[i];
+                    const correctAnswer = antonymsData[i].correct;
+                    
+                    if (selected !== null) {
+                        if (selected === correctAnswer) {
+                            fbDiv.innerHTML = `<i class="fas fa-check-circle"></i> Correct`;
+                            fbDiv.classList.add('correct-fb');
+                            fbDiv.classList.remove('incorrect-fb');
+                            fbDiv.style.display = 'flex';
+                        } else {
+                            fbDiv.innerHTML = `<i class="fas fa-times-circle"></i> Wrong`;
+                            fbDiv.classList.add('incorrect-fb');
+                            fbDiv.classList.remove('correct-fb');
+                            fbDiv.style.display = 'flex';
+                        }
+                        antFeedbackTriggered[i] = true;
+                    } else {
+                        fbDiv.innerHTML = `<i class="fas fa-question-circle"></i> No answer selected`;
+                        fbDiv.classList.add('incorrect-fb');
+                        fbDiv.classList.remove('correct-fb');
+                        fbDiv.style.display = 'flex';
+                    }
+                }
+            }
+        }
+        
+        // Main check function
+        function checkAllAnswers() {
+            // Show feedback for each question
+            showIndividualFeedback();
+            
+            // Calculate totals
+            let synCorrect = 0;
+            for (let i = 0; i < synonymsData.length; i++) {
+                if (synSelections[i] !== null && synSelections[i] === synonymsData[i].correct) synCorrect++;
+            }
+            
+            let antCorrect = 0;
+            for (let i = 0; i < antonymsData.length; i++) {
+                if (antSelections[i] !== null && antSelections[i] === antonymsData[i].correct) antCorrect++;
+            }
+            
+            const totalCorrect = synCorrect + antCorrect;
+            const totalQuestions = synonymsData.length + antonymsData.length;
+            
+            // Update score displays
+            updateSynScoreDisplay();
+            updateAntScoreDisplay();
+            updateTotalScoreDisplay();
+            
+            const globalResultDiv = document.getElementById('global-result');
+            if (!globalResultDiv) return;
+            
+            // Check if any question unanswered
+            let allAnswered = true;
+            for (let i = 0; i < synonymsData.length; i++) {
+                if (synSelections[i] === null) allAnswered = false;
+            }
+            for (let i = 0; i < antonymsData.length; i++) {
+                if (antSelections[i] === null) allAnswered = false;
+            }
+            
+            if (!allAnswered) {
+                globalResultDiv.className = 'result-banner incorrect';
+                globalResultDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> You have unanswered questions. Please select an answer for every blank.`;
+                globalResultDiv.style.display = 'flex';
+                return;
+            }
+            
+            if (totalCorrect === totalQuestions) {
+                globalResultDiv.className = 'result-banner correct';
+                globalResultDiv.innerHTML = `<i class="fas fa-trophy"></i> Perfect! ${totalCorrect}/${totalQuestions} correct. Excellent! 🎵`;
+                globalResultDiv.style.display = 'flex';
+            } else if (totalCorrect >= 6) {
+                globalResultDiv.className = 'result-banner correct';
+                globalResultDiv.innerHTML = `<i class="fas fa-smile-wink"></i> Good job! ${totalCorrect}/${totalQuestions} correct. Keep practicing! 🎶`;
+                globalResultDiv.style.display = 'flex';
+            } else {
+                globalResultDiv.className = 'result-banner incorrect';
+                globalResultDiv.innerHTML = `<i class="fas fa-frown"></i> ${totalCorrect}/${totalQuestions} correct. Review the words and try again.`;
+                globalResultDiv.style.display = 'flex';
+            }
+        }
+        
+        // Reset all selections and UI
+        function resetAllQuizzes() {
+            // Reset arrays
+            synSelections = new Array(synonymsData.length).fill(null);
+            antSelections = new Array(antonymsData.length).fill(null);
+            synFeedbackTriggered = new Array(synonymsData.length).fill(false);
+            antFeedbackTriggered = new Array(antonymsData.length).fill(false);
+            
+            // Re-render everything
+            renderSynonyms();
+            renderAntonyms();
+            
+            // Reset scores
+            updateSynScoreDisplay();
+            updateAntScoreDisplay();
+            updateTotalScoreDisplay();
+            
+            // Hide global result banner
+            const globalDiv = document.getElementById('global-result');
+            if (globalDiv) globalDiv.style.display = 'none';
+        }
+        
+        // Initialize quiz
+        function initQuiz() {
+            renderSynonyms();
+            renderAntonyms();
+            updateSynScoreDisplay();
+            updateAntScoreDisplay();
+            updateTotalScoreDisplay();
+            hideGlobalResult();
+        }
+        
+        // Expose globally
+        window.checkAllAnswers = checkAllAnswers;
+        window.resetAllQuizzes = resetAllQuizzes;
+        
+        // Start
+        initQuiz();
+    </script>
+</body>
+</html>
