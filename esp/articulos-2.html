@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>el / la — артикли в предложениях</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #FBFBFA;
+      font-family: 'Bitter', 'Georgia', 'Times New Roman', serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .trainer-container {
+      max-width: 850px;
+      width: 100%;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.8rem;
+    }
+
+    .progress-section {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #6B6B6B;
+      background: transparent;
+      letter-spacing: 0.3px;
+    }
+
+    .progress-badge {
+      background: #FFFFFF;
+      padding: 8px 20px;
+      border-radius: 40px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+      border: 1px solid #E9E9E6;
+      font-family: 'Bitter', monospace;
+      font-weight: 500;
+    }
+
+    .article-buttons {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      width: 100%;
+      margin: 0.2rem 0 0.2rem;
+      flex-wrap: wrap;
+    }
+
+    .article-btn {
+      font-size: 2.5rem;
+      font-weight: 700;
+      padding: 0.9rem 1.8rem;
+      min-width: 150px;
+      background: #FFFFFF;
+      border: 2px solid #E9E9E6;
+      border-radius: 28px;
+      cursor: pointer;
+      color: #2B2B2B;
+      transition: all 0.2s ease;
+      font-family: 'Bitter', 'Georgia', serif;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+      text-transform: lowercase;
+    }
+
+    .article-btn:hover {
+      background: #F5F5F3;
+      transform: translateY(-2px);
+      border-color: #DCDCD6;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .article-btn:active {
+      transform: translateY(1px);
+    }
+
+    .article-btn.disabled-btn {
+      pointer-events: none;
+      opacity: 0.65;
+      transform: none;
+    }
+
+    .article-btn.correct-btn-highlight {
+      background-color: #C7DDCA !important;
+      border-color: #9EBF9E !important;
+      transition: background 0.15s;
+    }
+
+    .article-btn.wrong-btn-highlight {
+      background-color: #E9C1C1 !important;
+      border-color: #D4A0A0 !important;
+      transition: background 0.15s;
+    }
+
+    .sentence-card {
+      background: #FFFFFF;
+      width: 100%;
+      padding: 2.5rem 1.8rem;
+      text-align: center;
+      border-radius: 28px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
+      border: 1px solid #E9E9E6;
+      transition: background-color 0.2s ease;
+      cursor: default;
+    }
+
+    .sentence-display {
+      font-size: 1.85rem;
+      font-weight: 500;
+      color: #1F1F1F;
+      line-height: 1.45;
+      word-break: break-word;
+      font-family: 'Bitter', 'Georgia', serif;
+    }
+
+    .inserted-article {
+      display: inline-block;
+      font-weight: 700;
+      color: #2B6B2B;
+      background: #EAF5EA;
+      border-radius: 12px;
+      padding: 0 6px;
+      margin: 0 2px;
+      text-decoration: none;
+      box-shadow: inset 0 0 0 1px #C8E0C8;
+    }
+
+    .blank-placeholder {
+      display: inline-block;
+      min-width: 70px;
+      background: #F0F0EB;
+      border-radius: 16px;
+      padding: 0 8px;
+      margin: 0 2px;
+      font-weight: 600;
+      color: #8B7F6C;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 5px;
+    }
+
+    .correct-highlight-card .sentence-card {
+      background-color: #C7DDCA;
+    }
+
+    .wrong-highlight-card .sentence-card {
+      background-color: #E9C1C1;
+    }
+
+    .feedback-msg {
+      min-height: 50px;
+      font-size: 0.95rem;
+      color: #6B6B6B;
+      text-align: center;
+      margin-top: 8px;
+      font-weight: 500;
+      font-family: 'Bitter', system-ui, serif;
+    }
+
+    .action-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .next-btn {
+      background: #F5F3EF;
+      border: 1px solid #E0DDD6;
+      padding: 10px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 60px;
+      cursor: pointer;
+      color: #2B2B2B;
+      transition: all 0.2s;
+      font-family: 'Bitter', serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .next-btn:hover {
+      background: #EDE7DE;
+      transform: translateY(-1px);
+    }
+
+    .next-btn:active {
+      transform: translateY(1px);
+    }
+
+    .next-btn.hidden-btn {
+      display: none;
+    }
+
+    .completion-screen {
+      background: #FFFFFF;
+      border-radius: 32px;
+      padding: 2rem 2rem 2rem;
+      text-align: center;
+      border: 1px solid #E9E9E6;
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.06);
+      width: 100%;
+    }
+
+    .completion-screen h2 {
+      color: #2B2B2B;
+      font-size: 1.9rem;
+      margin-bottom: 1rem;
+      font-family: 'Bitter', serif;
+      font-weight: 600;
+    }
+
+    .completion-screen p {
+      color: #6B6B6B;
+      margin-bottom: 1.8rem;
+      font-size: 1.1rem;
+    }
+
+    .restart-btn {
+      background: #FBFBFA;
+      border: 1px solid #E9E9E6;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 48px;
+      cursor: pointer;
+      color: #2B2B2B;
+      transition: all 0.2s;
+      font-family: 'Bitter', serif;
+    }
+
+    .restart-btn:hover {
+      background: #F5F5F3;
+      transform: scale(0.98);
+      border-color: #DCDCD6;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 650px) {
+      .article-btn {
+        font-size: 2rem;
+        min-width: 120px;
+        padding: 0.7rem 1rem;
+      }
+      .sentence-display {
+        font-size: 1.4rem;
+      }
+      .sentence-card {
+        padding: 1.8rem 1.2rem;
+      }
+      .article-buttons {
+        gap: 1.2rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .sentence-display {
+        font-size: 1.2rem;
+      }
+      .article-btn {
+        font-size: 1.8rem;
+        min-width: 100px;
+      }
+    }
+
+    .article-btn {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+
+<div class="trainer-container" id="trainerRoot">
+  <div class="progress-section">
+    <div class="progress-badge" id="progressText">0 / 0</div>
+  </div>
+
+  <div id="gamePanel">
+    <div class="article-buttons">
+      <button class="article-btn" data-article="EL">el</button>
+      <button class="article-btn" data-article="LA">la</button>
+    </div>
+
+    <div class="sentence-card" id="sentenceCard">
+      <div class="sentence-display" id="sentenceDisplay">cargando...</div>
+    </div>
+
+    <div class="feedback-msg" id="feedbackMsg"></div>
+    
+    <div class="action-bar">
+      <button class="next-btn" id="nextBtn">➡ Siguiente frase</button>
+    </div>
+  </div>
+
+  <div id="completionPanel" class="completion-screen hidden">
+    <h2>✨ ¡Fantástico! ✨</h2>
+    <p>Has completado todas las frases.<br>¡Muy bien usando el / la en contexto!</p>
+    <button class="restart-btn" id="restartCompletionBtn">⟳ Repetir lista</button>
+  </div>
+</div>
+
+<script>
+  // --------------------------------------------------------------
+  // 25 ФРАЗ (15 исходных + 10 новых) с артиклями EL / LA
+  // Каждая фраза содержит текст с "_____" (место для артикля)
+  // --------------------------------------------------------------
+  const sentencesData = [
+    // Оригинальные 15
+    { text: "_____ teléfono está en la mesa.", article: "EL" },
+    { text: "_____ computadora es muy rápida.", article: "LA" },
+    { text: "_____ problema no es grave.", article: "EL" },
+    { text: "_____ nacionalidad de Marta es española.", article: "LA" },
+    { text: "_____ música clásica relaja.", article: "LA" },
+    { text: "_____ universidad está en el centro.", article: "LA" },
+    { text: "_____ fruta es saludable.", article: "LA" },
+    { text: "_____ chocolate me gusta mucho.", article: "EL" },
+    { text: "_____ información es importante.", article: "LA" },
+    { text: "_____ restaurante italiano está cerca.", article: "EL" },
+    { text: "_____ leche está fría.", article: "LA" },
+    { text: "_____ parque es muy grande.", article: "EL" },
+    { text: "_____ televisión no funciona.", article: "LA" },
+    { text: "_____ hotel tiene internet gratis.", article: "EL" },
+    { text: "_____ familia de Luis vive en Madrid.", article: "LA" },
+    
+    // НОВЫЕ 10 предложений
+    { text: "_____ libro es interesante.", article: "EL" },
+    { text: "_____ mesa está limpia.", article: "LA" },
+    { text: "_____ profesor explica bien.", article: "EL" },
+    { text: "_____ casa tiene jardín.", article: "LA" },
+    { text: "_____ coche es rojo.", article: "EL" },
+    { text: "_____ playa está cerca.", article: "LA" },
+    { text: "_____ examen fue difícil.", article: "EL" },
+    { text: "_____ ciudad es moderna.", article: "LA" },
+    { text: "_____ vino tinto es español.", article: "EL" },
+    { text: "_____ palabra está mal escrita.", article: "LA" }
+  ];
+
+  // --------------------------------------------------------------
+  // ТРЕНАЖЁР: артикль вставляется в форму, переход по кнопке
+  // --------------------------------------------------------------
+  class SentenceTrainer {
+    constructor(originalSentences, gamePanelEl, completionPanelEl, progressSpan, sentenceDisplaySpan, feedbackSpan, nextBtnEl) {
+      this.originalSentences = [...originalSentences];
+      this.activeSentences = [];     // перемешанный массив
+      this.currentIndex = 0;
+      this.answerLock = false;       // блокируем кнопки артиклей, если уже ответили на текущую фразу
+      this.currentUserAnswer = null; // какой артикль выбрал пользователь для текущей фразы (EL/LA)
+      this.currentIsCorrect = false; // правильный ли был ответ
+      
+      this.gamePanel = gamePanelEl;
+      this.completionPanel = completionPanelEl;
+      this.progressSpan = progressSpan;
+      this.sentenceDisplaySpan = sentenceDisplaySpan;
+      this.feedbackSpan = feedbackSpan;
+      this.nextBtn = nextBtnEl;
+      this.sentenceCard = document.getElementById('sentenceCard');
+
+      this.btnEL = document.querySelector('.article-btn[data-article="EL"]');
+      this.btnLA = document.querySelector('.article-btn[data-article="LA"]');
+
+      // События
+      this.btnEL.addEventListener('click', () => this.onArticleClick('EL'));
+      this.btnLA.addEventListener('click', () => this.onArticleClick('LA'));
+      this.nextBtn.addEventListener('click', () => this.goToNextSentence());
+    }
+
+    shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // Преобразует текст с "_____" в html, подставляя выбранный артикль (если есть)
+    // Если артикль не выбран — показывает подчеркнутый пропуск.
+    renderSentenceWithArticle(originalText, selectedArticle = null) {
+      if (selectedArticle) {
+        // вставляем артикль (el/la) с красивым выделением
+        const articleText = selectedArticle === 'EL' ? 'el' : 'la';
+        return originalText.replace(/_____/g, `<span class="inserted-article">${articleText}</span>`);
+      } else {
+        // показываем пустой пропуск
+        return originalText.replace(/_____/g, '<span class="blank-placeholder">_____</span>');
+      }
+    }
+
+    // Обновить отображение карточки с учётом текущего ответа (или без ответа)
+    updateCardDisplay() {
+      if (!this.activeSentences.length) return;
+      if (this.currentIndex >= this.activeSentences.length) return;
+      
+      const sentenceObj = this.activeSentences[this.currentIndex];
+      const rawText = sentenceObj.text;
+      const selectedArt = this.currentUserAnswer; // может быть null
+      const formattedHtml = this.renderSentenceWithArticle(rawText, selectedArt);
+      this.sentenceDisplaySpan.innerHTML = formattedHtml;
+    }
+
+    // Обновить индикатор прогресса
+    updateProgress() {
+      const total = this.activeSentences.length;
+      const current = this.currentIndex + 1;
+      this.progressSpan.innerText = `${Math.min(current, total)} / ${total}`;
+    }
+
+    // Сброс состояния текущей карточки (перед загрузкой новой)
+    resetCurrentState() {
+      this.currentUserAnswer = null;
+      this.currentIsCorrect = false;
+      this.answerLock = false;
+      this.clearCardHighlights();
+      this.clearAllButtonsHighlight();
+      this.feedbackSpan.innerText = '';
+      this.enableArticleButtons(true);
+      this.nextBtn.classList.add('hidden-btn');   // кнопка next скрыта, пока не ответят
+    }
+
+    // Загрузить текущую фразу (индекс currentIndex)
+    loadCurrentSentence() {
+      if (this.currentIndex >= this.activeSentences.length) {
+        this.finishGame();
+        return;
+      }
+      this.resetCurrentState();
+      this.updateCardDisplay();
+      this.updateProgress();
+    }
+
+    initGame() {
+      this.activeSentences = this.shuffleArray([...this.originalSentences]);
+      this.currentIndex = 0;
+      this.resetCurrentState();
+      this.loadCurrentSentence();
+      this.gamePanel.classList.remove('hidden');
+      this.completionPanel.classList.add('hidden');
+    }
+
+    clearCardHighlights() {
+      this.sentenceCard.parentElement.classList.remove('correct-highlight-card', 'wrong-highlight-card');
+    }
+
+    highlightCardAsCorrect() {
+      this.clearCardHighlights();
+      this.sentenceCard.parentElement.classList.add('correct-highlight-card');
+    }
+
+    highlightCardAsWrong() {
+      this.clearCardHighlights();
+      this.sentenceCard.parentElement.classList.add('wrong-highlight-card');
+    }
+
+    clearAllButtonsHighlight() {
+      this.btnEL.classList.remove('correct-btn-highlight', 'wrong-btn-highlight');
+      this.btnLA.classList.remove('correct-btn-highlight', 'wrong-btn-highlight');
+    }
+
+    highlightCorrectButton(article) {
+      this.clearAllButtonsHighlight();
+      const correctBtn = article === 'EL' ? this.btnEL : this.btnLA;
+      correctBtn.classList.add('correct-btn-highlight');
+    }
+
+    highlightWrongButton(article) {
+      this.clearAllButtonsHighlight();
+      const wrongBtn = article === 'EL' ? this.btnEL : this.btnLA;
+      wrongBtn.classList.add('wrong-btn-highlight');
+    }
+
+    enableArticleButtons(enabled) {
+      if (enabled) {
+        this.btnEL.classList.remove('disabled-btn');
+        this.btnLA.classList.remove('disabled-btn');
+      } else {
+        this.btnEL.classList.add('disabled-btn');
+        this.btnLA.classList.add('disabled-btn');
+      }
+    }
+
+    // Обработка клика по артиклю
+    onArticleClick(selected) {
+      // Если уже ответили на эту фразу (answerLock true) — ничего не делаем
+      if (this.answerLock) return;
+      
+      const currentItem = this.activeSentences[this.currentIndex];
+      if (!currentItem) return;
+      
+      const correctArticle = currentItem.article;
+      const isCorrect = (selected === correctArticle);
+      
+      // Фиксируем ответ пользователя
+      this.currentUserAnswer = selected;
+      this.currentIsCorrect = isCorrect;
+      this.answerLock = true;
+      
+      // Обновляем отображение: вставляем выбранный артикль в предложение
+      this.updateCardDisplay();
+      
+      if (isCorrect) {
+        // Правильный ответ
+        this.highlightCardAsCorrect();
+        this.highlightCorrectButton(selected);
+        this.feedbackSpan.innerText = '✓ ¡Muy bien! Puedes continuar.';
+        // Показываем кнопку "Siguiente frase"
+        this.nextBtn.classList.remove('hidden-btn');
+        this.enableArticleButtons(false);  // артикли блокируются до след фразы
+      } else {
+        // Неправильный ответ — подсвечиваем ошибку, но не блокируем выбор артикля?
+        // По UX: показываем что ошибка, но позволяем выбрать другой артикль? 
+        // Лучше: дать попробовать снова, но не переходить к следующей фразе, пока не выбран верный.
+        // Поэтому не блокируем answerLock, а даём возможность выбрать другой артикль.
+        this.answerLock = false;  // снимаем блокировку, чтобы можно было выбрать заново
+        this.currentUserAnswer = null;   // сбрасываем ошибочный ответ из отображения
+        this.updateCardDisplay();        // возвращаем пустой пропуск
+        
+        this.highlightCardAsWrong();
+        this.highlightWrongButton(selected);
+        this.feedbackSpan.innerText = `❌ No es "${selected === 'EL' ? 'el' : 'la'}". Intenta de nuevo.`;
+        // Кнопка следующего остается скрытой
+        this.nextBtn.classList.add('hidden-btn');
+        // Артикли остаются активными (не дизейблим), пусть попробует другой
+        this.enableArticleButtons(true);
+        // Но подсветку неправильной кнопки убираем через небольшую задержку, чтобы не мешать
+        setTimeout(() => {
+          // убираем красную подсветку только если пользователь ещё не выбрал заново
+          if (!this.currentUserAnswer && !this.answerLock) {
+            this.clearAllButtonsHighlight();
+          }
+        }, 800);
+      }
+    }
+    
+    // Переход к следующему предложению
+    goToNextSentence() {
+      // Переход разрешен только если answerLock истинна (ответ дан и фраза завершена) и ответ правильный
+      if (!this.answerLock || !this.currentIsCorrect) {
+        // Если фраза ещё без ответа или ответ неправильный, нельзя перейти
+        if (!this.answerLock) {
+          this.feedbackSpan.innerText = '❓ Elige un artículo primero.';
+        } else if (!this.currentIsCorrect) {
+          this.feedbackSpan.innerText = '⚠️ Selecciona el artículo correcto antes de continuar.';
+        }
+        return;
+      }
+      
+      // Увеличиваем индекс и загружаем следующую фразу
+      this.currentIndex++;
+      if (this.currentIndex < this.activeSentences.length) {
+        this.resetCurrentState();          // сбросить состояние, скрыть кнопку next и т.д.
+        this.loadCurrentSentence();        // загрузить новую фразу
+      } else {
+        this.finishGame();
+      }
+    }
+    
+    finishGame() {
+      this.gamePanel.classList.add('hidden');
+      this.completionPanel.classList.remove('hidden');
+      this.answerLock = false;
+      this.enableArticleButtons(true);
+      this.clearCardHighlights();
+      this.clearAllButtonsHighlight();
+    }
+    
+    restartGame() {
+      this.initGame();
+    }
+  }
+
+  // --------------------------------------------------------------
+  // ЗАПУСК
+  // --------------------------------------------------------------
+  document.addEventListener('DOMContentLoaded', () => {
+    const gamePanel = document.getElementById('gamePanel');
+    const completionPanel = document.getElementById('completionPanel');
+    const progressSpan = document.getElementById('progressText');
+    const sentenceDisplaySpan = document.getElementById('sentenceDisplay');
+    const feedbackSpan = document.getElementById('feedbackMsg');
+    const nextBtn = document.getElementById('nextBtn');
+    const restartCompletionBtn = document.getElementById('restartCompletionBtn');
+    
+    const trainer = new SentenceTrainer(
+      sentencesData, gamePanel, completionPanel, progressSpan,
+      sentenceDisplaySpan, feedbackSpan, nextBtn
+    );
+    trainer.initGame();
+    
+    restartCompletionBtn.addEventListener('click', () => {
+      trainer.restartGame();
+    });
+  });
+</script>
+</body>
+</html>
