@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Verb Cards • Swiss Style • Speaking Practice</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f2f0;  /* soft Swiss off-white, paper-like */
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-weight: 450;
+      line-height: 1.5;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* main container – elegant centered column */
+    .card-container {
+      max-width: 860px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* actual card – Swiss precision: crisp corners, clean shadow, subtle border */
+    .card {
+      background: #ffffff;
+      border-radius: 28px;          /* generous but refined radius */
+      box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      padding: 2.2rem 2.2rem 2rem 2.2rem;
+      border: 1px solid #eaeaea;
+    }
+
+    /* subtle hover – Swiss understatement (only for regular cards, but applied generally) */
+    .card:hover {
+      box-shadow: 0 20px 32px -12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+      border-color: #dcdcdc;
+    }
+
+    /* verb headline – modern, bold, clean */
+    .verb {
+      font-size: 2.4rem;
+      font-weight: 620;
+      letter-spacing: -0.02em;
+      color: #1a1a1a;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e2e2e0;
+      display: inline-block;
+      width: auto;
+      line-height: 1.2;
+    }
+
+    /* prompt text – generous legibility, calm rhythm */
+    .prompt {
+      font-size: 1.35rem;
+      font-weight: 430;
+      color: #2c2c2c;
+      line-height: 1.55;
+      letter-spacing: -0.01em;
+      margin: 1.6rem 0 1rem 0;
+    }
+
+    /* special styling for "all done" state: softer, centered, subtle */
+    .all-done-verb {
+      font-size: 2rem;
+      font-weight: 560;
+      letter-spacing: -0.01em;
+      color: #2b6e4f;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #d4e2da;
+      display: inline-block;
+    }
+
+    .all-done-message {
+      font-size: 1.35rem;
+      font-weight: 430;
+      color: #2c2c2c;
+      text-align: center;
+      margin: 2rem 0 1.5rem 0;
+      line-height: 1.5;
+    }
+
+    /* start again button – minimal, elegant, Swiss functional */
+    .start-again-btn {
+      background: transparent;
+      border: 1.5px solid #c0c0bc;
+      border-radius: 60px;
+      padding: 0.6rem 1.6rem;
+      font-size: 0.9rem;
+      font-weight: 520;
+      font-family: inherit;
+      color: #2c2c2c;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #fefefc;
+      margin-top: 0.5rem;
+    }
+
+    .start-again-btn:hover {
+      background: #eaeae6;
+      border-color: #9a9a96;
+      color: #1a1a1a;
+      transform: scale(0.98);
+    }
+
+    .start-again-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* minimal footer area */
+    .card-footer {
+      margin-top: 2.2rem;
+      border-top: 1px solid #efefed;
+      padding-top: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      font-weight: 440;
+      color: #8b8b8b;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .hint span {
+      background: #f6f6f4;
+      padding: 0.2rem 0.8rem;
+      border-radius: 60px;
+      font-size: 0.7rem;
+      font-weight: 470;
+    }
+
+    .counter {
+      font-size: 0.75rem;
+      font-weight: 440;
+      color: #a5a5a3;
+      letter-spacing: 0.2px;
+      text-align: right;
+      margin-top: 0.85rem;
+    }
+
+    /* done state overrides – no hover transform, different cursor */
+    .card.done-state {
+      cursor: default;
+    }
+
+    .card.done-state:hover {
+      transform: none;
+      box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08);
+    }
+
+    /* responsive */
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+      .card {
+        padding: 1.5rem;
+      }
+      .verb {
+        font-size: 1.8rem;
+      }
+      .prompt {
+        font-size: 1.2rem;
+      }
+      .all-done-verb {
+        font-size: 1.6rem;
+      }
+      .all-done-message {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* focus accessibility */
+    .card:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 3px;
+    }
+    .start-again-btn:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card-container">
+  <div class="card" id="speakingCard" role="button" tabindex="0" aria-label="Verb card, click for next">
+    <div class="verb" id="verbDisplay">hate</div>
+    <div class="prompt" id="promptDisplay">
+      You started working on a long financial report for your team three hours ago. From the very beginning you strongly disliked this task, and the feeling has not changed up to now. What do you say?
+    </div>
+    <div class="card-footer">
+      <div class="hint">
+        <span>✧ click card ✧</span>
+        <span>next →</span>
+      </div>
+      <!-- no shuffle button – removed as requested, only pure experience -->
+      <div style="width: 10px;"></div> <!-- spacer for layout balance -->
+    </div>
+  </div>
+  <div class="counter" id="cardCounter">—</div>
+</div>
+
+<script>
+  // ---------- COMPLETE DECK (original 17 + new 10 = 27 cards, exactly from spec) ----------
+  const fullVerbPrompts = [
+    { verb: "hate", prompt: "You started working on a long financial report for your team three hours ago. From the very beginning you strongly disliked this task, and the feeling has not changed up to now. What do you say?" },
+    { verb: "play", prompt: "You joined a local football club last year and you are still training and playing matches every week. What do you say about your involvement?" },
+    { verb: "understand", prompt: "You started studying a difficult grammar topic for an exam two weeks ago, and you are still trying to fully understand it. What do you say about your progress?" },
+    { verb: "see", prompt: "You started dating someone from your university a few months ago and you continue meeting them regularly. What do you say about this situation?" },
+    { verb: "know", prompt: "You first met your new colleague six months ago and you still have the same knowledge about them and your relationship continues. What do you say?" },
+    { verb: "speak", prompt: "You started practicing Spanish for your job training last year and you are still using it in conversations at work. What do you say about your ability?" },
+    { verb: "want", prompt: "You have wanted a promotion at your company since last year and this desire is still strong today. What do you say?" },
+    { verb: "look", prompt: "You started looking for your lost passport this morning and you are still searching for it now. What do you say?" },
+    { verb: "upload", prompt: "You started uploading a large set of training videos to an online platform two hours ago and the process is still going. What do you say about it?" },
+    { verb: "love", prompt: "You started loving playing basketball when you were a teenager and you still enjoy it every weekend. What do you say?" },
+    { verb: "think", prompt: "You have been thinking about changing your job for the past month and you are still considering it now. What do you say?" },
+    { verb: "like", prompt: "You started liking a new coworker after working on a project together last month and this feeling is still there. What do you say?" },
+    { verb: "get", prompt: "You started trying to get access to a company database yesterday and you still don’t have it. What do you say about the situation?" },
+    { verb: "feel", prompt: "You have been feeling tired and stressed during your exam week for several days and this is still true now. What do you say?" },
+    { verb: "watch", prompt: "You started watching a new TV series on Netflix last weekend and you are still watching it now. What do you say about it?" },
+    { verb: "listen", prompt: "You started listening to a podcast about technology during your commute last week and you still listen to it regularly. What do you say?" },
+    { verb: "meet", prompt: "You started meeting with your project team every Monday three months ago and this is still happening now. What do you say about these meetings?" },
+    // Second batch (exactly as provided)
+    { verb: "live", prompt: "You moved to Berlin for work six months ago and you are still living in the same apartment today. What do you say about your situation?" },
+    { verb: "work", prompt: "You started working on a software development project two weeks ago and you are still actively coding it now. What do you say?" },
+    { verb: "study", prompt: "You began preparing for your final exams at the start of the semester and you are still studying every day. What do you say about your preparation?" },
+    { verb: "wait", prompt: "You arrived at the train station an hour ago and the train still hasn’t come. What do you say about the situation?" },
+    { verb: "write", prompt: "You started writing a research paper yesterday and you are still working on it now. What do you say?" },
+    { verb: "learn", prompt: "You began learning to drive last month and you are still taking lessons. What do you say about your progress?" },
+    { verb: "run", prompt: "You started training for a marathon three months ago and you are still running regularly. What do you say?" },
+    { verb: "build", prompt: "You began building a website for your portfolio last week and you are still developing it. What do you say?" },
+    { verb: "search", prompt: "You started searching for a new apartment a few weeks ago and you are still looking. What do you say?" },
+    { verb: "teach", prompt: "You started teaching English at a language school last year and you are still doing it now. What do you say about your job?" }
+  ];
+
+  // ---------- STATE ----------
+  let currentDeck = [];        // shuffled array of card objects
+  let currentIndex = 0;        // position inside the deck (0 ... deckLength-1)
+  let isAllDoneMode = false;    // flag for "all done" special card
+
+  // DOM elements
+  const cardElement = document.getElementById("speakingCard");
+  const verbDisplay = document.getElementById("verbDisplay");
+  const promptDisplay = document.getElementById("promptDisplay");
+  const counterSpan = document.getElementById("cardCounter");
+
+  // Helper: Fisher-Yates shuffle (returns new array)
+  function shuffleArray(arr) {
+    const array = [...arr];
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  // Render the "ALL DONE" special card (no verb/prompt from data, just completion message + start again button)
+  function renderAllDoneCard() {
+    isAllDoneMode = true;
+    // change card content to completion state
+    verbDisplay.innerHTML = '✨ all done ✨';
+    verbDisplay.className = 'all-done-verb';    // special styling
+    promptDisplay.innerHTML = `
+      <div class="all-done-message">
+        You’ve reviewed every verb.<br>
+        Ready for another round?
+      </div>
+      <div style="text-align: center; margin-top: 0.5rem;">
+        <button class="start-again-btn" id="startAgainButton">⟳ start again</button>
+      </div>
+    `;
+    // remove any leftover inline event? we'll manage via listener
+    counterSpan.innerText = `✓ completed ✓`;
+
+    // modify card appearance: done-state to avoid weird hover transforms
+    cardElement.classList.add('done-state');
+    // remove pointer cursor because card click shouldn't advance (only button works)
+    cardElement.style.cursor = 'default';
+    // remove existing click listener temporarily? we'll manage inside global click with flag
+    // Also remove tabindex role? keep but we will handle in click logic: if isAllDoneMode, do nothing unless start again clicked.
+    // Additionally attach event to the new button dynamically.
+    const startBtn = document.getElementById('startAgainButton');
+    if (startBtn) {
+      // remove previous listener to avoid duplicates
+      const newBtn = startBtn.cloneNode(true);
+      startBtn.parentNode.replaceChild(newBtn, startBtn);
+      newBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        resetAndRestart();
+      });
+    }
+  }
+
+  // Reset the entire session: reshuffle deck, reset index, exit all-done mode, render first card
+  function resetAndRestart() {
+    // reshuffle the full deck fresh
+    currentDeck = shuffleArray([...fullVerbPrompts]);
+    currentIndex = 0;
+    isAllDoneMode = false;
+    // restore default card styling
+    cardElement.classList.remove('done-state');
+    cardElement.style.cursor = 'pointer';
+    verbDisplay.className = 'verb';   // back to original class
+    // re-render normal card
+    updateNormalCard();
+  }
+
+  // update UI for regular verb card (no "all done")
+  function updateNormalCard() {
+    if (!currentDeck.length) {
+      // safety: if deck empty for any reason, reinitialize
+      currentDeck = shuffleArray([...fullVerbPrompts]);
+      currentIndex = 0;
+    }
+    const entry = currentDeck[currentIndex];
+    verbDisplay.innerHTML = entry.verb;
+    verbDisplay.className = 'verb';        // ensure correct styling
+    promptDisplay.innerHTML = entry.prompt;
+    // update counter elegantly: show position / total
+    counterSpan.innerText = `${currentIndex + 1} / ${currentDeck.length}`;
+    isAllDoneMode = false;
+    // card interactive again
+    cardElement.style.cursor = 'pointer';
+  }
+
+  // Move to next card: if there are cards left, increment; otherwise trigger "all done" card
+  function advanceToNext() {
+    if (isAllDoneMode) {
+      // if already in all-done mode, clicking does nothing (except button reset)
+      return;
+    }
+    // check if we have deck and there is a next card within bounds
+    if (!currentDeck.length) {
+      resetAndRestart();
+      return;
+    }
+    const nextIndex = currentIndex + 1;
+    if (nextIndex < currentDeck.length) {
+      // normal next card
+      currentIndex = nextIndex;
+      updateNormalCard();
+    } else {
+      // END OF DECK: show "all done" summary card (last card as completion)
+      renderAllDoneCard();
+    }
+  }
+
+  // card click handler: advances only if not in all-done mode
+  function onCardClick(e) {
+    // if click originated from inside "start again" button, ignore (button handles separately)
+    if (e.target && (e.target.id === 'startAgainButton' || e.target.closest?.('#startAgainButton'))) {
+      return;
+    }
+    if (isAllDoneMode) {
+      // In all-done mode, clicking the card does nothing except maybe the button (already handled)
+      return;
+    }
+    advanceToNext();
+  }
+
+  // keyboard support: Enter / Space on card
+  function onCardKeydown(e) {
+    if (isAllDoneMode) return;
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Space') {
+      e.preventDefault();
+      advanceToNext();
+    }
+  }
+
+  // Initialize the app: shuffled deck, first card, no extra shuffle button, all-done flag false
+  function init() {
+    // fresh shuffled deck
+    currentDeck = shuffleArray([...fullVerbPrompts]);
+    currentIndex = 0;
+    isAllDoneMode = false;
+    updateNormalCard();
+    cardElement.classList.remove('done-state');
+    cardElement.style.cursor = 'pointer';
+    // attach event listeners
+    cardElement.removeEventListener('click', onCardClick);
+    cardElement.removeEventListener('keydown', onCardKeydown);
+    cardElement.addEventListener('click', onCardClick);
+    cardElement.addEventListener('keydown', onCardKeydown);
+    // ensure any leftover startAgainButton from previous renders is gone (just in case)
+    // set proper counter display
+  }
+
+  // also handle potential window load (ensures first render)
+  init();
+</script>
+</body>
+</html>
