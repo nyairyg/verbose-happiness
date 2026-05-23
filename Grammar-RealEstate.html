@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ESL grammar · Dubai real estate</title>
+  <!-- Bitter font from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,450;0,500;0,550;0,600;0,620;0,700;1,400;1,450&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f2f0;
+      font-family: 'Bitter', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, serif;
+      font-weight: 450;
+      line-height: 1.5;
+      padding: 2rem 1.5rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card-container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+      transition: all 0.2s ease;
+      padding: 2.2rem 2.2rem 2rem 2.2rem;
+      border: 1px solid #eaeaea;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    .card:not(.done-state):hover {
+      box-shadow: 0 20px 32px -12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+      border-color: #dcdcdc;
+    }
+
+    .verb {
+      font-size: 2.2rem;
+      font-weight: 620;
+      letter-spacing: -0.02em;
+      color: #1a1a1a;
+      margin-bottom: 0.2rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e2e2e0;
+      display: inline-block;
+      width: auto;
+      line-height: 1.2;
+    }
+
+    .prompt {
+      font-size: 1.35rem;
+      font-weight: 430;
+      color: #2c2c2c;
+      line-height: 1.55;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+
+    .all-done-verb {
+      font-size: 2rem;
+      font-weight: 560;
+      letter-spacing: -0.01em;
+      color: #2b6e4f;
+      margin-bottom: 0.5rem;
+      border-bottom: 2px solid #d4e2da;
+      display: inline-block;
+    }
+
+    .all-done-message {
+      font-size: 1.35rem;
+      font-weight: 430;
+      color: #2c2c2c;
+      text-align: center;
+      margin: 1.2rem 0 1.5rem 0;
+      line-height: 1.5;
+    }
+
+    .built-text-card {
+      background: #ffffff;
+      border: 1px solid #eaeaea;
+      border-radius: 20px;
+      padding: 1.4rem 1.8rem;
+      min-height: 70px;
+      font-size: 1.15rem;
+      font-weight: 440;
+      letter-spacing: -0.01em;
+      color: #1a1a1a;
+      line-height: 1.7;
+      word-break: break-word;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .built-text-card:empty::after {
+      content: 'Your text will appear here…';
+      color: #a5a5a3;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 1rem;
+    }
+
+    .sentence-part {
+      display: inline;
+    }
+
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      transition: opacity 0.25s ease, filter 0.25s ease;
+    }
+
+    .options-container.muted {
+      opacity: 0.6;
+      filter: grayscale(30%);
+      pointer-events: none;
+    }
+
+    .options-container.muted .option-btn {
+      background: #f8f8f6;
+      border-color: #e0e0dc;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      width: 100%;
+      padding: 1rem 1.5rem;
+      font-size: 1.05rem;
+      font-weight: 440;
+      font-family: inherit;
+      letter-spacing: -0.01em;
+      text-align: left;
+      background: #ffffff;
+      border: 1.5px solid #e2e2e0;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px -2px rgba(0,0,0,0.03);
+      color: #1a1a1a;
+      line-height: 1.45;
+    }
+
+    .option-btn:hover:not(.disabled):not(.correct-flash):not(.wrong-flash) {
+      border-color: #c0bfba;
+      background: #fefefc;
+      box-shadow: 0 6px 14px -4px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
+    }
+
+    .option-btn:active:not(.disabled):not(.correct-flash):not(.wrong-flash) {
+      transform: scale(0.985);
+      transition: transform 0.1s;
+    }
+
+    .option-letter {
+      flex-shrink: 0;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: #f6f6f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 550;
+      font-size: 0.9rem;
+      color: #5e5e5c;
+      transition: all 0.2s;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .option-icon {
+      flex-shrink: 0;
+      font-size: 1.2rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .option-btn.correct-flash {
+      border-color: #2b6e4f !important;
+      background: #eaf4ed !important;
+      animation: pulseSwiss 0.6s ease-out;
+      cursor: default;
+      pointer-events: none;
+    }
+    .option-btn.correct-flash .option-letter {
+      background: #c8e0d2;
+      color: #1e4d34;
+    }
+    .option-btn.correct-flash .option-icon {
+      opacity: 1;
+      color: #2b6e4f;
+    }
+
+    @keyframes pulseSwiss {
+      0% { box-shadow: 0 0 0 0 rgba(43, 110, 79, 0.2); }
+      50% { box-shadow: 0 0 0 10px rgba(43, 110, 79, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(43, 110, 79, 0); }
+    }
+
+    .option-btn.wrong-flash {
+      border-color: #b13e3e !important;
+      background: #f9f0f0 !important;
+      animation: shakeGentle 0.5s ease-out;
+      cursor: default;
+      pointer-events: none;
+    }
+    .option-btn.wrong-flash .option-letter {
+      background: #f1d9d9;
+      color: #7a2e2e;
+    }
+    .option-btn.wrong-flash .option-icon {
+      opacity: 1;
+      color: #b13e3e;
+    }
+
+    @keyframes shakeGentle {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+    }
+
+    .option-btn.disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      pointer-events: none;
+      border-color: #dcdcdc !important;
+      text-decoration: line-through;
+      text-decoration-color: #b13e3e;
+      text-decoration-thickness: 1.2px;
+      background: #fafaf8;
+    }
+
+    .explanation-area {
+      background: #fefdf7;
+      border: 1px solid #efe2c6;
+      border-left: 4px solid #c9a63b;
+      border-radius: 18px;
+      padding: 0.9rem 1.4rem;
+      font-size: 0.9rem;
+      font-weight: 440;
+      color: #4d401c;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transform: translateY(-6px);
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      margin-top: 0.2rem;
+    }
+
+    .explanation-area.visible {
+      opacity: 1;
+      transform: translateY(0);
+      max-height: 300px;
+      pointer-events: auto;
+    }
+
+    .explanation-area strong {
+      color: #6b4f12;
+      font-weight: 550;
+    }
+
+    .card-footer {
+      margin-top: 0.5rem;
+      border-top: 1px solid #efefed;
+      padding-top: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      font-weight: 440;
+      color: #8b8b8b;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .hint span {
+      background: #f6f6f4;
+      padding: 0.2rem 0.8rem;
+      border-radius: 60px;
+      font-size: 0.7rem;
+      font-weight: 470;
+    }
+
+    .counter {
+      font-size: 0.75rem;
+      font-weight: 440;
+      color: #a5a5a3;
+      letter-spacing: 0.2px;
+      text-align: right;
+      margin-top: 0.1rem;
+    }
+
+    .start-again-btn {
+      background: transparent;
+      border: 1.5px solid #c0c0bc;
+      border-radius: 60px;
+      padding: 0.6rem 1.6rem;
+      font-size: 0.9rem;
+      font-weight: 520;
+      font-family: inherit;
+      color: #2c2c2c;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #fefefc;
+      margin-top: 0.5rem;
+    }
+
+    .start-again-btn:hover {
+      background: #eaeae6;
+      border-color: #9a9a96;
+      color: #1a1a1a;
+      transform: scale(0.98);
+    }
+
+    .start-again-btn:active {
+      transform: scale(0.96);
+    }
+
+    .card.done-state {
+      cursor: default;
+      align-items: center;
+      text-align: center;
+    }
+    .card.done-state:hover {
+      transform: none;
+      box-shadow: 0 12px 28px -8px rgba(0,0,0,0.08);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+      .card {
+        padding: 1.5rem;
+        gap: 1.2rem;
+      }
+      .verb {
+        font-size: 1.8rem;
+      }
+      .prompt {
+        font-size: 1.2rem;
+      }
+      .built-text-card {
+        padding: 1rem 1.2rem;
+        font-size: 1rem;
+      }
+      .option-btn {
+        padding: 0.9rem 1.2rem;
+        font-size: 0.95rem;
+      }
+      .all-done-verb {
+        font-size: 1.6rem;
+      }
+      .all-done-message {
+        font-size: 1.2rem;
+      }
+    }
+
+    .card:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 3px;
+    }
+    .option-btn:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 2px;
+    }
+    .start-again-btn:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+<div class="card-container">
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+  (function() {
+    // ── 19 steps with simple, jargon‑free explanations ──
+    const stepsData = [
+      {
+        correct: "Dubai's real estate market has transformed beyond recognition over the past decade.",
+        incorrect1: "Dubai's real estate market has transforming beyond recognition for the past decade.",
+        incorrect2: "Dubai's real estate market is transforming beyond recognition over the past decade.",
+        explanation1: "After the word <strong>has</strong>, you cannot use the <em>-ing</em> form of the verb. You need a different form here.",
+        explanation2: "The phrase <strong>is transforming</strong> describes something happening right now, but <em>'over the past decade'</em> talks about a change that started earlier and continues. A different structure would fit better."
+      },
+      {
+        correct: "If someone had told me ten years ago that studio apartments in Business Bay would cost a fortune, I wouldn't have believed them.",
+        incorrect1: "If someone had told me ten years ago that studio apartments in Business Bay will cost a fortune, I won't believe them.",
+        incorrect2: "If someone told me ten years ago that studio apartments in Business Bay cost a fortune, I don't believe them.",
+        explanation1: "<strong>Will</strong> and <strong>won't</strong> are for real future situations. This sentence is about an imaginary past, so those future words don't work.",
+        explanation2: "To talk about an imaginary situation in the past, you need special verb forms. Simple past <em>'told'</em> and present <em>'don't believe'</em> do not show that the situation is unreal."
+      },
+      {
+        correct: "Last week, a client of mine, who has been looking for a holiday home for months, finally found a penthouse overlooking the Palm.",
+        incorrect1: "Last week, a client of mine, which is looking for a holiday home for months, finally found a penthouse overlooking the Palm.",
+        incorrect2: "Last week, a client of mine, who has looking for a holiday home for months, finally found a penthouse overlooking the Palm.",
+        explanation1: "Use <strong>who</strong> for people, not <strong>which</strong>. A client is a person, so you need a different word.",
+        explanation2: "The combination <strong>has looking</strong> is missing a word. To show an action that started in the past and is still happening, you need an extra word before the <em>-ing</em> form."
+      },
+      {
+        correct: "However, the unit had already been bought by a Russian investor by the time we made an offer.",
+        incorrect1: "However, the unit already bought by a Russian investor by the time we made an offer.",
+        incorrect2: "However, the unit be already bought by a Russian investor by the time we made an offer.",
+        explanation1: "The sentence needs a helping verb to show that the buying happened before another past action. <em>'Already bought'</em> alone is incomplete.",
+        explanation2: "The word <strong>be</strong> needs to change to a proper past form. The sentence needs a correct past helping verb."
+      },
+      {
+        correct: "The agent told us that the deal had closed just two hours earlier.",
+        incorrect1: "The agent told us that the deal closed just two hours earlier.",
+        incorrect2: "The agent told us that the deal had been closed just two hours earlier.",
+        explanation1: "Simple past <em>'closed'</em> doesn't make it clear that the closing happened before the telling. A different past form would show the order better.",
+        explanation2: "<strong>Had been closed</strong> means someone actively closed the deal. But deals can close on their own; an active form is more natural here."
+      },
+      {
+        correct: "It was very frustrating.",
+        incorrect1: "It was very frustrated.",
+        incorrect2: "It was very frustratingly.",
+        explanation1: "<strong>Frustrated</strong> describes a person's feeling. 'It' is not a person, so this word doesn't fit the situation.",
+        explanation2: "<strong>Frustratingly</strong> is an adverb. After <em>'was'</em> you need an adjective, not an adverb."
+      },
+      {
+        correct: "Many first-time buyers don't understand how the payment plans are structured.",
+        incorrect1: "Many first-time buyers don't understand how are the payment plans structured.",
+        incorrect2: "Many first-time buyers don't understand how the payment plans are structuring.",
+        explanation1: "The word order is mixed up. In this part of the sentence, the subject should come before the verb, not after it.",
+        explanation2: "<strong>Are structuring</strong> means the plans are doing the action themselves, which doesn't make sense. The plans receive the action, so you need a different form."
+      },
+      {
+        correct: "Usually, a 10% deposit is required to secure a unit, and the remaining amount must be paid in installments.",
+        incorrect1: "Usually, a 10% deposit required to secure a unit, and the remaining amount must pay in installments.",
+        incorrect2: "Usually, a 10% deposit is required to secure a unit, and the remaining amount must pay in installments.",
+        explanation1: "The first part is missing a little word like <strong>is</strong>. Also, <em>'must pay'</em> means the amount pays itself, which is impossible.",
+        explanation2: "In the second part, <strong>must pay</strong> is active, but the amount cannot pay; it should receive the action."
+      },
+      {
+        correct: "The luxury segment is booming right now.",
+        incorrect1: "A luxury segment is booming right now.",
+        incorrect2: "Luxury segment booming right now.",
+        explanation1: "<strong>A</strong> suggests any random segment, but we are talking about a specific one. A different article is expected.",
+        explanation2: "The sentence is missing the verb <strong>is</strong>. A complete sentence needs a verb."
+      },
+      {
+        correct: "I have never seen such a high demand for branded residences.",
+        incorrect1: "I have never seen such a tall demand for branded residences.",
+        incorrect2: "Never I seen such high demand for branded residences.",
+        explanation1: "<strong>Tall</strong> is for height. We don't use 'tall' with demand; a different adjective is correct.",
+        explanation2: "The word order is strange: it should be <em>'I have never seen'</em> or <em>'Never have I seen'</em>. Also, <em>'seen'</em> needs a helping verb."
+      },
+      {
+        correct: "The most stunning project, which will be completed by 2026, is being built on Sheikh Zayed Road as we speak.",
+        incorrect1: "The most stunning project, which will be completed by 2026, is building on Sheikh Zayed Road as we speak.",
+        incorrect2: "The most stunning project, which will be completed by 2026, is built on Sheikh Zayed Road as we speak.",
+        explanation1: "<strong>Is building</strong> means the project is doing the building. A project cannot build itself, so a different form is needed.",
+        explanation2: "<strong>Is built</strong> suggests a permanent fact, not an action happening right now. The phrase <em>'as we speak'</em> needs a different structure."
+      },
+      {
+        correct: "They say it's going to be the tallest tower in the world.",
+        incorrect1: "They say it's going to be the taller tower in the world.",
+        incorrect2: "They say it's going to be tallest tower in the world.",
+        explanation1: "<strong>Taller</strong> is for comparing two things. For something unique in the whole world, you need a different form.",
+        explanation2: "The word <strong>the</strong> is missing before the highest degree adjective. It must be included."
+      },
+      {
+        correct: "Interestingly, many investors from Europe avoid buying off-plan properties because they are afraid the developer might not finish the project.",
+        incorrect1: "Interestingly, many investors from Europe avoid to buy off-plan properties because they are afraiding the developer might not finish the project.",
+        incorrect2: "Interestingly, many investors from Europe avoid buying off-plan properties because they are afraiding the developer might not finish the project.",
+        explanation1: "After <strong>avoid</strong>, you cannot use <em>'to buy'</em>. Also, <strong>afraiding</strong> is not a real word in English.",
+        explanation2: "The word <strong>afraiding</strong> does not exist. The correct word is an adjective and never ends with <em>-ing</em>."
+      },
+      {
+        correct: "However, if the developer is reputable, the risk is minimised.",
+        incorrect1: "However, if the developer is reputable, the risk is minimising.",
+        incorrect2: "However, if the developer is reputable, the risk minimised.",
+        explanation1: "<strong>Is minimising</strong> would mean the risk is actively doing something, which doesn't make sense. The risk receives the action.",
+        explanation2: "The verb group is missing a word before the past form. You need a helping verb."
+      },
+      {
+        correct: "My colleague asked me why I didn't invest in Dubai South earlier.",
+        incorrect1: "My colleague asked me why didn't I invest in Dubai South earlier.",
+        incorrect2: "My colleague asked me why I didn't invested in Dubai South earlier.",
+        explanation1: "The word order in the second part should be <strong>I didn't invest</strong>, not the question order <em>'didn't I invest'</em>.",
+        explanation2: "After <strong>didn't</strong>, use the base form of the verb, not the past tense form."
+      },
+      {
+        correct: "I explained that I didn't have enough capital at that time, but if I had known about the Expo 2020 effect, I would have found a way.",
+        incorrect1: "I explained that I didn't have enough capital at that time, but if I had known about the Expo 2020 effect, I would find a way.",
+        incorrect2: "I explained that I didn't have enough capital at that time, but if I knew about the Expo 2020 effect, I would have found a way.",
+        explanation1: "The result part <strong>would find</strong> is for an imaginary present/future. This is about the past, so the result part needs a different form.",
+        explanation2: "The <em>if</em>-clause <strong>if I knew</strong> is for an imaginary present/future. To talk about an imaginary past, you need a past perfect form."
+      },
+      {
+        correct: "Now the prices have skyrocketed.",
+        incorrect1: "Now the prices skyrocketed.",
+        incorrect2: "Now the prices are skyrocketed.",
+        explanation1: "Simple past <em>'skyrocketed'</em> is for finished past actions, but <strong>now</strong> connects to the present. A different past form is needed.",
+        explanation2: "<strong>Are skyrocketed</strong> is not a possible verb form. 'Skyrocket' cannot be used in this way."
+      },
+      {
+        correct: "In 2026, more than 40,000 new units will be handed over to buyers, and the market is expected to stabilise.",
+        incorrect1: "In 2026, more than 40,000 new units will handed over to buyers, and the market is expected to stabilise.",
+        incorrect2: "In 2026, more than 40,000 new units will be hand over to buyers, and the market is expected to stabilise.",
+        explanation1: "After <strong>will</strong>, you need a helping word before <em>'handed over'</em>. A word is missing.",
+        explanation2: "The verb <em>'hand over'</em> should be in the third form (past participle) here, not the base form."
+      },
+      {
+        correct: "The government introduced very wise regulations in the past, because the crash which many predicted never happened.",
+        incorrect1: "The government introduced very wise regulations in the past, because the crash which many predicted it never happened.",
+        incorrect2: "The government introduced very wise regulations in the past, because the crash which many predicted that never happened.",
+        explanation1: "The word <strong>which</strong> already refers to <em>'the crash'</em>, so adding <em>'it'</em> is unnecessary.",
+        explanation2: "The word <strong>that</strong> is unnecessary here; the sentence already has a clear subject."
+      }
+    ];
+
+    const mainCard = document.getElementById('mainCard');
+
+    let currentStep = 0;
+    let transitioning = false;
+    let completed = false;
+    let shuffledOptions = [];
+
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function getShuffledOptions(stepIndex) {
+      const step = stepsData[stepIndex];
+      return shuffleArray([
+        { text: step.correct, isCorrect: true, explanationKey: null },
+        { text: step.incorrect1, isCorrect: false, explanationKey: 'explanation1' },
+        { text: step.incorrect2, isCorrect: false, explanationKey: 'explanation2' }
+      ]);
+    }
+
+    function renderCard() {
+      if (completed) {
+        renderCompletionState();
+        return;
+      }
+      if (currentStep >= stepsData.length) {
+        finishExercise();
+        return;
+      }
+
+      transitioning = false;
+      shuffledOptions = getShuffledOptions(currentStep);
+
+      const verbHtml = `<div class="verb">Build the sentence</div>`;
+      const promptHtml = `<div class="prompt">Choose the correct option to continue the text.</div>`;
+
+      const builtTextContent = document.getElementById('builtText') ? document.getElementById('builtText').innerHTML : '';
+      const builtHtml = `<div class="built-text-card" id="builtText">${builtTextContent}</div>`;
+
+      let optionsHtml = `<div class="options-container" id="optionsContainer">`;
+      const letters = ['A', 'B', 'C'];
+      shuffledOptions.forEach((opt, i) => {
+        const explanationKey = opt.explanationKey || '';
+        optionsHtml += `
+          <button class="option-btn" data-index="${i}" data-is-correct="${opt.isCorrect ? '1' : '0'}" data-explanation-key="${explanationKey}" role="radio" aria-checked="false">
+            <span class="option-letter">${letters[i]}</span>
+            <span class="option-text">${opt.text}</span>
+            <span class="option-icon">${opt.isCorrect ? '✓' : '✗'}</span>
+          </button>
+        `;
+      });
+      optionsHtml += `</div>`;
+
+      const explanationHtml = `<div class="explanation-area" id="explanationArea"></div>`;
+
+      const footerHtml = `
+        <div class="card-footer">
+          <div class="hint">
+            <span>✧</span> pick one
+          </div>
+          <div class="counter" id="stepCounter">step ${currentStep + 1} of ${stepsData.length}</div>
+        </div>
+      `;
+
+      mainCard.innerHTML = verbHtml + promptHtml + builtHtml + optionsHtml + explanationHtml + footerHtml;
+      mainCard.classList.remove('done-state');
+
+      attachOptionListeners();
+    }
+
+    function renderCompletionState() {
+      const verbHtml = `<div class="all-done-verb">✓ All done</div>`;
+      const messageHtml = `<div class="all-done-message">You've successfully built the complete text.</div>`;
+      const builtTextContent = document.getElementById('builtText') ? document.getElementById('builtText').innerHTML : '';
+      const builtHtml = `<div class="built-text-card" id="builtText" style="text-align:left;">${builtTextContent}</div>`;
+      const restartHtml = `<button class="start-again-btn" id="restartButton">↺ Start again</button>`;
+      const footerHtml = `<div class="card-footer" style="justify-content:center;"><div class="counter">completed</div></div>`;
+
+      mainCard.innerHTML = verbHtml + messageHtml + builtHtml + restartHtml + footerHtml;
+      mainCard.classList.add('done-state');
+
+      document.getElementById('restartButton').addEventListener('click', restartExercise);
+    }
+
+    function attachOptionListeners() {
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', optionClickHandler);
+      });
+    }
+
+    function optionClickHandler(e) {
+      const btn = e.currentTarget;
+      if (transitioning || completed) return;
+      if (btn.classList.contains('disabled') || btn.classList.contains('wrong-flash') || btn.classList.contains('correct-flash')) return;
+
+      const isCorrect = btn.dataset.isCorrect === '1';
+
+      if (isCorrect) {
+        transitioning = true;
+        flashCorrect(btn, () => {
+          addSentenceToText(stepsData[currentStep].correct);
+          advanceAfterDelay();
+        });
+      } else {
+        const explanationKey = btn.dataset.explanationKey;
+        const step = stepsData[currentStep];
+        const explanationText = step[explanationKey] || '';
+        flashWrong(btn);
+        markDisabled(btn);
+        showExplanation(explanationText);
+      }
+    }
+
+    function flashCorrect(btn, callback) {
+      btn.classList.add('correct-flash');
+      btn.setAttribute('aria-checked', 'true');
+      setTimeout(() => {
+        btn.classList.remove('correct-flash');
+        if (callback) callback();
+      }, 600);
+    }
+
+    function flashWrong(btn) {
+      btn.classList.add('wrong-flash');
+      setTimeout(() => {
+        btn.classList.remove('wrong-flash');
+        btn.classList.add('disabled');
+      }, 500);
+    }
+
+    function markDisabled(btn) {
+      setTimeout(() => {
+        btn.classList.add('disabled');
+      }, 500);
+    }
+
+    function showExplanation(html) {
+      const area = document.getElementById('explanationArea');
+      if (!area) return;
+      area.innerHTML = `<span style="display:inline-block;margin-right:6px;">💡</span> ${html}`;
+      requestAnimationFrame(() => {
+        area.classList.add('visible');
+      });
+    }
+
+    function hideExplanation() {
+      const area = document.getElementById('explanationArea');
+      if (!area) return;
+      area.classList.remove('visible');
+      area.innerHTML = '';
+    }
+
+    function addSentenceToText(sentence) {
+      const builtText = document.getElementById('builtText');
+      if (!builtText) return;
+      const span = document.createElement('span');
+      span.className = 'sentence-part';
+      span.textContent = sentence;
+      if (builtText.children.length > 0) {
+        builtText.appendChild(document.createTextNode(' '));
+      }
+      builtText.appendChild(span);
+    }
+
+    function advanceAfterDelay() {
+      const optsContainer = document.getElementById('optionsContainer');
+      if (optsContainer) {
+        optsContainer.classList.add('muted');
+      }
+
+      setTimeout(() => {
+        hideExplanation();
+        currentStep++;
+        if (currentStep >= stepsData.length) {
+          finishExercise();
+        } else {
+          renderCard();
+          transitioning = false;
+        }
+      }, 500);
+    }
+
+    function finishExercise() {
+      completed = true;
+      transitioning = false;
+      renderCompletionState();
+    }
+
+    function restartExercise() {
+      completed = false;
+      currentStep = 0;
+      transitioning = false;
+      shuffledOptions = [];
+      renderCard();
+      const builtText = document.getElementById('builtText');
+      if (builtText) builtText.innerHTML = '';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Keyboard support (1/2/3 or A/B/C)
+    document.addEventListener('keydown', (e) => {
+      if (completed || transitioning) return;
+      const btns = document.querySelectorAll('.option-btn:not(.disabled):not(.wrong-flash)');
+      if (btns.length === 0) return;
+      const keyMap = { '1': 0, 'a': 0, 'A': 0, '2': 1, 'b': 1, 'B': 1, '3': 2, 'c': 2, 'C': 2 };
+      if (e.key in keyMap) {
+        e.preventDefault();
+        const idx = keyMap[e.key];
+        if (btns[idx]) btns[idx].click();
+      }
+    });
+
+    renderCard();
+  })();
+</script>
+</body>
+</html>
