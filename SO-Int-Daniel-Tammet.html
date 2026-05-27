@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ESL reading · Daniel Tammet · смысл</title>
+  <!-- Bitter font from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,450;0,500;0,550;0,600;0,620;0,700;1,400;1,450&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f2f0;
+      font-family: 'Bitter', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, serif;
+      font-weight: 450;
+      line-height: 1.5;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card-container {
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+      transition: all 0.2s ease;
+      padding: 2rem 2rem 1.8rem 2rem;
+      border: 1px solid #eaeaea;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .card:not(.done-state):hover {
+      box-shadow: 0 20px 32px -12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+      border-color: #dcdcdc;
+    }
+
+    .verb {
+      font-size: 1.9rem;
+      font-weight: 620;
+      letter-spacing: -0.02em;
+      color: #1a1a1a;
+      margin-bottom: 0.2rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 2px solid #e2e2e0;
+      display: inline-block;
+      width: auto;
+      line-height: 1.2;
+    }
+
+    .prompt {
+      font-size: 1.2rem;
+      font-weight: 430;
+      color: #2c2c2c;
+      line-height: 1.55;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+
+    .all-done-verb {
+      font-size: 1.8rem;
+      font-weight: 560;
+      letter-spacing: -0.01em;
+      color: #2b6e4f;
+      margin-bottom: 0.5rem;
+      border-bottom: 2px solid #d4e2da;
+      display: inline-block;
+    }
+
+    .all-done-message {
+      font-size: 1.2rem;
+      font-weight: 430;
+      color: #2c2c2c;
+      text-align: center;
+      margin: 1rem 0 1.2rem 0;
+      line-height: 1.5;
+    }
+
+    .built-text-card {
+      background: #ffffff;
+      border: 1px solid #eaeaea;
+      border-radius: 20px;
+      padding: 1.2rem 1.5rem;
+      min-height: 60px;
+      font-size: 1.05rem;
+      font-weight: 440;
+      letter-spacing: -0.01em;
+      color: #1a1a1a;
+      line-height: 1.7;
+      word-break: break-word;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .built-text-card:empty::after {
+      content: 'Your text will appear here…';
+      color: #a5a5a3;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 0.95rem;
+    }
+
+    .sentence-part {
+      display: inline;
+    }
+
+    .current-stem {
+      display: inline;
+      background: #fff9e6;
+      border-radius: 4px;
+      padding: 0 2px;
+    }
+
+    .options-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      transition: opacity 0.25s ease, filter 0.25s ease;
+    }
+
+    .options-container.muted {
+      opacity: 0.6;
+      filter: grayscale(30%);
+      pointer-events: none;
+    }
+
+    .options-container.muted .option-btn {
+      background: #f8f8f6;
+      border-color: #e0e0dc;
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      width: 100%;
+      padding: 0.9rem 1.3rem;
+      font-size: 0.95rem;
+      font-weight: 440;
+      font-family: inherit;
+      letter-spacing: -0.01em;
+      text-align: left;
+      background: #ffffff;
+      border: 1.5px solid #e2e2e0;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px -2px rgba(0,0,0,0.03);
+      color: #1a1a1a;
+      line-height: 1.45;
+    }
+
+    .option-btn:hover:not(.disabled):not(.correct-flash):not(.wrong-flash) {
+      border-color: #c0bfba;
+      background: #fefefc;
+      box-shadow: 0 6px 14px -4px rgba(0,0,0,0.06);
+      transform: translateY(-1px);
+    }
+
+    .option-btn:active:not(.disabled):not(.correct-flash):not(.wrong-flash) {
+      transform: scale(0.985);
+      transition: transform 0.1s;
+    }
+
+    .option-letter {
+      flex-shrink: 0;
+      width: 1.8rem;
+      height: 1.8rem;
+      border-radius: 50%;
+      background: #f6f6f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 550;
+      font-size: 0.8rem;
+      color: #5e5e5c;
+      transition: all 0.2s;
+    }
+
+    .option-text {
+      flex: 1;
+    }
+
+    .option-icon {
+      flex-shrink: 0;
+      font-size: 1.1rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .option-btn.correct-flash {
+      border-color: #2b6e4f !important;
+      background: #eaf4ed !important;
+      animation: pulseSwiss 0.6s ease-out;
+      cursor: default;
+      pointer-events: none;
+    }
+    .option-btn.correct-flash .option-letter {
+      background: #c8e0d2;
+      color: #1e4d34;
+    }
+    .option-btn.correct-flash .option-icon {
+      opacity: 1;
+      color: #2b6e4f;
+    }
+
+    @keyframes pulseSwiss {
+      0% { box-shadow: 0 0 0 0 rgba(43, 110, 79, 0.2); }
+      50% { box-shadow: 0 0 0 10px rgba(43, 110, 79, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(43, 110, 79, 0); }
+    }
+
+    .option-btn.wrong-flash {
+      border-color: #b13e3e !important;
+      background: #f9f0f0 !important;
+      animation: shakeGentle 0.5s ease-out;
+      cursor: default;
+      pointer-events: none;
+    }
+    .option-btn.wrong-flash .option-letter {
+      background: #f1d9d9;
+      color: #7a2e2e;
+    }
+    .option-btn.wrong-flash .option-icon {
+      opacity: 1;
+      color: #b13e3e;
+    }
+
+    @keyframes shakeGentle {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+    }
+
+    .option-btn.disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      pointer-events: none;
+      border-color: #dcdcdc !important;
+      text-decoration: line-through;
+      text-decoration-color: #b13e3e;
+      text-decoration-thickness: 1.2px;
+      background: #fafaf8;
+    }
+
+    .explanation-area {
+      background: #fefdf7;
+      border: 1px solid #efe2c6;
+      border-left: 4px solid #c9a63b;
+      border-radius: 18px;
+      padding: 0.8rem 1.2rem;
+      font-size: 0.85rem;
+      font-weight: 440;
+      color: #4d401c;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transform: translateY(-6px);
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+      margin-top: 0.2rem;
+    }
+
+    .explanation-area.visible {
+      opacity: 1;
+      transform: translateY(0);
+      max-height: 300px;
+      pointer-events: auto;
+    }
+
+    .explanation-area strong {
+      color: #6b4f12;
+      font-weight: 550;
+    }
+
+    .card-footer {
+      margin-top: 0.5rem;
+      border-top: 1px solid #efefed;
+      padding-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      font-weight: 440;
+      color: #8b8b8b;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .hint span {
+      background: #f6f6f4;
+      padding: 0.2rem 0.7rem;
+      border-radius: 60px;
+      font-size: 0.65rem;
+      font-weight: 470;
+    }
+
+    .counter {
+      font-size: 0.7rem;
+      font-weight: 440;
+      color: #a5a5a3;
+      letter-spacing: 0.2px;
+      text-align: right;
+      margin-top: 0.1rem;
+    }
+
+    .start-again-btn {
+      background: transparent;
+      border: 1.5px solid #c0c0bc;
+      border-radius: 60px;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.85rem;
+      font-weight: 520;
+      font-family: inherit;
+      color: #2c2c2c;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #fefefc;
+      margin-top: 0.5rem;
+    }
+
+    .start-again-btn:hover {
+      background: #eaeae6;
+      border-color: #9a9a96;
+      color: #1a1a1a;
+      transform: scale(0.98);
+    }
+
+    .start-again-btn:active {
+      transform: scale(0.96);
+    }
+
+    .card.done-state {
+      cursor: default;
+      align-items: center;
+      text-align: center;
+    }
+    .card.done-state:hover {
+      transform: none;
+      box-shadow: 0 12px 28px -8px rgba(0,0,0,0.08);
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 0.8rem;
+      }
+      .card {
+        padding: 1.3rem;
+        gap: 1rem;
+      }
+      .verb {
+        font-size: 1.6rem;
+      }
+      .built-text-card {
+        padding: 0.9rem 1rem;
+        font-size: 0.95rem;
+      }
+      .option-btn {
+        padding: 0.8rem 1rem;
+        font-size: 0.9rem;
+      }
+      .all-done-verb {
+        font-size: 1.5rem;
+      }
+      .all-done-message {
+        font-size: 1.1rem;
+      }
+    }
+
+    .card:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 3px;
+    }
+    .option-btn:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 2px;
+    }
+    .start-again-btn:focus-visible {
+      outline: 2px solid #1a1a1a;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+<div class="card-container">
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+  (function() {
+    // ── Steps with stem + correct ending (distractors more obviously wrong) ──
+    const stepsData = [
+      {
+        stem: "Daniel Tammet says he was born on a blue day, 31st January 1979. He knows it was blue because …",
+        correct: "Wednesdays are always blue, like the number nine or the sound of people arguing.",
+        incorrect1: "he always paints his room that way.",
+        incorrect2: "he was wearing blue clothes when he was born.",
+        explanation1: "The sentence is about why a day feels like a colour. Think about which option connects a day of the week to a colour, not just a personal preference.",
+        explanation2: "The reason should explain something inside his mind — a pattern he perceives. Wearing clothes has nothing to do with knowing a day's colour."
+      },
+      {
+        stem: "As a child, Daniel was diagnosed as autistic. He couldn't make friends. He …",
+        correct: "was too different from the other children.",
+        incorrect1: "spent all his time playing football with his neighbours.",
+        incorrect2: "was the most popular kid in his school.",
+        explanation1: "The previous sentence says he couldn't make friends. Playing football with neighbours would mean he had friends — that contradicts the idea.",
+        explanation2: "If he couldn't make friends, he can't be the most popular kid. Look for an option that explains why making friends was hard."
+      },
+      {
+        stem: "Aged eight, he was able to calculate 82 x 82 x 82 x 82 in his head, but …",
+        correct: "he couldn't tie his own shoe laces, or ride a bicycle.",
+        incorrect1: "he was also the fastest runner in his school.",
+        incorrect2: "he had already finished university by that age.",
+        explanation1: "The word 'but' signals a contrast. The first part shows an amazing mental skill, so the second part should show a surprising difficulty. Being a fast runner is just another skill, not a contrast.",
+        explanation2: "Finishing university at eight is another amazing achievement. The structure 'but' needs something that shows limitation, not more success."
+      },
+      {
+        stem: "He imagines numbers as shapes and colours and says …",
+        correct: "'289 is an ugly number'.",
+        incorrect1: "'I prefer dogs to cats'.",
+        incorrect2: "'mathematics was invented in ancient Greece'.",
+        explanation1: "The sentence is about how numbers look to him — their visual appearance. A preference for pets doesn't continue this idea about numbers.",
+        explanation2: "A historical fact about mathematics doesn't fit — he's describing his personal, visual experience of numbers."
+      },
+      {
+        stem: "On the TV programme that made him famous in the UK, he managed to …",
+        correct: "recite 22,514 numbers from pi perfectly.",
+        incorrect1: "cook a seven-course meal in under an hour.",
+        incorrect2: "sing every national anthem from memory.",
+        explanation1: "Everything in the story so far is about numbers and memory. Which option involves numbers? Cooking is a completely unrelated skill.",
+        explanation2: "Singing anthems is about music, not numbers. The story is building a picture of someone with unusual numerical abilities."
+      },
+      {
+        stem: "If you tell Daniel your birth date, he can tell you …",
+        correct: "what day of the week you were born on, and what day of the week it will be on your 65th birthday.",
+        incorrect1: "what you had for breakfast that day.",
+        incorrect2: "the name of the doctor who delivered you.",
+        explanation1: "He only has your birth date to work with — just a number. Calculating a day of the week from a date is a logical, mathematical skill. Guessing your breakfast is impossible from just a date.",
+        explanation2: "Knowing the doctor's name would require access to medical records, not just a date. The option must be something you can figure out from a date alone."
+      },
+      {
+        stem: "He eats exactly forty-five grams of porridge for breakfast each morning and …",
+        correct: "he brushes his teeth for exactly two minutes.",
+        incorrect1: "he goes skydiving every afternoon.",
+        incorrect2: "he makes friends easily.",
+        explanation1: "The first part shows a very precise, measured routine. Look for another habit that also involves exact measurements or time. Skydiving doesn't fit this pattern of precision.",
+        explanation2: "The pattern here is about precise quantities and durations."
+      },
+      {
+        stem: "He doesn't like walking on the beach near his home because …",
+        correct: "there are too many pebbles to count.",
+        incorrect1: "the water is always too cold for swimming.",
+        incorrect2: "he is allergic to sand.",
+        explanation1: "The story has already shown that he counts things obsessively. Think: what problem would a counter have at a beach? Cold water is a general complaint, not connected to his unique trait.",
+        explanation2: "An allergy is a physical reaction. But the text has been describing mental compulsions — his need to count. Which option connects to that idea?"
+      },
+      {
+        stem: "Daniel's other great love, besides numbers — which he calls 'his friends' — is learning languages. He speaks ten, and he managed to …",
+        correct: "learn Icelandic in a week for a TV programme in Iceland.",
+        incorrect1: "invent three new languages for a science fiction movie.",
+        incorrect2: "translate all UK books into Japanese by himself.",
+        explanation1: "The sentence starts with 'learning languages' and mentions a TV programme. Inventing languages is not the same as learning an existing one — and there's no mention of movies in the story.",
+        explanation2: "Translating books into Japanese would require already knowing Japanese well. The phrase 'managed to' suggests a remarkable, quick achievement — learning a language fast, not using one he already knows."
+      },
+      {
+        stem: "He is now a bestselling author, his books including …",
+        correct: "Born on a Blue Day, Embracing the Wide Sky and Thinking in Numbers.",
+        incorrect1: "How to Win Friends and Influence People, The 7 Habits of Highly Effective People, and Start with Why.",
+        incorrect2: "The History of the Roman Empire, World War II: A Complete Account, and Ancient Civilizations.",
+        explanation1: "These are famous self-help books by other authors. Based on the story, his books are about his own life and his unique mind — titles that mention colours, numbers, or the sky fit the theme.",
+        explanation2: "These are history books. The whole story has been about his personal experience with numbers, colours, and language — not about historical events."
+      }
+    ];
+
+    const mainCard = document.getElementById('mainCard');
+
+    let currentStep = 0;
+    let transitioning = false;
+    let completed = false;
+    let shuffledOptions = [];
+    let completedSentences = [];
+    let currentStemText = '';
+
+    function shuffleArray(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function getShuffledOptions(stepIndex) {
+      const step = stepsData[stepIndex];
+      return shuffleArray([
+        { text: step.correct, isCorrect: true, explanationKey: null },
+        { text: step.incorrect1, isCorrect: false, explanationKey: 'explanation1' },
+        { text: step.incorrect2, isCorrect: false, explanationKey: 'explanation2' }
+      ]);
+    }
+
+    function getBuiltTextHTML() {
+      let html = '';
+      if (completedSentences.length > 0) {
+        completedSentences.forEach((sentence, idx) => {
+          html += `<span class="sentence-part">${sentence}</span>`;
+          if (idx < completedSentences.length - 1 || currentStemText) {
+            html += ' ';
+          }
+        });
+      }
+      if (currentStemText) {
+        if (completedSentences.length > 0 && !html.endsWith(' ')) {
+          html += ' ';
+        }
+        html += `<span class="current-stem">${currentStemText}</span>`;
+      }
+      return html;
+    }
+
+    function renderCard() {
+      if (completed) {
+        renderCompletionState();
+        return;
+      }
+      if (currentStep >= stepsData.length) {
+        finishExercise();
+        return;
+      }
+
+      transitioning = false;
+      currentStemText = stepsData[currentStep].stem;
+      shuffledOptions = getShuffledOptions(currentStep);
+
+      const verbHtml = `<div class="verb">Build the story</div>`;
+      const promptHtml = `<div class="prompt">Choose the correct ending for the highlighted sentence.</div>`;
+
+      const builtHtml = `<div class="built-text-card" id="builtText">${getBuiltTextHTML()}</div>`;
+
+      let optionsHtml = `<div class="options-container" id="optionsContainer">`;
+      const letters = ['A', 'B', 'C'];
+      shuffledOptions.forEach((opt, i) => {
+        const explanationKey = opt.explanationKey || '';
+        optionsHtml += `
+          <button class="option-btn" data-index="${i}" data-is-correct="${opt.isCorrect ? '1' : '0'}" data-explanation-key="${explanationKey}" role="radio" aria-checked="false">
+            <span class="option-letter">${letters[i]}</span>
+            <span class="option-text">${opt.text}</span>
+            <span class="option-icon">${opt.isCorrect ? '✓' : '✗'}</span>
+          </button>
+        `;
+      });
+      optionsHtml += `</div>`;
+
+      const explanationHtml = `<div class="explanation-area" id="explanationArea"></div>`;
+
+      const footerHtml = `
+        <div class="card-footer">
+          <div class="hint">
+            <span>📖</span> read carefully
+          </div>
+          <div class="counter" id="stepCounter">step ${currentStep + 1} of ${stepsData.length}</div>
+        </div>
+      `;
+
+      mainCard.innerHTML = verbHtml + promptHtml + builtHtml + optionsHtml + explanationHtml + footerHtml;
+      mainCard.classList.remove('done-state');
+
+      attachOptionListeners();
+    }
+
+    function renderCompletionState() {
+      const verbHtml = `<div class="all-done-verb">✓ Story complete</div>`;
+      const messageHtml = `<div class="all-done-message">You've correctly reconstructed the text about Daniel Tammet.</div>`;
+      const builtHtml = `<div class="built-text-card" id="builtText" style="text-align:left;">${getBuiltTextHTML()}</div>`;
+      const restartHtml = `<button class="start-again-btn" id="restartButton">↺ Start again</button>`;
+      const footerHtml = `<div class="card-footer" style="justify-content:center;"><div class="counter">completed</div></div>`;
+
+      mainCard.innerHTML = verbHtml + messageHtml + builtHtml + restartHtml + footerHtml;
+      mainCard.classList.add('done-state');
+
+      document.getElementById('restartButton').addEventListener('click', restartExercise);
+    }
+
+    function attachOptionListeners() {
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', optionClickHandler);
+      });
+    }
+
+    function optionClickHandler(e) {
+      const btn = e.currentTarget;
+      if (transitioning || completed) return;
+      if (btn.classList.contains('disabled') || btn.classList.contains('wrong-flash') || btn.classList.contains('correct-flash')) return;
+
+      const isCorrect = btn.dataset.isCorrect === '1';
+
+      if (isCorrect) {
+        transitioning = true;
+        flashCorrect(btn, () => {
+          const ending = stepsData[currentStep].correct;
+          const fullSentence = currentStemText.replace(/ …$/, '') + ' ' + ending;
+          completedSentences.push(fullSentence);
+          currentStemText = '';
+          advanceAfterDelay();
+        });
+      } else {
+        const explanationKey = btn.dataset.explanationKey;
+        const step = stepsData[currentStep];
+        const explanationText = step[explanationKey] || '';
+        flashWrong(btn);
+        markDisabled(btn);
+        showExplanation(explanationText);
+      }
+    }
+
+    function flashCorrect(btn, callback) {
+      btn.classList.add('correct-flash');
+      btn.setAttribute('aria-checked', 'true');
+      setTimeout(() => {
+        btn.classList.remove('correct-flash');
+        if (callback) callback();
+      }, 600);
+    }
+
+    function flashWrong(btn) {
+      btn.classList.add('wrong-flash');
+      setTimeout(() => {
+        btn.classList.remove('wrong-flash');
+        btn.classList.add('disabled');
+      }, 500);
+    }
+
+    function markDisabled(btn) {
+      setTimeout(() => {
+        btn.classList.add('disabled');
+      }, 500);
+    }
+
+    function showExplanation(html) {
+      const area = document.getElementById('explanationArea');
+      if (!area) return;
+      area.innerHTML = `<span style="display:inline-block;margin-right:6px;">💡</span> ${html}`;
+      requestAnimationFrame(() => {
+        area.classList.add('visible');
+      });
+    }
+
+    function hideExplanation() {
+      const area = document.getElementById('explanationArea');
+      if (!area) return;
+      area.classList.remove('visible');
+      area.innerHTML = '';
+    }
+
+    function advanceAfterDelay() {
+      const optsContainer = document.getElementById('optionsContainer');
+      if (optsContainer) {
+        optsContainer.classList.add('muted');
+      }
+
+      setTimeout(() => {
+        hideExplanation();
+        currentStep++;
+        if (currentStep >= stepsData.length) {
+          finishExercise();
+        } else {
+          renderCard();
+          transitioning = false;
+        }
+      }, 500);
+    }
+
+    function finishExercise() {
+      completed = true;
+      transitioning = false;
+      currentStemText = '';
+      renderCompletionState();
+    }
+
+    function restartExercise() {
+      completed = false;
+      currentStep = 0;
+      transitioning = false;
+      shuffledOptions = [];
+      completedSentences = [];
+      currentStemText = '';
+      renderCard();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (completed || transitioning) return;
+      const btns = document.querySelectorAll('.option-btn:not(.disabled):not(.wrong-flash)');
+      if (btns.length === 0) return;
+      const keyMap = { '1': 0, 'a': 0, 'A': 0, '2': 1, 'b': 1, 'B': 1, '3': 2, 'c': 2, 'C': 2 };
+      if (e.key in keyMap) {
+        e.preventDefault();
+        const idx = keyMap[e.key];
+        if (btns[idx]) btns[idx].click();
+      }
+    });
+
+    renderCard();
+  })();
+</script>
+</body>
+</html>
