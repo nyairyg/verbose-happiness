@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>ESL · Fix the Story · Marta's Trip</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #FBFBFA;
+      font-family: 'Bitter', 'Georgia', 'Times New Roman', serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .trainer-container {
+      max-width: 850px;
+      width: 100%;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.8rem;
+    }
+
+    .progress-section {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #6B6B6B;
+      background: transparent;
+      letter-spacing: 0.3px;
+    }
+
+    .progress-badge {
+      background: #FFFFFF;
+      padding: 8px 20px;
+      border-radius: 40px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
+      border: 1px solid #E9E9E6;
+      font-family: 'Bitter', monospace;
+      font-weight: 500;
+    }
+
+    .sentence-card {
+      background: #FFFFFF;
+      width: 100%;
+      padding: 2.5rem 1.8rem;
+      text-align: center;
+      border-radius: 28px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.03);
+      border: 1px solid #E9E9E6;
+      transition: background-color 0.2s ease;
+      cursor: default;
+    }
+
+    .sentence-display {
+      font-size: 1.85rem;
+      font-weight: 500;
+      color: #1F1F1F;
+      line-height: 1.5;
+      word-break: break-word;
+      font-family: 'Bitter', 'Georgia', serif;
+      margin-bottom: 2rem;
+    }
+
+    .bold-word {
+      font-weight: 700;
+      color: #2B2B2B;
+      background: #F0EDE6;
+      border-radius: 8px;
+      padding: 0 6px;
+      margin: 0 2px;
+      display: inline-block;
+    }
+
+    .input-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .answer-input {
+      width: 100%;
+      max-width: 380px;
+      padding: 14px 18px;
+      font-size: 1.3rem;
+      font-family: 'Bitter', 'Georgia', serif;
+      border: 2px solid #E0DDD6;
+      border-radius: 24px;
+      background: #FFFFFF;
+      color: #1F1F1F;
+      text-align: center;
+      outline: none;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+
+    .answer-input:focus {
+      border-color: #A7B8A0;
+      box-shadow: 0 0 0 3px rgba(167, 184, 160, 0.15);
+    }
+
+    .answer-input.correct-input-highlight {
+      border-color: #6E9E6E;
+      background: #F3FAF3;
+      color: #1E3B1E;
+    }
+
+    .answer-input.wrong-input-highlight {
+      border-color: #C97B7B;
+      background: #FEF6F6;
+      color: #6B2E2E;
+    }
+
+    .feedback-msg {
+      min-height: 50px;
+      font-size: 0.95rem;
+      color: #6B6B6B;
+      text-align: center;
+      margin-top: 8px;
+      font-weight: 500;
+      font-family: 'Bitter', system-ui, serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .next-btn {
+      background: #F5F3EF;
+      border: 1px solid #E0DDD6;
+      padding: 10px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 60px;
+      cursor: pointer;
+      color: #2B2B2B;
+      transition: all 0.2s;
+      font-family: 'Bitter', serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .next-btn:hover {
+      background: #EDE7DE;
+      transform: translateY(-1px);
+    }
+
+    .next-btn:active {
+      transform: translateY(1px);
+    }
+
+    .next-btn.hidden-btn {
+      display: none;
+    }
+
+    .completion-screen {
+      background: #FFFFFF;
+      border-radius: 32px;
+      padding: 2rem 2rem 2rem;
+      text-align: center;
+      border: 1px solid #E9E9E6;
+      box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.06);
+      width: 100%;
+    }
+
+    .completion-screen h2 {
+      color: #2B2B2B;
+      font-size: 1.9rem;
+      margin-bottom: 1rem;
+      font-family: 'Bitter', serif;
+      font-weight: 600;
+    }
+
+    .completion-screen p {
+      color: #6B6B6B;
+      margin-bottom: 1.8rem;
+      font-size: 1.1rem;
+    }
+
+    .restart-btn {
+      background: #FBFBFA;
+      border: 1px solid #E9E9E6;
+      padding: 12px 28px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 48px;
+      cursor: pointer;
+      color: #2B2B2B;
+      transition: all 0.2s;
+      font-family: 'Bitter', serif;
+    }
+
+    .restart-btn:hover {
+      background: #F5F5F3;
+      transform: scale(0.98);
+      border-color: #DCDCD6;
+    }
+
+    .hidden {
+      display: none;
+    }
+    .correct-highlight-card {
+      background-color: #D9EBD9 !important;
+    }
+
+    .wrong-highlight-card {
+      background-color: #F2DCDC !important;
+    }
+
+    @media (max-width: 650px) {
+      .sentence-display {
+        font-size: 1.4rem;
+      }
+      .sentence-card {
+        padding: 1.8rem 1.2rem;
+      }
+      .answer-input {
+        font-size: 1.1rem;
+        padding: 12px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .sentence-display {
+        font-size: 1.2rem;
+      }
+    }
+
+    .answer-input {
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body>
+<div class="trainer-container" id="trainerRoot">
+  <div class="progress-section">
+    <div class="progress-badge" id="progressText">1 / 11</div>
+  </div>
+
+  <div id="gamePanel">
+    <div class="sentence-card" id="sentenceCard">
+      <div class="sentence-display" id="sentenceDisplay"></div>
+      <div class="input-area">
+        <input type="text" class="answer-input" id="answerInput" placeholder="correct the bold word(s)" autocomplete="off" autocapitalize="none" spellcheck="false">
+      </div>
+    </div>
+
+    <div class="feedback-msg" id="feedbackMsg"></div>
+
+    <div class="action-bar">
+      <button class="next-btn" id="checkAnswerBtn">Check answer</button>
+      <button class="next-btn hidden-btn" id="nextBtn">→ Next sentence</button>
+    </div>
+  </div>
+
+  <div id="completionPanel" class="completion-screen hidden">
+    <h2>✈️ Great job! ✨</h2>
+    <p>You've successfully corrected Marta's story.<br>Well done — you fixed every detail!</p>
+    <button class="restart-btn" id="restartCompletionBtn">↻ Start again</button>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // --------------------------------------------------------------
+    // DATA — Marta's corrected story (exactly as described)
+    // Each entry contains original sentence (with bold wrapped),
+    // the exact bold phrase, and the expected correction.
+    // Alternative answers for flexibility (common variations)
+    // --------------------------------------------------------------
+    const sentencesData = [
+      {
+        original: "Marta wanted to go to <b>Ireland</b>.",
+        bold: "Ireland",
+        answer: "France"
+      },
+      {
+        original: "She decided to take a <b>long</b> vacation.",
+        bold: "long",
+        answer: "short"
+      },
+      {
+        original: "She couldn't find any <b>cheap</b> flights.",
+        bold: "cheap",
+        answer: "direct"
+      },
+      {
+        original: "When she arrived, she couldn't find her <b>passport</b>.",
+        bold: "passport",
+        answer: "ID card"
+      },
+      {
+        original: "She looked everywhere — in her bag and in her <b>pocket</b>.",
+        bold: "pocket",
+        answer: "suitcase"
+      },
+      {
+        original: "The people at the gate made some <b>coffee</b>, but nobody could find it.",
+        bold: "coffee",
+        answer: "phone calls"
+      },
+      {
+        original: "She sat in a small room for more than <b>two hours</b>.",
+        bold: "two hours",
+        answer: "an hour"
+      },
+      {
+        original: "She felt <b>happy</b>.",
+        bold: "happy",
+        answer: "stressed and unhappy"
+      },
+      {
+        original: "The police officer said she could only go to <b>France</b> to get a new ID.",
+        bold: "France",
+        answer: "Spain"
+      },
+      {
+        original: "She waited another five or six hours for the flight to <b>Barcelona</b>.",
+        bold: "Barcelona",
+        answer: "Madrid"
+      },
+      {
+        original: "In the end, she never took her <b>flight</b>.",
+        bold: "flight",
+        answer: "vacation"
+      }
+    ];
+
+    // Define alternative accepted answers for each bold key to make the game learner-friendly
+    const alternativeAnswers = {
+      "Ireland": ["France"],
+      "long": ["short"],
+      "cheap": ["direct"],
+      "passport": ["ID card", "identification card", "id"],
+      "pocket": ["suitcase"],
+      "coffee": ["phone calls", "phone call"],
+      "two hours": ["an hour", "one hour"],
+      "happy": ["stressed and unhappy", "stressed & unhappy", "stressed", "unhappy"],
+      "France": ["Spain"],
+      "Barcelona": ["Madrid"],
+      "flight": ["vacation"]
+    };
+
+    // Helper: dynamically wrap the bold part in original sentence for consistent display
+    // Instead of relying on pre-marked HTML, we reconstruct the sentence to ensure bold styling.
+    function buildDisplaySentence(originalText, boldPhrase) {
+      // Escape regex special characters in boldPhrase
+      const escapedPhrase = boldPhrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedPhrase})`, 'gi');
+      // Replace with wrapped bold span
+      return originalText.replace(regex, `<span class="bold-word">$1</span>`);
+    }
+
+    // --------------------------------------------------------------
+    // TRAINER CLASS (robust, identical interaction to the example)
+    // --------------------------------------------------------------
+    class CorrectionTrainer {
+      constructor(data, gamePanel, completionPanel, progressSpan, sentenceDisplay, feedbackSpan, nextBtn, checkBtn, answerInput, sentenceCard) {
+        this.originalData = [...data];
+        this.activeSentences = [...data];
+        this.currentIndex = 0;
+        this.answerLocked = false;
+        this.currentCorrectAnswer = null;
+        this.currentBoldText = "";
+
+        this.gamePanel = gamePanel;
+        this.completionPanel = completionPanel;
+        this.progressSpan = progressSpan;
+        this.sentenceDisplay = sentenceDisplay;
+        this.feedbackSpan = feedbackSpan;
+        this.nextBtn = nextBtn;
+        this.checkBtn = checkBtn;
+        this.answerInput = answerInput;
+        this.sentenceCard = sentenceCard;
+
+        this.nextBtn.addEventListener('click', () => this.goToNextSentence());
+        this.checkBtn.addEventListener('click', () => {
+          if (!this.answerLocked) {
+            this.checkAnswer();
+          }
+        });
+
+        this.answerInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!this.answerLocked) {
+              this.checkAnswer();
+            } else if (this.answerLocked && this.nextBtn && !this.nextBtn.classList.contains('hidden-btn')) {
+              this.goToNextSentence();
+            }
+          }
+        });
+
+        this.answerInput.addEventListener('input', () => {
+          if (!this.answerLocked) {
+            this.clearInputHighlights();
+            this.feedbackSpan.innerText = '';
+          }
+        });
+      }
+
+      // Render sentence with bold styling
+      updateCardDisplay() {
+        if (!this.activeSentences.length || this.currentIndex >= this.activeSentences.length) return;
+        const item = this.activeSentences[this.currentIndex];
+        const displayHTML = buildDisplaySentence(item.original, item.bold);
+        this.sentenceDisplay.innerHTML = displayHTML;
+        this.currentBoldText = item.bold;
+        this.currentCorrectAnswer = item.answer;
+      }
+
+      updateProgress() {
+        const total = this.activeSentences.length;
+        const current = this.currentIndex + 1;
+        this.progressSpan.innerText = `${Math.min(current, total)} / ${total}`;
+      }
+
+      resetCurrentState() {
+        this.answerLocked = false;
+        this.currentCorrectAnswer = null;
+        this.currentBoldText = "";
+        this.answerInput.value = '';
+        this.clearInputHighlights();
+        this.clearCardHighlight();
+        this.feedbackSpan.innerText = '';
+        this.nextBtn.classList.add('hidden-btn');
+        this.checkBtn.classList.remove('hidden-btn');
+        this.answerInput.disabled = false;
+        this.answerInput.focus();
+      }
+
+      loadCurrentSentence() {
+        if (this.currentIndex >= this.activeSentences.length) {
+          this.finishGame();
+          return;
+        }
+        this.resetCurrentState();
+        this.updateCardDisplay();
+        this.updateProgress();
+        setTimeout(() => this.answerInput.focus(), 50);
+      }
+
+      initGame() {
+        this.activeSentences = [...this.originalData];
+        this.currentIndex = 0;
+        this.gamePanel.classList.remove('hidden');
+        this.completionPanel.classList.add('hidden');
+        this.loadCurrentSentence();
+      }
+
+      clearInputHighlights() {
+        this.answerInput.classList.remove('correct-input-highlight', 'wrong-input-highlight');
+      }
+
+      clearCardHighlight() {
+        this.sentenceCard.classList.remove('correct-highlight-card', 'wrong-highlight-card');
+      }
+
+      highlightInputCorrect() {
+        this.clearInputHighlights();
+        this.answerInput.classList.add('correct-input-highlight');
+      }
+
+      highlightInputWrong() {
+        this.clearInputHighlights();
+        this.answerInput.classList.add('wrong-input-highlight');
+      }
+
+      highlightCardCorrect() {
+        this.clearCardHighlight();
+        this.sentenceCard.classList.add('correct-highlight-card');
+      }
+
+      highlightCardWrong() {
+        this.clearCardHighlight();
+        this.sentenceCard.classList.add('wrong-highlight-card');
+      }
+
+      normalizeAnswer(str) {
+        return str.trim().toLowerCase().replace(/\s+/g, ' ').replace(/[^\w\s&]/g, '');
+      }
+
+      checkAnswer() {
+        if (this.answerLocked) return;
+        const userAnswer = this.answerInput.value;
+        if (!userAnswer.trim()) {
+          this.feedbackSpan.innerText = '✍️ Please type a correction.';
+          return;
+        }
+
+        const normalizedUser = this.normalizeAnswer(userAnswer);
+        const boldKey = this.currentBoldText;
+        // Get possible correct answers: first the main answer, then alternatives from map
+        let possibleAnswers = [this.currentCorrectAnswer];
+        if (alternativeAnswers[boldKey]) {
+          possibleAnswers = [...possibleAnswers, ...alternativeAnswers[boldKey]];
+        }
+        // Deduplicate (case-insensitive but already normalized later)
+        const uniqueAnswers = [...new Map(possibleAnswers.map(ans => [this.normalizeAnswer(ans), ans])).values()];
+        
+        const isCorrect = uniqueAnswers.some(ans => this.normalizeAnswer(ans) === normalizedUser);
+
+        this.answerLocked = true;
+        this.answerInput.disabled = true;
+
+        if (isCorrect) {
+          this.highlightInputCorrect();
+          this.highlightCardCorrect();
+          this.feedbackSpan.innerText = '✓ Correct! Great fix. You can continue.';
+          this.nextBtn.classList.remove('hidden-btn');
+          this.checkBtn.classList.add('hidden-btn');
+        } else {
+          this.highlightInputWrong();
+          this.highlightCardWrong();
+          // Provide gentle hint: show the expected answer style but not full answer? we give a hint.
+          let hintSuggestion = `Try: "${uniqueAnswers[0]}"`;
+          this.feedbackSpan.innerText = `❌ Not quite. ${hintSuggestion}`;
+          this.answerLocked = false;
+          this.answerInput.disabled = false;
+          this.answerInput.focus();
+          this.nextBtn.classList.add('hidden-btn');
+          this.checkBtn.classList.remove('hidden-btn');
+        }
+      }
+
+      goToNextSentence() {
+        if (!this.answerLocked) {
+          this.feedbackSpan.innerText = '⚠️ Please answer correctly first.';
+          return;
+        }
+        this.currentIndex++;
+        if (this.currentIndex < this.activeSentences.length) {
+          this.resetCurrentState();
+          this.loadCurrentSentence();
+        } else {
+          this.finishGame();
+        }
+      }
+
+      finishGame() {
+        this.gamePanel.classList.add('hidden');
+        this.completionPanel.classList.remove('hidden');
+        this.answerLocked = false;
+        this.clearInputHighlights();
+        this.clearCardHighlight();
+      }
+
+      restartGame() {
+        this.initGame();
+      }
+    }
+
+    // --------------------------------------------------------------
+    // INITIALIZE APPLICATION
+    // --------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      const gamePanel = document.getElementById('gamePanel');
+      const completionPanel = document.getElementById('completionPanel');
+      const progressSpan = document.getElementById('progressText');
+      const sentenceDisplay = document.getElementById('sentenceDisplay');
+      const feedbackSpan = document.getElementById('feedbackMsg');
+      const nextBtn = document.getElementById('nextBtn');
+      const checkBtn = document.getElementById('checkAnswerBtn');
+      const answerInput = document.getElementById('answerInput');
+      const sentenceCard = document.getElementById('sentenceCard');
+      const restartBtn = document.getElementById('restartCompletionBtn');
+
+      const trainer = new CorrectionTrainer(
+        sentencesData,
+        gamePanel,
+        completionPanel,
+        progressSpan,
+        sentenceDisplay,
+        feedbackSpan,
+        nextBtn,
+        checkBtn,
+        answerInput,
+        sentenceCard
+      );
+
+      trainer.initGame();
+
+      restartBtn.addEventListener('click', () => {
+        trainer.restartGame();
+      });
+
+      sentenceCard.addEventListener('click', () => {
+        if (!trainer.answerLocked && answerInput.disabled === false) {
+          answerInput.focus();
+        }
+      });
+    });
+  })();
+</script>
+</body>
+</html>
