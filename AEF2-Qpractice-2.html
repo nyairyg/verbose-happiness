@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ESL: Make Questions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #faf8f5;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1.5rem;
+            color: #1a1a1a;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            max-width: 780px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .exercise {
+            background: #fefcf9;
+            border: 1px solid #e8e3da;
+            padding: 2.5rem 2rem;
+            position: relative;
+            transition: border-color 0.3s ease;
+        }
+
+        .prompt {
+            background: transparent;
+            text-align: center;
+            padding: 2rem 1rem;
+            border-bottom: 1px solid #e2dcd3;
+            border-top: 1px solid #e2dcd3;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .prompt.completed-prompt::before {
+            content: '✓';
+            position: absolute;
+            top: 0.6rem;
+            right: 0.8rem;
+            font-size: 0.85rem;
+            color: #5a9e6f;
+            font-weight: 600;
+            letter-spacing: 0;
+        }
+
+        .prompt.locked-prompt {
+            opacity: 0.7;
+        }
+
+        .words {
+            font-size: 2.2rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: #2c2c2c;
+            word-break: break-word;
+            line-height: 1.3;
+            transition: color 0.2s ease;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            margin: 2rem 0 1.8rem;
+        }
+
+        .question-input {
+            width: 100%;
+            max-width: 560px;
+            padding: 1rem 1.3rem;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1.25rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            color: #2c2c2c;
+            background: #fefcf9;
+            border: 1.5px solid #d6cfc4;
+            outline: none;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .question-input:focus {
+            border-color: #8b8276;
+            box-shadow: 0 0 0 3px rgba(139, 130, 118, 0.08);
+        }
+
+        .question-input.correct-input {
+            border-color: #5a9e6f;
+            background: #f7faf8;
+            color: #2c6e2f;
+        }
+
+        .question-input.wrong-input {
+            border-color: #c75b4a;
+            background: #fdf7f6;
+            animation: shakeInput 0.4s ease;
+        }
+
+        .question-input::placeholder {
+            color: #b8b0a4;
+            font-weight: 300;
+            font-size: 1.05rem;
+        }
+
+        @keyframes shakeInput {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            15% {
+                transform: translateX(-6px);
+            }
+            30% {
+                transform: translateX(6px);
+            }
+            45% {
+                transform: translateX(-5px);
+            }
+            60% {
+                transform: translateX(5px);
+            }
+            75% {
+                transform: translateX(-2px);
+            }
+            90% {
+                transform: translateX(2px);
+            }
+        }
+
+        .action-btn {
+            background: #1a1a1a;
+            border: none;
+            padding: 0.9rem 2.4rem;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #faf8f5;
+            letter-spacing: 0.2px;
+            min-width: 140px;
+            border-radius: 0;
+            box-shadow: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .action-btn:hover {
+            background: #2e2e2e;
+        }
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+        .action-btn.btn-correct {
+            background: #3d6b47;
+            color: #f5faf6;
+        }
+        .action-btn.btn-correct:hover {
+            background: #4a7d55;
+        }
+        .action-btn.btn-wrong {
+            background: #8b3d32;
+            color: #fdf5f4;
+        }
+        .action-btn.btn-wrong:hover {
+            background: #9e473a;
+        }
+        .action-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .result {
+            text-align: center;
+            padding: 1rem 0.5rem;
+            margin: 1.2rem 0;
+            font-size: 1rem;
+            font-weight: 400;
+            color: #5a5a5a;
+            min-height: 80px;
+            border-top: 1px solid #ece6df;
+            transition: all 0.25s ease;
+        }
+
+        .result-correct {
+            color: #2c6e2f;
+            font-weight: 500;
+        }
+
+        .result-wrong {
+            color: #b33b2c;
+        }
+
+        .hint-text {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            font-style: italic;
+            margin-top: 0.35rem;
+            display: block;
+            letter-spacing: 0.2px;
+            color: #8b6f5e;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.8rem;
+            font-size: 0.85rem;
+            color: #7e7a72;
+            letter-spacing: 0.3px;
+            font-weight: 450;
+        }
+
+        .counter {
+            font-weight: 600;
+            color: #2c2c2c;
+        }
+
+        .completed-count {
+            font-weight: 500;
+            color: #5a9e6f;
+            font-size: 0.82rem;
+        }
+
+        .progress-bar-wrap {
+            width: 100%;
+            height: 3px;
+            background: #e8e3da;
+            margin-top: 0.6rem;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #5a9e6f;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid #d6cfc4;
+            padding: 0.6rem 1.6rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s linear;
+            color: #2c2c2c;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .nav-btn:hover {
+            background: #eee9e2;
+            border-color: #bfb6a8;
+        }
+        .nav-btn:active {
+            transform: translateY(1px);
+        }
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-color: #e0dbd2;
+            color: #b0aaa0;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #cbc3b7;
+            margin-right: 8px;
+            vertical-align: middle;
+            transition: background 0.3s ease;
+        }
+        .status-dot.dot-correct {
+            background: #5a9e6f;
+        }
+        .status-dot.dot-wrong {
+            background: #c75b4a;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e8e2d9;
+            margin: 0.6rem 0;
+        }
+
+        /* Congratulatory overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 26, 26, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 2rem;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .overlay-card {
+            background: #fefcf9;
+            border: 1px solid #e8e3da;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+            animation: cardAppear 0.5s ease;
+        }
+
+        @keyframes cardAppear {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .overlay-emoji {
+            font-size: 3.5rem;
+            display: block;
+            margin-bottom: 1.2rem;
+            animation: bounceEmoji 0.8s ease infinite alternate;
+        }
+
+        @keyframes bounceEmoji {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-14px);
+            }
+        }
+
+        .overlay-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #2c2c2c;
+            margin-bottom: 0.6rem;
+        }
+
+        .overlay-subtitle {
+            font-size: 1rem;
+            color: #5a5a5a;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .overlay-btn {
+            background: #1a1a1a;
+            border: none;
+            padding: 0.85rem 2.2rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #faf8f5;
+            letter-spacing: 0.2px;
+            transition: all 0.15s ease;
+        }
+        .overlay-btn:hover {
+            background: #2e2e2e;
+        }
+        .overlay-btn:active {
+            transform: scale(0.96);
+        }
+
+        .keyboard-hint {
+            display: inline-block;
+            background: #f0ede7;
+            border: 1px solid #d6cfc4;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.7rem;
+            color: #7e7a72;
+            margin-left: 0.4rem;
+            letter-spacing: 0.3px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 550px) {
+            .exercise {
+                padding: 1.5rem;
+            }
+            .words {
+                font-size: 1.6rem;
+            }
+            .question-input {
+                font-size: 1.1rem;
+                padding: 0.85rem 1rem;
+            }
+            .action-btn {
+                padding: 0.8rem 1.8rem;
+                font-size: 0.95rem;
+                min-width: 120px;
+            }
+            .overlay-card {
+                padding: 2rem 1.5rem;
+            }
+            .overlay-title {
+                font-size: 1.4rem;
+            }
+            .nav-buttons {
+                gap: 0.6rem;
+            }
+            .nav-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.82rem;
+            }
+            .keyboard-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="exercise" id="exerciseCard">
+            <div class="prompt" id="promptArea">
+                <div class="words" id="promptWords">(you / a student)</div>
+            </div>
+
+            <div class="input-area">
+                <input
+                type="text"
+                class="question-input"
+                id="questionInput"
+                placeholder="type your question here…"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                >
+                <button class="action-btn" id="actionBtn">check →</button>
+            </div>
+
+            <div class="result" id="resultArea">
+                <span class="status-dot"></span> type your question and press Enter
+            </div>
+
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+
+            <div class="progress">
+                <span class="counter" id="promptCounter">Prompt 1 / 50</span>
+                <span class="completed-count" id="completedCount">✓ 0 done</span>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" id="prevBtn">← previous</button>
+                <button class="nav-btn" id="nextBtn">next → </button>
+            </div>
+            <hr />
+        </div>
+    </div>
+
+    <!-- Congratulatory overlay -->
+    <div class="overlay" id="congratsOverlay">
+        <div class="overlay-card">
+            <span class="overlay-emoji">🌟</span>
+            <div class="overlay-title">Wonderful work!</div>
+            <div class="overlay-subtitle">You've completed all <strong>50</strong> questions.<br>Your question-making skills are strong!</div>
+            <button class="overlay-btn" id="overlayCloseBtn">review answers</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ──────────────────────────────────────
+            // PROMPT DATA
+            // ──────────────────────────────────────
+            const prompts = [
+    // Past Simple
+    { chunks: "(you / at the party last night)", correct: "were you at the party last night", cat: "be" },
+    // Present Simple
+    { chunks: "(you / a student)", correct: "are you a student", cat: "be" },
+    // Past Simple
+    { chunks: "(she / call you an hour ago)", correct: "did she call you an hour ago", cat: "action" },
+    // Present Simple
+    { chunks: "(where / you / work)", correct: "where do you work", cat: "qw_action" },
+    // Past Simple
+    { chunks: "(where / you / go last summer)", correct: "where did you go last summer", cat: "qw_action" },
+    // Present Simple
+    { chunks: "(she / speak Spanish)", correct: "does she speak spanish", cat: "action" },
+    // Past Simple
+    { chunks: "(they / finish the project two days ago)", correct: "did they finish the project two days ago", cat: "action" },
+    // Present Simple
+    { chunks: "(they / live in London)", correct: "do they live in london", cat: "action" },
+    // Past Simple
+    { chunks: "(you / see the news this morning)", correct: "did you see the news this morning", cat: "action" },
+    // Present Simple
+    { chunks: "(how often / you / exercise)", correct: "how often do you exercise", cat: "qw_action" },
+    // Past Simple
+    { chunks: "(he / buy a new car last week)", correct: "did he buy a new car last week", cat: "action" },
+    // Present Simple
+    { chunks: "(you / like coffee)", correct: "do you like coffee", cat: "action" },
+    // Past Simple
+    { chunks: "(where / she / yesterday)", correct: "where was she yesterday", cat: "qw_be" },
+    // Present Simple
+    { chunks: "(what / your name)", correct: "what is your name", cat: "qw_be" },
+    // Past Simple
+    { chunks: "(they / at the concert last weekend)", correct: "were they at the concert last weekend", cat: "be" },
+    // Present Simple
+    { chunks: "(he / a doctor)", correct: "is he a doctor", cat: "be" },
+    // Past Simple
+    { chunks: "(what / she / say when you called)", correct: "what did she say when you called", cat: "qw_action" },
+    // Present Simple
+    { chunks: "(where / the nearest bank)", correct: "where is the nearest bank", cat: "qw_be" },
+    // Past Simple
+    { chunks: "(why / they / leave early yesterday)", correct: "why did they leave early yesterday", cat: "qw_action" },
+    // Present Simple
+    { chunks: "(you / understand the question)", correct: "do you understand the question", cat: "action" },
+    // Past Simple
+    { chunks: "(you / tired after the trip yesterday)", correct: "were you tired after the trip yesterday", cat: "be" },
+    // Present Simple
+    { chunks: "(she / from Spain)", correct: "is she from spain", cat: "be" },
+    // Past Simple
+    { chunks: "(how / the movie you watched)", correct: "how was the movie you watched", cat: "qw_be" },
+    // Present Simple
+    { chunks: "(what / you / think about this movie)", correct: "what do you think about this movie", cat: "qw_action" },
+    // Past Simple
+    { chunks: "(he / tell you the truth last time)", correct: "did he tell you the truth last time", cat: "action" },
+    // Present Simple
+    { chunks: "(we / in the right place)", correct: "are we in the right place", cat: "be" },
+    // Past Simple
+    { chunks: "(you / eat breakfast this morning)", correct: "did you eat breakfast this morning", cat: "action" },
+    // Present Simple
+    { chunks: "(how / she / go to work)", correct: "how does she go to work", cat: "qw_action" },
+    // Past Simple
+    { chunks: "(she / a teacher before)", correct: "was she a teacher before", cat: "be" },
+    // Present Simple
+    { chunks: "(it / rain a lot here)", correct: "does it rain a lot here", cat: "action" },
+    // Past Simple
+    { chunks: "(what time / you / arrive last night)", correct: "what time did you arrive last night", cat: "qw_action" },
+    // Present Simple
+    { chunks: "(they / have a car)", correct: "do they have a car", cat: "action" },
+    // Past Simple
+    { chunks: "(they / visit the museum last month)", correct: "did they visit the museum last month", cat: "action" },
+    // Present Simple
+    { chunks: "(why / you / study English)", correct: "why do you study english", cat: "qw_action" },
+    // Past Simple
+    { chunks: "(why / you / not at work yesterday)", correct: "why were you not at work yesterday", cat: "qw_be" },
+    // Present Simple
+    { chunks: "(your parents / at home)", correct: "are your parents at home", cat: "be" },
+    // Past Simple
+    { chunks: "(you / at the meeting last Monday)", correct: "were you at the meeting last Monday", cat: "be" },
+    // Present Simple
+    { chunks: "(what color / your car)", correct: "what color is your car", cat: "qw_be" },
+    // Past Simple
+    { chunks: "(she / enjoy the concert last week)", correct: "did she enjoy the concert last week", cat: "action" },
+    // Present Simple
+    { chunks: "(you / want a drink)", correct: "do you want a drink", cat: "action" },
+    // Past Simple
+    { chunks: "(when / you / finish your homework yesterday)", correct: "when did you finish your homework yesterday", cat: "qw_action" },
+    // Present Simple
+    { chunks: "(where / your brother / study)", correct: "where does your brother study", cat: "qw_action" },
+    // Past Simple
+    { chunks: "(they / happy with the results last year)", correct: "were they happy with the results last year", cat: "be" },
+    // Present Simple
+    { chunks: "(the food / good here)", correct: "is the food good here", cat: "be" },
+    // Past Simple
+    { chunks: "(what / that noise a moment ago)", correct: "what was that noise a moment ago", cat: "qw_be" },
+    // Present Simple
+    { chunks: "(how / you)", correct: "how are you", cat: "qw_be" },
+    // Past Simple
+    { chunks: "(you / see Sarah recently)", correct: "did you see sarah recently", cat: "action" },
+    // Present Simple
+    { chunks: "(we / need to pay)", correct: "do we need to pay", cat: "action" },
+    // Past Simple
+    { chunks: "(how / he / learn to swim when he was a child)", correct: "how did he learn to swim when he was a child", cat: "qw_action" },
+    // Present Simple
+    { chunks: "(what time / the train / leave usually)", correct: "what time does the train leave usually", cat: "qw_action" },
+];
+
+            const totalPrompts = prompts.length;
+            let currentIdx = 0;
+            let completed = new Array(totalPrompts).fill(false);
+            let currentFeedbackState = 'neutral'; // 'neutral' | 'correct' | 'wrong'
+
+            // ──────────────────────────────────────
+            // DOM ELEMENTS
+            // ──────────────────────────────────────
+            const promptWordsSpan = document.getElementById('promptWords');
+            const promptArea = document.getElementById('promptArea');
+            const questionInput = document.getElementById('questionInput');
+            const actionBtn = document.getElementById('actionBtn');
+            const resultArea = document.getElementById('resultArea');
+            const promptCounter = document.getElementById('promptCounter');
+            const completedCountSpan = document.getElementById('completedCount');
+            const progressBarFill = document.getElementById('progressBarFill');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const congratsOverlay = document.getElementById('congratsOverlay');
+            const overlayCloseBtn = document.getElementById('overlayCloseBtn');
+            const exerciseCard = document.getElementById('exerciseCard');
+
+            // ──────────────────────────────────────
+            // HINT POOLS (subtle, not giving away answers)
+            // ──────────────────────────────────────
+            const hintsBe = [
+                "Check the word order — where should the verb go?",
+                "Hmm, think about how yes/no questions begin.",
+                "The verb needs to move to the front for a question.",
+                "Something's off with the structure. Try again.",
+                "Remember: subject and verb swap places in questions.",
+            ];
+
+            const hintsAction = [
+                "For action verbs, you'll need an extra word at the start.",
+                "Check the beginning — is an auxiliary verb missing?",
+                "Think about which helping verb fits here.",
+                "The word order might need a small adjustment.",
+                "Something's not quite right at the front of your question.",
+            ];
+
+            const hintsQw = [
+                "Question word first, then the auxiliary — check the order.",
+                "The question word is fine, but what comes after it?",
+                "Make sure the auxiliary verb follows the question word.",
+                "You've got the right idea — review the structure after the question word.",
+                "The beginning is key. Question word + auxiliary + subject.",
+            ];
+
+            const hintsGeneric = [
+                "Not quite. Try rearranging a few words.",
+                "Something's missing or out of place. Take another look.",
+                "Read it aloud — does it sound like a natural question?",
+                "Almost there, but the structure needs a tweak.",
+                "Hmm, that doesn't sound like a proper question yet.",
+            ];
+
+            function getHintForCategory(cat) {
+                let pool;
+                if (cat === 'be' || cat === 'qw_be') pool = hintsBe;
+                else if (cat === 'action' || cat === 'qw_action') pool = hintsAction;
+                else pool = hintsQw;
+                // mix in a generic hint sometimes
+                if (Math.random() < 0.35) pool = hintsGeneric;
+                return pool[Math.floor(Math.random() * pool.length)];
+            }
+
+            // ──────────────────────────────────────
+            // NORMALIZATION & COMPARISON
+            // ──────────────────────────────────────
+            function expandContractions(str) {
+                const contractions = [
+                    { pattern: /\bwhat's\b/g, replacement: 'what is' },
+                    { pattern: /\bwhere's\b/g, replacement: 'where is' },
+                    { pattern: /\bwhy's\b/g, replacement: 'why is' },
+                    { pattern: /\bhow's\b/g, replacement: 'how is' },
+                    { pattern: /\bwho's\b/g, replacement: 'who is' },
+                    { pattern: /\bwhen's\b/g, replacement: 'when is' },
+                    { pattern: /\bthat's\b/g, replacement: 'that is' },
+                    { pattern: /\bit's\b/g, replacement: 'it is' },
+                    { pattern: /\bhe's\b/g, replacement: 'he is' },
+                    { pattern: /\bshe's\b/g, replacement: 'she is' },
+                    { pattern: /\byou're\b/g, replacement: 'you are' },
+                    { pattern: /\bwe're\b/g, replacement: 'we are' },
+                    { pattern: /\bthey're\b/g, replacement: 'they are' },
+                    { pattern: /\bi'm\b/g, replacement: 'i am' },
+                    { pattern: /\baren't\b/g, replacement: 'are not' },
+                    { pattern: /\bisn't\b/g, replacement: 'is not' },
+                    { pattern: /\bdon't\b/g, replacement: 'do not' },
+                    { pattern: /\bdoesn't\b/g, replacement: 'does not' },
+                    { pattern: /\bcan't\b/g, replacement: 'can not' },
+                    { pattern: /\bwon't\b/g, replacement: 'will not' },
+                ];
+                let result = str;
+                for (const c of contractions) {
+                    result = result.replace(c.pattern, c.replacement);
+                }
+                return result;
+            }
+
+            function normalizeForCompare(str) {
+                let s = str.toLowerCase().trim();
+                s = expandContractions(s);
+                // Remove punctuation except apostrophes already handled
+                s = s.replace(/[^\w\s]/g, '');
+                s = s.replace(/\s+/g, ' ').trim();
+                return s;
+            }
+
+            function isAnswerCorrect(userRaw, correctRaw) {
+                const userNorm = normalizeForCompare(userRaw);
+                const correctNorm = normalizeForCompare(correctRaw);
+
+                if (userNorm === correctNorm) return true;
+
+                // Also check without expanding contractions on the correct side
+                const correctNormSimple = correctRaw.toLowerCase().trim().replace(/[^\w\s]/g, '').replace(
+                    /\s+/g, ' ').trim();
+                if (userNorm === correctNormSimple) return true;
+
+                // Word-level check: allow minor variations but enforce structural similarity
+                const userWords = userNorm.split(/\s+/);
+                const correctWords = correctNorm.split(/\s+/);
+
+                // If lengths differ by more than 1, likely wrong structure
+                if (Math.abs(userWords.length - correctWords.length) > 1) return false;
+
+                // Check first word — critical for question structure
+                const firstCorrect = correctWords[0];
+                const firstUser = userWords[0];
+                const questionStarters = ['what', 'where', 'why', 'how', 'when', 'who', 'which', 'whose',
+                    'am', 'is', 'are', 'do', 'does', 'did', 'can', 'will', 'shall', 'may', 'must',
+                    'have', 'has'
+                ];
+                if (questionStarters.includes(firstCorrect) && firstUser !== firstCorrect) {
+                    // The first word needs to match for proper question structure
+                    return false;
+                }
+
+                // Check word overlap
+                let matchCount = 0;
+                const correctSet = [...correctWords];
+                const userSet = [...userWords];
+                for (const cw of correctSet) {
+                    const idx = userSet.indexOf(cw);
+                    if (idx !== -1) {
+                        matchCount++;
+                        userSet.splice(idx, 1);
+                    }
+                }
+                const ratio = matchCount / correctWords.length;
+                return ratio >= 0.85;
+            }
+
+            // ──────────────────────────────────────
+            // UI STATE MANAGEMENT
+            // ──────────────────────────────────────
+            function updateProgressUI() {
+                const doneCount = completed.filter(Boolean).length;
+                completedCountSpan.textContent = '✓ ' + doneCount + ' done';
+                promptCounter.textContent = 'Prompt ' + (currentIdx + 1) + ' / ' + totalPrompts;
+                const pct = Math.round((doneCount / totalPrompts) * 100);
+                progressBarFill.style.width = pct + '%';
+
+                // Update prompt completion indicator
+                if (completed[currentIdx]) {
+                    promptArea.classList.add('completed-prompt');
+                } else {
+                    promptArea.classList.remove('completed-prompt');
+                }
+            }
+
+            function updateNavigationButtons() {
+                const isCorrect = currentFeedbackState === 'correct';
+                const nextIdx = (currentIdx + 1) % totalPrompts;
+                const nextIsCompleted = completed[nextIdx];
+
+                // Previous button always enabled (can go back to review)
+                prevBtn.disabled = false;
+
+                // Next button enabled when current prompt is correct OR next prompt was already completed
+                nextBtn.disabled = !(isCorrect || nextIsCompleted);
+
+                // Visual feedback on next button
+                if (!(isCorrect || nextIsCompleted)) {
+                    nextBtn.style.opacity = '0.4';
+                    nextBtn.style.cursor = 'not-allowed';
+                    nextBtn.title = 'answer correctly to proceed';
+                } else {
+                    nextBtn.style.opacity = '1';
+                    nextBtn.style.cursor = 'pointer';
+                    nextBtn.title = 'go to next question';
+                }
+            }
+
+            function resetToNeutral() {
+                currentFeedbackState = 'neutral';
+                questionInput.classList.remove('correct-input', 'wrong-input');
+                actionBtn.classList.remove('btn-correct', 'btn-wrong');
+                actionBtn.textContent = 'check →';
+                actionBtn.disabled = false;
+                resultArea.innerHTML = '<span class="status-dot"></span> create a full question';
+                resultArea.classList.remove('result-correct', 'result-wrong');
+                const dot = resultArea.querySelector('.status-dot');
+                if (dot) { dot.classList.remove('dot-correct', 'dot-wrong'); }
+                updateNavigationButtons();
+            }
+
+            function showCorrectFeedback(spokenText) {
+                currentFeedbackState = 'correct';
+                questionInput.classList.add('correct-input');
+                questionInput.classList.remove('wrong-input');
+                actionBtn.classList.add('btn-correct');
+                actionBtn.classList.remove('btn-wrong');
+                actionBtn.textContent = 'next →';
+                actionBtn.disabled = false;
+                const display = spokenText.length > 50 ? spokenText.substring(0, 47) + '…' : spokenText;
+                resultArea.innerHTML =
+                    '<span class="status-dot dot-correct"></span> ✓ <strong>"' + escapeHTML(display) +
+                    '"</strong> — perfect!';
+                resultArea.classList.add('result-correct');
+                resultArea.classList.remove('result-wrong');
+                updateNavigationButtons();
+                // Don't blur - keep focus for Enter key
+                questionInput.focus();
+            }
+
+            function showWrongFeedback(spokenText, hint) {
+                currentFeedbackState = 'wrong';
+                questionInput.classList.add('wrong-input');
+                questionInput.classList.remove('correct-input');
+                actionBtn.classList.add('btn-wrong');
+                actionBtn.classList.remove('btn-correct');
+                actionBtn.textContent = 'try again ↻';
+                actionBtn.disabled = false;
+                const display = spokenText.length > 50 ? spokenText.substring(0, 47) + '…' : spokenText;
+                resultArea.innerHTML = '<span class="status-dot dot-wrong"></span> ✗ <strong>"' + escapeHTML(
+                    display) + '"</strong>' +
+                    '<span class="hint-text">' + escapeHTML(hint) + '</span>';
+                resultArea.classList.add('result-wrong');
+                resultArea.classList.remove('result-correct');
+                updateNavigationButtons();
+                // Select all text for easy editing
+                questionInput.select();
+                questionInput.focus();
+            }
+
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ──────────────────────────────────────
+            // LOAD PROMPT
+            // ──────────────────────────────────────
+            function loadPrompt() {
+                const prompt = prompts[currentIdx];
+                promptWordsSpan.textContent = prompt.chunks;
+                questionInput.value = '';
+
+                if (completed[currentIdx]) {
+                    // Prompt already completed — show as correct so forward navigation is available
+                    currentFeedbackState = 'correct';
+                    questionInput.classList.add('correct-input');
+                    questionInput.classList.remove('wrong-input');
+                    actionBtn.classList.add('btn-correct');
+                    actionBtn.classList.remove('btn-wrong');
+                    actionBtn.textContent = 'next →';
+                    actionBtn.disabled = false;
+                    resultArea.innerHTML =
+                        '<span class="status-dot dot-correct"></span> ✓ you\'ve already completed this one — practice again or move on';
+                    resultArea.classList.add('result-correct');
+                    resultArea.classList.remove('result-wrong');
+                    // Ensure navigation buttons reflect correct state
+                    updateNavigationButtons();
+                } else {
+                    resetToNeutral();
+                }
+
+                questionInput.focus();
+                updateProgressUI();
+            }
+
+            // ──────────────────────────────────────
+            // CHECK ANSWER
+            // ──────────────────────────────────────
+            function checkAnswer() {
+                const userAnswer = questionInput.value.trim();
+                if (userAnswer === '') {
+                    resultArea.innerHTML =
+                        '<span class="status-dot dot-wrong"></span> please type your question first';
+                    resultArea.classList.add('result-wrong');
+                    resultArea.classList.remove('result-correct');
+                    questionInput.classList.add('wrong-input');
+                    setTimeout(() => {
+                        questionInput.classList.remove('wrong-input');
+                        if (currentFeedbackState === 'neutral') {
+                            resultArea.classList.remove('result-wrong');
+                            resultArea.innerHTML =
+                                '<span class="status-dot"></span> type your question and press Enter';
+                        }
+                    }, 900);
+                    questionInput.focus();
+                    return;
+                }
+
+                const currentPrompt = prompts[currentIdx];
+                const isCorrect = isAnswerCorrect(userAnswer, currentPrompt.correct);
+
+                if (isCorrect) {
+                    showCorrectFeedback(userAnswer);
+                    // Mark as completed
+                    if (!completed[currentIdx]) {
+                        completed[currentIdx] = true;
+                        updateProgressUI();
+                        // Check if all completed
+                        const allDone = completed.every(Boolean);
+                        if (allDone) {
+                            setTimeout(() => {
+                                congratsOverlay.classList.add('active');
+                            }, 700);
+                        }
+                    } else {
+                        updateProgressUI();
+                    }
+                } else {
+                    const hint = getHintForCategory(currentPrompt.cat);
+                    showWrongFeedback(userAnswer, hint);
+                }
+            }
+
+            // ──────────────────────────────────────
+            // NAVIGATION
+            // ──────────────────────────────────────
+            function goNext() {
+                const nextIdx = (currentIdx + 1) % totalPrompts;
+                const nextIsCompleted = completed[nextIdx];
+
+                // Allow going forward if current is correct OR next prompt was already completed
+                if (currentFeedbackState !== 'correct' && !nextIsCompleted) {
+                    // Shake or highlight that they need to answer first
+                    questionInput.classList.add('wrong-input');
+                    setTimeout(() => questionInput.classList.remove('wrong-input'), 500);
+                    resultArea.innerHTML =
+                        '<span class="status-dot dot-wrong"></span> you need to answer correctly before moving on';
+                    resultArea.classList.add('result-wrong');
+                    setTimeout(() => {
+                        if (currentFeedbackState === 'neutral') {
+                            resultArea.classList.remove('result-wrong');
+                            resultArea.innerHTML =
+                                '<span class="status-dot"></span> type your question and press Enter';
+                        }
+                    }, 1500);
+                    questionInput.focus();
+                    return;
+                }
+
+                currentIdx = nextIdx;
+                loadPrompt();
+            }
+
+            function goPrev() {
+                // Previous is always allowed for review
+                currentIdx = (currentIdx - 1 + totalPrompts) % totalPrompts;
+                loadPrompt();
+            }
+
+            // ──────────────────────────────────────
+            // ACTION BUTTON HANDLER
+            // ──────────────────────────────────────
+            function handleActionBtn() {
+                if (currentFeedbackState === 'correct') {
+                    // Button acts as "next"
+                    goNext();
+                } else if (currentFeedbackState === 'wrong') {
+                    // Button acts as "try again"
+                    checkAnswer();
+                } else {
+                    // Neutral — check the answer
+                    checkAnswer();
+                }
+            }
+
+            // ──────────────────────────────────────
+            // EVENT LISTENERS
+            // ──────────────────────────────────────
+            actionBtn.addEventListener('click', handleActionBtn);
+
+            // Enter key handler
+            questionInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+
+                    if (currentFeedbackState === 'correct') {
+                        // If answer is correct, Enter acts as "next"
+                        goNext();
+                    } else {
+                        // Otherwise, Enter checks the answer
+                        checkAnswer();
+                    }
+                }
+            });
+
+            // Reset feedback when user starts typing again after a wrong answer
+            questionInput.addEventListener('input', function() {
+                if (currentFeedbackState === 'wrong') {
+                    // Keep the try-again state but let them edit freely
+                    // Don't reset — they need to explicitly try again
+                }
+                if (currentFeedbackState === 'correct') {
+                    // If they start typing after correct, reset to neutral so they can practice again
+                    resetToNeutral();
+                    questionInput.focus();
+                }
+            });
+
+            prevBtn.addEventListener('click', goPrev);
+            nextBtn.addEventListener('click', goNext);
+
+            // Keyboard shortcuts for navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && e.ctrlKey) {
+                    e.preventDefault();
+                    goPrev();
+                }
+                if (e.key === 'ArrowRight' && e.ctrlKey) {
+                    e.preventDefault();
+                    // Only allow if current is correct or next is completed
+                    const nextIdx = (currentIdx + 1) % totalPrompts;
+                    if (currentFeedbackState === 'correct' || completed[nextIdx]) {
+                        goNext();
+                    } else {
+                        questionInput.focus();
+                    }
+                }
+            });
+
+            // Overlay close
+            overlayCloseBtn.addEventListener('click', function() {
+                congratsOverlay.classList.remove('active');
+                loadPrompt();
+            });
+
+            // Close overlay on Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && congratsOverlay.classList.contains('active')) {
+                    congratsOverlay.classList.remove('active');
+                    loadPrompt();
+                }
+            });
+
+            // Close overlay on clicking background
+            congratsOverlay.addEventListener('click', function(e) {
+                if (e.target === congratsOverlay) {
+                    congratsOverlay.classList.remove('active');
+                    loadPrompt();
+                }
+            });
+
+            // ──────────────────────────────────────
+            // INITIAL LOAD
+            // ──────────────────────────────────────
+            loadPrompt();
+            updateProgressUI();
+
+            // Log hint for curious students (subtle)
+            console.log(
+                '🔍 ESL Question Practice — type your answers. Press Enter to check, Enter again to go next. Good luck!'
+            );
+        })();
+    </script>
+</body>
