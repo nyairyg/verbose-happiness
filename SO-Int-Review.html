@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>English practice · 60 questions · [?] format</title>
+</head>
+<body style="background:#f4f4f4; font-family:Inter, Helvetica, sans-serif; margin:0; padding:16px;">
+
+<div
+  id="card"
+  style="
+    background:#ffffff;
+    padding:24px;
+    border-radius:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    max-width:700px;
+    margin:40px auto;
+    line-height:1.5;
+    font-size:28px;
+  "
+>
+  <div id="questionText" style="white-space: pre-line;">
+    Click any answer to start.
+  </div>
+
+  <div id="answers" style="margin-top:20px;"></div>
+
+  <div style="margin-top:20px; font-size:14px; color:#666;">
+    Click the correct answer to continue
+  </div>
+</div>
+
+<script>
+  const quiz = [
+    {
+      text: "1. Hi, Jake. What [?] this evening?",
+      answers: ["you doing", "are you doing", "will you doing"],
+      correct: "are you doing"
+    },
+    {
+      text: "2. I'm not sure. I think I [?] stay at home and study.",
+      answers: ["will to", "might", "going to"],
+      correct: "might"
+    },
+    {
+      text: "3. We [?] Italy for our holidays. We love it there.",
+      answers: ["are going to", "will go", "might going"],
+      correct: "are going to"
+    },
+    {
+      text: "4. I always want to [?] things done as quickly as possible. I hate time wasting.",
+      answers: ["have", "make", "get"],
+      correct: "get"
+    },
+    {
+      text: "5. I hate doing my banking so I'm very easily [?].",
+      answers: ["prioritised", "distracted", "changed"],
+      correct: "distracted"
+    },
+    {
+      text: "6. He's changing his job in a month or [?].",
+      answers: ["term", "year", "two"],
+      correct: "two"
+    },
+    {
+      text: "7. I think it will be better for everyone in the long [?].",
+      answers: ["year", "term", "time"],
+      correct: "term"
+    },
+    {
+      text: "8. Look at the sunshine! You have a [?] great time at the beach.",
+      answers: ["'re going to", "'re likely to", "may"],
+      correct: "'re going to"
+    },
+    {
+      text: "9. We [?] never see him again.",
+      answers: ["aren't likely to", "may", "won't"],
+      correct: "may"
+    },
+    {
+      text: "10. Yes, we're working against the [?] to finish in time.",
+      answers: ["pressure", "life", "clock"],
+      correct: "clock"
+    },
+    {
+      text: "11. I was really late home even though my dad told me not to be. I'm in really [?] water.",
+      answers: ["dark", "hot", "dirty"],
+      correct: "hot"
+    },
+    {
+      text: "12. We don't know much about him. He's a dark [?].",
+      answers: ["horse", "dog", "fish"],
+      correct: "horse"
+    },
+    {
+      text: "13. She's very lazy. The boss told me to keep an [?] on her and check she's working.",
+      answers: ["sign", "note", "eye"],
+      correct: "eye"
+    },
+    {
+      text: "14. I'm sorry. I didn't [?] you were busy.",
+      answers: ["recognise", "remind", "realise"],
+      correct: "realise"
+    },
+    {
+      text: "15. I'm afraid I didn't [?] that. Can you say it again?",
+      answers: ["catch", "take", "do"],
+      correct: "catch"
+    },
+    {
+      text: "16. Andre is very [?]. He wants to sell his designs all over the world.",
+      answers: ["lazy", "ambitious", "indecisive"],
+      correct: "ambitious"
+    },
+    {
+      text: "17. Françoise is a good [?]. People really listen to what she has to say.",
+      answers: ["risk taker", "listener", "communicator"],
+      correct: "communicator"
+    },
+    {
+      text: "18. The doctor said I [?] take these pills.",
+      answers: ["has to", "have to", "haven't to"],
+      correct: "have to"
+    },
+    {
+      text: "19. Help yourself to anything you want. You [?] ask.",
+      answers: ["don't have to", "have to", "must"],
+      correct: "don't have to"
+    },
+    {
+      text: "20. It's a wonderful [?]. I enjoy it a lot.",
+      answers: ["work", "study", "job"],
+      correct: "job"
+    },
+    {
+      text: "21. I can't believe how big your kitchen is. It's [?].",
+      answers: ["tiny", "big", "enormous"],
+      correct: "enormous"
+    },
+    {
+      text: "22. The interview was [?]. I'll never get the job.",
+      answers: ["brilliant", "awful", "exhausting"],
+      correct: "awful"
+    },
+    {
+      text: "23. When I told my boss, he was [?].",
+      answers: ["furious", "terrible", "impossible"],
+      correct: "furious"
+    },
+    {
+      text: "24. As children, we [?] play at the bottom of the garden.",
+      answers: ["used", "use to", "would"],
+      correct: "would"
+    },
+    {
+      text: "25. My mother [?] live in the mountains.",
+      answers: ["used to", "use to", "would"],
+      correct: "used to"
+    },
+    {
+      text: "26. If we work as a [?], we'll get the job done faster.",
+      answers: ["boss", "businessman", "team"],
+      correct: "team"
+    },
+    {
+      text: "27. More than a hundred people had to [?] for a single job.",
+      answers: ["compete", "decide", "get fired"],
+      correct: "compete"
+    },
+    {
+      text: "28. The way I see [?], we need to start again.",
+      answers: ["point", "things", "idea"],
+      correct: "things"
+    },
+    {
+      text: "29. That's OK [?] me.",
+      answers: ["on", "at", "by"],
+      correct: "by"
+    },
+    {
+      text: "30. I think we need to sum [?] what we've learned.",
+      answers: ["up", "on", "at"],
+      correct: "up"
+    },
+    {
+      text: "31. Houses in the area have become much [?] recently.",
+      answers: ["more affordable", "more cheaper", "expensiver"],
+      correct: "more affordable"
+    },
+    {
+      text: "32. People are able to work far [?] hours than before.",
+      answers: ["most flexible", "more flexible", "the more flexible"],
+      correct: "more flexible"
+    },
+    {
+      text: "33. The saxophone is [?] to learn than some other instruments.",
+      answers: ["slightly the hard", "slightly easy", "slightly harder"],
+      correct: "slightly harder"
+    },
+    {
+      text: "34. Could you go and get the [?] ? I need to clean the floor.",
+      answers: ["communications satellite", "washing machine", "vacuum cleaner"],
+      correct: "vacuum cleaner"
+    },
+    {
+      text: "35. Nowadays you can have a [?] to protect you from influenza.",
+      answers: ["antibiotic", "vaccination", "genetic engineering"],
+      correct: "vaccination"
+    },
+    {
+      text: "36. That's a very good [?].",
+      answers: ["wonder", "inquire", "question"],
+      correct: "question"
+    },
+    {
+      text: "37. I'm doing [?] into how computers affect children.",
+      answers: ["a research", "some research", "some investigate"],
+      correct: "some research"
+    },
+    {
+      text: "38. You don't want to come with us, [?] ?",
+      answers: ["would you", "did you", "do you"],
+      correct: "do you"
+    },
+    {
+      text: "39. You've brought the camera with you, [?] ?",
+      answers: ["did you", "haven't you", "didn't you"],
+      correct: "haven't you"
+    },
+    {
+      text: "40. She [?] one of the best players in the world, isn't she?",
+      answers: ["'s", "will be", "was"],
+      correct: "'s"
+    },
+    {
+      text: "41. I couldn't do anything to make things better. I felt [?].",
+      answers: ["effective", "painful", "useless"],
+      correct: "useless"
+    },
+    {
+      text: "42. He's a very [?] puppy.",
+      answers: ["lovable", "creative", "biological"],
+      correct: "lovable"
+    },
+    {
+      text: "43. My computer's [?] . Can you help me?",
+      answers: ["needs fixing", "doesn't work", "crashed"],
+      correct: "crashed"
+    },
+    {
+      text: "44. Could you tell me [?] ?",
+      answers: ["what is the problem", "what the problem is", "what the problem"],
+      correct: "what the problem is"
+    },
+    {
+      text: "45. Sure. Let me [?].",
+      answers: ["look for", "have a look", "look at"],
+      correct: "have a look"
+    },
+    {
+      text: "46. I've had a really [?] week.",
+      answers: ["exhausted", "tired", "exhausting"],
+      correct: "exhausting"
+    },
+    {
+      text: "47. I get really [?] when he doesn't reply to my texts.",
+      answers: ["annoyed", "annoying", "relaxed"],
+      correct: "annoyed"
+    },
+    {
+      text: "48. I'll give you the present when [?] you.",
+      answers: ["I will see", "I would see", "I see"],
+      correct: "I see"
+    },
+    {
+      text: "49. If we can arrange everything, [?] to France for a holiday.",
+      answers: ["we'll go", "we go", "we would go"],
+      correct: "we'll go"
+    },
+    {
+      text: "50. [?] very tired when I have to travel a lot.",
+      answers: ["I'll get", "I get", "I would get"],
+      correct: "I get"
+    },
+    {
+      text: "51. It's a formal evening, so we must [?] in something nice.",
+      answers: ["dress down", "dress for", "dress up"],
+      correct: "dress up"
+    },
+    {
+      text: "52. We're very different characters, but we [?] well.",
+      answers: ["get off", "get on", "get on with"],
+      correct: "get on"
+    },
+    {
+      text: "53. She's selling the paintings to [?] for charity.",
+      answers: ["buy money", "earn money", "raise money"],
+      correct: "raise money"
+    },
+    {
+      text: "54. I'll get there early and get us some [?].",
+      answers: ["seats", "entrance", "chair"],
+      correct: "seats"
+    },
+    {
+      text: "55. If he [?] the drums late at night, I would sleep much better.",
+      answers: ["doesn't play", "didn't play", "would play"],
+      correct: "didn't play"
+    },
+    {
+      text: "56. Life [?] easier if we didn't have to work so hard.",
+      answers: ["would be", "is", "was"],
+      correct: "would be"
+    },
+    {
+      text: "57. I wouldn't mind if he [?] back again!",
+      answers: ["always comes", "never comes", "never came"],
+      correct: "never came"
+    },
+    {
+      text: "58. She was [?] a job at their head office in Washington.",
+      answers: ["offered to", "offered", "promoted"],
+      correct: "offered"
+    },
+    {
+      text: "59. I'm really pleased [?] you that you've won first prize.",
+      answers: ["tell", "to tell", "telling"],
+      correct: "to tell"
+    },
+    {
+      text: "60. A: Their house burned down in a fire. B: Oh no. That's [?].",
+      answers: ["a shame", "annoying", "awful"],
+      correct: "awful"
+    }
+  ];
+
+  let index = -1;
+  let locked = false;
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function resetColors(answersDiv) {
+    const buttons = answersDiv.querySelectorAll('div');
+    buttons.forEach(btn => {
+      btn.style.background = "#f4f4f4";
+      btn.style.color = "#000";
+    });
+  }
+
+  function highlightAnswer(answersDiv, answerText, isCorrect) {
+    const buttons = answersDiv.querySelectorAll('div');
+    buttons.forEach(btn => {
+      if (btn.innerText === answerText) {
+        if (isCorrect) {
+          btn.style.background = "#c8f7c5";
+          btn.style.color = "#1a4d1a";
+        } else {
+          btn.style.background = "#f8d7da";
+          btn.style.color = "#721c24";
+        }
+      }
+    });
+  }
+
+  function nextCard() {
+    index++;
+    if (index >= quiz.length) index = 0;
+
+    locked = false;
+
+    document.getElementById("questionText").innerText = quiz[index].text;
+    const answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML = "";
+
+    const shuffledAnswers = shuffle([...quiz[index].answers]);
+
+    shuffledAnswers.forEach(answer => {
+      const div = document.createElement("div");
+      div.innerText = answer;
+      div.style = `
+        margin-top:10px;
+        padding:12px 16px;
+        border-radius:8px;
+        background:#f4f4f4;
+        cursor:pointer;
+        transition: background 0.2s;
+        user-select:none;
+      `;
+      div.onmouseover = () => {
+        if (locked) return;
+        div.style.background = "#e0e0e0";
+      };
+      div.onmouseout = () => {
+        if (locked) return;
+        div.style.background = "#f4f4f4";
+      };
+
+      div.onclick = () => {
+        if (locked) return;
+
+        const selectedAnswer = answer;
+        const correctAnswer = quiz[index].correct;
+
+        resetColors(answersDiv);
+
+        if (selectedAnswer === correctAnswer) {
+          highlightAnswer(answersDiv, selectedAnswer, true);
+          locked = true;
+          setTimeout(() => {
+            nextCard();
+          }, 700);
+        } else {
+          highlightAnswer(answersDiv, selectedAnswer, false);
+        }
+      };
+
+      answersDiv.appendChild(div);
+    });
+  }
+
+  nextCard();
+</script>
+
+</body>
+</html>
