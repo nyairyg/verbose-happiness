@@ -538,8 +538,8 @@
           this.highlightInputWrong();
           this.highlightCardWrong();
           // Provide gentle hint: show the expected answer style but not full answer? we give a hint.
-          let hintSuggestion = `Try: "${uniqueAnswers[0]}"`;
-          this.feedbackSpan.innerText = `❌ Not quite. ${hintSuggestion}`;
+          let hintSuggestion = `Try again.`;
+          this.feedbackSpan.innerText = `❌ Not quite.`;
           this.answerLocked = false;
           this.answerInput.disabled = false;
           this.answerInput.focus();
