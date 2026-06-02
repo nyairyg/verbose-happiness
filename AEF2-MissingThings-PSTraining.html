@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0">
+  <title>Speaking cards • Funny travel stories</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #f4f4f4;
+      font-family: 'Inter', Helvetica, system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 750px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .block-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      background: transparent;
+      padding: 0 8px;
+    }
+    .block-btn {
+      background: #ffffff;
+      border: 1px solid #d0d5dd;
+      border-radius: 40px;
+      padding: 10px 20px;
+      font-family: 'Inter', Helvetica, sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      background-color: #f9fafb;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      letter-spacing: 0.01em;
+    }
+    .block-btn:hover {
+      background-color: #eef2f6;
+      border-color: #b0b8c4;
+    }
+    .block-btn.active-block {
+      background: #1e293b;
+      border-color: #1e293b;
+      color: white;
+      font-weight: 550;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    }
+    .card {
+      background: #ffffff;
+      padding: 30px 28px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.04);
+      max-width: 700px;
+      width: 100%;
+      margin: 0 auto;
+      line-height: 1.5;
+      font-size: 22px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.25s;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border: 1px solid #eaecf0;
+      word-break: break-word;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 30px rgba(0, 0, 0, 0.08), 0 6px 12px rgba(0, 0, 0, 0.04);
+    }
+    .card:active {
+      transform: scale(0.99);
+      background: #fafbfc;
+    }
+    .question-line {
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 14px;
+      font-size: 1.4rem;
+      letter-spacing: -0.2px;
+    }
+    .answer-line {
+      font-weight: 500;
+      color: #2d3a4a;
+      background: #f2f3f5;
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 30px;
+      font-size: 1.25rem;
+      margin-top: 6px;
+      align-self: flex-start;
+      border: 1px solid #dce1e8;
+      line-height: 1.4;
+      letter-spacing: 0.01em;
+    }
+    @media (max-width: 500px) {
+      .card {
+        padding: 24px 18px;
+        font-size: 18px;
+      }
+      .question-line {
+        font-size: 1.2rem;
+      }
+      .answer-line {
+        font-size: 1.1rem;
+        padding: 5px 14px;
+      }
+      .block-btn {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="block-buttons" id="blockButtonsContainer"></div>
+
+    <div class="card" id="speakingCard">
+      <div id="questionDisplay" class="question-line">Where did he go last summer?</div>
+      <div id="answerDisplay" class="answer-line">→ Greece</div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- БАНКИ ВОПРОСОВ (глаголы в ответах приведены к первой форме) ----------
+      const story1 = [
+        { q: "Where did he go last summer?", a: "→ Greece" },
+        { q: "Who did he go with?", a: "→ his girlfriend" },
+        { q: "How long did they spend at the beach?", a: "→ all morning" },
+        { q: "What did they do at the beach?", a: "→ swim, sunbathe, play in the sand" },
+        { q: "Why couldn't he find the key card?", a: "→ not in his bag" },
+        { q: "Where did they look for the key?", a: "→ in the towels, in the bag, everywhere" },
+        { q: "Did they find it at the beach?", a: "→ no" },
+        { q: "What did he do at the hotel reception?", a: "→ get a new key" },
+        { q: "How much did the new key cost?", a: "→ 20 euros" },
+        { q: "How did he feel about paying 20 euros?", a: "→ upset" },
+        { q: "When did he find the old key?", a: "→ in the evening" },
+        { q: "Where was the key?", a: "→ in a secret pocket in his shorts" },
+        { q: "Why did he forget about the secret pocket?", a: "→ put it there in the morning" },
+        { q: "How did he feel when he found the key?", a: "→ stupid" }
+      ];
+
+      const story2 = [
+        { q: "Where did the family go last year?", a: "→ Spain, a water park" },
+        { q: "What did he want to do with the camera?", a: "→ take photos of his children" },
+        { q: "When did he notice the camera was missing?", a: "→ after lunch" },
+        { q: "Where did he think he left it?", a: "→ near the wave pool" },
+        { q: "What did he do to find it?", a: "→ go to Lost and Found, ask the lifeguards" },
+        { q: "Did the lifeguards have his camera?", a: "→ no" },
+        { q: "How did he feel when he couldn't find it?", a: "→ sad" },
+        { q: "Where did he sit down?", a: "→ on his sun lounger" },
+        { q: "What did he feel behind his back?", a: "→ something hard" },
+        { q: "Where was the camera in the end?", a: "→ in the net pocket of the sun lounger" },
+        { q: "Why did he put it there?", a: "→ to keep it safe" },
+        { q: "How do you think he felt when he found it?", a: "→ silly" }
+      ];
+
+      const story3 = [
+        { q: "What season was it?", a: "→ winter" },
+        { q: "Where did he go skiing?", a: "→ Austria" },
+        { q: "Who did he go with?", a: "→ his friends" },
+        { q: "Where did they have lunch?", a: "→ at a restaurant on the top of the mountain" },
+        { q: "What did he buy at the restaurant?", a: "→ hot chocolate" },
+        { q: "Where did he put his wallet first?", a: "→ in his jacket pocket" },
+        { q: "When did he notice his wallet was gone?", a: "→ at the bottom of the mountain" },
+        { q: "What did he think happened to it?", a: "→ fall out on the ski slope" },
+        { q: "What did he want to do?", a: "→ go back up and look for it" },
+        { q: "Did he go back up the mountain?", a: "→ no" },
+        { q: "Where did he find his wallet?", a: "→ in his backpack" },
+        { q: "Had he opened his backpack before lunch?", a: "→ no" },
+        { q: "What really happened after lunch?", a: "→ put the wallet in his backpack" },
+        { q: "How did he feel at the end?", a: "→ cringey" }
+      ];
+
+      const story4 = [
+        { q: "Where were they flying to?", a: "→ Rome" },
+        { q: "Why was the trip special?", a: "→ wedding anniversary" },
+        { q: "What was inside the envelope?", a: "→ tickets and passports" },
+        { q: "What happened at the check-in desk?", a: "→ can't find the envelope" },
+        { q: "Where did he look for the envelope first?", a: "→ in his bag" },
+        { q: "What did he take out of his bag?", a: "→ books, make-up, a water bottle" },
+        { q: "How did his wife react?", a: "→ very worried" },
+        { q: "What did he think would happen to their vacation?", a: "→ it is over" },
+        { q: "Where was the envelope in the end?", a: "→ in his mouth" },
+        { q: "Why did he put it in his mouth?", a: "→ his hands are full" },
+        { q: "How did he look with the envelope in his teeth?", a: "→ funny" },
+        { q: "What did the people behind them do?", a: "→ clap and laugh" },
+        { q: "Did his wife think it was a bad moment?", a: "→ no" }
+      ];
+
+      const story5 = [
+        { q: "Where did he travel to?", a: "→ the Maldives" },
+        { q: "Who did he go with?", a: "→ his best friend" },
+        { q: "What activity did they do?", a: "→ snorkeling" },
+        { q: "What did he do with his sunglasses before jumping?", a: "→ take them off" },
+        { q: "When did he notice they were missing?", a: "→ after swimming" },
+        { q: "What did he think happened?", a: "→  fall into the water" },
+        { q: "How long did he look for them?", a: "→ half an hour" },
+        { q: "Who laughed at him?", a: "→ the boat captain" },
+        { q: "How did he feel after looking?", a: "→ sad" },
+        { q: "What did he do on the boat?", a: "→ open a can of cola" },
+        { q: "How did he see his reflection?", a: "→ in a metal bottle" },
+        { q: "Where were the sunglasses all the time?", a: "→ on his head" },
+        { q: "Why was this funny?", a: "→ look for them everywhere but ... on his head" },
+        { q: "What did his friend do?", a: "→ film everything on his phone" }
+      ];
+
+      const blocks = [
+        { title: "1. Hotel Key", data: story1 },
+        { title: "2. Camera", data: story2 },
+        { title: "3. Wallet", data: story3 },
+        { title: "4. Tickets", data: story4 },
+        { title: "5. Sunglasses", data: story5 }
+      ];
+
+      let currentBlockIndex = 0;
+      let currentQuestionIndex = 0;
+
+      const questionEl = document.getElementById('questionDisplay');
+      const answerEl = document.getElementById('answerDisplay');
+      const card = document.getElementById('speakingCard');
+      const buttonsContainer = document.getElementById('blockButtonsContainer');
+
+      function renderCurrentCard() {
+        const activeBlock = blocks[currentBlockIndex];
+        if (!activeBlock || !activeBlock.data.length) {
+          questionEl.textContent = "No questions";
+          answerEl.textContent = "";
+          return;
+        }
+        const item = activeBlock.data[currentQuestionIndex];
+        questionEl.textContent = item.q;
+        answerEl.textContent = item.a;
+      }
+
+      function nextQuestion() {
+        const activeBlock = blocks[currentBlockIndex];
+        if (!activeBlock || activeBlock.data.length === 0) return;
+        currentQuestionIndex = (currentQuestionIndex + 1) % activeBlock.data.length;
+        renderCurrentCard();
+      }
+
+      function setActiveBlock(blockIndex) {
+        if (blockIndex === currentBlockIndex) return;
+        if (blockIndex < 0 || blockIndex >= blocks.length) return;
+        currentBlockIndex = blockIndex;
+        currentQuestionIndex = 0;
+        renderCurrentCard();
+        updateActiveButtonStyle();
+      }
+
+      function updateActiveButtonStyle() {
+        const allButtons = document.querySelectorAll('.block-btn');
+        allButtons.forEach((btn, idx) => {
+          if (idx === currentBlockIndex) {
+            btn.classList.add('active-block');
+          } else {
+            btn.classList.remove('active-block');
+          }
+        });
+      }
+
+      function buildBlockButtons() {
+        buttonsContainer.innerHTML = '';
+        blocks.forEach((block, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'block-btn';
+          btn.textContent = block.title;
+          btn.setAttribute('data-block-index', index);
+          btn.addEventListener('click', function(e) {
+            const idx = parseInt(e.currentTarget.getAttribute('data-block-index'), 10);
+            setActiveBlock(idx);
+          });
+          buttonsContainer.appendChild(btn);
+        });
+        updateActiveButtonStyle();
+      }
+
+      card.addEventListener('click', nextQuestion);
+
+      window.addEventListener('keydown', function(e) {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+          e.preventDefault();
+          nextQuestion();
+        }
+      });
+
+      buildBlockButtons();
+      currentBlockIndex = 0;
+      currentQuestionIndex = 0;
+      renderCurrentCard();
+      updateActiveButtonStyle();
+    })();
+  </script>
+</body>
+</html>
