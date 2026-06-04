@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Music Theory: Intervals | Reading & Quiz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f4f2ef;
+            height: 100vh;
+            overflow: hidden;
+            padding: 24px 32px;
+        }
+
+        .dashboard {
+            max-width: 1600px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            background: transparent;
+        }
+
+        .reading-column {
+            flex: 1.2;
+            min-width: 340px;
+            background: #fffefc;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #ece4df;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .reading-column .content-padding {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 28px 28px 28px;
+        }
+
+        .quiz-column {
+            flex: 1;
+            min-width: 360px;
+            background: #fffefc;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #ece4df;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .quiz-column .content-padding {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 28px 28px 28px;
+        }
+
+        .section-header {
+            padding: 24px 28px 12px 28px;
+            border-bottom: 2px solid #f0e7e2;
+            flex-shrink: 0;
+        }
+
+        .section-header h2 {
+            font-size: 1.65rem;
+            font-weight: 600;
+            color: #3f2e2a;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h2 i {
+            color: #b28b7a;
+            font-size: 1.5rem;
+        }
+
+        .passage {
+            font-size: 1rem;
+            line-height: 1.65;
+            color: #2c241f;
+            background: #fefaf8;
+            border-radius: 20px;
+            padding: 4px 0;
+        }
+.passage img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 16px auto;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .passage img.inline-img {
+    display: inline-block;     
+    vertical-align: middle;      /* выравнивание по тексту */
+}
+
+        .passage p {
+            margin-bottom: 1.2rem;
+        }
+
+        .passage .interval-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px auto;
+            font-size: 0.92rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .passage .interval-table th {
+            background: #b28b7a;
+            color: #fff;
+            padding: 10px 14px;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+        }
+
+        .passage .interval-table td {
+            padding: 9px 14px;
+            text-align: center;
+            background: #fefbf9;
+            border-bottom: 1px solid #f0e3dd;
+            font-weight: 500;
+            color: #3f2e2a;
+        }
+
+        .passage .interval-table tr:nth-child(even) td {
+            background: #fdf6f2;
+        }
+
+        .passage .music-def {
+            background: #f8f2ed;
+            border-left: 3px solid #b28b7a;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-style: normal;
+        }
+
+        .passage .rule-list {
+            list-style: none;
+            padding-left: 8px;
+            margin-bottom: 1.2rem;
+        }
+
+        .passage .rule-list li {
+            padding: 5px 0 5px 28px;
+            position: relative;
+            font-size: 0.94rem;
+            color: #3f2e2a;
+        }
+
+        .passage .rule-list li::before {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #b28b7a;
+        }
+
+        .truefalse-list {
+            margin-top: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tf-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+            background: #fefbf9;
+            padding: 10px 16px;
+            border-radius: 60px;
+            transition: background 0.2s;
+            border: 1px solid #f0e3dd;
+        }
+
+        .tf-item:hover {
+            background: #fff7f3;
+        }
+
+        .tf-statement {
+            flex: 1;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #3f2e2a;
+        }
+
+        .tf-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .tf-btn {
+            background: #f1edeb;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 6px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #5f4c44;
+            font-family: monospace;
+            letter-spacing: 0.5px;
+        }
+
+        .tf-btn.selected-true {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+
+        .tf-btn.selected-false {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+
+        .tf-item.correct-item {
+            background: #e8f5e9;
+            border-color: #81c784;
+        }
+
+        .tf-item.incorrect-item {
+            background: #ffebee;
+            border-color: #e57373;
+        }
+
+        .mc-question {
+            background: #fefbf9;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            padding: 16px 20px;
+            border: 1px solid #efe4df;
+            transition: all 0.15s;
+        }
+
+        .mc-question.correct-mc {
+            background: #e8f5e9;
+            border-color: #81c784;
+        }
+
+        .mc-question.incorrect-mc {
+            background: #ffebee;
+            border-color: #e57373;
+        }
+
+        .mc-question p {
+            font-weight: 600;
+            color: #3f2e2a;
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+        }
+
+        .mc-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .mc-option {
+            background: #f5f0ed;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #4c3a34;
+            font-weight: 500;
+            border: 1px solid #e1d5cf;
+        }
+
+        .mc-option.selected {
+            background: #538e9b;
+            color: white;
+            border-color: #3f727e;
+            box-shadow: 0 2px 6px rgba(83, 142, 155, 0.25);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 16px;
+            margin: 20px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: #538e9b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #3f727e;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #d9cdc5;
+            color: #4c3a34;
+        }
+
+        .btn-secondary:hover {
+            background: #cbbbb0;
+        }
+
+        .result-panel {
+            margin-top: 20px;
+            background: #faf7f4;
+            border-radius: 24px;
+            padding: 16px 20px;
+            border-left: 5px solid #b28b7a;
+        }
+
+        .score-text {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .counter-badge {
+            background: #e8e0da;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 16px;
+            color: #4d3730;
+        }
+
+        hr {
+            margin: 18px 0;
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #e2d5ce, transparent);
+        }
+
+        .section-divider {
+            margin: 12px 0 8px;
+            font-weight: 600;
+            color: #8b6e62;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .indented-list {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .content-padding::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .content-padding::-webkit-scrollbar-track {
+            background: #f0e7e2;
+            border-radius: 10px;
+        }
+
+        .content-padding::-webkit-scrollbar-thumb {
+            background: #c4a79b;
+            border-radius: 10px;
+        }
+
+        .content-padding::-webkit-scrollbar-thumb:hover {
+            background: #b28b7a;
+        }
+
+        @media (max-width: 950px) {
+            body {
+                padding: 16px;
+                height: 100vh;
+            }
+            .dashboard {
+                flex-direction: column;
+            }
+            .reading-column,
+            .quiz-column {
+                min-height: 45vh;
+                height: auto;
+                flex: none;
+            }
+            body {
+                overflow: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- LEFT COLUMN: Reading passage about Intervals (unchanged) -->
+        <div class="reading-column">
+            <div class="section-header">
+                <h2><i class="fas fa-arrows-left-right"></i> Intervals</h2>
+            </div>
+            <div class="content-padding">
+                <div class="passage">
+                    <p>A <strong>scale</strong> is a pattern of notes centred around a tonic. Within that overall pattern are smaller patterns, right down to the relationships between individual notes that form the building blocks of both melodies and harmonies. By knowing these small relationships, it is easier to gain a much greater understanding of the larger patterns and to learn to control the emotional effects they create in listeners.</p>
+
+                    <p>The distance between any two musical tones is described as an <strong>interval</strong>. If the tones are played one after the other, as in a melody, they form a <strong>melodic interval</strong>, and if they are played simultaneously, they form a <strong>harmonic interval</strong>. The names of the intervals are based on the number of scale tones they contain. For example, the distance from C to D contains two scale tones, C and D; therefore it is a <strong>second</strong> interval. The distance from C to E contains three scale tones, C-D-E, so it is a <strong>third</strong> interval. Intervals are the same whether measured from the lower note or from the upper note; for instance, the distance from E down to C, containing three scale tones E-D-C, is still a third interval.</p>
+
+                    <p>The number of scale tones an interval contains is called the <strong>interval quantity</strong>. The quantity is counted the same way in any key. For instance, the quantity of the interval B♭ up to E♭, containing four scale tones, B♭-C-D-E♭, is a fourth interval; the presence of flats does not alter the interval quantity. Likewise, the distance from C♯ to G♯ is a fifth interval, because it contains five scale tones, C♯-D♯-E♯-F♯-G♯, and the sharps do not affect the quantity. If the interval contains eight scale tones, it is called an <strong>octave</strong>; also, the distance between two notes of exactly the same pitch (containing only one scale tone) is called a <strong>unison</strong>.</p>
+
+                    <p>Some intervals contain the same number of scale tones, but still look and sound different. Interval quantity gives us a general measurement of the size of the interval. The exact measurement is called the <strong>interval quality</strong>, which is the number of half steps the interval contains. Quality can be measured in comparison to the major scale.</p>
+
+                    <p>The intervals in a major scale between the first note (tonic) and the other notes are:</p>
+
+                <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u3r1-pic1.png" alt="Intervals in a major scale" style="width:90%; height:auto; margin:8px auto;">
+
+
+                    <p>Here are the basic rules and names (when examining the distance from the first note of a major scale upwards):</p>
+                    <ol class="rule-list" style="list-style: none; padding-left: 8px;">
+                        <li><strong>1)</strong> Seconds, thirds, sixths and sevenths are <strong>major</strong> intervals.</li>
+                        <li><strong>2)</strong> Unisons, fourths, fifths and octaves are <strong>perfect</strong> intervals.</li>
+                        <li><strong>3)</strong> Major intervals made smaller by a half step become <strong>minor</strong>.</li>
+                        <li><strong>4)</strong> Major intervals made smaller by two half steps become <strong>diminished</strong>.</li>
+                        <li><strong>5)</strong> Perfect intervals made smaller by a half step become <strong>diminished</strong>.</li>
+                        <li><strong>6)</strong> Perfect intervals made smaller by two half steps become <strong>double diminished</strong>.</li>
+                        <li><strong>7)</strong> Major or perfect intervals made larger by a half step are <strong>augmented</strong>; by two half steps they become <strong>double augmented</strong>.</li>
+                    </ol>
+                                    <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u3r1-pic2.png" alt="Augmented vs diminished" style="width:60%; height:auto; margin:8px auto;">
+
+
+                    <p style="font-weight: 600; color: #8b6e62; margin-top: 1.6rem;">Inversion of Intervals</p>
+                    <p>Intervals describe the distance between two notes. The notes involved can appear and sound in two ways:</p>
+                                                        <p style="text-align: center;"><img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u3r1-pic3.png" alt="Interval 1" class="inline-img" style="width:20%; height:auto; margin:8px auto;">
+  or  
+                                    <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u3r1-pic4.png" alt="Interval 2" class="inline-img" style="width:20%; height:auto; margin:8px auto;"> </p>
+
+                    <p>In other words, any interval can be turned upside-down (<strong>inverted</strong>). </p>
+                                                        <p><img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u3r1-pic5.png" alt="Interval 3" class="inline-img" style="width:20%; height:auto; margin:8px auto;">
+  is the inversion of   
+                                    <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u3r1-pic6.png" alt="Interval 4" class="inline-img" style="width:20%; height:auto; margin:8px auto;">
+
+                 and vice versa.</p> 
+                    <p>When an interval is inverted, the note names involved are still the same, and the intervallic relationship follows a pattern.</p>
+
+                    <p>Some simple rules for inversion of intervals follow:</p>
+                    <ol class="rule-list" style="list-style: none; padding-left: 8px;">
+                        <li><strong>1)</strong> <strong>'Nine'</strong> minus the number of the interval equals the inversion interval.</li>
+                        <li><strong>2)</strong> Major intervals inverted become <strong>minor</strong>.</li>
+                        <li><strong>3)</strong> Minor intervals inverted become <strong>major</strong>.</li>
+                        <li><strong>4)</strong> Perfect intervals inverted remain <strong>perfect</strong>.</li>
+                        <li><strong>5)</strong> Augmented intervals inverted become <strong>diminished</strong>.</li>
+                        <li><strong>6)</strong> Diminished intervals inverted become <strong>augmented</strong>.</li>
+                        <li><strong>7)</strong> Double diminished intervals inverted become <strong>double augmented</strong>.</li>
+                        <li><strong>8)</strong> Double augmented intervals inverted become <strong>double diminished</strong>.</li>
+                    </ol>
+
+                    <p>In order to correctly produce an inversion of any interval, the bottom pitch must be raised one octave or the top pitch must be lowered one octave. The inversion of a perfect unison becomes a perfect octave and vice versa.</p>
+                                                        <img src="https://nyairyg.github.io/verbose-happiness/EnglishForMusicStudents/u3r1-pic7.png" alt="Augmented vs diminished" style="width:30%; height:auto; margin:8px auto;">
+
+
+                    <p class="music-def"><strong>The Tritone:</strong> The tritone interval (augmented fourth) is a special case. Unlike any other interval, when it is inverted, the number and qualifier change — it becomes a <strong>diminished fifth</strong> — but it remains a tritone (3 whole steps).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Updated True/False + Multiple Choice -->
+        <div class="quiz-column">
+            <div class="section-header">
+                <h2><i class="fas fa-puzzle-piece"></i> Knowledge Check</h2>
+            </div>
+            <div class="content-padding">
+                <div class="truefalse-list">
+                    <div class="section-divider">
+                        <i class="fas fa-check-square" style="color:#b28b7a;"></i> <span style="font-size: 1.2rem; font-weight:600;">Part 1: True or False</span>
+                    </div>
+                    <div id="tf-container"></div>
+                </div>
+
+                <hr>
+
+                <div class="section-divider" style="margin-top: 4px;">
+                    <i class="fas fa-list-ul" style="color:#b28b7a;"></i> <span style="font-size: 1.2rem; font-weight:600;">Part 2: Multiple Choice</span>
+                </div>
+                <div class="counter-badge" id="mc-counter"><i class="fas fa-check-circle"></i> Questions: 0/10 answered</div>
+                <div id="mc-container"></div>
+
+                <div class="action-bar">
+                    <button class="btn btn-primary" id="checkAnswersBtn"><i class="fas fa-check-double"></i> Check Answers</button>
+                    <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset All</button>
+                </div>
+                <div id="globalResult" class="result-panel" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // NEW DATA: TRUE/FALSE (10 items) matching the provided statements
+        const tfStatements = [
+            "In a melodic interval the two notes are played simultaneously.",
+            "The distance from C to E forms a second interval.",
+            "An interval containing eight scale tones is called an octave.",
+            "An interval containing two scale tones is called a unison.",
+            "The number of scale tones an interval contains is called interval quality.",
+            "Interval quality is based on the number of half steps an interval contains.",
+            "In a major scale, the fourths, fifths, and octaves are major intervals.",
+            "A major interval made smaller by a semitone becomes diminished.",
+            "A major interval made larger by a semitone becomes augmented.",
+            "A tritone interval inverted remains tritone."
+        ];
+
+        const tfCorrect = [
+            false, // 1: melodic = one after another; simultaneous = harmonic
+            false, // 2: C to E is a third
+            true,  // 3: eight scale tones = octave
+            false, // 4: two scale tones = second; unison = one scale tone
+            false, // 5: number of scale tones = interval quantity; quality = half steps
+            true,  // 6: quality = half steps
+            false, // 7: fourths, fifths, octaves are perfect, not major
+            false, // 8: major smaller by semitone becomes minor, not diminished
+            true,  // 9: major larger by semitone = augmented
+            true   // 10: tritone inverted remains tritone
+        ];
+
+        // NEW DATA: MULTIPLE CHOICE (10 questions)
+        const mcQuestions = [
+            {
+                text: "Which statement is not true about the intervals?",
+                options: [
+                    "If the tones are played one after the other, they form a melodic interval.",
+                    "If the tones are played simultaneously, they form a harmonic interval.",
+                    "Intervals are different if measured from the upper note.",
+                    "The names of the intervals are based on the number of scale tones they contain."
+                ],
+                correct: 2 // c
+            },
+            {
+                text: "The interval quantity is ________.",
+                options: [
+                    "the number of scale tones an interval contains",
+                    "the number of half steps an interval contains",
+                    "counted the same way in any key",
+                    "a and c"
+                ],
+                correct: 3 // d
+            },
+            {
+                text: "Which of the following is not true about the interval quantity?",
+                options: [
+                    "It is counted the same way in any key.",
+                    "The presence of sharps and flats affects the quantity.",
+                    "If the interval contains eight scale tones it is called an octave.",
+                    "If the interval contains only one scale tone it is called a unison."
+                ],
+                correct: 1 // b
+            },
+            {
+                text: "The unison is ________.",
+                options: [
+                    "the distance between two notes of exactly the same pitch",
+                    "an interval containing one scale tone",
+                    "an interval containing eight scale tones",
+                    "a and b"
+                ],
+                correct: 3 // d
+            },
+            {
+                text: "Perfect intervals made smaller by a semitone become ________.",
+                options: ["minor", "major", "diminished", "augmented"],
+                correct: 2 // c
+            },
+            {
+                text: "Perfect intervals made larger by a whole step become ________.",
+                options: ["major", "minor", "augmented", "double augmented"],
+                correct: 3 // d
+            },
+            {
+                text: "Unisons and octaves in a major scale ________ when inverted.",
+                options: ["remain the same", "remain perfect", "become perfect", "become diminished"],
+                correct: 1 // b
+            },
+            {
+                text: "Major intervals become ________ when inverted.",
+                options: ["perfect", "minor", "diminished", "augmented"],
+                correct: 1 // b
+            },
+            {
+                text: "________ intervals remain the same when inverted.",
+                options: ["major", "minor", "perfect", "diminished"],
+                correct: 2 // c
+            },
+            {
+                text: "An augmented fourth interval ________ when inverted.",
+                options: ["remains the same", "remains a tritone", "becomes a diminished fifth", "b and c"],
+                correct: 3 // d
+            }
+        ];
+
+        let tfSelections = new Array(tfStatements.length).fill(null);
+        let mcSelections = new Array(mcQuestions.length).fill(null);
+        let resultsVisible = false;
+
+        const tfContainer = document.getElementById('tf-container');
+        const mcContainer = document.getElementById('mc-container');
+        const globalResultDiv = document.getElementById('globalResult');
+        const mcCounterSpan = document.getElementById('mc-counter');
+
+        function updateMCCounter() {
+            const answered = mcSelections.filter(s => s !== null).length;
+            mcCounterSpan.innerHTML =
+                `<i class="fas fa-check-circle"></i> Questions: ${answered}/${mcQuestions.length} answered`;
+        }
+
+        function hideResultPanel() {
+            if (globalResultDiv) globalResultDiv.style.display = 'none';
+            resultsVisible = false;
+        }
+
+        function clearHighlighting() {
+            document.querySelectorAll('.tf-item').forEach(item => {
+                item.classList.remove('correct-item', 'incorrect-item');
+            });
+            document.querySelectorAll('.mc-question').forEach(q => {
+                q.classList.remove('correct-mc', 'incorrect-mc');
+            });
+        }
+
+        function renderTrueFalse() {
+            tfContainer.innerHTML = '';
+            tfStatements.forEach((stmt, idx) => {
+                const row = document.createElement('div');
+                row.className = 'tf-item';
+                const statementSpan = document.createElement('div');
+                statementSpan.className = 'tf-statement';
+                statementSpan.innerText = `${idx + 1}. ${stmt}`;
+                const btnGroup = document.createElement('div');
+                btnGroup.className = 'tf-buttons';
+
+                const trueBtn = document.createElement('button');
+                trueBtn.innerText = 'T';
+                trueBtn.className = 'tf-btn';
+                const falseBtn = document.createElement('button');
+                falseBtn.innerText = 'F';
+                falseBtn.className = 'tf-btn';
+
+                if (tfSelections[idx] === 'T') trueBtn.classList.add('selected-true');
+                if (tfSelections[idx] === 'F') falseBtn.classList.add('selected-false');
+
+                trueBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    tfSelections[idx] = 'T';
+                    if (resultsVisible) clearHighlighting();
+                    resultsVisible = false;
+                    hideResultPanel();
+                    renderTrueFalse();
+                    renderMultipleChoice();
+                });
+                falseBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    tfSelections[idx] = 'F';
+                    if (resultsVisible) clearHighlighting();
+                    resultsVisible = false;
+                    hideResultPanel();
+                    renderTrueFalse();
+                    renderMultipleChoice();
+                });
+
+                btnGroup.appendChild(trueBtn);
+                btnGroup.appendChild(falseBtn);
+                row.appendChild(statementSpan);
+                row.appendChild(btnGroup);
+                tfContainer.appendChild(row);
+            });
+        }
+
+        function renderMultipleChoice() {
+            mcContainer.innerHTML = '';
+            mcQuestions.forEach((q, qIdx) => {
+                const card = document.createElement('div');
+                card.className = 'mc-question';
+                const questionText = document.createElement('p');
+                questionText.innerHTML = `<strong>${qIdx + 1}.</strong> ${q.text}`;
+                card.appendChild(questionText);
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'mc-options';
+                q.options.forEach((opt, optIdx) => {
+                    const optSpan = document.createElement('span');
+                    optSpan.className = 'mc-option';
+                    optSpan.innerText = `${String.fromCharCode(97 + optIdx)}) ${opt}`;
+                    if (mcSelections[qIdx] === optIdx) optSpan.classList.add('selected');
+                    optSpan.addEventListener('click', () => {
+                        mcSelections[qIdx] = optIdx;
+                        if (resultsVisible) clearHighlighting();
+                        resultsVisible = false;
+                        hideResultPanel();
+                        renderMultipleChoice();
+                        updateMCCounter();
+                    });
+                    optionsDiv.appendChild(optSpan);
+                });
+                card.appendChild(optionsDiv);
+                mcContainer.appendChild(card);
+            });
+            updateMCCounter();
+        }
+
+        function applyResultStyling() {
+            const tfItems = document.querySelectorAll('.tf-item');
+            tfStatements.forEach((_, idx) => {
+                const user = tfSelections[idx];
+                if (user !== null) {
+                    const isCorrect = (user === 'T' && tfCorrect[idx] === true) || (user === 'F' && tfCorrect[idx] === false);
+                    const itemDiv = tfItems[idx];
+                    if (isCorrect) {
+                        itemDiv.classList.add('correct-item');
+                    } else {
+                        itemDiv.classList.add('incorrect-item');
+                    }
+                }
+            });
+
+            for (let i = 0; i < mcQuestions.length; i++) {
+                const card = document.querySelectorAll('.mc-question')[i];
+                const userIdx = mcSelections[i];
+                if (userIdx !== null) {
+                    const isCorrect = (userIdx === mcQuestions[i].correct);
+                    if (isCorrect) {
+                        card.classList.add('correct-mc');
+                    } else {
+                        card.classList.add('incorrect-mc');
+                    }
+                }
+            }
+        }
+
+        function checkAnswers() {
+            let tfScore = 0;
+            for (let i = 0; i < tfStatements.length; i++) {
+                const user = tfSelections[i];
+                if (user !== null) {
+                    const isCorrect = (user === 'T' && tfCorrect[i] === true) || (user === 'F' && tfCorrect[i] === false);
+                    if (isCorrect) tfScore++;
+                }
+            }
+
+            let mcScore = 0;
+            for (let i = 0; i < mcQuestions.length; i++) {
+                if (mcSelections[i] !== null && mcSelections[i] === mcQuestions[i].correct) mcScore++;
+            }
+
+            const totalPossible = tfStatements.length + mcQuestions.length;
+            const totalScore = tfScore + mcScore;
+            const percent = Math.round((totalScore / totalPossible) * 100);
+
+            let allAnswered = true;
+            for (let i = 0; i < tfSelections.length; i++)
+                if (tfSelections[i] === null) allAnswered = false;
+            for (let i = 0; i < mcSelections.length; i++)
+                if (mcSelections[i] === null) allAnswered = false;
+
+            let message = '';
+            if (totalScore === totalPossible) {
+                message = `<i class="fas fa-trophy"></i> Perfect! ${totalScore}/${totalPossible} (${percent}%) — Outstanding mastery of intervals!`;
+            } else {
+                message = `<i class="fas fa-chart-line"></i> Your score: ${totalScore}/${totalPossible} (${percent}%)<br>`;
+                message += `<span style="font-size:0.85rem;">✓ True/False: ${tfScore}/${tfStatements.length} &nbsp;|&nbsp; ✓ Multiple Choice: ${mcScore}/${mcQuestions.length}</span>`;
+            }
+
+            if (!allAnswered) {
+                message += `<div style="margin-top:8px;"><i class="fas fa-exclamation-triangle"></i> You have unanswered questions. Please answer all before checking for full score.</div>`;
+            }
+
+            globalResultDiv.innerHTML = `<div class="score-text">${message}</div>`;
+            globalResultDiv.style.display = 'block';
+
+            clearHighlighting();
+            applyResultStyling();
+            resultsVisible = true;
+            globalResultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function resetAll() {
+            tfSelections = new Array(tfStatements.length).fill(null);
+            mcSelections = new Array(mcQuestions.length).fill(null);
+            resultsVisible = false;
+            clearHighlighting();
+            renderTrueFalse();
+            renderMultipleChoice();
+            hideResultPanel();
+            updateMCCounter();
+        }
+
+        function bindGlobalButtons() {
+            document.getElementById('checkAnswersBtn').addEventListener('click', checkAnswers);
+            document.getElementById('resetBtn').addEventListener('click', resetAll);
+        }
+
+        function init() {
+            renderTrueFalse();
+            renderMultipleChoice();
+            bindGlobalButtons();
+            updateMCCounter();
+            hideResultPanel();
+        }
+
+        init();
+    </script>
+</body>
+</html>
