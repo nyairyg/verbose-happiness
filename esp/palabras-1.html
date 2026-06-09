@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover, maximum-scale=1.2">
+  <title>Сопоставь слово и перевод · Испанский тренажёр</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #f4edeef0;
+      background-image: radial-gradient(circle at 10% 30%, rgba(239, 210, 220, 0.2) 2%, transparent 2.5%);
+      background-size: 28px 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      padding: 12px;
+      zoom: 80%;
+    }
+
+    @supports not (zoom: 0.8) {
+      body {
+        transform: scale(0.8);
+        transform-origin: top center;
+      }
+    }
+
+    .poster {
+      width: 1100px;
+      max-width: 100%;
+      background: #ffffffec;
+      backdrop-filter: blur(0px);
+      border-radius: 48px;
+      box-shadow: 0 28px 48px -20px rgba(0, 0, 0, 0.25), 0 10px 28px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .content {
+      padding: 20px 24px 24px 24px;
+    }
+
+    .title-section {
+      border-bottom: 3px solid #d9a2b8;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 720;
+      color: #2b2b3b;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #3e2a36, #6c4b5e);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .badge-round {
+      background: #f9eef3;
+      padding: 5px 14px;
+      border-radius: 80px;
+      font-weight: 570;
+      font-size: 12px;
+      color: #a5607c;
+      box-shadow: inset 0 0 0 1px #f3d9e4;
+    }
+
+    .subhead {
+      font-size: 12px;
+      font-weight: 600;
+      color: #b38398;
+      background: #fef4f9;
+      padding: 6px 14px;
+      border-radius: 60px;
+      letter-spacing: 0.3px;
+    }
+
+    .two-columns {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .col-header {
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.8px;
+      color: #8f6f82;
+      padding-left: 8px;
+      margin-bottom: 2px;
+    }
+
+    .match-item {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 10px 16px;
+      transition: all 0.18s ease;
+      border: 1.5px solid #f2e2ea;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+      cursor: pointer;
+      touch-action: manipulation;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 68px;
+    }
+
+    .match-item.selected {
+      background: #fef0f7;
+      border-color: #cf8aa4;
+      box-shadow: 0 6px 14px -10px rgba(190, 100, 130, 0.2);
+      transform: scale(0.98);
+    }
+
+    .match-item.paired-correct {
+      background: #cfe9d6;
+      border-color: #2e7d64;
+      opacity: 0.9;
+      cursor: default;
+      pointer-events: none;
+      box-shadow: 0 0 0 2px rgba(55, 155, 100, 0.2);
+    }
+
+    .match-item.paired-wrong {
+      background: #ffe3e3;
+      border-color: #cf6f6f;
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-5px); }
+      40% { transform: translateX(5px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+    }
+
+    .audio-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 2;
+      pointer-events: none;
+    }
+
+    .audio-icon {
+      background: #f6e9ef;
+      width: 44px;
+      height: 44px;
+      border-radius: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: #bb6b8a;
+    }
+
+    .audio-info {
+      font-weight: 540;
+      font-size: 15px;
+      color: #2d3a4b;
+    }
+
+    .play-indicator {
+      background: #e8d9e1;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #5a3f4b;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      pointer-events: none;
+    }
+
+    .translation-name {
+      font-weight: 700;
+      font-size: 16px;
+      padding: 10.7px 10px;
+      color: #2b3b4c;
+      letter-spacing: -0.2px;
+      word-break: break-word;
+      flex: 1;
+    }
+
+    .result-panel {
+      margin-top: 20px;
+      background: #fbf5f8;
+      border-radius: 32px;
+      padding: 12px 20px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 500;
+      color: #3b2a33;
+    }
+
+    .round-info {
+      background: #f4e9ef;
+      border-radius: 50px;
+      padding: 6px 16px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: #9f637e;
+      margin-bottom: 18px;
+      display: inline-block;
+      width: auto;
+    }
+
+    .progress-indicator {
+      display: flex;
+      gap: 6px;
+      margin-left: 12px;
+      align-items: center;
+    }
+
+    .progress-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #e0cfd9;
+      transition: all 0.3s;
+    }
+
+    .progress-dot.completed {
+      background: #2e7d64;
+      box-shadow: 0 0 6px rgba(46, 125, 100, 0.4);
+    }
+
+    .action-button {
+      background: #efe2e9;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #4c3542;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      width: 100%;
+      margin-top: 12px;
+      touch-action: manipulation;
+    }
+
+    .action-button:active {
+      transform: scale(0.97);
+      background: #e0cfd9;
+    }
+
+    .primary-btn {
+      background: #cf8aa4;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .primary-btn:active {
+      background: #b96f8e;
+    }
+
+    .final-screen {
+      text-align: center;
+      padding: 20px;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    @media (max-width: 900px) {
+      .two-columns {
+        flex-direction: column;
+        gap: 20px;
+      }
+      .content {
+        padding: 18px 20px;
+      }
+      .match-item {
+        padding: 10px 14px;
+        min-height: 64px;
+      }
+      .translation-name {
+        font-size: 16px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 550px) {
+      body {
+        padding: 8px;
+      }
+      .content {
+        padding: 14px 16px;
+      }
+      .audio-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+      }
+      .audio-info {
+        font-size: 13px;
+      }
+      .play-indicator {
+        padding: 4px 10px;
+        font-size: 10px;
+      }
+      .translation-name {
+        font-size: 14px;
+      }
+      .action-button {
+        padding: 10px 18px;
+        font-size: 14px;
+      }
+      h1 {
+        font-size: 20px;
+      }
+    }
+
+    .speaking {
+      animation: pulse 0.5s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; background: #f0d9e4; }
+    }
+  </style>
+</head>
+<body>
+<div class="poster" id="appRoot">
+  <div class="content">
+    <div class="title-section">
+      <div>
+        <h1>🎧 Соотнеси слово и перевод</h1>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+      <div id="roundIndicator" class="round-info">Ronda 1 / 9</div>
+      <div id="progressIndicator" class="progress-indicator"></div>
+    </div>
+
+    <div class="two-columns">
+      <div class="col">
+        <div class="col-header">🎙️Audio</div>
+        <div id="audioListContainer" style="display: flex; flex-direction: column; gap: 16px;"></div>
+      </div>
+      <div class="col">
+        <div class="col-header">🇷🇺</div>
+        <div id="translationsListContainer" style="display: flex; flex-direction: column; gap: 16px;"></div>
+      </div>
+    </div>
+
+    <div id="resultArea" class="result-panel" style="display: none; margin-top: 24px;"></div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // --- СЛОВАРЬ ---
+    const SPANISH_TO_RUSSIAN = {
+      "el verano": "лето",
+      "el azúcar": "сахар",
+      "limpio": "чистый",
+      "ancho": "широкий",
+      "la tía": "тётя",
+      "el tío": "дядя",
+      "el arroz": "рис",
+      "el pollo": "курица",
+      "ir de compras": "ходить по магазинам",
+      "la película": "фильм",
+      "odiar": "ненавидеть",
+      "nadar": "плавать",
+      "el perrito": "собачка",
+      "el gatito": "котик",
+      "la fresa": "клубника",
+      "ayudar": "помогать",
+      "el gimnasio": "спортзал",
+      "el trabajo": "работа",
+      "la enfermera": "медсестра",
+      "el bosque": "лес",
+      "el lunes": "понедельник",
+      "el martes": "вторник",
+      "el miércoles": "среда",
+      "el jueves": "четверг",
+      "el viernes": "пятница",
+      "el sábado": "суббота",
+      "el domingo": "воскресенье",
+      "extrañar": "скучать",
+      "la ciudad": "город",
+      "el conejo": "кролик",
+      "los vecinos": "соседи",
+      "a mano": "вручную, от руки",
+      "el avión": "самолёт",
+      "viajar": "путешествовать",
+      "el libro": "книга",
+      "el pájaro": "птица",
+      "la jaula": "клетка",
+      "pequeño": "маленький",
+      "descansado": "отдохнувший",
+      "pobre": "бедный",
+      "abierto": "открытый",
+      "caro": "дорогой",
+      "el carro": "машина",
+      "la vida": "жизнь",
+      "cocinar": "готовить",
+      "la casa": "дом",
+      "las papas": "картофель",
+      "la leche": "молоко",
+      "la hermana": "сестра",
+      "la bicicleta": "велосипед"
+    };
+
+    const ALL_SPANISH_WORDS = Object.keys(SPANISH_TO_RUSSIAN);
+
+    // --- ФОРМИРОВАНИЕ РАУНДОВ ПО 5 СЛОВ ---
+    function buildRounds() {
+      const shuffled = [...ALL_SPANISH_WORDS].sort(() => Math.random() - 0.5);
+      const rounds = [];
+      for (let i = 0; i < shuffled.length; i += 5) {
+        const roundWords = shuffled.slice(i, i + 5);
+        if (roundWords.length > 0) {
+          rounds.push({
+            name: `Ronda ${rounds.length + 1}`,
+            words: roundWords
+          });
+        }
+      }
+      return rounds;
+    }
+
+    const ROUNDS_DATA = buildRounds();
+    const TOTAL_ROUNDS = ROUNDS_DATA.length;
+
+    // --- СОСТОЯНИЕ ---
+    let currentRoundIdx = 0;
+    let currentRoundData = null;
+    let shuffledTranslations = [];
+    let audioItems = [];
+    let pairedMap = new Map(); // только правильные пары
+    let reversePaired = new Map(); // только правильные пары
+    let selectedAudioId = null;
+    let roundComplete = false;
+    let autoAdvanceTimeout = null;
+    let availableVoices = [];
+    let wrongTimers = new Map(); // отслеживание таймеров для карточек
+
+    // DOM
+    const audioContainer = document.getElementById('audioListContainer');
+    const translationsContainer = document.getElementById('translationsListContainer');
+    const resultArea = document.getElementById('resultArea');
+    const roundIndicator = document.getElementById('roundIndicator');
+    const progressIndicator = document.getElementById('progressIndicator');
+
+    // --- ЗАГРУЗКА ГОЛОСОВ ---
+    function loadVoices() {
+      return new Promise((resolve) => {
+        if (window.speechSynthesis.getVoices().length) {
+          availableVoices = window.speechSynthesis.getVoices();
+          resolve();
+        } else {
+          window.speechSynthesis.onvoiceschanged = () => {
+            availableVoices = window.speechSynthesis.getVoices();
+            resolve();
+          };
+        }
+      });
+    }
+
+    // --- ОЗВУЧКА (женский голос) ---
+    function speakSpanishWord(word) {
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+
+      const femaleVoice = availableVoices.find(v =>
+        v.lang.startsWith('es-MX') &&
+        (v.name.includes('Monica') || v.name.includes('Mónica') || v.name.includes('Maria') || v.name.toLowerCase().includes('female'))
+      ) || availableVoices.find(v =>
+        v.lang.startsWith('es') &&
+        (v.name.includes('Monica') || v.name.includes('Mónica') || v.name.includes('Maria') || v.name.toLowerCase().includes('female'))
+      ) || availableVoices.find(v => v.lang.startsWith('es-MX')) || availableVoices.find(v => v.lang.startsWith('es')) || availableVoices[0];
+
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.voice = femaleVoice || availableVoices[0] || null;
+      utterance.lang = 'es-MX';
+      utterance.rate = 0.9;
+      utterance.pitch = 1.2;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function animatePlay(cardElement) {
+      cardElement.classList.add('speaking');
+      setTimeout(() => cardElement.classList.remove('speaking'), 500);
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    // --- ПРОВЕРКА ПАРЫ ---
+    function checkPair(audioId, translationId) {
+      const audio = audioItems.find(a => a.id === audioId);
+      const transObj = shuffledTranslations.find(t => t.id === translationId);
+      if (!audio || !transObj) return false;
+      const correctTranslation = SPANISH_TO_RUSSIAN[audio.spanishWord];
+      return transObj.text === correctTranslation;
+    }
+
+    // --- ЗАВЕРШЕНИЕ РАУНДА ---
+    function finishRound() {
+      if (roundComplete) return;
+      roundComplete = true;
+
+      // Очищаем все таймеры
+      wrongTimers.forEach(timer => clearTimeout(timer));
+      wrongTimers.clear();
+
+      const correctCount = pairedMap.size;
+
+      if (!window.globalScores) window.globalScores = new Array(TOTAL_ROUNDS).fill(null);
+      window.globalScores[currentRoundIdx] = correctCount;
+
+      resultArea.style.display = 'block';
+      const isPerfect = correctCount === 5;
+      resultArea.innerHTML = `🎯 <strong>Правильно: ${correctCount} из 5</strong><br>${isPerfect ? '🎉 ¡Perfecto!' : '👍 Хорошая попытка!'}`;
+
+      autoAdvanceTimeout = setTimeout(() => {
+        if (currentRoundIdx + 1 < TOTAL_ROUNDS) {
+          currentRoundIdx++;
+          initRound(currentRoundIdx);
+        } else {
+          showFinalResult();
+        }
+      }, 1500);
+    }
+
+    // --- ОБРАБОТКА ВЫБОРА ПЕРЕВОДА ---
+    function handleTranslationClick(transId) {
+      if (roundComplete) return;
+      if (selectedAudioId === null) return;
+      if (reversePaired.has(transId)) return;
+
+      const currentAudioId = selectedAudioId;
+      const audio = audioItems.find(a => a.id === currentAudioId);
+      if (!audio || audio.pairedTranslationId !== null) {
+        selectedAudioId = null;
+        renderUI();
+        return;
+      }
+
+      const isCorrect = checkPair(currentAudioId, transId);
+
+      const audioCard = document.querySelector(`#audioListContainer .match-item[data-audio-id="${currentAudioId}"]`);
+      const transCard = document.querySelector(`#translationsListContainer .match-item[data-trans-id="${transId}"]`);
+
+      if (!isCorrect) {
+        // Очищаем предыдущий таймер для этих карточек если есть
+        const timerKey = `${currentAudioId}-${transId}`;
+        if (wrongTimers.has(timerKey)) {
+          clearTimeout(wrongTimers.get(timerKey));
+        }
+
+        // Показываем красный на обеих карточках
+        if (audioCard) {
+          audioCard.classList.add('paired-wrong');
+        }
+        if (transCard) {
+          transCard.classList.add('paired-wrong');
+        }
+
+        selectedAudioId = null;
+        // Убираем выделение только с аудио карточек
+        document.querySelectorAll('#audioListContainer .match-item.selected').forEach(el => {
+          el.classList.remove('selected');
+        });
+
+        // Убираем красный через 1 секунду
+        const timer = setTimeout(() => {
+          if (audioCard) {
+            audioCard.classList.remove('paired-wrong');
+          }
+          if (transCard) {
+            transCard.classList.remove('paired-wrong');
+          }
+          wrongTimers.delete(timerKey);
+        }, 1000);
+        
+        wrongTimers.set(timerKey, timer);
+
+      } else {
+        // Правильно — фиксируем зелёным
+        audio.pairedTranslationId = transId;
+        pairedMap.set(currentAudioId, transId);
+        reversePaired.set(transId, currentAudioId);
+
+        if (audioCard) {
+          audioCard.classList.add('paired-correct');
+          audioCard.style.pointerEvents = 'none';
+          audioCard.style.cursor = 'default';
+        }
+        if (transCard) {
+          transCard.classList.add('paired-correct');
+          transCard.style.pointerEvents = 'none';
+          transCard.style.cursor = 'default';
+        }
+
+        selectedAudioId = null;
+        updateProgressDots();
+
+        if (pairedMap.size === 5) {
+          finishRound();
+        }
+      }
+    }
+
+    // --- ОБРАБОТКА КЛИКА ПО АУДИО ---
+    function handleAudioClick(audio, cardElement) {
+      if (roundComplete) return;
+      if (audio.pairedTranslationId !== null) return;
+
+      speakSpanishWord(audio.spanishWord);
+      animatePlay(cardElement);
+
+      if (selectedAudioId === audio.id) {
+        selectedAudioId = null;
+      } else {
+        selectedAudioId = audio.id;
+      }
+      renderUI();
+    }
+
+    // --- ОБНОВЛЕНИЕ ИНДИКАТОРА ПРОГРЕССА ---
+    function updateProgressDots() {
+      progressIndicator.innerHTML = '';
+      for (let i = 0; i < 5; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot';
+        const audio = audioItems[i];
+        if (audio && audio.pairedTranslationId !== null) {
+          dot.classList.add('completed');
+        }
+        progressIndicator.appendChild(dot);
+      }
+    }
+
+    // --- РЕНДЕР ---
+    function renderUI() {
+      // Левая колонка
+      audioContainer.innerHTML = '';
+      audioItems.forEach(audio => {
+        const isPaired = audio.pairedTranslationId !== null;
+        const isSelected = (selectedAudioId === audio.id);
+        const card = document.createElement('div');
+        card.className = `match-item ${isSelected ? 'selected' : ''}`;
+        card.setAttribute('data-audio-id', audio.id);
+
+        if (isPaired) {
+          card.classList.add('paired-correct');
+          card.style.cursor = 'default';
+          card.style.pointerEvents = 'none';
+        } else if (!roundComplete) {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleAudioClick(audio, card);
+          });
+        } else {
+          card.style.cursor = 'default';
+          card.style.pointerEvents = 'none';
+        }
+
+        const leftDiv = document.createElement('div');
+        leftDiv.className = 'audio-left';
+        leftDiv.innerHTML = `
+          <div class="audio-icon">🎙️</div>
+          <div class="audio-info">Audio ${audio.id+1}</div>
+        `;
+
+        const playIndicator = document.createElement('div');
+        playIndicator.className = 'play-indicator';
+        playIndicator.innerHTML = '🔊 прослушать';
+
+        card.appendChild(leftDiv);
+        card.appendChild(playIndicator);
+        audioContainer.appendChild(card);
+      });
+
+      // Правая колонка
+      translationsContainer.innerHTML = '';
+      shuffledTranslations.forEach(trans => {
+        const isPaired = reversePaired.has(trans.id);
+        const card = document.createElement('div');
+        card.className = 'match-item';
+        card.setAttribute('data-trans-id', trans.id);
+
+        if (isPaired) {
+          card.classList.add('paired-correct');
+          card.style.cursor = 'default';
+          card.style.pointerEvents = 'none';
+        } else if (!roundComplete) {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            handleTranslationClick(trans.id);
+          });
+        } else {
+          card.style.cursor = 'default';
+          card.style.pointerEvents = 'none';
+        }
+
+        const transDiv = document.createElement('div');
+        transDiv.style.flex = '1';
+        transDiv.style.display = 'flex';
+        transDiv.style.alignItems = 'center';
+        transDiv.style.justifyContent = 'space-between';
+        transDiv.style.width = '100%';
+        transDiv.innerHTML = `<span class="translation-name">📖 ${trans.text}</span>`;
+        card.appendChild(transDiv);
+        translationsContainer.appendChild(card);
+      });
+    }
+
+    // --- ИНИЦИАЛИЗАЦИЯ РАУНДА ---
+    function initRound(roundIndex) {
+      if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
+      
+      // Очищаем все таймеры
+      wrongTimers.forEach(timer => clearTimeout(timer));
+      wrongTimers.clear();
+
+      selectedAudioId = null;
+      pairedMap.clear();
+      reversePaired.clear();
+      roundComplete = false;
+      resultArea.style.display = 'none';
+      resultArea.innerHTML = '';
+
+      currentRoundData = ROUNDS_DATA[roundIndex];
+      const words = currentRoundData.words;
+
+      const translations = words.map((spanWord, idx) => ({
+        id: idx,
+        text: SPANISH_TO_RUSSIAN[spanWord]
+      }));
+      shuffledTranslations = shuffleArray([...translations]);
+
+      audioItems = words.map((spanWord, i) => ({
+        id: i,
+        spanishWord: spanWord,
+        pairedTranslationId: null,
+      }));
+
+      renderUI();
+      updateRoundIndicator();
+      updateProgressDots();
+    }
+
+    function updateRoundIndicator() {
+      roundIndicator.innerHTML = `🎙️ Ronda ${currentRoundIdx+1} / ${TOTAL_ROUNDS}`;
+    }
+
+    // --- ФИНАЛЬНЫЙ ЭКРАН ---
+    // --- ФИНАЛЬНЫЙ ЭКРАН ---
+function showFinalResult() {
+  if (autoAdvanceTimeout) clearTimeout(autoAdvanceTimeout);
+  
+  wrongTimers.forEach(timer => clearTimeout(timer));
+  wrongTimers.clear();
+
+  audioContainer.innerHTML = '';
+  translationsContainer.innerHTML = '';
+  progressIndicator.innerHTML = '';
+  roundIndicator.innerHTML = '🏆 Завершено!';
+
+  resultArea.style.display = 'block';
+  resultArea.style.fontSize = '20px';
+  resultArea.style.padding = '32px';
+  resultArea.innerHTML = `<div class="final-screen">
+    <strong>🏆 ¡Felicidades! 🏆</strong><br><br>
+    <div style="font-size: 24px; margin: 20px 0;">
+      ¡Todo listo!
+    </div>
+    <button id="restartBtn" class="action-button primary-btn" style="margin-top: 20px;">🔄 Пройти заново</button>
+  </div>`;
+
+  const restartBtn = document.getElementById('restartBtn');
+  if (restartBtn) {
+    restartBtn.addEventListener('click', () => {
+      window.globalScores = new Array(TOTAL_ROUNDS).fill(null);
+      currentRoundIdx = 0;
+      initRound(0);
+    });
+  }
+}
+
+    // --- ЗАПУСК ---
+    async function setup() {
+      await loadVoices();
+      window.globalScores = new Array(TOTAL_ROUNDS).fill(null);
+      initRound(0);
+    }
+
+    setup();
+  })();
+</script>
+</body>
+</html>
