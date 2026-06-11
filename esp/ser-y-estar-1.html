@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ser / Estar – ejercicio A1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #f7f5f0;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .glass-panel {
+            max-width: 800px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 1.75rem;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid #e8e3da;
+        }
+
+        .conj-wrapper {
+            background: #faf8f4;
+            border-radius: 1.25rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .conj-card {
+            background: #ffffff;
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            min-width: 180px;
+            text-align: center;
+            border: 1px solid #e8e3da;
+        }
+
+        .conj-card h3 {
+            font-weight: 600;
+            font-size: 1.3rem;
+            letter-spacing: -0.3px;
+            color: #3e3a35;
+            margin-bottom: 0.75rem;
+            border-bottom: 2px solid #d1a15e;
+            display: inline-block;
+        }
+
+        .conj-card table {
+            width: 100%;
+            margin-top: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .conj-card td {
+            padding: 0.3rem 0;
+            text-align: left;
+        }
+
+        .pron {
+            font-weight: 600;
+            color: #5a524a;
+            padding-right: 1.8rem;
+        }
+
+        .verb-form {
+            font-family: 'Fira Mono', monospace;
+            font-weight: 500;
+            color: #2b2b2b;
+        }
+
+        .round-badge {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+            color: #8b8178;
+            margin-bottom: 1rem;
+        }
+
+        /* предложение – всё в одну строку, выровнено по базовой линии */
+        .sentence {
+            background: #ffffff;
+            border: 1px solid #e8e3da;
+            border-radius: 1.5rem;
+            padding: 1.5rem 1rem;
+            font-size: 1.25rem;
+            font-weight: 500;
+            line-height: 1.4;
+            text-align: center;
+            color: #2e2b26;
+            margin: 1rem 0 1.5rem 0;
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: baseline;          /* ← выравнивание по базовой линии текста */
+            justify-content: center;
+            gap: 0.2rem;
+            white-space: nowrap;
+        }
+
+        /* контейнер для инпута с абсолютно позиционированной кнопкой á */
+        .inline-gap {
+            position: relative;
+            display: inline-block;
+            vertical-align: baseline;      /* участвует в базовом выравнивании */
+            margin: 0 0.25rem;
+        }
+
+        .inline-input {
+            display: block;
+            min-width: 110px;
+            width: auto;
+            background: #faf8f4;
+            border: none;
+            font-size: inherit;
+            font-family: inherit;
+            font-weight: 500;
+            color: #2e2b26;
+            text-align: center;
+            padding: 0.1rem 0.4rem;
+            outline: none;
+            transition: 0.2s;
+            line-height: 1.3;
+            border-radius: 0.5rem;
+            margin: 0 auto;
+        }
+
+        .inline-input:focus {
+            background: #fffdf9;
+            box-shadow: 0 0 0 2px rgba(209, 161, 94, 0.3);
+        }
+
+        .inline-input.correct {
+            background: #eef5f0;
+            box-shadow: 0 0 0 1px #5a7d6c;
+        }
+
+        .inline-input.incorrect {
+            background: #fef4f0;
+            box-shadow: 0 0 0 1px #c06b50;
+        }
+
+        /* кнопка á – абсолютно над инпутом, не занимает места в потоке */
+        .accent-above {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-bottom: 2px;
+            background: #ffffff;
+            border: 1px solid #d6cfc4;
+            font-size: 0.8rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #5a524a;
+            line-height: 1;
+            white-space: nowrap;
+            transition: 0.1s;
+            z-index: 2;
+        }
+
+        .accent-above:hover {
+            background: #f0ebe0;
+            border-color: #b9aa94;
+        }
+
+        .check-btn, .next-btn, .restart-btn {
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.7rem 2rem;
+            border-radius: 2.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-top: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .check-btn {
+            background: #3d3d3d;
+        }
+
+        .check-btn:hover {
+            background: #222;
+        }
+
+        .next-btn {
+            background: #5a7d6c;
+        }
+
+        .next-btn:hover {
+            background: #465f54;
+        }
+
+        .restart-btn {
+            background: #c28b5c;
+            color: #ffffff;
+            border: none;
+        }
+
+        .restart-btn:hover {
+            background: #a67345;
+        }
+
+        .message {
+            text-align: center;
+            margin: 1rem 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #5a524a;
+            min-height: 2.5rem;
+        }
+
+        .result-screen {
+            text-align: center;
+        }
+
+        .stats {
+            background: #faf8f4;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #c28b5c;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        button {
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+<div class="glass-panel">
+    <!-- Таблица ser / estar с явными пробелами -->
+    <div class="conj-wrapper">
+        <div class="conj-card">
+            <h3>SER</h3>
+            <table>
+                <tr><td class="pron">yo</td><td class="verb-form">&nbsp;soy</td></tr>
+                <tr><td class="pron">tú</td><td class="verb-form">&nbsp;eres</td></tr>
+                <tr><td class="pron">él/ella/usted</td><td class="verb-form">&nbsp;es</td></tr>
+                <tr><td class="pron">nosotros/as</td><td class="verb-form">&nbsp;somos</td></tr>
+                <tr><td class="pron">ellos/ellas/ustedes</td><td class="verb-form">&nbsp;son</td></tr>
+            </table>
+        </div>
+        <div class="conj-card">
+            <h3>ESTAR</h3>
+            <table>
+                <tr><td class="pron">yo</td><td class="verb-form">&nbsp;estoy</td></tr>
+                <tr><td class="pron">tú</td><td class="verb-form">&nbsp;estás</td></tr>
+                <tr><td class="pron">él/ella/usted</td><td class="verb-form">&nbsp;está</td></tr>
+                <tr><td class="pron">nosotros/as</td><td class="verb-form">&nbsp;estamos</td></tr>
+                <tr><td class="pron">ellos/ellas/ustedes</td><td class="verb-form">&nbsp;están</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- Экран игры -->
+    <div id="gameScreen">
+        <div class="round-badge" id="roundInfo">Ronda 1 / 40</div>
+        <div class="sentence" id="sentenceText"></div>
+
+        <div style="display: flex; justify-content: center; gap: 0.75rem;">
+            <button class="check-btn" id="checkBtn">Comprobar</button>
+            <button class="next-btn" id="nextBtn">Siguiente →</button>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <!-- Экран результатов -->
+    <div id="resultScreen" class="result-screen hidden">
+        <div style="font-size: 3rem;">✨</div>
+        <div class="stats">
+            <div class="stats-number" id="scoreDisplay">0/40</div>
+            <p style="margin-top: 0.5rem;">aciertos</p>
+        </div>
+        <button class="restart-btn" id="restartBtn">Volver a empezar</button>
+    </div>
+</div>
+
+<script>
+    // ---------- 40 ФРАЗ (полный список, перемешиваются) ----------
+    const FRASES = [
+        { texto: "Yo ____ profesor de español.", respuesta: "soy" },
+        { texto: "Tú ____ muy simpático.", respuesta: "eres" },
+        { texto: "Él ____ alto y delgado.", respuesta: "es" },
+        { texto: "Ella ____ pelirroja.", respuesta: "es" },
+        { texto: "Usted ____ muy generoso.", respuesta: "es" },
+        { texto: "Nosotros ____ compañeros de clase.", respuesta: "somos" },
+        { texto: "Ustedes ____ los nuevos vecinos.", respuesta: "son" },
+        { texto: "Ellos ____ canadienses.", respuesta: "son" },
+        { texto: "Ellas ____ muy ordenadas.", respuesta: "son" },
+        { texto: "Yo ____ vegetariano.", respuesta: "soy" },
+        { texto: "Tú ____ el mejor amigo.", respuesta: "eres" },
+        { texto: "Él ____ muy paciente.", respuesta: "es" },
+        { texto: "Ella ____ la directora de la escuela.", respuesta: "es" },
+        { texto: "Usted ____ muy importante para nosotros.", respuesta: "es" },
+        { texto: "Nosotros ____ muy unidos.", respuesta: "somos" },
+        { texto: "Ustedes ____ muy amables con todos.", respuesta: "son" },
+        { texto: "Ellos ____ muy creativos.", respuesta: "son" },
+        { texto: "Ellas ____ las ganadoras del concurso.", respuesta: "son" },
+        { texto: "Yo ____ de Buenos Aires.", respuesta: "soy" },
+        { texto: "Tú ____ muy deportista.", respuesta: "eres" },
+        { texto: "Yo ____ en mi casa ahora.", respuesta: "estoy" },
+        { texto: "Tú ____ muy cansado hoy.", respuesta: "estás" },
+        { texto: "Él ____ enfermo desde el lunes.", respuesta: "está" },
+        { texto: "Ella ____ preocupada por el examen.", respuesta: "está" },
+        { texto: "Usted ____ en el hospital.", respuesta: "está" },
+        { texto: "Nosotros ____ en la playa.", respuesta: "estamos" },
+        { texto: "Ustedes ____ en la sala de espera.", respuesta: "están" },
+        { texto: "Ellos ____ felices por la noticia.", respuesta: "están" },
+        { texto: "Ellas ____ tristes porque llueve.", respuesta: "están" },
+        { texto: "Yo ____ aburrido en esta reunión.", respuesta: "estoy" },
+        { texto: "Tú ____ en tu habitación, ¿verdad?", respuesta: "estás" },
+        { texto: "Él ____ en la oficina hasta tarde.", respuesta: "está" },
+        { texto: "Ella ____ muy elegante hoy.", respuesta: "está" },
+        { texto: "Usted ____ confundido con las instrucciones.", respuesta: "está" },
+        { texto: "Nosotros ____ en el cine.", respuesta: "estamos" },
+        { texto: "Ustedes ____ sentados en la primera fila.", respuesta: "están" },
+        { texto: "Ellos ____ en la estación de tren.", respuesta: "están" },
+        { texto: "Ellas ____ enojadas con su hermano.", respuesta: "están" },
+        { texto: "Yo ____ tranquilo porque todo está bien.", respuesta: "estoy" },
+        { texto: "Tú ____ en el parque con tu perro.", respuesta: "estás" }
+    ];
+
+    const RONDAS_POR_PARTIDA = 40;
+    let ejerciciosSeleccionados = [];
+    let rondaActual = 0;
+    let puntuacion = 0;
+    let respuestaCorrectaActual = false;
+
+    // DOM
+    const gameScreen = document.getElementById('gameScreen');
+    const resultScreen = document.getElementById('resultScreen');
+    const roundInfoSpan = document.getElementById('roundInfo');
+    const sentenceDiv = document.getElementById('sentenceText');
+    const messageDiv = document.getElementById('message');
+    const checkBtn = document.getElementById('checkBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const scoreDisplaySpan = document.getElementById('scoreDisplay');
+
+    function obtenerInput() {
+        return document.getElementById('inlineAnswer');
+    }
+
+    function normalizar(str) {
+        return str
+            .toLowerCase()
+            .trim()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/ñ/g, 'n')
+            .replace(/ü/g, 'u');
+    }
+
+    function mezclar(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    function iniciarJuego() {
+        const copia = [...FRASES];
+        mezclar(copia);
+        ejerciciosSeleccionados = copia;
+        rondaActual = 0;
+        puntuacion = 0;
+        respuestaCorrectaActual = false;
+
+        gameScreen.classList.remove('hidden');
+        resultScreen.classList.add('hidden');
+        cargarRonda();
+    }
+
+    function cargarRonda() {
+        respuestaCorrectaActual = false;
+        messageDiv.textContent = '';
+
+        const fraseObj = ejerciciosSeleccionados[rondaActual];
+        // вставляем контейнер с абсолютно позиционированной кнопкой á
+        const textoConInput = fraseObj.texto.replace(
+            '____',
+            '<span class="inline-gap">' +
+                '<button class="accent-above" id="acentoBtn" title="Insertar á">á</button>' +
+                '<input type="text" id="inlineAnswer" class="inline-input" placeholder="______" autocomplete="off">' +
+            '</span>'
+        );
+        sentenceDiv.innerHTML = textoConInput;
+
+        const input = obtenerInput();
+        if (input) {
+            input.classList.remove('correct', 'incorrect');
+            input.disabled = false;
+            input.focus();
+        }
+
+        const acentoBtn = document.getElementById('acentoBtn');
+        if (acentoBtn) {
+            acentoBtn.addEventListener('click', insertarA);
+        }
+
+        checkBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'none';
+
+        roundInfoSpan.textContent = `Ronda ${rondaActual + 1} / ${RONDAS_POR_PARTIDA}`;
+    }
+
+    function comprobar() {
+        if (respuestaCorrectaActual) {
+            messageDiv.textContent = '✓ Ya acertaste. Presiona "Siguiente".';
+            return;
+        }
+
+        const input = obtenerInput();
+        if (!input) return;
+
+        const usuario = input.value.trim();
+        if (usuario === '') {
+            messageDiv.textContent = '✏️ Escribe una forma de ser o estar.';
+            return;
+        }
+
+        const correcta = ejerciciosSeleccionados[rondaActual].respuesta;
+        const normUsr = normalizar(usuario);
+        const normOk = normalizar(correcta);
+
+        if (normUsr === normOk) {
+            respuestaCorrectaActual = true;
+            puntuacion++;
+            messageDiv.textContent = '✓ ¡Correcto!';
+            input.classList.add('correct');
+            input.classList.remove('incorrect');
+            input.disabled = true;
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+        } else {
+            messageDiv.textContent = '✗ Incorrecto. Inténtalo de nuevo.';
+            input.classList.add('incorrect');
+            input.classList.remove('correct');
+        }
+    }
+
+    function siguiente() {
+        if (!respuestaCorrectaActual) {
+            messageDiv.textContent = '❓ Primero escribe la respuesta correcta.';
+            return;
+        }
+
+        if (rondaActual + 1 < RONDAS_POR_PARTIDA) {
+            rondaActual++;
+            cargarRonda();
+        } else {
+            mostrarResultados();
+        }
+    }
+
+    function mostrarResultados() {
+        gameScreen.classList.add('hidden');
+        resultScreen.classList.remove('hidden');
+        scoreDisplaySpan.textContent = `${puntuacion}/${RONDAS_POR_PARTIDA}`;
+    }
+
+    function insertarA() {
+        const input = obtenerInput();
+        if (!input || input.disabled) return;
+        const start = input.selectionStart || 0;
+        const end = input.selectionEnd || 0;
+        const texto = input.value;
+        const nuevo = texto.substring(0, start) + 'á' + texto.substring(end);
+        input.value = nuevo;
+        input.focus();
+        input.setSelectionRange(start + 1, start + 1);
+    }
+
+    checkBtn.addEventListener('click', comprobar);
+    nextBtn.addEventListener('click', siguiente);
+    restartBtn.addEventListener('click', iniciarJuego);
+
+    gameScreen.addEventListener('keypress', (e) => {
+        if (e.target && e.target.id === 'inlineAnswer' && e.key === 'Enter') {
+            e.preventDefault();
+            if (checkBtn.style.display !== 'none') {
+                comprobar();
+            } else if (nextBtn.style.display !== 'none') {
+                siguiente();
+            }
+        }
+    });
+
+    iniciarJuego();
+</script>
+</body>
+</html>
