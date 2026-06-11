@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>Opposing Meanings • Bold Opposites • Sentence Match</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background: #fef9ef;  /* warm off-white background */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 20px;
+}
+
+.container {
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* main game card */
+.game-card {
+  background: #fffdf9;   /* soft off-white card */
+  border-radius: 32px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  padding: 28px 24px 32px 24px;
+  transition: all 0.2s;
+}
+
+h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: #2c2b28;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.subhead {
+  text-align: center;
+  color: #6b6a66;
+  font-weight: 500;
+  font-size: 1rem;
+  margin-bottom: 28px;
+  border-bottom: 1px solid #efe6da;
+  display: inline-block;
+  width: auto;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 10px;
+}
+
+/* two-column layout */
+.match-wrapper {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  margin-top: 12px;
+}
+
+.column {
+  flex: 1;
+  min-width: 260px;
+}
+
+.column-header {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #9b8e7c;
+  background: #f6f0e8;
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 40px;
+  margin-bottom: 18px;
+}
+
+/* items — off-white, subtle borders */
+.match-item {
+  background: #ffffff;
+  border: 1.5px solid #ece2d4;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.match-item:hover {
+  border-color: #cdbcab;
+  background: #fffaf5;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px -8px rgba(0,0,0,0.08);
+}
+
+.match-item.used {
+  opacity: 0.5;
+  background: #f3ede6;
+  border-color: #ddd2c4;
+  pointer-events: none;
+  filter: grayscale(0.02);
+  text-decoration: none;
+}
+
+.match-item.active {
+  background: #f5ede3;
+  border-color: #bc9a6f;
+  box-shadow: 0 0 0 3px rgba(188,154,111,0.2);
+}
+
+.shake {
+  animation: softShake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* left item content */
+.left-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.sentence-icon {
+  width: 44px;
+  height: 44px;
+  background: #f3ede5;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 500;
+  color: #a58357;
+  flex-shrink: 0;
+  transition: all 0.1s;
+}
+
+.sentence-text {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  font-weight: 500;
+  color: #2f2e2a;
+  flex: 1;
+}
+
+/* right item (answers) - now also with icon and bold */
+.right-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+}
+
+.right-icon {
+  width: 44px;
+  height: 44px;
+  background: #f3ede5;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 500;
+  color: #a58357;
+  flex-shrink: 0;
+  transition: all 0.1s;
+}
+
+.opposite-text {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  font-weight: 500;
+  color: #2f2e2a;
+  flex: 1;
+}
+
+/* BOLD ONLY — no background highlight, just font weight and subtle color */
+.opposing-bold {
+  font-weight: 800;
+  color: #b1624b;
+}
+
+/* fallback for strong tags */
+.sentence-text strong, .opposite-text strong {
+  font-weight: 800;
+  color: #b1624b;
+}
+
+/* SVG lines container */
+#lines-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* message area */
+.message-area {
+  margin-top: 28px;
+  text-align: center;
+  font-weight: 600;
+  background: #f8f2ea;
+  padding: 12px 18px;
+  border-radius: 60px;
+  color: #6c5b48;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.reset-btn {
+  background: none;
+  border: 1.5px solid #e1d4c6;
+  padding: 8px 22px;
+  border-radius: 40px;
+  font-weight: 600;
+  color: #8e7a62;
+  margin-top: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reset-btn:hover {
+  background: #f3ede5;
+  border-color: #bc9a6f;
+  color: #5e4b34;
+}
+
+@keyframes softShake {
+  0% { transform: translateX(0px); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+/* responsiveness */
+@media (max-width: 780px) {
+  .match-wrapper {
+    flex-direction: column;
+  }
+  .game-card {
+    padding: 20px;
+  }
+  .left-content, .right-content {
+    padding: 12px 14px;
+  }
+  .sentence-icon, .right-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="game-card">
+    <h1>📖 find the opposing meanings</h1>
+    <div class="subhead">match each statement with its opposite meaning — <span style="font-weight:bold; color:#b1624b;">bold text</span> highlights the contrasting ideas</div>
+
+    <div class="match-wrapper" id="matchWrapper">
+      <svg id="lines-canvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></svg>
+      
+      <!-- LEFT COLUMN: original statements -->
+      <div class="column" id="leftColumn">
+        <div class="column-header">📌 STATEMENTS</div>
+        <!-- dynamic left items inserted -->
+      </div>
+      
+      <!-- RIGHT COLUMN: opposing answers -->
+      <div class="column" id="rightColumn">
+        <div class="column-header">⚡ OPPOSITE MEANINGS</div>
+        <!-- dynamic right items -->
+      </div>
+    </div>
+
+    <div class="message-area" id="gameMessage">
+      🧩 Click a statement, then click its opposite meaning.
+    </div>
+    <div style="display: flex; justify-content: center;">
+      <button class="reset-btn" id="resetGameBtn">⟳ New game / shuffle</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ----- DEFINE THE 5 PAIRS with BOLD ONLY for opposing structures (no background) -----
+  
+  const PAIRS = [
+    {
+      id: 1,
+      leftText: "I get on well with my neighbour — we always say 'hello' and have a chat.",
+      rightText: "My neighbour gets on my nerves — he's always complaining.",
+      leftBold: "get on well",
+      rightBold: "gets on my nerves"
+    },
+    {
+      id: 2,
+      leftText: "I prefer to mind my own business so I don't ask the neighbours personal questions.",
+      rightText: "I can be quite nosy so I often ask my neighbours about their lives.",
+      leftBold: "mind my own business",
+      rightBold: "nosy"
+    },
+    {
+      id: 3,
+      leftText: "I sometimes invite my neighbour over for coffee.",
+      rightText: "I like to keep myself to myself so my neighbour hasn't been in my house.",
+      leftBold: "invite|over",
+      rightBold: "keep myself to myself"
+    },
+    {
+      id: 4,
+      leftText: "My neighbour's dog is a nuisance — he's always barking early in the morning.",
+      rightText: "My neighbour has pets but they never disturb me.",
+      leftBold: "nuisance",
+      rightBold: "never disturb me"
+    },
+    {
+      id: 5,
+      leftText: "We didn't get to know our neighbours for years.",
+      rightText: "We made friends with our neighbours immediately.",
+      leftBold: "didn't get to know",
+      rightBold: "made friends"
+    }
+  ];
+  
+  // Helper: apply bold ONLY (no background, no highlight) to specific phrases
+  function applyBoldOnly(originalText, boldPatternRaw) {
+    if (!boldPatternRaw) return originalText;
+    let patterns = boldPatternRaw.split('|').map(p => p.trim());
+    let resultText = originalText;
+    
+    // sort by length descending to avoid partial overlaps
+    patterns.sort((a,b) => b.length - a.length);
+    
+    for (let pattern of patterns) {
+      if (pattern === "") continue;
+      // escape special regex characters
+      const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedPattern})`, 'gi');
+      resultText = resultText.replace(regex, `<strong class="opposing-bold">$1</strong>`);
+    }
+    return resultText;
+  }
+  
+  // Build left item HTML with quote icon (❝) and bold-only opposing structures
+  function buildLeftHTML(pair) {
+    const highlightedLeft = applyBoldOnly(pair.leftText, pair.leftBold);
+    return `
+      <div class="left-content">
+        <div class="sentence-icon">❝</div>
+        <div class="sentence-text">${highlightedLeft}</div>
+      </div>
+    `;
+  }
+  
+  // Build right item HTML with quote icon (❞) and bold-only opposing structures
+  function buildRightHTML(pair) {
+    const highlightedRight = applyBoldOnly(pair.rightText, pair.rightBold);
+    return `
+      <div class="right-content">
+        <div class="right-icon">❞</div>
+        <div class="opposite-text">${highlightedRight}</div>
+      </div>
+    `;
+  }
+  
+  // DOM elements
+  let selectedLeftItem = null;
+  let currentMatchCount = 0;
+  const totalPairs = PAIRS.length;
+  
+  let leftContainer, rightContainer, svgLines, messageDiv;
+  let matchedPairs = []; // store { leftEl, rightEl }
+  
+  function createLeftElement(pair) {
+    const div = document.createElement('div');
+    div.className = 'match-item left-item';
+    div.setAttribute('data-id', pair.id);
+    div.setAttribute('data-side', 'left');
+    div.innerHTML = buildLeftHTML(pair);
+    div.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleLeftClick(div);
+    });
+    return div;
+  }
+  
+  function createRightElement(pair) {
+    const div = document.createElement('div');
+    div.className = 'match-item right-item';
+    div.setAttribute('data-id', pair.id);
+    div.setAttribute('data-side', 'right');
+    div.innerHTML = buildRightHTML(pair);
+    div.addEventListener('click', (e) => {
+      e.stopPropagation();
+      handleRightClick(div);
+    });
+    return div;
+  }
+  
+  // redraw all connection lines
+  function redrawAllLines() {
+    svgLines.innerHTML = '';
+    if (!matchedPairs.length) return;
+    
+    const wrapper = document.getElementById('matchWrapper');
+    if (!wrapper) return;
+    const wrapperRect = wrapper.getBoundingClientRect();
+    if (wrapperRect.width === 0) return;
+    
+    for (let match of matchedPairs) {
+      const leftEl = match.leftEl;
+      const rightEl = match.rightEl;
+      if (!leftEl || !rightEl) continue;
+      if (!leftEl.isConnected || !rightEl.isConnected) continue;
+      
+      const leftRect = leftEl.getBoundingClientRect();
+      const rightRect = rightEl.getBoundingClientRect();
+      
+      const leftX = leftRect.right - wrapperRect.left - 5;
+      const leftY = (leftRect.top + leftRect.bottom) / 2 - wrapperRect.top;
+      const rightX = rightRect.left - wrapperRect.left + 5;
+      const rightY = (rightRect.top + rightRect.bottom) / 2 - wrapperRect.top;
+      
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", leftX);
+      line.setAttribute("y1", leftY);
+      line.setAttribute("x2", rightX);
+      line.setAttribute("y2", rightY);
+      line.setAttribute("stroke", "#b48c5c");
+      line.setAttribute("stroke-width", "2.3");
+      line.setAttribute("stroke-dasharray", "5 4");
+      line.setAttribute("stroke-linecap", "round");
+      line.style.opacity = "0.8";
+      svgLines.appendChild(line);
+    }
+  }
+  
+  function scheduleRedraw() {
+    setTimeout(() => redrawAllLines(), 20);
+    requestAnimationFrame(() => redrawAllLines());
+  }
+  
+  function clearLeftActive() {
+    if (selectedLeftItem) {
+      selectedLeftItem.classList.remove('active');
+      selectedLeftItem = null;
+    }
+  }
+  
+  function handleLeftClick(leftElement) {
+    if (leftElement.classList.contains('used')) {
+      messageDiv.innerHTML = `⚠️ This statement is already matched. Click reset to play again.`;
+      setTimeout(() => {
+        if (currentMatchCount !== totalPairs) messageDiv.innerHTML = `🧩 Click a statement, then click its opposite meaning.`;
+        else messageDiv.innerHTML = `🎉 Perfect! All opposites found. 🎉`;
+      }, 1200);
+      return;
+    }
+    
+    if (selectedLeftItem && selectedLeftItem !== leftElement) {
+      selectedLeftItem.classList.remove('active');
+      selectedLeftItem = leftElement;
+      leftElement.classList.add('active');
+    } 
+    else if (selectedLeftItem === leftElement) {
+      leftElement.classList.remove('active');
+      selectedLeftItem = null;
+    }
+    else {
+      clearLeftActive();
+      selectedLeftItem = leftElement;
+      leftElement.classList.add('active');
+    }
+  }
+  
+  function handleRightClick(rightElement) {
+    if (rightElement.classList.contains('used')) {
+      messageDiv.innerHTML = `🔁 This opposite meaning is already matched.`;
+      setTimeout(() => {
+        if (currentMatchCount !== totalPairs) messageDiv.innerHTML = `🧩 Click a statement, then click its opposite meaning.`;
+        else messageDiv.innerHTML = `🎉 Complete! Great matching.`;
+      }, 1000);
+      return;
+    }
+    
+    if (!selectedLeftItem) {
+      messageDiv.innerHTML = `✨ First click on a statement (left side), then on its opposite.`;
+      rightElement.classList.add('shake');
+      setTimeout(() => rightElement.classList.remove('shake'), 400);
+      return;
+    }
+    
+    if (selectedLeftItem.classList.contains('used')) {
+      clearLeftActive();
+      messageDiv.innerHTML = `⚠️ That statement is already matched. Choose another.`;
+      return;
+    }
+    
+    const leftId = parseInt(selectedLeftItem.getAttribute('data-id'));
+    const rightId = parseInt(rightElement.getAttribute('data-id'));
+    
+    if (leftId === rightId) {
+      // Correct match
+      selectedLeftItem.classList.add('used');
+      rightElement.classList.add('used');
+      matchedPairs.push({
+        leftEl: selectedLeftItem,
+        rightEl: rightElement
+      });
+      currentMatchCount++;
+      
+      messageDiv.innerHTML = `✔️ Correct! ${currentMatchCount} of ${totalPairs} matched.`;
+      if (currentMatchCount === totalPairs) {
+        messageDiv.innerHTML = `🎉 Excellent! All opposing meanings found! 🎉`;
+      }
+      
+      selectedLeftItem.classList.remove('active');
+      selectedLeftItem = null;
+      scheduleRedraw();
+    } else {
+      messageDiv.innerHTML = `❌ Not opposite. Those sentences don't share opposing ideas. Try again!`;
+      selectedLeftItem.classList.add('shake');
+      rightElement.classList.add('shake');
+      setTimeout(() => {
+        selectedLeftItem.classList.remove('shake');
+        rightElement.classList.remove('shake');
+      }, 400);
+    }
+  }
+  
+  function buildGame() {
+    leftContainer.innerHTML = '';
+    rightContainer.innerHTML = '';
+    svgLines.innerHTML = '';
+    
+    if (selectedLeftItem) {
+      selectedLeftItem.classList.remove('active');
+      selectedLeftItem = null;
+    }
+    matchedPairs = [];
+    currentMatchCount = 0;
+
+    // independently shuffle left and right pairs
+    const shuffledLeftPairs = [...PAIRS];
+    const shuffledRightPairs = [...PAIRS];
+    for (let i = shuffledLeftPairs.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledLeftPairs[i], shuffledLeftPairs[j]] = [shuffledLeftPairs[j], shuffledLeftPairs[i]];
+    }
+    for (let i = shuffledRightPairs.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledRightPairs[i], shuffledRightPairs[j]] = [shuffledRightPairs[j], shuffledRightPairs[i]];
+    }
+    
+    for (let pair of shuffledLeftPairs) {
+      leftContainer.appendChild(createLeftElement(pair));
+    }
+    for (let pair of shuffledRightPairs) {
+      rightContainer.appendChild(createRightElement(pair));
+    }
+    
+    setTimeout(() => {
+      redrawAllLines();
+    }, 40);
+  }
+  
+  // observer for line repositioning
+  let resizeObserver = null;
+  function initObserver() {
+    if (resizeObserver) resizeObserver.disconnect();
+    resizeObserver = new ResizeObserver(() => scheduleRedraw());
+    const wrapper = document.getElementById('matchWrapper');
+    if (wrapper) resizeObserver.observe(wrapper);
+    window.addEventListener('resize', () => scheduleRedraw());
+    window.addEventListener('scroll', () => scheduleRedraw());
+  }
+  
+  function resetGame() {
+    buildGame();
+    scheduleRedraw();
+  }
+  
+  function init() {
+    leftContainer = document.getElementById('leftColumn');
+    rightContainer = document.getElementById('rightColumn');
+    svgLines = document.getElementById('lines-canvas');
+    messageDiv = document.getElementById('gameMessage');
+    
+    buildGame();
+    initObserver();
+    
+    const resetBtn = document.getElementById('resetGameBtn');
+    if (resetBtn) resetBtn.addEventListener('click', () => resetGame());
+    
+    scheduleRedraw();
+  }
+  
+  init();
+</script>
+</body>
+</html>
