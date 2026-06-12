@@ -257,7 +257,7 @@
 </head>
 <body>
 <div class="glass-panel">
-    <!-- Таблица ser / estar с явными пробелами -->
+    <!-- Tabla ser / estar -->
     <div class="conj-wrapper">
         <div class="conj-card">
             <h3>SER</h3>
@@ -281,7 +281,7 @@
         </div>
     </div>
 
-    <!-- Экран игры -->
+    <!-- Pantalla del juego -->
     <div id="gameScreen">
         <div class="round-badge" id="roundInfo">Ronda 1 / 40</div>
         <div class="sentence" id="sentenceText"></div>
@@ -294,7 +294,7 @@
         <div class="message" id="message"></div>
     </div>
 
-    <!-- Экран результатов -->
+    <!-- Pantalla de resultados -->
     <div id="resultScreen" class="result-screen hidden">
         <div style="font-size: 3rem;">✨</div>
         <div class="stats">
@@ -306,7 +306,7 @@
 </div>
 
 <script>
-    // ---------- 40 ФРАЗ (полный список, перемешиваются) ----------
+    // ---------- 40 FRASES ----------
     const FRASES = [
         { texto: "Yo ____ profesor de español.", respuesta: "soy" },
         { texto: "Tú ____ muy simpático.", respuesta: "eres" },
@@ -407,7 +407,6 @@
         messageDiv.textContent = '';
 
         const fraseObj = ejerciciosSeleccionados[rondaActual];
-        // вставляем контейнер с абсолютно позиционированной кнопкой á
         const textoConInput = fraseObj.texto.replace(
             '____',
             '<span class="inline-gap">' +
@@ -420,7 +419,7 @@
         const input = obtenerInput();
         if (input) {
             input.classList.remove('correct', 'incorrect');
-            input.disabled = false;
+            input.readOnly = false;   // ← CAMBIADO: disabled → readOnly
             input.focus();
         }
 
@@ -460,7 +459,7 @@
             messageDiv.textContent = '✓ ¡Correcto!';
             input.classList.add('correct');
             input.classList.remove('incorrect');
-            input.disabled = true;
+            input.readOnly = true;   // ← CAMBIADO: disabled → readOnly
             checkBtn.style.display = 'none';
             nextBtn.style.display = 'inline-block';
         } else {
@@ -492,7 +491,7 @@
 
     function insertarA() {
         const input = obtenerInput();
-        if (!input || input.disabled) return;
+        if (!input || input.readOnly) return;   // ← CAMBIADO: disabled → readOnly
         const start = input.selectionStart || 0;
         const end = input.selectionEnd || 0;
         const texto = input.value;
