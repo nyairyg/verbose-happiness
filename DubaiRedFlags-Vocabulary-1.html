@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vocabulary Quiz: Master 16 Words</title>
 <style>
   * {
     margin: 0;
@@ -18,11 +17,11 @@
   }
 
   .quiz-wrapper {
-    max-width: 820px;
+    max-width: 920px;
     margin: 0 auto;
   }
 
-  /* card style — no blue border anywhere */
+  /* card style — no blue border anywhere on quiz card */
   .quiz-card {
     background: #ffffff;
     border-radius: 24px;
@@ -122,7 +121,7 @@
     transform: scale(0.99);
   }
 
-  /* LONGER flash feedback (500ms instead of 220ms) */
+  /* LONGER flash feedback (600ms) */
   .correct-flash {
     background: #c8f0d1 !important;
     border-color: #2b7e3a !important;
@@ -134,7 +133,7 @@
     transition: background 0.05s;
   }
 
-  /* final screen styling - no blue border anywhere */
+  /* final screen styling - minimal borders, no blue per-card border */
   .final-screen {
     background: #ffffff;
     border-radius: 24px;
@@ -151,85 +150,112 @@
     display: inline-block;
     padding-bottom: 6px;
   }
-  .glossary-list {
+  
+  /* Two-column grid for glossary — clean, no individual blue borders */
+  .glossary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 28px 0 24px;
+  }
+  
+  /* each word card: only very subtle background, no blue border */
+  .glossary-card {
+    background: #f9fafc;
+    border-radius: 20px;
+    padding: 14px 20px;
+    transition: all 0.1s ease;
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    margin: 28px 0;
-    max-height: 520px;
-    overflow-y: auto;
-    padding-right: 8px;
+    gap: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    border: 1px solid #edf2f7;
   }
-  .glossary-card {
-    background: #f9fafb;
-    border-left: 4px solid #9aa9bf;
-    padding: 14px 18px;
-    border-radius: 18px;
-    font-size: 0.96rem;
-  }
+  
   .glossary-word {
     font-weight: 800;
     color: #0c4e6e;
     font-size: 1.05rem;
+    background: #eef2fa;
+    padding: 4px 14px;
+    border-radius: 30px;
     display: inline-block;
-    margin-right: 12px;
+    align-self: flex-start;
   }
+  
   .glossary-def {
     color: #2c3e44;
+    font-weight: 460;
+    line-height: 1.45;
+    font-size: 0.94rem;
+    word-break: break-word;
+    margin-top: 2px;
   }
-  .example-sentence {
-    font-size: 0.8rem;
-    color: #4f6f8f;
-    margin-top: 8px;
-    font-style: normal;
-    background: #ffffffc9;
-    padding: 6px 10px;
-    border-radius: 14px;
+  
+  /* break before arrow — ensures arrow appears on its own line after the word */
+  .def-break {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
   }
-  .copy-btn {
-    background: #1f5e3a;
-    color: white;
-    border: none;
-    border-radius: 40px;
-    padding: 10px 28px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    transition: 0.2s;
+  .arrow-symbol {
+    font-weight: 600;
+    color: #4b6b8f;
+    margin-right: 6px;
+    font-size: 1rem;
   }
-  .copy-btn:hover {
-    background: #0b4b2f;
-    transform: translateY(-1px);
+  /* Ensures that the definition always starts after arrow, but the whole block is after word */
+  .definition-text {
+    flex: 1;
   }
+  
+  /* button row: restart only (no copy button) */
+  .button-row {
+    display: flex;
+    justify-content: center;
+    margin: 8px 0 20px;
+  }
+  
   .restart-btn {
     background: #eef2ff;
     color: #1e3a8a;
     border: none;
     border-radius: 40px;
-    padding: 10px 24px;
+    padding: 12px 32px;
     font-weight: 500;
-    margin-left: 16px;
     cursor: pointer;
     font-family: inherit;
+    transition: 0.2s;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
   }
   .restart-btn:hover {
     background: #e2e8f5;
+    transform: translateY(-1px);
   }
-  .button-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-top: 24px;
-  }
+  
+  /* footnote at bottom (copy/paste reminder, no button) */
   .copy-notice {
-    margin-top: 20px;
+    margin-top: 16px;
     background: #f2f5f9;
     border-radius: 40px;
-    padding: 10px 20px;
+    padding: 12px 20px;
     font-size: 0.85rem;
     color: #2c4c6e;
     text-align: center;
+    border: 1px solid #e2edf2;
+  }
+  
+  /* responsive: on smaller screens, single column */
+  @media (max-width: 640px) {
+    .glossary-grid {
+      grid-template-columns: 1fr;
+    }
+    .quiz-card, .final-screen {
+      padding: 20px;
+    }
   }
 </style>
 </head>
@@ -255,7 +281,7 @@ const vocabularyData = [
   { word: "Reluctance", context: "Despite loving the job offer, his **reluctance** to move to a different country made him finally say no to the position.", definition: "Unwillingness or hesitation" }
 ];
 
-// Build distractor sets (plausible but wrong) for each item using fixed map or fallback
+// Build distractor sets (plausible but wrong) for each item
 const distractorMap = {
   "Permit": ["A type of camping equipment", "A safety warning sign"],
   "Eligible": ["Required to do something by law", "Excluded from a group by default"],
@@ -278,20 +304,19 @@ const distractorMap = {
 function buildQuiz() {
   return vocabularyData.map(item => {
     let rawSentence = item.context;
-    // remove markdown ** but keep text clean, we'll highlight separately
+    // remove markdown ** but keep text clean
     let cleanSentence = rawSentence.replace(/\*\*/g, '');
     const targetWord = item.word;
     const correctDef = item.definition;
     let distractors = distractorMap[targetWord];
     if (!distractors) distractors = ["Incorrect meaning", "Not the right definition"];
-    const choices = [correctDef, distractors[0], distractors[1]];
+    let choices = [correctDef, distractors[0], distractors[1]];
     return {
       rawSentence: cleanSentence,
       word: targetWord,
       correctAnswer: correctDef,
       allChoices: choices,
       fullDefinition: correctDef,
-      exampleRaw: rawSentence.replace(/\*\*/g, '')   // for final screen
     };
   });
 }
@@ -310,7 +335,7 @@ function shuffleArray(arr) {
   return arr;
 }
 
-// Flash effect on answer element - LONGER duration (600ms)
+// Flash effect on answer element - duration 600ms
 function flashAnswerElement(el, type) {
   if (!el) return;
   if (type === 'correct') {
@@ -322,6 +347,21 @@ function flashAnswerElement(el, type) {
   }
 }
 
+// escape regex special chars
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
+}
+
 // Render current question
 function renderCurrentQuestion() {
   if (quizFinished || currentQIndex >= quizQuestions.length) {
@@ -330,15 +370,15 @@ function renderCurrentQuestion() {
   }
 
   const q = quizQuestions[currentQIndex];
-  // Build sentence with bold target word: we insert <strong> around the word occurrence
+  // Build sentence with bold target word
   let sentenceText = q.rawSentence;
   const regex = new RegExp(`\\b(${escapeRegex(q.word)})\\b`, 'gi');
-  sentenceText = sentenceText.replace(regex, (match) => `<strong class="bold-word">${match}</strong>`);
+  sentenceText = sentenceText.replace(regex, (match) => `<strong class="bold-word">${escapeHtml(match)}</strong>`);
   
   const lowerWord = q.word.charAt(0).toLowerCase() + q.word.slice(1);
   const promptHTML = `<div class="question-prompt">What does <strong class="bold-word">${escapeHtml(lowerWord)}</strong> mean?</div>`;
   
-  // Shuffle answer choices for this question (random order each time)
+  // Shuffle answer choices for this question (random order)
   const shuffledChoices = shuffleArray([...q.allChoices]);
   
   // Build answers with A B C labels
@@ -354,7 +394,6 @@ function renderCurrentQuestion() {
   });
   answersHTML += `</div>`;
   
-  // Footnote moved to the TOP (first thing user sees)
   const cardHTML = `
     <div class="quiz-card" id="activeQuizCard">
       <div class="footnote-top">Choose the correct definition based on the context.</div>
@@ -366,7 +405,6 @@ function renderCurrentQuestion() {
   
   rootEl.innerHTML = cardHTML;
   
-  // attach click handlers to each answer option
   const answerDivs = document.querySelectorAll('.answer-option');
   answerDivs.forEach(div => {
     div.addEventListener('click', (e) => {
@@ -374,9 +412,7 @@ function renderCurrentQuestion() {
       const selectedAnswer = div.getAttribute('data-answer');
       const isCorrect = (selectedAnswer === q.correctAnswer);
       if (isCorrect) {
-        // correct -> flash green, disable temporarily, move to next
         flashAnswerElement(div, 'correct');
-        // disable all clicks to prevent double advance
         const allOptions = document.querySelectorAll('.answer-option');
         allOptions.forEach(opt => opt.style.pointerEvents = 'none');
         setTimeout(() => {
@@ -387,54 +423,36 @@ function renderCurrentQuestion() {
             quizFinished = true;
             renderFinalScreen();
           }
-        }, 650); // slightly longer than flash to feel smooth
+        }, 650);
       } else {
-        // wrong: flash red only, stay on same question (longer flash)
         flashAnswerElement(div, 'wrong');
-        // no further action, user can try another answer
       }
     });
   });
 }
 
-// helper: escape regex special chars
-function escapeRegex(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return str.replace(/[&<>]/g, function(m) {
-    if (m === '&') return '&amp;';
-    if (m === '<') return '&lt;';
-    if (m === '>') return '&gt;';
-    return m;
-  }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-    return c;
-  });
-}
-
-// Final screen: full word list + definitions + copy phrase
+// Final screen: two columns, clean design, word on its own line, line break before arrow (→) 
 function renderFinalScreen() {
-  let glossaryHTML = `<div class="final-screen">
+  let glossaryGridHTML = `<div class="final-screen">
     <h2>📘 Vocabulary Master List</h2>
-    <div class="glossary-list" id="glossaryList">`;
+    <div class="glossary-grid" id="glossaryGrid">`;
   
+  // Build each card: word displayed first, then on next line arrow + definition
   for (let i = 0; i < quizQuestions.length; i++) {
     const item = quizQuestions[i];
-    const originalExample = vocabularyData.find(v => v.word === item.word)?.context.replace(/\*\*/g, '') || item.exampleRaw;
-    glossaryHTML += `
+    const defText = escapeHtml(item.fullDefinition);
+    glossaryGridHTML += `
       <div class="glossary-card">
-        <div><span class="glossary-word">${escapeHtml(item.word)}</span> 
-        <span class="glossary-def">→ ${escapeHtml(item.fullDefinition)}</span></div>
-        <div class="example-sentence">📖 ${escapeHtml(originalExample)}</div>
+        <div class="glossary-word">${escapeHtml(item.word)}</div>
+        <div class="glossary-def">
+          <span class="arrow-symbol">→</span> ${defText}
+        </div>
       </div>
     `;
   }
   
-  glossaryHTML += `</div>
+  glossaryGridHTML += `</div>
     <div class="button-row">
-      <button class="copy-btn" id="copyFinalBtn">📋 Copy & paste to your file</button>
       <button class="restart-btn" id="restartQuizBtn">⟳ Restart quiz</button>
     </div>
     <div class="copy-notice">
@@ -442,37 +460,14 @@ function renderFinalScreen() {
     </div>
   </div>`;
   
-  rootEl.innerHTML = glossaryHTML;
+  rootEl.innerHTML = glossaryGridHTML;
   
-  const copyBtn = document.getElementById("copyFinalBtn");
-  if (copyBtn) {
-    copyBtn.addEventListener("click", () => {
-      let textOutput = "===== VOCABULARY STUDY LIST =====\n\n";
-      for (let i = 0; i < quizQuestions.length; i++) {
-        const w = quizQuestions[i];
-        const origExample = vocabularyData.find(v => v.word === w.word)?.context.replace(/\*\*/g, '') || w.exampleRaw;
-        textOutput += `${i+1}. ${w.word}\n   Definition: ${w.fullDefinition}\n   Example: ${origExample}\n\n`;
-      }
-      textOutput += "\n💡 Copy and paste to your file because it will help you with your next tasks.\n";
-      navigator.clipboard.writeText(textOutput).then(() => {
-        const originalBtnText = copyBtn.innerText;
-        copyBtn.innerText = "✓ Copied!";
-        setTimeout(() => {
-          if (copyBtn) copyBtn.innerText = originalBtnText;
-        }, 1500);
-      }).catch(() => {
-        alert("Please copy manually (CTRL+C)");
-      });
-    });
-  }
-  
+  // Attach restart functionality (no copy button)
   const restartBtn = document.getElementById("restartQuizBtn");
   if (restartBtn) {
     restartBtn.addEventListener("click", () => {
-      // reset state
       currentQIndex = 0;
       quizFinished = false;
-      // reshuffle answer orders per question will happen inside renderCurrentQuestion due to fresh shuffle
       renderCurrentQuestion();
     });
   }
