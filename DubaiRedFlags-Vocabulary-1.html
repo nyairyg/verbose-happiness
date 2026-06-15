@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary Quiz: Master 16 Words</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #f1f5f9;
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+    padding: 24px 16px;
+  }
+
+  .quiz-wrapper {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  /* card style — no blue border anywhere */
+  .quiz-card {
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.02);
+    padding: 28px 32px;
+    transition: all 0.2s;
+  }
+
+  /* footnote at the top (first thing user sees) */
+  .footnote-top {
+    font-size: 0.85rem;
+    color: #5b6e8c;
+    text-align: center;
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 60px;
+    margin-bottom: 24px;
+    letter-spacing: 0.2px;
+    font-weight: 400;
+    border: 1px solid #eef2f6;
+  }
+
+  .question-sentence {
+    font-size: 1.28rem;
+    line-height: 1.5;
+    color: #0f172a;
+    margin-bottom: 18px;
+    font-weight: 450;
+    background: #fefefe;
+    padding: 8px 0;
+  }
+
+  /* prompt with lowercase word */
+  .question-prompt {
+    margin-top: 24px;
+    margin-bottom: 20px;
+    font-size: 1.18rem;
+    font-weight: 500;
+    color: #1e293b;
+    border-top: 1px solid #e9edf2;
+    padding-top: 20px;
+  }
+  .bold-word {
+    font-weight: 700;
+    color: #075985;
+    background: #eef2ff;
+    padding: 0px 4px;
+    border-radius: 10px;
+    display: inline-block;
+  }
+
+  /* answers grid */
+  .answers-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin: 28px 0 20px;
+  }
+
+  .answer-option {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 60px;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 450;
+    color: #0f172a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .answer-prefix {
+    font-weight: 700;
+    background: #e9edf2;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    color: #1e293b;
+    flex-shrink: 0;
+  }
+
+  .answer-text {
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .answer-option:hover {
+    background: #f1f5fe;
+    border-color: #cbd5e1;
+    transform: scale(0.99);
+  }
+
+  /* LONGER flash feedback (500ms instead of 220ms) */
+  .correct-flash {
+    background: #c8f0d1 !important;
+    border-color: #2b7e3a !important;
+    transition: background 0.05s;
+  }
+  .wrong-flash {
+    background: #ffe0db !important;
+    border-color: #c72a0f !important;
+    transition: background 0.05s;
+  }
+
+  /* final screen styling - no blue border anywhere */
+  .final-screen {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 28px 32px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  }
+  .final-screen h2 {
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: #0f3b5c;
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #dce3ec;
+    display: inline-block;
+    padding-bottom: 6px;
+  }
+  .glossary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin: 28px 0;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  .glossary-card {
+    background: #f9fafb;
+    border-left: 4px solid #9aa9bf;
+    padding: 14px 18px;
+    border-radius: 18px;
+    font-size: 0.96rem;
+  }
+  .glossary-word {
+    font-weight: 800;
+    color: #0c4e6e;
+    font-size: 1.05rem;
+    display: inline-block;
+    margin-right: 12px;
+  }
+  .glossary-def {
+    color: #2c3e44;
+  }
+  .example-sentence {
+    font-size: 0.8rem;
+    color: #4f6f8f;
+    margin-top: 8px;
+    font-style: normal;
+    background: #ffffffc9;
+    padding: 6px 10px;
+    border-radius: 14px;
+  }
+  .copy-btn {
+    background: #1f5e3a;
+    color: white;
+    border: none;
+    border-radius: 40px;
+    padding: 10px 28px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: 0.2s;
+  }
+  .copy-btn:hover {
+    background: #0b4b2f;
+    transform: translateY(-1px);
+  }
+  .restart-btn {
+    background: #eef2ff;
+    color: #1e3a8a;
+    border: none;
+    border-radius: 40px;
+    padding: 10px 24px;
+    font-weight: 500;
+    margin-left: 16px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .restart-btn:hover {
+    background: #e2e8f5;
+  }
+  .button-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 24px;
+  }
+  .copy-notice {
+    margin-top: 20px;
+    background: #f2f5f9;
+    border-radius: 40px;
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    color: #2c4c6e;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="quiz-wrapper" id="quizRoot"></div>
+
+<script>
+// ----------------------------------------------
+// Vocabulary data: 16 words with context, correct definition
+// ----------------------------------------------
+const vocabularyData = [
+  { word: "Permit", context: "The national park only issues a **permit** to campers who have watched a 10-minute bear safety video.", definition: "An official document allowing something" },
+  { word: "Eligible", context: "After working at the company for 11 months, Sara learned she was not **eligible** for the parental leave policy, which required 12 months of employment.", definition: "Qualified or entitled to receive something" },
+  { word: "Altered", context: "When I looked at the original photo next to the edited one, I saw someone had **altered** the color of the sky from grey to bright blue.", definition: "Changed or modified" },
+  { word: "Incomplete", context: "The professor returned my essay because it was **incomplete** — I had written the introduction and conclusion but left out all three body paragraphs.", definition: "Missing necessary parts" },
+  { word: "Compliant", context: "The toy factory's safety procedures were fully **compliant** with international standards, so every doll passed the fire and choking tests.", definition: "Following rules or regulations" },
+  { word: "Prerequisite", context: "Before taking Advanced French Conversation, students must complete French 201 as a **prerequisite**, because the advanced class is taught entirely in French.", definition: "A requirement that must be met first" },
+  { word: "Levied", context: "The local government **levied** a fee of $2 on every hotel room per night to fund public beach maintenance.", definition: "Imposed or collected a tax or fee" },
+  { word: "Omission", context: "The employee handbook listed many safety rules, but the **omission** of any guidance on what to do during a fire worried the new staff.", definition: "Something left out or missing" },
+  { word: "Administrative oversight", context: "The scholarship committee apologized for the **administrative oversight** that caused them to lose my application; they asked me to resubmit it immediately.", definition: "An unintentional mistake by an organization" },
+  { word: "Disseminated", context: "The weather service **disseminated** tornado warnings through phone alerts, radio broadcasts, and highway message boards.", definition: "Spread or distributed widely" },
+  { word: "Furnish", context: "The landlord agreed to **furnish** the empty apartment with a bed, a table, and two chairs before the new tenant moved in.", definition: "Provide or supply something needed" },
+  { word: "Fraud", context: "The elderly man lost his life savings to a **fraud** when someone pretending to be his grandson called and asked for money to 'get out of jail.'", definition: "Criminal deception for personal gain" },
+  { word: "Breaches", context: "The security team detected several **breaches** in the hospital's computer system, including unauthorized access to patient records from an unknown device.", definition: "Violations or gaps in security" },
+  { word: "Disengage", context: "When the argument on social media became toxic, Maria decided to **disengage** by not replying to any more comments and closing the app.", definition: "Withdraw or separate from a situation" },
+  { word: "Cross-check", context: "Before publishing the news article, the editor called the mayor's office to **cross-check** the quote against the official press release.", definition: "Verify by comparing with another source" },
+  { word: "Reluctance", context: "Despite loving the job offer, his **reluctance** to move to a different country made him finally say no to the position.", definition: "Unwillingness or hesitation" }
+];
+
+// Build distractor sets (plausible but wrong) for each item using fixed map or fallback
+const distractorMap = {
+  "Permit": ["A type of camping equipment", "A safety warning sign"],
+  "Eligible": ["Required to do something by law", "Excluded from a group by default"],
+  "Altered": ["Copied exactly", "Destroyed completely"],
+  "Incomplete": ["Too long and detailed", "Written in a foreign language"],
+  "Compliant": ["Resistant to change", "Cheaply made and low quality"],
+  "Prerequisite": ["An optional enrichment activity", "A final exam at the end of a course"],
+  "Levied": ["Canceled or removed a charge", "Borrowed money from a fund"],
+  "Omission": ["A repeated warning", "An overly strict requirement"],
+  "Administrative oversight": ["A deliberate attempt to exclude someone", "A legal penalty for missing a deadline"],
+  "Disseminated": ["Kept secret and confidential", "Collected from multiple sources"],
+  "Furnish": ["Remove or take away", "Decorate with expensive artwork"],
+  "Fraud": ["A generous gift from a stranger", "An accidental overpayment"],
+  "Breaches": ["Repairs or fixes to something broken", "Routine maintenance checks"],
+  "Disengage": ["Argue more aggressively", "Report the conversation to authorities"],
+  "Cross-check": ["Delete without reading carefully", "Guess based on limited information"],
+  "Reluctance": ["Enthusiasm and eagerness", "Anger and frustration"]
+};
+
+// Build quiz array: each item = { sentenceText, word, correctAnswer, allChoices }
+function buildQuiz() {
+  return vocabularyData.map(item => {
+    let rawSentence = item.context;
+    // remove markdown ** but keep text clean, we'll highlight separately
+    let cleanSentence = rawSentence.replace(/\*\*/g, '');
+    const targetWord = item.word;
+    const correctDef = item.definition;
+    let distractors = distractorMap[targetWord];
+    if (!distractors) distractors = ["Incorrect meaning", "Not the right definition"];
+    const choices = [correctDef, distractors[0], distractors[1]];
+    return {
+      rawSentence: cleanSentence,
+      word: targetWord,
+      correctAnswer: correctDef,
+      allChoices: choices,
+      fullDefinition: correctDef,
+      exampleRaw: rawSentence.replace(/\*\*/g, '')   // for final screen
+    };
+  });
+}
+
+let quizQuestions = buildQuiz();
+let currentQIndex = 0;
+let quizFinished = false;
+let rootEl = document.getElementById("quizRoot");
+
+// Helper: shuffle array (Fisher-Yates)
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Flash effect on answer element - LONGER duration (600ms)
+function flashAnswerElement(el, type) {
+  if (!el) return;
+  if (type === 'correct') {
+    el.classList.add('correct-flash');
+    setTimeout(() => el.classList.remove('correct-flash'), 600);
+  } else if (type === 'wrong') {
+    el.classList.add('wrong-flash');
+    setTimeout(() => el.classList.remove('wrong-flash'), 600);
+  }
+}
+
+// Render current question
+function renderCurrentQuestion() {
+  if (quizFinished || currentQIndex >= quizQuestions.length) {
+    renderFinalScreen();
+    return;
+  }
+
+  const q = quizQuestions[currentQIndex];
+  // Build sentence with bold target word: we insert <strong> around the word occurrence
+  let sentenceText = q.rawSentence;
+  const regex = new RegExp(`\\b(${escapeRegex(q.word)})\\b`, 'gi');
+  sentenceText = sentenceText.replace(regex, (match) => `<strong class="bold-word">${match}</strong>`);
+  
+  const lowerWord = q.word.charAt(0).toLowerCase() + q.word.slice(1);
+  const promptHTML = `<div class="question-prompt">What does <strong class="bold-word">${escapeHtml(lowerWord)}</strong> mean?</div>`;
+  
+  // Shuffle answer choices for this question (random order each time)
+  const shuffledChoices = shuffleArray([...q.allChoices]);
+  
+  // Build answers with A B C labels
+  let answersHTML = `<div class="answers-container" id="answersContainer">`;
+  const prefixLetters = ['A', 'B', 'C'];
+  shuffledChoices.forEach((choice, idx) => {
+    answersHTML += `
+      <div class="answer-option" data-answer="${escapeHtml(choice)}">
+        <span class="answer-prefix">${prefixLetters[idx]}</span>
+        <span class="answer-text">${escapeHtml(choice)}</span>
+      </div>
+    `;
+  });
+  answersHTML += `</div>`;
+  
+  // Footnote moved to the TOP (first thing user sees)
+  const cardHTML = `
+    <div class="quiz-card" id="activeQuizCard">
+      <div class="footnote-top">Choose the correct definition based on the context.</div>
+      <div class="question-sentence">${sentenceText}</div>
+      ${promptHTML}
+      ${answersHTML}
+    </div>
+  `;
+  
+  rootEl.innerHTML = cardHTML;
+  
+  // attach click handlers to each answer option
+  const answerDivs = document.querySelectorAll('.answer-option');
+  answerDivs.forEach(div => {
+    div.addEventListener('click', (e) => {
+      if (quizFinished) return;
+      const selectedAnswer = div.getAttribute('data-answer');
+      const isCorrect = (selectedAnswer === q.correctAnswer);
+      if (isCorrect) {
+        // correct -> flash green, disable temporarily, move to next
+        flashAnswerElement(div, 'correct');
+        // disable all clicks to prevent double advance
+        const allOptions = document.querySelectorAll('.answer-option');
+        allOptions.forEach(opt => opt.style.pointerEvents = 'none');
+        setTimeout(() => {
+          currentQIndex++;
+          if (currentQIndex < quizQuestions.length) {
+            renderCurrentQuestion();
+          } else {
+            quizFinished = true;
+            renderFinalScreen();
+          }
+        }, 650); // slightly longer than flash to feel smooth
+      } else {
+        // wrong: flash red only, stay on same question (longer flash)
+        flashAnswerElement(div, 'wrong');
+        // no further action, user can try another answer
+      }
+    });
+  });
+}
+
+// helper: escape regex special chars
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+    return c;
+  });
+}
+
+// Final screen: full word list + definitions + copy phrase
+function renderFinalScreen() {
+  let glossaryHTML = `<div class="final-screen">
+    <h2>📘 Vocabulary Master List</h2>
+    <div class="glossary-list" id="glossaryList">`;
+  
+  for (let i = 0; i < quizQuestions.length; i++) {
+    const item = quizQuestions[i];
+    const originalExample = vocabularyData.find(v => v.word === item.word)?.context.replace(/\*\*/g, '') || item.exampleRaw;
+    glossaryHTML += `
+      <div class="glossary-card">
+        <div><span class="glossary-word">${escapeHtml(item.word)}</span> 
+        <span class="glossary-def">→ ${escapeHtml(item.fullDefinition)}</span></div>
+        <div class="example-sentence">📖 ${escapeHtml(originalExample)}</div>
+      </div>
+    `;
+  }
+  
+  glossaryHTML += `</div>
+    <div class="button-row">
+      <button class="copy-btn" id="copyFinalBtn">📋 Copy & paste to your file</button>
+      <button class="restart-btn" id="restartQuizBtn">⟳ Restart quiz</button>
+    </div>
+    <div class="copy-notice">
+      Copy and paste to your file because it will help you with your next tasks.
+    </div>
+  </div>`;
+  
+  rootEl.innerHTML = glossaryHTML;
+  
+  const copyBtn = document.getElementById("copyFinalBtn");
+  if (copyBtn) {
+    copyBtn.addEventListener("click", () => {
+      let textOutput = "===== VOCABULARY STUDY LIST =====\n\n";
+      for (let i = 0; i < quizQuestions.length; i++) {
+        const w = quizQuestions[i];
+        const origExample = vocabularyData.find(v => v.word === w.word)?.context.replace(/\*\*/g, '') || w.exampleRaw;
+        textOutput += `${i+1}. ${w.word}\n   Definition: ${w.fullDefinition}\n   Example: ${origExample}\n\n`;
+      }
+      textOutput += "\n💡 Copy and paste to your file because it will help you with your next tasks.\n";
+      navigator.clipboard.writeText(textOutput).then(() => {
+        const originalBtnText = copyBtn.innerText;
+        copyBtn.innerText = "✓ Copied!";
+        setTimeout(() => {
+          if (copyBtn) copyBtn.innerText = originalBtnText;
+        }, 1500);
+      }).catch(() => {
+        alert("Please copy manually (CTRL+C)");
+      });
+    });
+  }
+  
+  const restartBtn = document.getElementById("restartQuizBtn");
+  if (restartBtn) {
+    restartBtn.addEventListener("click", () => {
+      // reset state
+      currentQIndex = 0;
+      quizFinished = false;
+      // reshuffle answer orders per question will happen inside renderCurrentQuestion due to fresh shuffle
+      renderCurrentQuestion();
+    });
+  }
+}
+
+// initial load
+renderCurrentQuestion();
+</script>
+</body>
+</html>
