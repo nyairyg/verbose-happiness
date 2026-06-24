@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ESL: Negative Answers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #faf8f5;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1.5rem;
+            color: #1a1a1a;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            max-width: 780px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .exercise {
+            background: #fefcf9;
+            border: 1px solid #e8e3da;
+            padding: 2.5rem 2rem;
+            position: relative;
+            transition: border-color 0.3s ease;
+        }
+
+        .prompt {
+            background: transparent;
+            text-align: center;
+            padding: 2rem 1rem;
+            border-bottom: 1px solid #e2dcd3;
+            border-top: 1px solid #e2dcd3;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .prompt.completed-prompt::before {
+            content: '✓';
+            position: absolute;
+            top: 0.6rem;
+            right: 0.8rem;
+            font-size: 0.85rem;
+            color: #5a9e6f;
+            font-weight: 600;
+            letter-spacing: 0;
+        }
+
+        .prompt.locked-prompt {
+            opacity: 0.7;
+        }
+
+        .words {
+            font-size: 2.2rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            color: #2c2c2c;
+            word-break: break-word;
+            line-height: 1.3;
+            transition: color 0.2s ease;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            margin: 2rem 0 1.8rem;
+        }
+
+        .question-input {
+            width: 100%;
+            max-width: 560px;
+            padding: 1rem 1.3rem;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1.25rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            color: #2c2c2c;
+            background: #fefcf9;
+            border: 1.5px solid #d6cfc4;
+            outline: none;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .question-input:focus {
+            border-color: #8b8276;
+            box-shadow: 0 0 0 3px rgba(139, 130, 118, 0.08);
+        }
+
+        .question-input.correct-input {
+            border-color: #5a9e6f;
+            background: #f7faf8;
+            color: #2c6e2f;
+        }
+
+        .question-input.wrong-input {
+            border-color: #c75b4a;
+            background: #fdf7f6;
+            animation: shakeInput 0.4s ease;
+        }
+
+        .question-input::placeholder {
+            color: #b8b0a4;
+            font-weight: 300;
+            font-size: 1.05rem;
+        }
+
+        @keyframes shakeInput {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            15% {
+                transform: translateX(-6px);
+            }
+            30% {
+                transform: translateX(6px);
+            }
+            45% {
+                transform: translateX(-5px);
+            }
+            60% {
+                transform: translateX(5px);
+            }
+            75% {
+                transform: translateX(-2px);
+            }
+            90% {
+                transform: translateX(2px);
+            }
+        }
+
+        .action-btn {
+            background: #1a1a1a;
+            border: none;
+            padding: 0.9rem 2.4rem;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: #faf8f5;
+            letter-spacing: 0.2px;
+            min-width: 140px;
+            border-radius: 0;
+            box-shadow: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .action-btn:hover {
+            background: #2e2e2e;
+        }
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+        .action-btn.btn-correct {
+            background: #3d6b47;
+            color: #f5faf6;
+        }
+        .action-btn.btn-correct:hover {
+            background: #4a7d55;
+        }
+        .action-btn.btn-wrong {
+            background: #8b3d32;
+            color: #fdf5f4;
+        }
+        .action-btn.btn-wrong:hover {
+            background: #9e473a;
+        }
+        .action-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .result {
+            text-align: center;
+            padding: 1rem 0.5rem;
+            margin: 1.2rem 0;
+            font-size: 1rem;
+            font-weight: 400;
+            color: #5a5a5a;
+            min-height: 80px;
+            border-top: 1px solid #ece6df;
+            transition: all 0.25s ease;
+        }
+
+        .result-correct {
+            color: #2c6e2f;
+            font-weight: 500;
+        }
+
+        .result-wrong {
+            color: #b33b2c;
+        }
+
+        .hint-text {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            font-style: italic;
+            margin-top: 0.35rem;
+            display: block;
+            letter-spacing: 0.2px;
+            color: #8b6f5e;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.8rem;
+            font-size: 0.85rem;
+            color: #7e7a72;
+            letter-spacing: 0.3px;
+            font-weight: 450;
+        }
+
+        .counter {
+            font-weight: 600;
+            color: #2c2c2c;
+        }
+
+        .completed-count {
+            font-weight: 500;
+            color: #5a9e6f;
+            font-size: 0.82rem;
+        }
+
+        .progress-bar-wrap {
+            width: 100%;
+            height: 3px;
+            background: #e8e3da;
+            margin-top: 0.6rem;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #5a9e6f;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: none;
+            border: 1px solid #d6cfc4;
+            padding: 0.6rem 1.6rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.1s linear;
+            color: #2c2c2c;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .nav-btn:hover {
+            background: #eee9e2;
+            border-color: #bfb6a8;
+        }
+        .nav-btn:active {
+            transform: translateY(1px);
+        }
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+            border-color: #e0dbd2;
+            color: #b0aaa0;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #cbc3b7;
+            margin-right: 8px;
+            vertical-align: middle;
+            transition: background 0.3s ease;
+        }
+        .status-dot.dot-correct {
+            background: #5a9e6f;
+        }
+        .status-dot.dot-wrong {
+            background: #c75b4a;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #e8e2d9;
+            margin: 0.6rem 0;
+        }
+
+        /* Congratulatory overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 26, 26, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 2rem;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .overlay-card {
+            background: #fefcf9;
+            border: 1px solid #e8e3da;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15);
+            animation: cardAppear 0.5s ease;
+        }
+
+        @keyframes cardAppear {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .overlay-emoji {
+            font-size: 3.5rem;
+            display: block;
+            margin-bottom: 1.2rem;
+            animation: bounceEmoji 0.8s ease infinite alternate;
+        }
+
+        @keyframes bounceEmoji {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-14px);
+            }
+        }
+
+        .overlay-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #2c2c2c;
+            margin-bottom: 0.6rem;
+        }
+
+        .overlay-subtitle {
+            font-size: 1rem;
+            color: #5a5a5a;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .overlay-btn {
+            background: #1a1a1a;
+            border: none;
+            padding: 0.85rem 2.2rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #faf8f5;
+            letter-spacing: 0.2px;
+            transition: all 0.15s ease;
+        }
+        .overlay-btn:hover {
+            background: #2e2e2e;
+        }
+        .overlay-btn:active {
+            transform: scale(0.96);
+        }
+
+        .keyboard-hint {
+            display: inline-block;
+            background: #f0ede7;
+            border: 1px solid #d6cfc4;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.7rem;
+            color: #7e7a72;
+            margin-left: 0.4rem;
+            letter-spacing: 0.3px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 550px) {
+            .exercise {
+                padding: 1.5rem;
+            }
+            .words {
+                font-size: 1.6rem;
+            }
+            .question-input {
+                font-size: 1.1rem;
+                padding: 0.85rem 1rem;
+            }
+            .action-btn {
+                padding: 0.8rem 1.8rem;
+                font-size: 0.95rem;
+                min-width: 120px;
+            }
+            .overlay-card {
+                padding: 2rem 1.5rem;
+            }
+            .overlay-title {
+                font-size: 1.4rem;
+            }
+            .nav-buttons {
+                gap: 0.6rem;
+            }
+            .nav-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.82rem;
+            }
+            .keyboard-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="exercise" id="exerciseCard">
+            <div class="prompt" id="promptArea">
+                <div class="words" id="promptWords">(you / a student)</div>
+            </div>
+
+            <div class="input-area">
+                <input
+                type="text"
+                class="question-input"
+                id="questionInput"
+                placeholder="type your negative answer here…"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                >
+                <button class="action-btn" id="actionBtn">check →</button>
+            </div>
+
+            <div class="result" id="resultArea">
+                <span class="status-dot"></span> type your answer and press Enter
+            </div>
+
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progressBarFill"></div>
+            </div>
+
+            <div class="progress">
+                <span class="counter" id="promptCounter">Prompt 1 / 50</span>
+                <span class="completed-count" id="completedCount">✓ 0 done</span>
+            </div>
+            <div class="nav-buttons">
+                <button class="nav-btn" id="prevBtn">← previous</button>
+                <button class="nav-btn" id="nextBtn">next → </button>
+            </div>
+            <hr />
+        </div>
+    </div>
+
+    <!-- Congratulatory overlay -->
+    <div class="overlay" id="congratsOverlay">
+        <div class="overlay-card">
+            <span class="overlay-emoji">🌟</span>
+            <div class="overlay-title">Wonderful work!</div>
+            <div class="overlay-subtitle">You've completed all <strong>50</strong> negative answers.<br>Your grammar skills are strong!</div>
+            <button class="overlay-btn" id="overlayCloseBtn">review answers</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ──────────────────────────────────────
+            // PROMPT DATA — 50 absurd questions, NEGATIVE ANSWERS ONLY (SHUFFLED)
+            // ──────────────────────────────────────
+            const rawPrompts = [
+                // Present Simple
+                { chunks: "Do you brush your teeth with a hammer?", correct: "I do not brush my teeth with a hammer", cat: "action" },
+                { chunks: "Do you wear your trousers on your head?", correct: "I do not wear my trousers on my head", cat: "action" },
+                { chunks: "Do you drink milk from a shoe?", correct: "I do not drink milk from a shoe", cat: "action" },
+                { chunks: "Do you sleep under your bed?", correct: "I do not sleep under my bed", cat: "action" },
+                { chunks: "Do you eat soup with a fork?", correct: "I do not eat soup with a fork", cat: "action" },
+                { chunks: "Do you wash your hair with ketchup?", correct: "I do not wash my hair with ketchup", cat: "action" },
+                { chunks: "Do you talk to your cat in Russian?", correct: "I do not talk to my cat in Russian", cat: "action" },
+                { chunks: "Do you wear sunglasses at night?", correct: "I do not wear sunglasses at night", cat: "action" },
+                { chunks: "Do you put sugar on your pizza?", correct: "I do not put sugar on my pizza", cat: "action" },
+                { chunks: "Do you take a shower in your clothes?", correct: "I do not take a shower in my clothes", cat: "action" },
+
+                // Past Simple
+                { chunks: "Did you swim in the sky last summer?", correct: "I did not swim in the sky last summer", cat: "action" },
+                { chunks: "Did you eat your homework yesterday?", correct: "I did not eat my homework yesterday", cat: "action" },
+                { chunks: "Did you paint your dog green?", correct: "I did not paint my dog green", cat: "action" },
+                { chunks: "Did you fly to school on a broom?", correct: "I did not fly to school on a broom", cat: "action" },
+                { chunks: "Did you drink tea from a flower pot?", correct: "I did not drink tea from a flower pot", cat: "action" },
+                { chunks: "Did you wear two left shoes yesterday?", correct: "I did not wear two left shoes yesterday", cat: "action" },
+                { chunks: "Did you cook eggs in the microwave with the shell?", correct: "I did not cook eggs in the microwave with the shell", cat: "action" },
+                { chunks: "Did you ride a dinosaur to work?", correct: "I did not ride a dinosaur to work", cat: "action" },
+                { chunks: "Did you read a book upside down?", correct: "I did not read a book upside down", cat: "action" },
+                { chunks: "Did you brush your hair with a toothbrush?", correct: "I did not brush my hair with a toothbrush", cat: "action" },
+
+                // Present Perfect
+                { chunks: "Have you ever eaten a stone?", correct: "I have not ever eaten a stone", cat: "action" },
+                { chunks: "Have you ever slept in a fridge?", correct: "I have not ever slept in a fridge", cat: "action" },
+                { chunks: "Have you ever talked to a lamp?", correct: "I have not ever talked to a lamp", cat: "action" },
+                { chunks: "Have you ever worn a bucket on your head?", correct: "I have not ever worn a bucket on my head", cat: "action" },
+                { chunks: "Have you ever swum in a pool of chocolate?", correct: "I have not ever swum in a pool of chocolate", cat: "action" },
+                { chunks: "Have you ever kissed a fish?", correct: "I have not ever kissed a fish", cat: "action" },
+                { chunks: "Have you ever driven a spaceship?", correct: "I have not ever driven a spaceship", cat: "action" },
+                { chunks: "Have you ever eaten grass from the garden?", correct: "I have not ever eaten grass from the garden", cat: "action" },
+                { chunks: "Have you ever worn socks on your ears?", correct: "I have not ever worn socks on my ears", cat: "action" },
+                { chunks: "Have you ever married a cactus?", correct: "I have not ever married a cactus", cat: "action" },
+
+                // Future Simple
+                { chunks: "Will you eat your shoe tomorrow?", correct: "I will not eat my shoe tomorrow", cat: "action" },
+                { chunks: "Will you sleep in the bath tonight?", correct: "I will not sleep in the bath tonight", cat: "action" },
+                { chunks: "Will you wear a pineapple as a hat?", correct: "I will not wear a pineapple as a hat", cat: "action" },
+                { chunks: "Will you drink coffee with a spoon?", correct: "I will not drink coffee with a spoon", cat: "action" },
+                { chunks: "Will you talk to your fridge tomorrow?", correct: "I will not talk to my fridge tomorrow", cat: "action" },
+                { chunks: "Will you paint your face blue next week?", correct: "I will not paint my face blue next week", cat: "action" },
+                { chunks: "Will you go to school on a donkey?", correct: "I will not go to school on a donkey", cat: "action" },
+                { chunks: "Will you cook your phone for dinner?", correct: "I will not cook my phone for dinner", cat: "action" },
+                { chunks: "Will you wear pyjamas to the office?", correct: "I will not wear pyjamas to the office", cat: "action" },
+                { chunks: "Will you wash your feet in the sink?", correct: "I will not wash my feet in the sink", cat: "action" },
+
+                // Present Continuous
+                { chunks: "Are you flying on a carpet right now?", correct: "I am not flying on a carpet right now", cat: "be" },
+                { chunks: "Are you wearing a saucepan on your head?", correct: "I am not wearing a saucepan on my head", cat: "be" },
+                { chunks: "Are you eating paper at the moment?", correct: "I am not eating paper at the moment", cat: "be" },
+                { chunks: "Are you singing to your chair?", correct: "I am not singing to my chair", cat: "be" },
+                { chunks: "Are you brushing your teeth with a stick?", correct: "I am not brushing my teeth with a stick", cat: "be" },
+                { chunks: "Are you standing on one finger now?", correct: "I am not standing on one finger now", cat: "be" },
+                { chunks: "Are you hugging your TV?", correct: "I am not hugging my TV", cat: "be" },
+                { chunks: "Are you dancing with a broom?", correct: "I am not dancing with a broom", cat: "be" },
+                { chunks: "Are you drinking juice through your nose?", correct: "I am not drinking juice through my nose", cat: "be" },
+                { chunks: "Are you reading this upside down?", correct: "I am not reading this upside down", cat: "be" },
+            ];
+
+            // Shuffle function (Fisher-Yates)
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
+            const prompts = shuffleArray(rawPrompts);
+
+            const totalPrompts = prompts.length;
+            let currentIdx = 0;
+            let completed = new Array(totalPrompts).fill(false);
+            let currentFeedbackState = 'neutral'; // 'neutral' | 'correct' | 'wrong'
+
+            // ──────────────────────────────────────
+            // DOM ELEMENTS
+            // ──────────────────────────────────────
+            const promptWordsSpan = document.getElementById('promptWords');
+            const promptArea = document.getElementById('promptArea');
+            const questionInput = document.getElementById('questionInput');
+            const actionBtn = document.getElementById('actionBtn');
+            const resultArea = document.getElementById('resultArea');
+            const promptCounter = document.getElementById('promptCounter');
+            const completedCountSpan = document.getElementById('completedCount');
+            const progressBarFill = document.getElementById('progressBarFill');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const congratsOverlay = document.getElementById('congratsOverlay');
+            const overlayCloseBtn = document.getElementById('overlayCloseBtn');
+            const exerciseCard = document.getElementById('exerciseCard');
+
+            // ──────────────────────────────────────
+            // HINT POOLS
+            // ──────────────────────────────────────
+            const hintsBe = [
+                "Check the word order — use 'am not' or 'are not'?",
+                "Hmm, think about the correct form of 'to be' for 'I'.",
+                "The verb needs to match the subject 'I'.",
+                "Remember: 'I am not' for present continuous.",
+                "Something's off with the structure. Try again.",
+            ];
+
+            const hintsAction = [
+                "Use 'do not' or 'did not' or 'will not' or 'have not' — which tense?",
+                "Check the auxiliary verb for the tense.",
+                "Think about which helping verb fits here.",
+                "The word order might need a small adjustment.",
+                "Remember the pattern: subject + auxiliary + not + verb.",
+            ];
+
+            const hintsGeneric = [
+                "Not quite. Try rearranging a few words.",
+                "Something's missing or out of place. Take another look.",
+                "Read it aloud — does it sound like a natural negative answer?",
+                "Almost there, but the structure needs a tweak.",
+                "Hmm, that doesn't sound like a proper negative sentence yet.",
+            ];
+
+            function getHintForCategory(cat) {
+                let pool;
+                if (cat === 'be') pool = hintsBe;
+                else if (cat === 'action') pool = hintsAction;
+                else pool = hintsGeneric;
+                if (Math.random() < 0.35) pool = hintsGeneric;
+                return pool[Math.floor(Math.random() * pool.length)];
+            }
+
+            // ──────────────────────────────────────
+            // NORMALIZATION & COMPARISON
+            // ──────────────────────────────────────
+            function expandContractions(str) {
+                const contractions = [
+                    { pattern: /\bwhat's\b/g, replacement: 'what is' },
+                    { pattern: /\bwhere's\b/g, replacement: 'where is' },
+                    { pattern: /\bwhy's\b/g, replacement: 'why is' },
+                    { pattern: /\bhow's\b/g, replacement: 'how is' },
+                    { pattern: /\bwho's\b/g, replacement: 'who is' },
+                    { pattern: /\bwhen's\b/g, replacement: 'when is' },
+                    { pattern: /\bthat's\b/g, replacement: 'that is' },
+                    { pattern: /\bit's\b/g, replacement: 'it is' },
+                    { pattern: /\bhe's\b/g, replacement: 'he is' },
+                    { pattern: /\bshe's\b/g, replacement: 'she is' },
+                    { pattern: /\byou're\b/g, replacement: 'you are' },
+                    { pattern: /\bwe're\b/g, replacement: 'we are' },
+                    { pattern: /\bthey're\b/g, replacement: 'they are' },
+                    { pattern: /\bi'm\b/g, replacement: 'i am' },
+                    { pattern: /\baren't\b/g, replacement: 'are not' },
+                    { pattern: /\bisn't\b/g, replacement: 'is not' },
+                    { pattern: /\bdon't\b/g, replacement: 'do not' },
+                    { pattern: /\bdoesn't\b/g, replacement: 'does not' },
+                    { pattern: /\bdidn't\b/g, replacement: 'did not' },
+                    { pattern: /\bhaven't\b/g, replacement: 'have not' },
+                    { pattern: /\bhasn't\b/g, replacement: 'has not' },
+                    { pattern: /\bwon't\b/g, replacement: 'will not' },
+                    { pattern: /\bcan't\b/g, replacement: 'can not' },
+                ];
+                let result = str;
+                for (const c of contractions) {
+                    result = result.replace(c.pattern, c.replacement);
+                }
+                return result;
+            }
+
+            function normalizeForCompare(str) {
+                let s = str.toLowerCase().trim();
+                s = expandContractions(s);
+                s = s.replace(/[^\w\s]/g, '');
+                s = s.replace(/\s+/g, ' ').trim();
+                return s;
+            }
+
+            function isAnswerCorrect(userRaw, correctRaw) {
+                const userNorm = normalizeForCompare(userRaw);
+                const correctNorm = normalizeForCompare(correctRaw);
+
+                if (userNorm === correctNorm) return true;
+
+                const correctNormSimple = correctRaw.toLowerCase().trim().replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+                if (userNorm === correctNormSimple) return true;
+
+                const userWords = userNorm.split(/\s+/);
+                const correctWords = correctNorm.split(/\s+/);
+
+                if (Math.abs(userWords.length - correctWords.length) > 2) return false;
+
+                const firstCorrect = correctWords[0];
+                const firstUser = userWords[0];
+                const subjectCorrect = correctWords[1] || '';
+                const subjectUser = userWords[1] || '';
+
+                if (firstCorrect === 'i' && firstUser !== 'i') return false;
+                if (subjectCorrect === 'am' && subjectUser !== 'am' && subjectUser !== 'i') return false;
+                if (firstCorrect === 'i' && correctWords[1] === 'am' && userWords[1] !== 'am') return false;
+
+                let matchCount = 0;
+                const correctSet = [...correctWords];
+                const userSet = [...userWords];
+                for (const cw of correctSet) {
+                    const idx = userSet.indexOf(cw);
+                    if (idx !== -1) {
+                        matchCount++;
+                        userSet.splice(idx, 1);
+                    }
+                }
+                const ratio = matchCount / correctWords.length;
+                return ratio >= 0.80;
+            }
+
+            // ──────────────────────────────────────
+            // UI STATE MANAGEMENT
+            // ──────────────────────────────────────
+            function updateProgressUI() {
+                const doneCount = completed.filter(Boolean).length;
+                completedCountSpan.textContent = '✓ ' + doneCount + ' done';
+                promptCounter.textContent = 'Prompt ' + (currentIdx + 1) + ' / ' + totalPrompts;
+                const pct = Math.round((doneCount / totalPrompts) * 100);
+                progressBarFill.style.width = pct + '%';
+
+                if (completed[currentIdx]) {
+                    promptArea.classList.add('completed-prompt');
+                } else {
+                    promptArea.classList.remove('completed-prompt');
+                }
+            }
+
+            function updateNavigationButtons() {
+                const isCorrect = currentFeedbackState === 'correct';
+                const nextIdx = (currentIdx + 1) % totalPrompts;
+                const nextIsCompleted = completed[nextIdx];
+
+                prevBtn.disabled = false;
+                nextBtn.disabled = !(isCorrect || nextIsCompleted);
+
+                if (!(isCorrect || nextIsCompleted)) {
+                    nextBtn.style.opacity = '0.4';
+                    nextBtn.style.cursor = 'not-allowed';
+                    nextBtn.title = 'answer correctly to proceed';
+                } else {
+                    nextBtn.style.opacity = '1';
+                    nextBtn.style.cursor = 'pointer';
+                    nextBtn.title = 'go to next question';
+                }
+            }
+
+            function resetToNeutral() {
+                currentFeedbackState = 'neutral';
+                questionInput.classList.remove('correct-input', 'wrong-input');
+                actionBtn.classList.remove('btn-correct', 'btn-wrong');
+                actionBtn.textContent = 'check →';
+                actionBtn.disabled = false;
+                resultArea.innerHTML = '<span class="status-dot"></span> type your negative answer';
+                resultArea.classList.remove('result-correct', 'result-wrong');
+                const dot = resultArea.querySelector('.status-dot');
+                if (dot) { dot.classList.remove('dot-correct', 'dot-wrong'); }
+                updateNavigationButtons();
+            }
+
+            function showCorrectFeedback(spokenText) {
+                currentFeedbackState = 'correct';
+                questionInput.classList.add('correct-input');
+                questionInput.classList.remove('wrong-input');
+                actionBtn.classList.add('btn-correct');
+                actionBtn.classList.remove('btn-wrong');
+                actionBtn.textContent = 'next →';
+                actionBtn.disabled = false;
+                const display = spokenText.length > 60 ? spokenText.substring(0, 57) + '…' : spokenText;
+                resultArea.innerHTML =
+                    '<span class="status-dot dot-correct"></span> ✓ <strong>"' + escapeHTML(display) +
+                    '"</strong> — perfect negative answer!';
+                resultArea.classList.add('result-correct');
+                resultArea.classList.remove('result-wrong');
+                updateNavigationButtons();
+                questionInput.focus();
+            }
+
+            function showWrongFeedback(spokenText, hint) {
+                currentFeedbackState = 'wrong';
+                questionInput.classList.add('wrong-input');
+                questionInput.classList.remove('correct-input');
+                actionBtn.classList.add('btn-wrong');
+                actionBtn.classList.remove('btn-correct');
+                actionBtn.textContent = 'try again ↻';
+                actionBtn.disabled = false;
+                const display = spokenText.length > 60 ? spokenText.substring(0, 57) + '…' : spokenText;
+                resultArea.innerHTML = '<span class="status-dot dot-wrong"></span> ✗ <strong>"' + escapeHTML(
+                    display) + '"</strong>' +
+                    '<span class="hint-text">' + escapeHTML(hint) + '</span>';
+                resultArea.classList.add('result-wrong');
+                resultArea.classList.remove('result-correct');
+                updateNavigationButtons();
+                questionInput.select();
+                questionInput.focus();
+            }
+
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ──────────────────────────────────────
+            // LOAD PROMPT
+            // ──────────────────────────────────────
+            function loadPrompt() {
+                const prompt = prompts[currentIdx];
+                promptWordsSpan.textContent = prompt.chunks;
+                questionInput.value = '';
+
+                if (completed[currentIdx]) {
+                    currentFeedbackState = 'correct';
+                    questionInput.classList.add('correct-input');
+                    questionInput.classList.remove('wrong-input');
+                    actionBtn.classList.add('btn-correct');
+                    actionBtn.classList.remove('btn-wrong');
+                    actionBtn.textContent = 'next →';
+                    actionBtn.disabled = false;
+                    resultArea.innerHTML =
+                        '<span class="status-dot dot-correct"></span> ✓ you\'ve already completed this one — practice again or move on';
+                    resultArea.classList.add('result-correct');
+                    resultArea.classList.remove('result-wrong');
+                    updateNavigationButtons();
+                } else {
+                    resetToNeutral();
+                }
+
+                questionInput.focus();
+                updateProgressUI();
+            }
+
+            // ──────────────────────────────────────
+            // CHECK ANSWER
+            // ──────────────────────────────────────
+            function checkAnswer() {
+                const userAnswer = questionInput.value.trim();
+                if (userAnswer === '') {
+                    resultArea.innerHTML =
+                        '<span class="status-dot dot-wrong"></span> please type your negative answer first';
+                    resultArea.classList.add('result-wrong');
+                    resultArea.classList.remove('result-correct');
+                    questionInput.classList.add('wrong-input');
+                    setTimeout(() => {
+                        questionInput.classList.remove('wrong-input');
+                        if (currentFeedbackState === 'neutral') {
+                            resultArea.classList.remove('result-wrong');
+                            resultArea.innerHTML =
+                                '<span class="status-dot"></span> type your negative answer and press Enter';
+                        }
+                    }, 900);
+                    questionInput.focus();
+                    return;
+                }
+
+                const currentPrompt = prompts[currentIdx];
+                const isCorrect = isAnswerCorrect(userAnswer, currentPrompt.correct);
+
+                if (isCorrect) {
+                    showCorrectFeedback(userAnswer);
+                    if (!completed[currentIdx]) {
+                        completed[currentIdx] = true;
+                        updateProgressUI();
+                        const allDone = completed.every(Boolean);
+                        if (allDone) {
+                            setTimeout(() => {
+                                congratsOverlay.classList.add('active');
+                            }, 700);
+                        }
+                    } else {
+                        updateProgressUI();
+                    }
+                } else {
+                    const hint = getHintForCategory(currentPrompt.cat);
+                    showWrongFeedback(userAnswer, hint);
+                }
+            }
+
+            // ──────────────────────────────────────
+            // NAVIGATION
+            // ──────────────────────────────────────
+            function goNext() {
+                const nextIdx = (currentIdx + 1) % totalPrompts;
+                const nextIsCompleted = completed[nextIdx];
+
+                if (currentFeedbackState !== 'correct' && !nextIsCompleted) {
+                    questionInput.classList.add('wrong-input');
+                    setTimeout(() => questionInput.classList.remove('wrong-input'), 500);
+                    resultArea.innerHTML =
+                        '<span class="status-dot dot-wrong"></span> you need to answer correctly before moving on';
+                    resultArea.classList.add('result-wrong');
+                    setTimeout(() => {
+                        if (currentFeedbackState === 'neutral') {
+                            resultArea.classList.remove('result-wrong');
+                            resultArea.innerHTML =
+                                '<span class="status-dot"></span> type your negative answer and press Enter';
+                        }
+                    }, 1500);
+                    questionInput.focus();
+                    return;
+                }
+
+                currentIdx = nextIdx;
+                loadPrompt();
+            }
+
+            function goPrev() {
+                currentIdx = (currentIdx - 1 + totalPrompts) % totalPrompts;
+                loadPrompt();
+            }
+
+            // ──────────────────────────────────────
+            // ACTION BUTTON HANDLER
+            // ──────────────────────────────────────
+            function handleActionBtn() {
+                if (currentFeedbackState === 'correct') {
+                    goNext();
+                } else if (currentFeedbackState === 'wrong') {
+                    checkAnswer();
+                } else {
+                    checkAnswer();
+                }
+            }
+
+            // ──────────────────────────────────────
+            // EVENT LISTENERS
+            // ──────────────────────────────────────
+            actionBtn.addEventListener('click', handleActionBtn);
+
+            questionInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (currentFeedbackState === 'correct') {
+                        goNext();
+                    } else {
+                        checkAnswer();
+                    }
+                }
+            });
+
+            questionInput.addEventListener('input', function() {
+                if (currentFeedbackState === 'wrong') {
+                    // keep state
+                }
+                if (currentFeedbackState === 'correct') {
+                    resetToNeutral();
+                    questionInput.focus();
+                }
+            });
+
+            prevBtn.addEventListener('click', goPrev);
+            nextBtn.addEventListener('click', goNext);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft' && e.ctrlKey) {
+                    e.preventDefault();
+                    goPrev();
+                }
+                if (e.key === 'ArrowRight' && e.ctrlKey) {
+                    e.preventDefault();
+                    const nextIdx = (currentIdx + 1) % totalPrompts;
+                    if (currentFeedbackState === 'correct' || completed[nextIdx]) {
+                        goNext();
+                    } else {
+                        questionInput.focus();
+                    }
+                }
+            });
+
+            overlayCloseBtn.addEventListener('click', function() {
+                congratsOverlay.classList.remove('active');
+                loadPrompt();
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && congratsOverlay.classList.contains('active')) {
+                    congratsOverlay.classList.remove('active');
+                    loadPrompt();
+                }
+            });
+
+            congratsOverlay.addEventListener('click', function(e) {
+                if (e.target === congratsOverlay) {
+                    congratsOverlay.classList.remove('active');
+                    loadPrompt();
+                }
+            });
+
+            // ──────────────────────────────────────
+            // INITIAL LOAD
+            // ──────────────────────────────────────
+            loadPrompt();
+            updateProgressUI();
+
+            console.log('🔍 Negative Answers Practice — type your full negative answer. Press Enter to check, Enter again to go next. Good luck!');
+        })();
+    </script>
+</body>
+</html>
