@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Music Theory: Fill-in-the-Blanks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: #fbf9f8;
+            color: #2c3e2f;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-image: radial-gradient(#d4e0d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 1000px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3c5e3a;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #5a6e55;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .text-container {
+            flex: 2;
+            min-width: 320px;
+            background-color: #fefcf9;
+            border-radius: 20px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #dde6da;
+        }
+        
+        .text-header {
+            background-color: #6f9e6d;
+            color: white;
+            padding: 20px 28px;
+        }
+        
+        .text-header h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+        
+        .text-content {
+            padding: 32px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            color: #1e2a1e;
+        }
+        
+        .question {
+            margin-bottom: 28px;
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .question-number {
+            font-weight: 700;
+            color: #4c6e49;
+            min-width: 32px;
+            line-height: 1.5;
+            font-size: 1.05rem;
+        }
+        
+        .question-text {
+            flex: 1;
+            min-width: 220px;
+            line-height: 1.5;
+        }
+        
+        .drop-zone {
+            display: inline-block;
+            background-color: #f2f6ef;
+            border: 2px dashed #b9cfb1;
+            border-radius: 12px;
+            height: 40px;
+            margin: 0 4px;
+            padding: 0 10px;
+            transition: all 0.2s;
+            vertical-align: middle;
+            position: relative;
+            min-width: 130px;
+            background-clip: padding-box;
+        }
+        
+        .drop-zone.highlight {
+            background-color: #e3f0de;
+            border-color: #3f7e3a;
+            border-style: solid;
+        }
+        
+        .drop-zone.empty::after {
+            content: "__________";
+            color: #9bb192;
+            font-size: 0.85rem;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            pointer-events: none;
+            letter-spacing: 2px;
+        }
+        
+        .dropped-item {
+            display: inline-block;
+            background-color: #7dab79;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 24px;
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            user-select: none;
+            border: 1px solid #628f5e;
+            line-height: 1.3;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        
+        .dropped-item:hover {
+            background-color: #528f4e;
+            transform: scale(1.02);
+        }
+        
+        .dropped-item.correct {
+            background-color: #2b7a3e;
+            border-color: #1d632f;
+        }
+        
+        .dropped-item.incorrect {
+            background-color: #bc6f6f;
+            border-color: #a15353;
+        }
+        
+        .phrase-bank {
+            flex: 1;
+            min-width: 260px;
+            background-color: #fefcf9;
+            border-radius: 20px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #dfe9db;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .phrase-header {
+            background-color: #c5a572;
+            color: white;
+            padding: 20px 25px;
+        }
+        
+        .phrase-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .phrase-content {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .drag-item {
+            background-color: #fffcf7;
+            border: 2px solid #d4bb91;
+            border-radius: 40px;
+            padding: 8px 14px;
+            margin-bottom: 10px;
+            cursor: grab;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 600;
+            color: #4a3b2c;
+            user-select: none;
+            line-height: 1.3;
+            font-size: 0.95rem;
+        }
+        
+        .drag-item:hover {
+            background-color: #f5ede1;
+            border-color: #8faa7a;
+            transform: translateX(4px);
+        }
+        
+        .drag-item.dragging {
+            opacity: 0.4;
+            cursor: grabbing;
+        }
+        
+        .drag-item.used {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background-color: #ece2d6;
+            border-style: dashed;
+            text-decoration: line-through;
+        }
+        
+        .feedback {
+            margin-top: 25px;
+            padding: 18px;
+            background-color: #f5f7f2;
+            border-radius: 16px;
+            border-left: 5px solid #7dab79;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        
+        .btn-check {
+            background-color: #518e4c;
+            color: white;
+        }
+        
+        .btn-check:hover {
+            background-color: #3c6f37;
+        }
+        
+        .btn-reset {
+            background-color: #b5675b;
+            color: white;
+        }
+        
+        .btn-reset:hover {
+            background-color: #9a4c40;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 20px;
+            display: none;
+            font-weight: 500;
+        }
+        
+        .result.correct {
+            background-color: #e2f3e0;
+            border-left: 6px solid #2b7a3e;
+            color: #1f542c;
+        }
+        
+        .result.incorrect {
+            background-color: #ffe6e3;
+            border-left: 6px solid #bc6f6f;
+            color: #a14242;
+        }
+        
+        .instructions {
+            background-color: #f9f5ef;
+            padding: 12px 15px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c5a572;
+        }
+        
+        .counter {
+            background-color: #f0ebe3;
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            color: #5f4e3a;
+            margin-top: 18px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        
+        .phrase-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 750px) {
+            .container {
+                flex-direction: column;
+            }
+            .drop-zone {
+                min-width: 110px;
+            }
+            .text-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 Fill in the Blanks: Music Vocabulary</h1>
+        <p>Drag the correct term from the word bank into each blank space. Each word can be used only once.</p>
+    </div>
+    
+    <div class="container">
+        <div class="text-container">
+            <div class="text-header">
+                <h2>📖 Definitions & Sentences</h2>
+            </div>
+            <div class="text-content">
+                <div class="question">
+                    <span class="question-number">1.</span>
+                    <span class="question-text">A/an <span class="drop-zone empty" data-correct="interval" data-id="1"></span> is best described as the distance between two notes.</span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">2.</span>
+                    <span class="question-text">A minor or perfect interval made smaller by a semitone becomes <span class="drop-zone empty" data-correct="diminished" data-id="2"></span>.</span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">3.</span>
+                    <span class="question-text">When we turn the notes of a chord or an interval upside down (usually by raising the lowest note up an octave), the chord or interval so produced is called a/an <span class="drop-zone empty" data-correct="inversion" data-id="3"></span>.</span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">4.</span>
+                    <span class="question-text">The <span class="drop-zone empty" data-correct="augmented" data-id="4"></span> interval is a semitone greater than the corresponding major or perfect interval.</span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">5.</span>
+                    <span class="question-text">There are many ways to <span class="drop-zone empty" data-correct="describe" data-id="5"></span> musical notes, including letters, numbers, tablature, and of course the standard music staves.</span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">6.</span>
+                    <span class="question-text">The <span class="drop-zone empty" data-correct="perfect" data-id="6"></span> interval belongs to the group comprising the fourth, the fifth, and the octave.</span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">7.</span>
+                    <span class="question-text">A/an <span class="drop-zone empty" data-correct="minor" data-id="7"></span> interval is a semitone smaller than the correlative major interval.</span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">8.</span>
+                    <span class="question-text">They offer <span class="drop-zone empty" data-correct="quality" data-id="8"></span> at a reasonable price.</span>
+                </div>
+                
+                <div class="question">
+                    <span class="question-number">9.</span>
+                    <span class="question-text">An interval of three whole steps is called a/an <span class="drop-zone empty" data-correct="tritone" data-id="9"></span>.</span>
+                </div>
+                
+                <div class="feedback">
+                    <h3><i class="fas fa-lightbulb"></i> How it works</h3>
+                    <p>Drag each term from the right column into the blank spaces. Click on any filled answer to remove it and return it to the term bank. Press "Check Answers" to see your score.</p>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn btn-check" onclick="checkAnswers()"><i class="fas fa-check-circle"></i> Check Answers</button>
+                    <button class="btn btn-reset" onclick="resetExercise()"><i class="fas fa-undo-alt"></i> Reset All</button>
+                </div>
+                
+                <div class="result" id="result"></div>
+                
+                <div class="counter">
+                    <i class="fas fa-puzzle-piece"></i> Terms placed: <span id="counter">0</span> / 9
+                </div>
+            </div>
+        </div>
+        
+        <div class="phrase-bank">
+            <div class="phrase-header">
+                <h2>📚 Word Bank</h2>
+            </div>
+            <div class="phrase-content">
+                <div class="instructions">
+                    <h3><i class="fas fa-arrows-alt"></i> Drag these terms</h3>
+                </div>
+                
+                <div class="phrase-grid" id="phrase-container"></div>
+                
+                <div class="counter">
+                    📋 Terms remaining: <span id="remaining">9</span> / 9
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+    <script>
+        const correctAnswers = {
+            1: "interval",
+            2: "diminished",
+            3: "inversion",
+            4: "augmented",
+            5: "describe",
+            6: "perfect",
+            7: "minor",
+            8: "quality",
+            9: "tritone"
+        };
+        
+        const allPhrases = [
+            { id: 1, text: "interval" },
+            { id: 2, text: "diminished" },
+            { id: 3, text: "inversion" },
+            { id: 4, text: "augmented" },
+            { id: 5, text: "describe" },
+            { id: 6, text: "perfect" },
+            { id: 7, text: "minor" },
+            { id: 8, text: "quality" },
+            { id: 9, text: "tritone" }
+        ];
+        
+        let usedPhrases = new Set();
+        let placedCount = 0;
+        
+        function updateCounters() {
+            document.getElementById('counter').textContent = placedCount;
+            document.getElementById('remaining').textContent = 9 - placedCount;
+        }
+        
+        function markPhraseAsUsed(id) {
+            const dragItem = document.querySelector(`.drag-item[data-id="${id}"]`);
+            if (dragItem && !dragItem.classList.contains('used')) {
+                dragItem.classList.add('used');
+                dragItem.draggable = false;
+            }
+        }
+        
+        function markPhraseAsAvailable(id) {
+            const dragItem = document.querySelector(`.drag-item[data-id="${id}"]`);
+            if (dragItem) {
+                dragItem.classList.remove('used');
+                dragItem.draggable = true;
+            }
+        }
+        
+        function dragStartHandler(e) {
+            if (this.classList.contains('used')) {
+                e.preventDefault();
+                return false;
+            }
+            this.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', this.dataset.phrase);
+            e.dataTransfer.setData('id', this.dataset.id);
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+        
+        function dragEndHandler(e) {
+            this.classList.remove('dragging');
+        }
+        
+        function dragOverHandler(e) { e.preventDefault(); }
+        
+        function dragEnterHandler(e) {
+            e.preventDefault();
+            this.classList.add('highlight');
+        }
+        
+        function dragLeaveHandler() {
+            this.classList.remove('highlight');
+        }
+        
+        function dropHandler(e) {
+            e.preventDefault();
+            this.classList.remove('highlight');
+            
+            const draggedPhrase = e.dataTransfer.getData('text/plain');
+            const draggedId = e.dataTransfer.getData('id');
+            const dropZoneId = this.dataset.id;
+            
+            if (this.children.length > 0) {
+                const existingSpan = this.firstElementChild;
+                const existingOrigId = existingSpan.dataset.originalId;
+                if (existingOrigId) {
+                    markPhraseAsAvailable(existingOrigId);
+                    usedPhrases.delete(existingOrigId);
+                    placedCount--;
+                }
+                this.innerHTML = '';
+                this.classList.add('empty');
+            }
+            
+            if (usedPhrases.has(draggedId)) {
+                if (this.children.length === 0) this.classList.add('empty');
+                return;
+            }
+            
+            const droppedSpan = document.createElement('div');
+            droppedSpan.className = 'dropped-item';
+            droppedSpan.textContent = draggedPhrase;
+            droppedSpan.dataset.originalId = draggedId;
+            droppedSpan.dataset.droppedIn = dropZoneId;
+            
+            droppedSpan.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const originalTermId = droppedSpan.dataset.originalId;
+                if (originalTermId) {
+                    markPhraseAsAvailable(originalTermId);
+                    usedPhrases.delete(originalTermId);
+                    placedCount--;
+                    const parentZone = droppedSpan.parentElement;
+                    parentZone.innerHTML = '';
+                    parentZone.classList.add('empty');
+                    updateCounters();
+                    const resultDiv = document.getElementById('result');
+                    if (resultDiv) resultDiv.style.display = 'none';
+                }
+            });
+            
+            this.innerHTML = '';
+            this.appendChild(droppedSpan);
+            this.classList.remove('empty');
+            
+            markPhraseAsUsed(draggedId);
+            usedPhrases.add(draggedId);
+            placedCount++;
+            updateCounters();
+            
+            const resultDiv = document.getElementById('result');
+            if (resultDiv) resultDiv.style.display = 'none';
+        }
+        
+        function setupDropZones() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            dropZones.forEach(zone => {
+                zone.removeEventListener('dragover', dragOverHandler);
+                zone.removeEventListener('dragenter', dragEnterHandler);
+                zone.removeEventListener('dragleave', dragLeaveHandler);
+                zone.removeEventListener('drop', dropHandler);
+                zone.addEventListener('dragover', dragOverHandler);
+                zone.addEventListener('dragenter', dragEnterHandler);
+                zone.addEventListener('dragleave', dragLeaveHandler);
+                zone.addEventListener('drop', dropHandler);
+            });
+        }
+        
+        function shuffleAndLoadPhrases() {
+            const phraseContainer = document.getElementById('phrase-container');
+            phraseContainer.innerHTML = '';
+            
+            const shuffled = [...allPhrases].sort(() => Math.random() - 0.5);
+            shuffled.forEach(phrase => {
+                const dragDiv = document.createElement('div');
+                dragDiv.className = 'drag-item';
+                dragDiv.draggable = true;
+                dragDiv.dataset.phrase = phrase.text;
+                dragDiv.dataset.id = phrase.id;
+                dragDiv.textContent = phrase.text;
+                phraseContainer.appendChild(dragDiv);
+            });
+            
+            const dragItems = document.querySelectorAll('.drag-item');
+            dragItems.forEach(item => {
+                item.removeEventListener('dragstart', dragStartHandler);
+                item.removeEventListener('dragend', dragEndHandler);
+                item.addEventListener('dragstart', dragStartHandler);
+                item.addEventListener('dragend', dragEndHandler);
+            });
+        }
+        
+        function resetExercise() {
+            const allDropZones = document.querySelectorAll('.drop-zone');
+            allDropZones.forEach(zone => {
+                zone.innerHTML = '';
+                zone.classList.add('empty');
+                zone.classList.remove('highlight');
+            });
+            
+            usedPhrases.clear();
+            placedCount = 0;
+            updateCounters();
+            
+            shuffleAndLoadPhrases();
+            
+            const resultDiv = document.getElementById('result');
+            if (resultDiv) resultDiv.style.display = 'none';
+        }
+        
+        function checkAnswers() {
+            const zones = document.querySelectorAll('.drop-zone');
+            let correctCount = 0;
+            let filledCount = 0;
+            
+            zones.forEach(zone => {
+                if (zone.children.length > 0) {
+                    filledCount++;
+                    const droppedElement = zone.firstElementChild;
+                    const droppedText = droppedElement.textContent;
+                    const expectedAnswer = zone.dataset.correct;
+                    droppedElement.classList.remove('correct', 'incorrect');
+                    if (droppedText === expectedAnswer) {
+                        correctCount++;
+                        droppedElement.classList.add('correct');
+                    } else {
+                        droppedElement.classList.add('incorrect');
+                    }
+                }
+            });
+            
+            const resultDiv = document.getElementById('result');
+            if (filledCount < 9) {
+                resultDiv.className = 'result incorrect';
+                resultDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> You filled ${filledCount} out of 9 blanks. Complete all blanks before checking.`;
+                resultDiv.style.display = 'block';
+            } else if (correctCount === 9) {
+                resultDiv.className = 'result correct';
+                resultDiv.innerHTML = `<i class="fas fa-star-of-life"></i> Perfect! All 9 answers are correct! 🎉`;
+                resultDiv.style.display = 'block';
+            } else if (correctCount >= 7) {
+                resultDiv.className = 'result correct';
+                resultDiv.innerHTML = `<i class="fas fa-thumbs-up"></i> Good job! ${correctCount} out of 9 answers are correct.`;
+                resultDiv.style.display = 'block';
+            } else {
+                resultDiv.className = 'result incorrect';
+                resultDiv.innerHTML = `<i class="fas fa-graduation-cap"></i> ${correctCount} out of 9 correct. Try again!`;
+                resultDiv.style.display = 'block';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            shuffleAndLoadPhrases();
+            setupDropZones();
+            updateCounters();
+        });
+        
+        window.checkAnswers = checkAnswers;
+        window.resetExercise = resetExercise;
+    </script>
+</body>
+</html>
