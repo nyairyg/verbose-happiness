@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Education Word Sort · clean split</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      background: #f7f5f0;  /* off‑white background */
+      font-family: 'Arial', sans-serif;
+      color: #2c2c2c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* main layout – no extra containers, just a clean split */
+    .game {
+      width: 100%;
+      max-width: 950px;
+      height: 90vh;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    /* ----- instruction text ----- */
+    .instruction {
+      text-align: center;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: #4a4a4a;
+      background: transparent;
+      padding: 8px 10px;
+      margin-bottom: 5px;
+      letter-spacing: 0.2px;
+      border-bottom: 1px dashed #d4cec2;
+    }
+
+    /* ----- word bank above the columns ----- */
+    .word-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      background: transparent;   /* no frame, no border */
+      padding: 8px 0;
+      min-height: 70px;
+    }
+
+    .word {
+      padding: 10px 18px;
+      background: #f0ede6;
+      border: 1px solid #d9d4c9;
+      border-radius: 40px;       /* pill shape, soft */
+      color: #2b2b2b;
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      cursor: grab;
+      user-select: none;
+      transition: background 0.2s ease, transform 0.15s, border-color 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .word:active {
+      cursor: grabbing;
+      transform: scale(0.96);
+    }
+
+    /* flash green when correct */
+    .word.flash-green {
+      background: #d1e7d6;
+      border-color: #5a9e6b;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    /* buzzing animation when incorrect (applied temporarily) */
+    .word.buzz-error {
+      animation: buzz 0.35s ease-in-out;
+      background: #f3d9d9;
+      border-color: #c95b5b;
+    }
+
+    @keyframes buzz {
+      0%   { transform: translateX(0); }
+      20%  { transform: translateX(-6px); }
+      40%  { transform: translateX(6px); }
+      60%  { transform: translateX(-4px); }
+      80%  { transform: translateX(4px); }
+      100% { transform: translateX(0); }
+    }
+
+    /* ----- split columns without extra frames ----- */
+    .columns {
+      display: flex;
+      flex: 1;
+      gap: 30px;
+      min-height: 0;
+    }
+
+    .column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      background: transparent;   /* no container box */
+    }
+
+    .column h2 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #4a4a4a;
+      text-transform: lowercase;
+      letter-spacing: 1px;
+      border-bottom: 1.5px solid #cfc9bc;
+      padding-bottom: 6px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .dropzone {
+      width: 100%;
+      flex: 1;
+      background: transparent;
+      border: 1px dashed #cfc9bc;
+      border-radius: 24px;
+      padding: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 10px;
+      transition: border-color 0.2s;
+    }
+
+    .dropzone:hover {
+      border-color: #b9af9a;
+    }
+
+    .dropzone .word {
+      background: #f0ede6;
+      border-color: #d9d4c9;
+    }
+
+    /* empty state hint inside dropzone */
+    .dropzone::after {
+      content: "drop words here";
+      display: block;
+      width: 100%;
+      text-align: center;
+      color: #c1b8a8;
+      font-size: 0.9rem;
+      margin-top: 12px;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .dropzone:has(.word)::after {
+      content: none;
+    }
+
+    @media (max-width: 600px) {
+      .game {
+        height: auto;
+        min-height: 100vh;
+        padding: 16px;
+      }
+      .columns {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="game">
+  <!-- instruction: describes purpose -->
+  <div class="instruction">
+    These words can be used to describe education.<br />
+    Split them into two categories: <strong>positive meaning</strong> vs <strong>negative meaning</strong>.<br />
+    Drag each word to the suitable column.
+  </div>
+
+  <!-- word bank appears above columns, no container frame -->
+  <div class="word-bank" id="wordBank"></div>
+
+  <!-- clean split: two columns without extra wrappers -->
+  <div class="columns">
+    <div class="column">
+      <h2>Positive</h2>
+      <div class="dropzone" id="positiveDrop"></div>
+    </div>
+    <div class="column">
+      <h2>Negative</h2>
+      <div class="dropzone" id="negativeDrop"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- word data (same 20 words) -----
+    const words = [
+      { text: "effective", type: "positive" },
+      { text: "engaging", type: "positive" },
+      { text: "structured", type: "positive" },
+      { text: "supportive", type: "positive" },
+      { text: "interactive", type: "positive" },
+      { text: "practical", type: "positive" },
+      { text: "enriching", type: "positive" },
+      { text: "clear", type: "positive" },
+      { text: "motivating", type: "positive" },
+      { text: "accessible", type: "positive" },
+      { text: "confusing", type: "negative" },
+      { text: "boring", type: "negative" },
+      { text: "overwhelming", type: "negative" },
+      { text: "disorganized", type: "negative" },
+      { text: "frustrating", type: "negative" },
+      { text: "unclear", type: "negative" },
+      { text: "outdated", type: "negative" },
+      { text: "monotonous", type: "negative" },
+      { text: "inefficient", type: "negative" },
+      { text: "rigid", type: "negative" }
+    ];
+
+    // ----- Fisher–Yates shuffle (in-place) -----
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    // Create a shuffled copy
+    const shuffledWords = [...words];
+    shuffleArray(shuffledWords);
+
+    const bankEl = document.getElementById("wordBank");
+    const positiveDrop = document.getElementById("positiveDrop");
+    const negativeDrop = document.getElementById("negativeDrop");
+
+    // Map to keep track of word elements (not strictly necessary but useful)
+    const wordElements = new Map();
+
+    // ----- Create word elements from shuffled array -----
+    shuffledWords.forEach((word, index) => {
+      const el = document.createElement("div");
+      el.className = "word";
+      el.draggable = true;
+      el.textContent = word.text;
+      el.dataset.type = word.type;
+      // unique identifier
+      el.id = `word-${index}-${Date.now()}-${Math.random()}`;
+
+      // dragstart: store element id
+      el.addEventListener("dragstart", handleDragStart);
+      el.addEventListener("dragend", handleDragEnd);
+
+      bankEl.appendChild(el);
+      wordElements.set(el.id, el);
+    });
+
+    // ----- Drag handlers -----
+    function handleDragStart(e) {
+      e.dataTransfer.setData("text/plain", e.target.id);
+      e.dataTransfer.effectAllowed = "move";
+      e.target.style.opacity = "0.7";
+    }
+
+    function handleDragEnd(e) {
+      // restore opacity
+      e.target.style.opacity = "1";
+    }
+
+    // ----- Helper: remove flash/buzz classes after animation -----
+    function clearWordClasses(wordEl) {
+      wordEl.classList.remove("flash-green", "buzz-error");
+    }
+
+    // ----- Flash green briefly (correct placement) -----
+    function applyGreenFlash(wordEl) {
+      clearWordClasses(wordEl);
+      wordEl.classList.add("flash-green");
+      setTimeout(() => {
+        wordEl.classList.remove("flash-green");
+      }, 400);
+    }
+
+    // ----- Buzz animation and then return word to the bank (incorrect) -----
+    function applyBuzzAndReturn(wordEl) {
+      clearWordClasses(wordEl);
+      wordEl.classList.add("buzz-error");
+
+      // After buzz animation ends, move word back to the bank
+      const onAnimationEnd = () => {
+        wordEl.removeEventListener("animationend", onAnimationEnd);
+        wordEl.classList.remove("buzz-error");
+        // Move back to the word bank (if not already there)
+        if (wordEl.parentElement !== bankEl) {
+          bankEl.appendChild(wordEl);
+        }
+        // ensure opacity is normal
+        wordEl.style.opacity = "1";
+      };
+
+      wordEl.addEventListener("animationend", onAnimationEnd);
+      // Fallback: if animationend doesn't fire for some reason, move after 400ms
+      setTimeout(() => {
+        if (wordEl.classList.contains("buzz-error")) {
+          wordEl.classList.remove("buzz-error");
+          if (wordEl.parentElement !== bankEl) {
+            bankEl.appendChild(wordEl);
+          }
+          wordEl.style.opacity = "1";
+        }
+      }, 400);
+    }
+
+    // ----- Setup drop zones -----
+    function setupDropZone(zoneElement, expectedType) {
+      zoneElement.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+      });
+
+      zoneElement.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const draggedId = e.dataTransfer.getData("text/plain");
+        const draggedElement = document.getElementById(draggedId);
+        if (!draggedElement) return;
+
+        const wordType = draggedElement.dataset.type;
+        const isCorrect = (wordType === expectedType);
+
+        if (isCorrect) {
+          // Move word into the correct column
+          zoneElement.appendChild(draggedElement);
+          draggedElement.style.opacity = "1";
+          // brief green highlight
+          applyGreenFlash(draggedElement);
+        } else {
+          // Incorrect: do NOT move the word; instead buzz and return to bank
+          // (word stays in its current location, but we apply buzz animation,
+          // then move it back to the bank explicitly)
+          // First, ensure we remember where it currently is.
+          // Apply buzz + return to bank.
+          applyBuzzAndReturn(draggedElement);
+          // No append to zone; word remains in place until animation ends, then moves to bank.
+        }
+      });
+    }
+
+    // Positive column expects "positive", Negative expects "negative"
+    setupDropZone(positiveDrop, "positive");
+    setupDropZone(negativeDrop, "negative");
+
+    // Optional: allow dragging words back to the bank manually (for flexibility)
+    bankEl.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+    });
+
+    bankEl.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const draggedId = e.dataTransfer.getData("text/plain");
+      const draggedElement = document.getElementById(draggedId);
+      if (!draggedElement) return;
+      // Move back to bank (no feedback needed)
+      bankEl.appendChild(draggedElement);
+      draggedElement.style.opacity = "1";
+      // remove any residual classes
+      clearWordClasses(draggedElement);
+    });
+
+  })();
+</script>
+</body>
+</html>
