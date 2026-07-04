@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Verb + Phrase Matching Game</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#4a4a4a;}
+body{background:#f2efe9;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:30px;}
+h2{margin-bottom:6px;color:#5a5a5a;text-align:center;font-weight:400;font-size:1.5rem;letter-spacing:0.5px;}
+.story-intro{font-size:0.95rem;font-weight:400;text-align:center;margin-bottom:20px;color:#7a7a7a;max-width:700px;line-height:1.6;padding:14px 22px;background:#e8e4de;border-radius:6px;border-left:3px solid #c5bdb5;}
+.wrapper{position:relative;width:100%;max-width:1100px;display:flex;justify-content:center;gap:150px;margin-top:10px;align-items:flex-start;}
+.column{width:42%;display:flex;flex-direction:column;}
+.item{
+  background:#f5f2ed;
+  border:1px solid #d5cec6;
+  border-radius:4px;
+  padding:0px;
+  margin-bottom:10px;
+  cursor:pointer;
+  font-weight:400;
+  font-size:18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  word-wrap:break-word;
+  white-space:normal;
+  min-height:65px;
+  transition:all 0.2s ease;
+}
+.item:hover:not(.used){background:#ece7e1;border-color:#c0b7ad;}
+.item.used{opacity:.3;pointer-events:none}
+.item.active{background:#e3ddd6;border-color:#b5aba1}
+.item.shake{animation:shake .4s}
+
+.left-item{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:100%;
+  padding:10px 16px;
+  gap:10px;
+}
+.verb-text{
+  font-size:20px;
+  font-weight:500;
+  color:#555;
+  flex-shrink:0;
+}
+.verb-arrow{
+  font-size:18px;
+  color:#b5aba1;
+  flex-shrink:0;
+}
+
+.right-item{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100%;
+  width:100%;
+  font-size:19px;
+  font-weight:400;
+  text-align:center;
+  padding:10px 16px;
+  color:#555;
+}
+
+svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#message{margin-top:20px;font-size:1rem;font-weight:400;color:#8a8a8a;min-height:30px;text-align:center;}
+#resetBtn{
+  margin-top:12px;
+  padding:8px 28px;
+  font-size:0.95rem;
+  font-weight:400;
+  color:#f2efe9;
+  background:#9a8e84;
+  border:none;
+  border-radius:4px;
+  cursor:pointer;
+  transition:background 0.3s;
+  letter-spacing:0.3px;
+}
+#resetBtn:hover{background:#7a7068;}
+
+@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+</style>
+</head>
+<body>
+
+<h2>🔗 Hannah & Jamie — Vocabulary Match</h2>
+<p class="story-intro">
+  Connect each <strong>verb</strong> (left) with the correct <strong>words</strong> (right) to complete the phrases from the story of <strong>Hannah and Jamie</strong>.
+</p>
+
+<div class="wrapper" id="wrapper">
+  <svg id="lines"></svg>
+  <div class="column" id="left"></div>
+  <div class="column" id="right"></div>
+</div>
+
+<div id="message">Match each verb with its partner</div>
+<button id="resetBtn">🔄 New Game</button>
+
+<script>
+const allPairs = [
+  { id: 1, left: "invite", right: "somebody to dinner" },
+  { id: 2, left: "drive", right: "along Bridge Street" },
+  { id: 3, left: "meet", right: "in a coffee shop" },
+  { id: 4, left: "give", right: "somebody your phone number" },
+  { id: 5, left: "take", right: "somebody to a restaurant" },
+  { id: 6, left: "wait for", right: "somebody" },
+  { id: 7, left: "be", right: "in a hurry" },
+  { id: 8, left: "play", right: "a song" },
+  { id: 9, left: "leave", right: "the club" },
+  { id: 10, left: "run", right: "across the street" },
+  { id: 11, left: "have", right: "a great time" }
+];
+
+let selected = null, correctCount = 0;
+const totalPairs = allPairs.length;
+
+function initGame() {
+  const left = document.getElementById('left');
+  const right = document.getElementById('right');
+  const lines = document.getElementById('lines');
+  const message = document.getElementById('message');
+  
+  left.innerHTML = "";
+  right.innerHTML = "";
+  lines.innerHTML = "";
+  selected = null;
+  correctCount = 0;
+  message.textContent = "Match each verb with its partner";
+
+  const shuffled = shuffle(allPairs);
+  const leftItems = shuffle(shuffled).map(p => createLeftItem(p.left, p.id));
+  const rightItems = shuffle(shuffled).map(p => createRightItem(p.right, p.id));
+
+  leftItems.forEach(item => left.appendChild(item));
+  rightItems.forEach(item => right.appendChild(item));
+
+  setTimeout(() => {
+    for (let i = 0; i < totalPairs; i++) {
+      if (leftItems[i] && rightItems[i]) {
+        const maxH = Math.max(leftItems[i].offsetHeight, rightItems[i].offsetHeight);
+        leftItems[i].style.minHeight = maxH + "px";
+        rightItems[i].style.minHeight = maxH + "px";
+      }
+    }
+  }, 100);
+}
+
+function createLeftItem(text, id) {
+  const d = document.createElement("div");
+  d.className = "item left";
+  d.dataset.id = id;
+  d.dataset.side = "left";
+  
+  const wrapper = document.createElement("div");
+  wrapper.className = "left-item";
+  
+  const verbSpan = document.createElement("span");
+  verbSpan.className = "verb-text";
+  verbSpan.textContent = text;
+  
+  const arrowSpan = document.createElement("span");
+  arrowSpan.className = "verb-arrow";
+  arrowSpan.textContent = "→";
+  
+  wrapper.appendChild(verbSpan);
+  wrapper.appendChild(arrowSpan);
+  d.appendChild(wrapper);
+  
+  d.onclick = () => selectItem(d);
+  return d;
+}
+
+function createRightItem(text, id) {
+  const d = document.createElement("div");
+  d.className = "item right";
+  d.dataset.id = id;
+  d.dataset.side = "right";
+  
+  const wrapper = document.createElement("div");
+  wrapper.className = "right-item";
+  wrapper.textContent = text;
+  d.appendChild(wrapper);
+  
+  d.onclick = () => selectItem(d);
+  return d;
+}
+
+function anchor(el) {
+  const r = el.getBoundingClientRect();
+  const w = document.getElementById('wrapper').getBoundingClientRect();
+  return el.dataset.side === "left"
+    ? { x: r.right - w.left, y: r.top + r.height / 2 - w.top }
+    : { x: r.left - w.left, y: r.top + r.height / 2 - w.top };
+}
+
+function selectItem(el) {
+  if (el.classList.contains("used")) return;
+
+  if (!selected) {
+    selected = el;
+    el.classList.add("active");
+    return;
+  }
+
+  if (selected.dataset.side === el.dataset.side) {
+    selected.classList.remove("active");
+    selected = el;
+    el.classList.add("active");
+    return;
+  }
+
+  const lines = document.getElementById('lines');
+  const p1 = anchor(selected);
+  const p2 = anchor(el);
+  
+  const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+  line.setAttribute("x1", p1.x);
+  line.setAttribute("y1", p1.y);
+  line.setAttribute("x2", p2.x);
+  line.setAttribute("y2", p2.y);
+  line.setAttribute("stroke-width", "2");
+  lines.appendChild(line);
+
+  if (selected.dataset.id === el.dataset.id) {
+    line.setAttribute("stroke", "#9aaa8a");
+    selected.classList.add("used");
+    el.classList.add("used");
+    correctCount++;
+    if (correctCount === totalPairs) {
+      document.getElementById('message').textContent = "✓ All 11 phrases matched! Well done!";
+    }
+  } else {
+    line.setAttribute("stroke", "#b58a7a");
+    selected.classList.add("shake");
+    el.classList.add("shake");
+    setTimeout(() => {
+      line.remove();
+      selected.classList.remove("shake");
+      el.classList.remove("shake");
+    }, 400);
+  }
+
+  selected.classList.remove("active");
+  selected = null;
+}
+
+function shuffle(a) {
+  return [...a].sort(() => Math.random() - 0.5);
+}
+
+document.getElementById('resetBtn').addEventListener('click', initGame);
+
+initGame();
+</script>
+
+</body>
+</html>
