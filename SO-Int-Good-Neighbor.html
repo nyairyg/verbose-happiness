@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ESL grammar · Dropdown auto-check</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,400;0,450;0,500;0,550;0,600;0,620;0,700;1,400;1,450&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f2f0;
+      font-family: 'Bitter', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, serif;
+      font-weight: 450;
+      line-height: 1.5;
+      padding: 1.5rem 1rem;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .card-container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+      padding: 2rem 2rem 1.8rem 2rem;
+      border: 1px solid #eaeaea;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .step-title {
+      font-size: 1.4rem;
+      font-weight: 620;
+      letter-spacing: -0.02em;
+      color: #1a1a1a;
+      padding-bottom: 0.4rem;
+      border-bottom: 2px solid #e2e2e0;
+      line-height: 1.2;
+    }
+
+    .step-subtitle {
+      font-size: 0.95rem;
+      font-weight: 430;
+      color: #5e5e5c;
+      line-height: 1.4;
+      margin-top: -0.2rem;
+    }
+
+    .full-text {
+      background: #fafaf8;
+      border-radius: 20px;
+      padding: 1.2rem 1.5rem;
+      border: 1px solid #eaeaea;
+      font-size: 1.05rem;
+      font-weight: 440;
+      color: #1a1a1a;
+      line-height: 2.2;
+      min-height: 80px;
+    }
+
+    .full-text .text-part {
+      display: inline;
+    }
+
+    .full-text .sentence-part {
+      display: inline;
+    }
+
+    .full-text .sentence-part.correct-text {
+      color: #2b6e4f;
+    }
+
+    .full-text select {
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 0.1rem 0.5rem 0.1rem 0.7rem;
+      border-radius: 12px;
+      border: 2px solid #d0d0cc;
+      background: #ffffff;
+      color: #1a1a1a;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 100px;
+      appearance: auto;
+      vertical-align: middle;
+      height: 2.4rem;
+    }
+
+    .full-text select:focus {
+      outline: none;
+      border-color: #6b6b66;
+    }
+
+    .full-text select:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .full-text select.correct {
+      border-color: #2b6e4f;
+      background: #eaf4ed;
+    }
+
+    .full-text select.wrong {
+      border-color: #b13e3e;
+      background: #f9f0f0;
+      animation: shake 0.3s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    .full-text .completed-sentence {
+      display: block;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed #e2e2e0;
+    }
+
+    .full-text .completed-sentence:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .full-text .completed-sentence .sentence-part {
+      display: inline;
+    }
+
+    .full-text .completed-sentence .sentence-part.correct-text {
+      color: #2b6e4f;
+    }
+
+    .full-text .current-sentence-block {
+      display: block;
+      margin-top: 0.3rem;
+    }
+
+    .status-message {
+      font-size: 0.85rem;
+      font-weight: 450;
+      padding: 0.3rem 0;
+      text-align: center;
+    }
+
+    .status-message .error {
+      color: #b13e3e;
+    }
+
+    .status-message .success {
+      color: #2b6e4f;
+    }
+
+    .progress {
+      font-size: 0.7rem;
+      font-weight: 440;
+      color: #a5a5a3;
+      letter-spacing: 0.2px;
+      text-align: right;
+    }
+
+    .card-footer {
+      border-top: 1px solid #efefed;
+      padding-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+    }
+
+    .start-again-btn {
+      background: transparent;
+      border: 1.5px solid #c0c0bc;
+      border-radius: 60px;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.85rem;
+      font-weight: 520;
+      font-family: inherit;
+      color: #2c2c2c;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      letter-spacing: 0.3px;
+      background: #fefefc;
+    }
+
+    .start-again-btn:hover {
+      background: #eaeae6;
+      border-color: #9a9a96;
+      color: #1a1a1a;
+      transform: scale(0.98);
+    }
+
+    .all-done-verb {
+      font-size: 1.8rem;
+      font-weight: 560;
+      letter-spacing: -0.01em;
+      color: #2b6e4f;
+      border-bottom: 2px solid #d4e2da;
+      display: inline-block;
+      padding-bottom: 0.3rem;
+    }
+
+    .all-done-message {
+      font-size: 1.1rem;
+      font-weight: 430;
+      color: #2c2c2c;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .card.done-state {
+      align-items: center;
+      text-align: center;
+    }
+
+    .sentence-counter {
+      font-size: 0.75rem;
+      color: #8b8b8b;
+      background: #f6f6f4;
+      padding: 0.2rem 0.8rem;
+      border-radius: 60px;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 0.8rem; }
+      .card { padding: 1.3rem; gap: 1rem; }
+      .step-title { font-size: 1.2rem; }
+      .full-text { font-size: 0.95rem; padding: 1rem; }
+      .full-text select { min-width: 70px; font-size: 0.85rem; height: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="card-container">
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+  (function() {
+    // ── Complete text with all sentences ──
+    const stepsData = [
+      {
+        parts: [
+          { type: 'text', value: 'If someone moves in next door, introduce yourself. If they\'re new to the area, they\'ll probably have ' },
+          { type: 'dropdown', id: 'd1', options: ['a little', 'a lot of'], correct: 'a lot of' },
+          { type: 'text', value: ' questions, e.g. how ' },
+          { type: 'dropdown', id: 'd2', options: ['much', 'many'], correct: 'many' },
+          { type: 'text', value: ' times per week the rubbish is collected.' }
+        ]
+      },
+      {
+        parts: [
+          { type: 'text', value: 'Get to know them and give them ' },
+          { type: 'dropdown', id: 'd3', options: ['a bit of', 'plenty'], correct: 'a bit of' },
+          { type: 'text', value: ' information about yourself.' }
+        ]
+      },
+      {
+        parts: [
+          { type: 'text', value: 'If you do ' },
+          { type: 'dropdown', id: 'd4', options: ['all of', 'a lot of'], correct: 'a lot of' },
+          { type: 'text', value: ' gardening or if your kids sometimes make ' },
+          { type: 'dropdown', id: 'd5', options: ['too much', 'too many'], correct: 'too much' },
+          { type: 'text', value: ' noise, let them know.' }
+        ]
+      },
+      {
+        parts: [
+          { type: 'text', value: 'Some families have ' },
+          { type: 'dropdown', id: 'd6', options: ['several', 'plenty'], correct: 'several' },
+          { type: 'text', value: ' pets. Dogs can be noisy, and cats sometimes wander into neighbours\' gardens or homes.' }
+        ]
+      },
+      {
+        parts: [
+          { type: 'text', value: 'If it happens only ' },
+          { type: 'dropdown', id: 'd7', options: ['a few', 'little'], correct: 'a few' },
+          { type: 'text', value: ' times, that\'s OK, but if it happens ' },
+          { type: 'dropdown', id: 'd8', options: ['a lot', 'much'], correct: 'a lot' },
+          { type: 'text', value: ', it\'s a problem.' }
+        ]
+      },
+      {
+        parts: [
+          { type: 'text', value: 'People who say they never have ' },
+          { type: 'dropdown', id: 'd9', options: ['much', 'many'], correct: 'much' },
+          { type: 'text', value: ' trouble with their neighbours are usually good communicators. It\'s easy: tell them about community news and events. Tell them beforehand about your parties.' }
+        ]
+      },
+      {
+        parts: [
+          { type: 'text', value: 'Or, better still, invite them! If they\'re partying with you, will they complain about the noise? ' },
+          { type: 'dropdown', id: 'd10', options: ['None!', 'No!'], correct: 'No!' },
+          { type: 'text', value: '' }
+        ]
+      }
+    ];
+
+    const mainCard = document.getElementById('mainCard');
+    let currentStep = 0;
+    let completed = false;
+    let currentSelects = [];
+    let stepCompleted = false;
+    let hasErrors = false;
+
+    // Store completed sentences
+    let completedSentences = [];
+
+    function renderStep() {
+      if (completed) {
+        renderCompletion();
+        return;
+      }
+
+      if (currentStep >= stepsData.length) {
+        completed = true;
+        renderCompletion();
+        return;
+      }
+
+      const step = stepsData[currentStep];
+      stepCompleted = false;
+      hasErrors = false;
+
+      // Build the full text with all completed sentences + current sentence with dropdowns
+      let fullTextHtml = `<div class="full-text" id="fullText">`;
+
+      // Add completed sentences
+      if (completedSentences.length > 0) {
+        completedSentences.forEach((item, idx) => {
+          fullTextHtml += `<div class="completed-sentence">`;
+          fullTextHtml += `<span class="sentence-part correct-text">${item.text}</span>`;
+          fullTextHtml += `</div>`;
+        });
+      }
+
+      // Add current sentence with dropdowns
+      fullTextHtml += `<div class="current-sentence-block" id="currentSentence">`;
+      step.parts.forEach((part, idx) => {
+        if (part.type === 'text') {
+          fullTextHtml += `<span class="text-part">${part.value}</span>`;
+        } else if (part.type === 'dropdown') {
+          const optionsHtml = part.options.map(opt =>
+            `<option value="${opt}">${opt}</option>`
+          ).join('');
+          fullTextHtml += `
+            <select id="${part.id}" data-correct="${part.correct}" data-part-index="${idx}">
+              <option value="">—</option>
+              ${optionsHtml}
+            </select>
+          `;
+        }
+      });
+      fullTextHtml += `</div>`;
+      fullTextHtml += `</div>`;
+
+      // Status message
+      let statusHtml = `<div class="status-message" id="statusMessage"></div>`;
+
+      const titleHtml = `<div class="step-title">Complete the sentences</div>`;
+      const subtitleHtml = `<div class="step-subtitle">Choose the correct options from the dropdowns. You must get all answers right to continue.</div>`;
+
+      const progressHtml = `<div class="progress">sentence ${currentStep + 1} of ${stepsData.length}</div>`;
+      const footerHtml = `
+        <div class="card-footer">
+          <span class="sentence-counter">${completedSentences.length} sentences completed</span>
+          ${progressHtml}
+        </div>
+      `;
+
+      mainCard.innerHTML = titleHtml + subtitleHtml + fullTextHtml + statusHtml + footerHtml;
+      mainCard.classList.remove('done-state');
+
+      // Attach auto-check listeners
+      currentSelects = document.querySelectorAll('.current-sentence-block select');
+      currentSelects.forEach(sel => {
+        sel.addEventListener('change', autoCheck);
+        // Also check on blur (when user tabs away)
+        sel.addEventListener('blur', function(e) {
+          if (this.value !== '') {
+            autoCheck(e);
+          }
+        });
+      });
+    }
+
+    function autoCheck(e) {
+      const sel = e.target;
+      if (sel.value === '') return;
+
+      const isCorrect = sel.value === sel.dataset.correct;
+      
+      // Visual feedback
+      sel.classList.remove('correct', 'wrong');
+      if (isCorrect) {
+        sel.classList.add('correct');
+      } else {
+        sel.classList.add('wrong');
+        // Shake animation is handled by CSS
+        hasErrors = true;
+        // Show error message
+        const statusMsg = document.getElementById('statusMessage');
+        if (statusMsg) {
+          statusMsg.innerHTML = `<span class="error">✗ That's not correct. Please try again.</span>`;
+        }
+        return;
+      }
+
+      // If correct, check if all are answered correctly
+      const allSelects = document.querySelectorAll('.current-sentence-block select');
+      let allFilled = true;
+      let allCorrect = true;
+      let answered = 0;
+
+      allSelects.forEach(s => {
+        if (s.value === '') {
+          allFilled = false;
+        } else {
+          answered++;
+          if (s.value !== s.dataset.correct) {
+            allCorrect = false;
+            hasErrors = true;
+          }
+        }
+      });
+
+      // Clear error message if all filled and correct
+      const statusMsg = document.getElementById('statusMessage');
+      if (statusMsg) {
+        if (allFilled && allCorrect) {
+          statusMsg.innerHTML = `<span class="success">✓ All correct! Great job!</span>`;
+        } else if (allFilled && !allCorrect) {
+          statusMsg.innerHTML = `<span class="error">✗ Some answers are still incorrect. Please fix them.</span>`;
+        } else {
+          statusMsg.innerHTML = '';
+        }
+      }
+
+      // Check if all are answered AND all are correct
+      if (allFilled && allCorrect && !stepCompleted) {
+        stepCompleted = true;
+        
+        // Build the full sentence for display
+        let displaySentence = '';
+        const stepParts = stepsData[currentStep].parts;
+        stepParts.forEach((part, idx) => {
+          if (part.type === 'text') {
+            displaySentence += part.value;
+          } else if (part.type === 'dropdown') {
+            const selectEl = document.getElementById(part.id);
+            displaySentence += selectEl.value;
+          }
+        });
+
+        // Add to completed sentences
+        completedSentences.push({
+          text: displaySentence
+        });
+
+        // Disable all selects
+        allSelects.forEach(s => s.disabled = true);
+
+        // Auto-advance after delay
+        setTimeout(() => {
+          advanceStep();
+        }, 2000);
+      }
+    }
+
+    function advanceStep() {
+      currentStep++;
+      if (currentStep >= stepsData.length) {
+        completed = true;
+        renderCompletion();
+      } else {
+        renderStep();
+      }
+    }
+
+    function renderCompletion() {
+      const verbHtml = `<div class="all-done-verb">✓ All done</div>`;
+      const messageHtml = `<div class="all-done-message">You've successfully completed all sentences!</div>`;
+      
+      // Show all built text
+      let fullTextHtml = `<div class="full-text" style="text-align:left;">`;
+      completedSentences.forEach((item, idx) => {
+        fullTextHtml += `<div class="completed-sentence">`;
+        fullTextHtml += `<span class="sentence-part correct-text">${item.text}</span>`;
+        fullTextHtml += `</div>`;
+      });
+      fullTextHtml += `</div>`;
+
+      const restartHtml = `<button class="start-again-btn" id="restartBtn">↺ Start again</button>`;
+
+      mainCard.innerHTML = verbHtml + messageHtml + fullTextHtml + restartHtml;
+      mainCard.classList.add('done-state');
+
+      document.getElementById('restartBtn').addEventListener('click', restartExercise);
+    }
+
+    function restartExercise() {
+      completed = false;
+      currentStep = 0;
+      completedSentences = [];
+      stepCompleted = false;
+      hasErrors = false;
+      renderStep();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Keyboard support: Tab through dropdowns, Enter to confirm selection
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.tagName === 'SELECT') {
+        e.target.dispatchEvent(new Event('change'));
+      }
+    });
+
+    renderStep();
+  })();
+</script>
+</body>
+</html>
