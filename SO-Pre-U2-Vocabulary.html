@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Matching: Company Words</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,system-ui,sans-serif;color:#333;}
+body{background:#f8fafc;min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px}
+h2{margin-bottom:6px}
+.sub{margin-bottom:20px;font-size:1.1rem;color:#666}
+.wrapper{position:relative;width:1100px;display:flex;justify-content:center;gap:50px;margin-top:10px}
+.column{display:flex;flex-direction:column}
+#left{width:70%}  /* левая колонка (определения) - широкая */
+#right{width:30%} /* правая колонка (термины) - в 2.33 раза уже (70/30 ≈ 2.33) */
+.item{
+    background:#f8fafc;
+    border:2px solid #e2e8f0;
+    border-radius:6px;
+    padding:16px 12px;
+    margin-bottom:12px;
+    text-align:center;
+    cursor:pointer;
+    font-weight:600;
+    font-size:1rem;
+    position:relative;
+    color:#333;
+    transition:all 0.15s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:50px;
+    white-space:nowrap; /* текст в одну строку */
+    overflow:hidden;
+    text-overflow:ellipsis; /* если не влезает - многоточие */
+}
+/* для правой колонки можно чуть уменьшить шрифт, если слова длинные */
+#right .item {
+    font-size:0.95rem;
+}
+.item:hover{background:#f1f5f9}
+.item.used{opacity:.4;pointer-events:none;background:#e2e8f0}
+.item.active{background:#e8f4fd;border-color:#538e9b}
+@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-6px)}100%{transform:translateX(0)}}
+.item.shake{animation:shake .35s}
+svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+#message{margin-top:24px;font-size:1.3rem;font-weight:700;color:#538e9b;min-height:2.5rem}
+#resetBtn{margin-top:10px;padding:10px 28px;border:none;border-radius:6px;background:#538e9b;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:background 0.2s}
+#resetBtn:hover{background:#3d7a86}
+</style>
+</head>
+<body>
+
+<h2>🔗 Company Vocabulary</h2>
+<p class="sub">Click a word on the left, then its match on the right.</p>
+
+<div class="wrapper" id="wrapper">
+    <svg id="lines"></svg>
+    <div class="column" id="left"></div>
+    <div class="column" id="right"></div>
+</div>
+
+<div id="message"></div>
+<button id="resetBtn">🔄 Play Again</button>
+
+<script>
+// Ваши 10 слов (определения + слова)
+const pairs = [
+    { id: 1, en: "a business that makes or sells things or provides services", ru: "company" },
+    { id: 2, en: "a person who buys products or uses services", ru: "customer" },
+    { id: 3, en: "extra money given to a worker (often for especially good work)", ru: "bonus" },
+    { id: 4, en: "a place where many people work at desks", ru: "office" },
+    { id: 5, en: "a worker", ru: "employee" },
+    { id: 6, en: "a job you need to do", ru: "task" },
+    { id: 7, en: "a person who manages the workers in the company", ru: "boss" },
+    { id: 8, en: "everyone who works in the company", ru: "staff" },
+    { id: 9, en: "a fixed, regular sum of money given to someone for doing a job", ru: "salary" },
+    { id: 10, en: "a person or business that pays workers to do a job", ru: "employer" }
+];
+
+let selected = null;
+let correctCount = 0;
+const totalPairs = pairs.length;
+
+const leftCol = document.getElementById('left');
+const rightCol = document.getElementById('right');
+const linesSvg = document.getElementById('lines');
+const message = document.getElementById('message');
+const wrapper = document.getElementById('wrapper');
+
+function shuffle(arr) {
+    return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function initGame() {
+    leftCol.innerHTML = '';
+    rightCol.innerHTML = '';
+    linesSvg.innerHTML = '';
+    selected = null;
+    correctCount = 0;
+    message.textContent = '';
+
+    const shuffledLeft = shuffle(pairs);
+    const shuffledRight = shuffle(pairs);
+
+    shuffledLeft.forEach(p => leftCol.appendChild(createItem(p.en, p.id, 'left')));
+    shuffledRight.forEach(p => rightCol.appendChild(createItem(p.ru, p.id, 'right')));
+}
+
+function createItem(text, id, side) {
+    const el = document.createElement('div');
+    el.className = 'item ' + side;
+    el.dataset.id = id;
+    el.dataset.side = side;
+    el.textContent = text;
+    el.addEventListener('click', () => selectItem(el));
+    return el;
+}
+
+function getAnchor(el) {
+    const r = el.getBoundingClientRect();
+    const w = wrapper.getBoundingClientRect();
+    return el.dataset.side === 'left'
+        ? { x: r.right - w.left, y: r.top + r.height / 2 - w.top }
+        : { x: r.left - w.left, y: r.top + r.height / 2 - w.top };
+}
+
+function selectItem(el) {
+    if (el.classList.contains('used')) return;
+
+    if (!selected) {
+        selected = el;
+        el.classList.add('active');
+        return;
+    }
+
+    if (selected.dataset.side === el.dataset.side) {
+        selected.classList.remove('active');
+        selected = el;
+        el.classList.add('active');
+        return;
+    }
+
+    const p1 = getAnchor(selected);
+    const p2 = getAnchor(el);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', p1.x);
+    line.setAttribute('y1', p1.y);
+    line.setAttribute('x2', p2.x);
+    line.setAttribute('y2', p2.y);
+    line.setAttribute('stroke-width', '2.5');
+    linesSvg.appendChild(line);
+
+    if (selected.dataset.id === el.dataset.id) {
+        line.setAttribute('stroke', '#4fa46b');
+        selected.classList.add('used');
+        el.classList.add('used');
+        correctCount++;
+
+        if (correctCount === totalPairs) {
+            message.textContent = '🎉 Perfect! All 10 matched correctly!';
+        }
+    } else {
+        line.setAttribute('stroke', '#c05b6d');
+        selected.classList.add('shake');
+        el.classList.add('shake');
+        setTimeout(() => {
+            line.remove();
+            selected.classList.remove('shake');
+            el.classList.remove('shake');
+        }, 400);
+    }
+
+    selected.classList.remove('active');
+    selected = null;
+}
+
+document.getElementById('resetBtn').addEventListener('click', initGame);
+
+initGame();
+</script>
+</body>
+</html>
