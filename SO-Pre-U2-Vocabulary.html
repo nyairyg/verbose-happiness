@@ -10,8 +10,8 @@ h2{margin-bottom:6px}
 .sub{margin-bottom:20px;font-size:1.1rem;color:#666}
 .wrapper{position:relative;width:1100px;display:flex;justify-content:center;gap:50px;margin-top:10px}
 .column{display:flex;flex-direction:column}
-#left{width:70%}  /* левая колонка (определения) - широкая */
-#right{width:30%} /* правая колонка (термины) - в 2.33 раза уже (70/30 ≈ 2.33) */
+#left{width:70%}
+#right{width:30%}
 .item{
     background:#f8fafc;
     border:2px solid #e2e8f0;
@@ -28,12 +28,11 @@ h2{margin-bottom:6px}
     display:flex;
     align-items:center;
     justify-content:center;
-    min-height:50px;
-    white-space:nowrap; /* текст в одну строку */
+    height:60px; /* ФИКСИРОВАННАЯ высота для всех */
+    white-space:nowrap;
     overflow:hidden;
-    text-overflow:ellipsis; /* если не влезает - многоточие */
+    text-overflow:ellipsis;
 }
-/* для правой колонки можно чуть уменьшить шрифт, если слова длинные */
 #right .item {
     font-size:0.95rem;
 }
@@ -63,7 +62,6 @@ svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
 <button id="resetBtn">🔄 Play Again</button>
 
 <script>
-// Ваши 10 слов (определения + слова)
 const pairs = [
     { id: 1, en: "a business that makes or sells things or provides services", ru: "company" },
     { id: 2, en: "a person who buys products or uses services", ru: "customer" },
