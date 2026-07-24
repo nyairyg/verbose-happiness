@@ -274,7 +274,7 @@
         // ROUND 3: correct mistakes (NO present continuous)
         {
           title: 'Correct the Mistakes',
-          instruction: 'Rewrite correctly (short or long negatives accepted).',
+          instruction: 'Rewrite correctly.',
           type: 'correction',
           data: [
             { wrong: 'She are a wonderful person.', answer: 'She is a wonderful person.' },
@@ -286,7 +286,7 @@
             { wrong: 'I aren\'t hungry right now.', answer: 'I am not hungry right now.' },
             { wrong: 'She am not at home.', answer: 'She is not at home.' },
             { wrong: 'They isn\'t coming to the party.', answer: 'They are not coming to the party.' },
-            { wrong: 'The dogs is barking very loudly.', answer: 'The dogs are barking very loudly.' }
+            { wrong: 'The dogs is very loud.', answer: 'The dogs are very loud.' }
           ]
         },
         // ROUND 4: yes/no questions (full nouns) - wider input
@@ -324,7 +324,7 @@
             { sentence: 'The dog barks loudly at night.', answer: 'A' },
             { sentence: 'My grandparents are from Spain.', answer: 'I' },
             { sentence: 'She writes emails every day.', answer: 'A' },
-            { sentence: 'The baby cries when he is hungry.', answer: 'A' }
+            { sentence: 'The baby cries every night.', answer: 'A' }
           ]
         },
         // ROUND 6: multiple choice (present simple positive)
@@ -380,13 +380,13 @@
           type: 'mc_mixed',
           data: [
             { sentence: 'She _______ my best friend.', options: ['is', 'are', 'do', 'does'], answer: 'A' },
-            { sentence: 'We _______ going to the cinema.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
+            { sentence: 'We _______ at the cinema.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
             { sentence: 'I _______ not sure about that.', options: ['is', 'am', 'do', 'does'], answer: 'B' },
             { sentence: 'The dog and the cat _______ in the garden.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
             { sentence: 'You _______ very quiet today.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
             { sentence: 'My parents _______ at work right now.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
             { sentence: 'I _______ twelve years old.', options: ['is', 'am', 'do', 'does'], answer: 'B' },
-            { sentence: 'The books _______ on the shelf.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
+            { sentence: 'The books _______ on the sofa.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
             { sentence: 'He _______ a good singer.', options: ['is', 'are', 'do', 'does'], answer: 'A' },
             { sentence: 'We _______ all excited about the trip.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
             { sentence: 'She _______ not like coffee.', options: ['is', 'are', 'do', 'does'], answer: 'D' },
@@ -431,7 +431,7 @@
           instruction: 'Turn each statement into a wh- question using the word in brackets.',
           type: 'wh_simple',
           data: [
-            { statement: 'She is a teacher. (What)', answer: 'What is she?' },
+            { statement: 'She is a teacher. (What / job)', answer: 'What is her job?' },
             { statement: 'They live in London. (Where)', answer: 'Where do they live?' },
             { statement: 'He eats breakfast at 7 am. (When)', answer: 'When does he eat breakfast?' },
             { statement: 'I am tired because I worked late. (Why)', answer: 'Why are you tired?' },
