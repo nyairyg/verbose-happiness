@@ -110,7 +110,7 @@
 
     .input-gap { width: 80px; }
     .input-rewrite { width: 200px; flex: 1 1 180px; }
-    .input-correct { width: 240px; flex: 1 1 200px; }
+    .input-correct { width: 280px; flex: 1 1 240px; }
     .input-short { width: 60px; }
 
     .input-gap:focus, .input-rewrite:focus, .input-correct:focus, .input-short:focus {
@@ -128,7 +128,6 @@
       padding: 0.7rem 2rem;
       letter-spacing: 0.3px;
       cursor: pointer;
-      margin: 0.8rem 0 0.2rem 0;
       transition: background 0.15s;
       border-radius: 0;
       font-family: inherit;
@@ -156,8 +155,7 @@
       color: #1e1e1e;
       font-weight: 600;
       font-size: 1rem;
-      padding: 0.5rem 2rem;
-      margin-left: 1rem;
+      padding: 0.7rem 2rem;
       cursor: pointer;
       transition: 0.1s;
       font-family: inherit;
@@ -172,11 +170,12 @@
       color: #aaa;
     }
 
-    .flex-row {
+    .button-row {
       display: flex;
       align-items: center;
+      gap: 1rem;
       flex-wrap: wrap;
-      gap: 0.5rem 0.2rem;
+      margin-top: 0.8rem;
     }
 
     .example-hint {
@@ -210,17 +209,10 @@
       height: 16px;
     }
 
-    .inline-radio-group {
-      display: flex;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      margin-left: 0.5rem;
-    }
-
     @media (max-width: 600px) {
       .game-container { padding: 1.8rem 1.2rem; }
       .input-rewrite { width: 140px; flex: 1 1 120px; }
-      .input-correct { width: 160px; flex: 1 1 140px; }
+      .input-correct { width: 180px; flex: 1 1 160px; }
       .input-gap { width: 60px; }
     }
   </style>
@@ -232,7 +224,7 @@
     <div class="round-title" id="roundTitle">Fill the Gap</div>
     <div class="round-instruction" id="roundInstruction">Complete each sentence with <strong>am</strong>, <strong>is</strong>, or <strong>are</strong>.</div>
     <div id="dynamicContent"></div>
-    <div class="flex-row" style="margin-top: 0.5rem;">
+    <div class="button-row">
       <button class="check-btn" id="checkBtn">✓ CHECK</button>
       <button class="next-btn" id="nextBtn" disabled>➔ NEXT ROUND</button>
     </div>
@@ -279,7 +271,7 @@
             { prompt: 'They / ready.', answer: 'They are not ready.' }
           ]
         },
-        // ROUND 3: correct mistakes (accept short & long)
+        // ROUND 3: correct mistakes (NO present continuous)
         {
           title: 'Correct the Mistakes',
           instruction: 'Rewrite correctly (short or long negatives accepted).',
@@ -291,13 +283,13 @@
             { wrong: 'We is not ready yet.', answer: 'We are not ready yet.' },
             { wrong: 'He are a famous actor.', answer: 'He is a famous actor.' },
             { wrong: 'You am my favorite teacher.', answer: 'You are my favorite teacher.' },
-            { wrong: 'The children is playing outside.', answer: 'The children are playing outside.' },
             { wrong: 'I aren\'t hungry right now.', answer: 'I am not hungry right now.' },
             { wrong: 'She am not at home.', answer: 'She is not at home.' },
-            { wrong: 'They isn\'t coming to the party.', answer: 'They are not coming to the party.' }
+            { wrong: 'They isn\'t coming to the party.', answer: 'They are not coming to the party.' },
+            { wrong: 'The dogs is barking very loudly.', answer: 'The dogs are barking very loudly.' }
           ]
         },
-        // ROUND 4: yes/no questions (full nouns)
+        // ROUND 4: yes/no questions (full nouns) - wider input
         {
           title: 'Yes/No Questions',
           instruction: 'Turn each statement into a yes/no question. Use full noun subjects.',
@@ -418,7 +410,7 @@
             { statement: 'Your sister plays the piano. (What instrument)', answer: 'What instrument does your sister play?' },
             { statement: 'He works because he needs money. (Why)', answer: 'Why does he work?' },
             { statement: 'My friends go to the cinema once a week. (How often)', answer: 'How often do your friends go to the cinema?' },
-            { statement: 'The children eat vegetables.', answer: 'Do the children eat vegetables?' }, // no wh word, but keep as yes/no
+            { statement: 'The children eat vegetables.', answer: 'Do the children eat vegetables?' },
             { statement: 'The children play in the park. (Where)', answer: 'Where do the children play?' },
             { statement: 'My father works on weekends.', answer: 'Does my father work on weekends?' },
             { statement: 'The dogs sleep in the garden.', answer: 'Do the dogs sleep in the garden?' },
@@ -493,7 +485,6 @@
         const normUser = normalize(userVal);
         const full = normalize(correctFull);
         if (normUser === full) return true;
-        // generate short variants
         const words = full.split(' ');
         if (words.includes('not')) {
           const notIdx = words.indexOf('not');
