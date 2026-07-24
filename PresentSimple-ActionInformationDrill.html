@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESL · am/is/are & more · Swiss style</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f5f5f0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      color: #1e1e1e;
+    }
+
+    .game-container {
+      max-width: 860px;
+      width: 100%;
+      background: white;
+      padding: 2.5rem 2.8rem;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02);
+      border-radius: 0;
+      border: 1px solid #d0d0d0;
+    }
+
+    h1 {
+      font-weight: 500;
+      font-size: 1.8rem;
+      letter-spacing: -0.3px;
+      border-bottom: 2px solid #1e1e1e;
+      padding-bottom: 0.6rem;
+      margin-bottom: 1.8rem;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .round-badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      background: #1e1e1e;
+      color: white;
+      padding: 0.2rem 0.9rem;
+      margin-bottom: 0.6rem;
+      border-radius: 0;
+    }
+
+    .round-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 0.2rem 0 0.8rem 0;
+      letter-spacing: -0.2px;
+    }
+
+    .round-instruction {
+      font-size: 1rem;
+      border-left: 4px solid #1e1e1e;
+      padding-left: 0.8rem;
+      margin: 0.5rem 0 1.5rem 0;
+      color: #2c2c2c;
+      font-weight: 400;
+    }
+
+    .sentence-list {
+      list-style: none;
+      margin: 1.2rem 0 1.8rem 0;
+    }
+
+    .sentence-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      padding: 0.3rem 0;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #eaeaea;
+      line-height: 1.8;
+    }
+
+    .sentence-item:last-child {
+      border-bottom: none;
+    }
+
+    .sentence-text {
+      font-weight: 400;
+      white-space: pre-wrap;
+    }
+
+    .input-gap, .input-rewrite, .input-correct, .input-short {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 1rem;
+      border: none;
+      border-bottom: 2px solid #1e1e1e;
+      background: transparent;
+      padding: 0.1rem 0.2rem;
+      transition: border-color 0.1s;
+      font-weight: 400;
+      color: #1e1e1e;
+    }
+
+    .input-gap { width: 80px; }
+    .input-rewrite { width: 200px; flex: 1 1 180px; }
+    .input-correct { width: 240px; flex: 1 1 200px; }
+    .input-short { width: 60px; }
+
+    .input-gap:focus, .input-rewrite:focus, .input-correct:focus, .input-short:focus {
+      outline: none;
+      border-bottom-color: #888;
+      background: #f9f9f6;
+    }
+
+    .check-btn {
+      background: #1e1e1e;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.7rem 2rem;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      margin: 0.8rem 0 0.2rem 0;
+      transition: background 0.15s;
+      border-radius: 0;
+      font-family: inherit;
+      border: 1px solid #1e1e1e;
+    }
+
+    .check-btn:hover { background: #3b3b3b; }
+    .check-btn:active { background: #000; }
+
+    .message-area {
+      margin: 1rem 0 0.4rem 0;
+      font-weight: 500;
+      font-size: 1rem;
+      min-height: 2.2rem;
+      border-top: 1px solid #ddd;
+      padding-top: 0.8rem;
+    }
+
+    .message-success { color: #1a6b3c; }
+    .message-error { color: #b13e3e; }
+
+    .next-btn {
+      background: transparent;
+      border: 2px solid #1e1e1e;
+      color: #1e1e1e;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.5rem 2rem;
+      margin-left: 1rem;
+      cursor: pointer;
+      transition: 0.1s;
+      font-family: inherit;
+      border-radius: 0;
+    }
+
+    .next-btn:hover { background: #1e1e1e; color: white; }
+    .next-btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+      border-color: #aaa;
+      color: #aaa;
+    }
+
+    .flex-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.2rem;
+    }
+
+    .example-hint {
+      font-size: 0.9rem;
+      color: #3d3d3d;
+      background: #f0f0eb;
+      padding: 0.2rem 0.6rem;
+      margin-bottom: 0.4rem;
+      display: inline-block;
+    }
+
+    .option-group {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 0.2rem 0;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 1rem;
+    }
+
+    .option-label input[type="radio"] {
+      margin-right: 0.1rem;
+      accent-color: #1e1e1e;
+      width: 16px;
+      height: 16px;
+    }
+
+    .inline-radio-group {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-left: 0.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .game-container { padding: 1.8rem 1.2rem; }
+      .input-rewrite { width: 140px; flex: 1 1 120px; }
+      .input-correct { width: 160px; flex: 1 1 140px; }
+      .input-gap { width: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container" id="app">
+    <h1>⏺ am / is / are · plus</h1>
+    <div class="round-badge" id="roundBadge">ROUND 1 / 11</div>
+    <div class="round-title" id="roundTitle">Fill the Gap</div>
+    <div class="round-instruction" id="roundInstruction">Complete each sentence with <strong>am</strong>, <strong>is</strong>, or <strong>are</strong>.</div>
+    <div id="dynamicContent"></div>
+    <div class="flex-row" style="margin-top: 0.5rem;">
+      <button class="check-btn" id="checkBtn">✓ CHECK</button>
+      <button class="next-btn" id="nextBtn" disabled>➔ NEXT ROUND</button>
+    </div>
+    <div id="messageArea" class="message-area"></div>
+  </div>
+
+  <script>
+    (function() {
+      // ----- all rounds --------------------------------------------
+      const rounds = [
+        // ROUND 1: gap (am/is/are)
+        {
+          title: 'Fill the Gap',
+          instruction: 'Complete each sentence with <strong>am</strong>, <strong>is</strong>, or <strong>are</strong>.',
+          type: 'gap',
+          data: [
+            { prefix: 'I', suffix: 'a student.', answer: 'am' },
+            { prefix: 'She', suffix: 'my sister.', answer: 'is' },
+            { prefix: 'We', suffix: 'in the classroom.', answer: 'are' },
+            { prefix: 'They', suffix: 'very kind.', answer: 'are' },
+            { prefix: 'It', suffix: 'a sunny day.', answer: 'is' },
+            { prefix: 'You', suffix: 'my best friend.', answer: 'are' },
+            { prefix: 'He', suffix: 'a teacher.', answer: 'is' },
+            { prefix: 'The dogs', suffix: 'hungry.', answer: 'are' },
+            { prefix: 'I', suffix: 'happy today.', answer: 'am' },
+            { prefix: 'We', suffix: 'ready to go.', answer: 'are' }
+          ]
+        },
+        // ROUND 2: negative full forms
+        {
+          title: 'Negative forms (full)',
+          instruction: 'Rewrite using <strong>am not / is not / are not</strong> (full forms).',
+          type: 'rewrite',
+          data: [
+            { prompt: 'I / tired.', answer: 'I am not tired.' },
+            { prompt: 'They / at home.', answer: 'They are not at home.' },
+            { prompt: 'He / a doctor.', answer: 'He is not a doctor.' },
+            { prompt: 'We / late.', answer: 'We are not late.' },
+            { prompt: 'It / cold.', answer: 'It is not cold.' },
+            { prompt: 'You / wrong.', answer: 'You are not wrong.' },
+            { prompt: 'The children / noisy.', answer: 'The children are not noisy.' },
+            { prompt: 'I / hungry.', answer: 'I am not hungry.' },
+            { prompt: 'She / happy.', answer: 'She is not happy.' },
+            { prompt: 'They / ready.', answer: 'They are not ready.' }
+          ]
+        },
+        // ROUND 3: correct mistakes (accept short & long)
+        {
+          title: 'Correct the Mistakes',
+          instruction: 'Rewrite correctly (short or long negatives accepted).',
+          type: 'correction',
+          data: [
+            { wrong: 'She are a wonderful person.', answer: 'She is a wonderful person.' },
+            { wrong: 'I is very tired today.', answer: 'I am very tired today.' },
+            { wrong: 'They am in the classroom.', answer: 'They are in the classroom.' },
+            { wrong: 'We is not ready yet.', answer: 'We are not ready yet.' },
+            { wrong: 'He are a famous actor.', answer: 'He is a famous actor.' },
+            { wrong: 'You am my favorite teacher.', answer: 'You are my favorite teacher.' },
+            { wrong: 'The children is playing outside.', answer: 'The children are playing outside.' },
+            { wrong: 'I aren\'t hungry right now.', answer: 'I am not hungry right now.' },
+            { wrong: 'She am not at home.', answer: 'She is not at home.' },
+            { wrong: 'They isn\'t coming to the party.', answer: 'They are not coming to the party.' }
+          ]
+        },
+        // ROUND 4: yes/no questions (full nouns)
+        {
+          title: 'Yes/No Questions',
+          instruction: 'Turn each statement into a yes/no question. Use full noun subjects.',
+          type: 'question',
+          data: [
+            { statement: 'The students are ready for the test.', answer: 'Are the students ready for the test?' },
+            { statement: 'My mother is a doctor.', answer: 'Is my mother a doctor?' },
+            { statement: 'The children are in the garden.', answer: 'Are the children in the garden?' },
+            { statement: 'Your brother is at home.', answer: 'Is your brother at home?' },
+            { statement: 'The cat and the dog are friends.', answer: 'Are the cat and the dog friends?' },
+            { statement: 'The weather is nice today.', answer: 'Is the weather nice today?' },
+            { statement: 'The books are on the shelf.', answer: 'Are the books on the shelf?' },
+            { statement: 'My parents are very kind.', answer: 'Are my parents very kind?' },
+            { statement: 'The manager is in the office.', answer: 'Is the manager in the office?' },
+            { statement: 'The windows are open.', answer: 'Are the windows open?' }
+          ]
+        },
+        // ROUND 5: A (Action) / I (Information)
+        {
+          title: 'Action or Information?',
+          instruction: 'Choose <strong>A</strong> (Action) or <strong>I</strong> (Information) for each sentence.',
+          type: 'ai',
+          data: [
+            { sentence: 'The birds fly south in winter.', answer: 'A' },
+            { sentence: 'My sister is a nurse.', answer: 'I' },
+            { sentence: 'The children play football every day.', answer: 'A' },
+            { sentence: 'Our teacher explains the lesson clearly.', answer: 'A' },
+            { sentence: 'The flowers are beautiful in spring.', answer: 'I' },
+            { sentence: 'My father drives to work every morning.', answer: 'A' },
+            { sentence: 'The students listen to the teacher.', answer: 'A' },
+            { sentence: 'The house is very old.', answer: 'I' },
+            { sentence: 'The dog barks loudly at night.', answer: 'A' },
+            { sentence: 'My grandparents are from Spain.', answer: 'I' },
+            { sentence: 'She writes emails every day.', answer: 'A' },
+            { sentence: 'The baby cries when he is hungry.', answer: 'A' }
+          ]
+        },
+        // ROUND 6: multiple choice (present simple positive)
+        {
+          title: 'Choose the correct option (positive)',
+          instruction: 'Select A, B, C, or D.',
+          type: 'mc_pos',
+          data: [
+            { sentence: 'She _______ to school every day.', options: ['go', 'goes', 'is', 'are'], answer: 'B' },
+            { sentence: 'They _______ breakfast at 7 am.', options: ['eat', 'eats', 'is', 'are'], answer: 'A' },
+            { sentence: 'He _______ his homework in the evening.', options: ['do', 'does', 'is', 'are'], answer: 'B' },
+            { sentence: 'We _______ TV after dinner.', options: ['watch', 'watches', 'is', 'am'], answer: 'A' },
+            { sentence: 'The cat _______ milk.', options: ['drink', 'drinks', 'is', 'are'], answer: 'B' },
+            { sentence: 'My friends _______ to the park every weekend.', options: ['walk', 'walks', 'is', 'are'], answer: 'A' },
+            { sentence: 'She _______ her room every Saturday.', options: ['clean', 'cleans', 'is', 'am'], answer: 'B' },
+            { sentence: 'The dog _______ loudly at strangers.', options: ['bark', 'barks', 'is', 'are'], answer: 'B' },
+            { sentence: 'I _______ my teeth twice a day.', options: ['brush', 'brushes', 'am', 'are'], answer: 'A' },
+            { sentence: 'The children _______ games in the garden.', options: ['play', 'plays', 'is', 'am'], answer: 'A' }
+          ]
+        },
+        // ROUND 7: multiple choice (positive/negative with reason)
+        {
+          title: 'Choose the correct option (positive/negative)',
+          instruction: 'Select A, B, C, or D.',
+          type: 'mc_neg',
+          data: [
+            { sentence: 'She _______ to school every day because she lives nearby.', options: ['go', 'goes', 'don\'t go', 'doesn\'t go'], answer: 'B' },
+            { sentence: 'They _______ breakfast at 7 am because they wake up early.', options: ['eat', 'eats', 'don\'t eat', 'doesn\'t eat'], answer: 'A' },
+            { sentence: 'He _______ his homework in the evening because he prefers mornings.', options: ['do', 'does', 'don\'t do', 'doesn\'t do'], answer: 'D' },
+            { sentence: 'We _______ TV after dinner because we are too tired.', options: ['watch', 'watches', 'don\'t watch', 'doesn\'t watch'], answer: 'C' },
+            { sentence: 'The cat _______ milk because it\'s allergic.', options: ['drink', 'drinks', 'don\'t drink', 'doesn\'t drink'], answer: 'D' },
+            { sentence: 'My friends _______ to the park every weekend because they love nature.', options: ['walk', 'walks', 'don\'t walk', 'doesn\'t walk'], answer: 'A' },
+            { sentence: 'She _______ her room every Saturday because it gets messy.', options: ['clean', 'cleans', 'don\'t clean', 'doesn\'t clean'], answer: 'B' },
+            { sentence: 'The dog _______ loudly at strangers because it\'s very friendly.', options: ['bark', 'barks', 'don\'t bark', 'doesn\'t bark'], answer: 'D' },
+            { sentence: 'I _______ my teeth twice a day because my dentist told me to.', options: ['brush', 'brushes', 'don\'t brush', 'doesn\'t brush'], answer: 'A' },
+            { sentence: 'The children _______ games in the garden because it\'s raining outside.', options: ['play', 'plays', 'don\'t play', 'doesn\'t play'], answer: 'C' },
+            { sentence: 'My father _______ coffee in the morning because he prefers tea.', options: ['drink', 'drinks', 'don\'t drink', 'doesn\'t drink'], answer: 'D' },
+            { sentence: 'We _______ to school by bus because our school is very close.', options: ['go', 'goes', 'don\'t go', 'doesn\'t go'], answer: 'C' },
+            { sentence: 'The birds _______ south in winter because they like the cold.', options: ['fly', 'flies', 'don\'t fly', 'doesn\'t fly'], answer: 'C' },
+            { sentence: 'My sister _______ vegetables because she thinks they\'re delicious.', options: ['like', 'likes', 'don\'t like', 'doesn\'t like'], answer: 'B' },
+            { sentence: 'The students _______ attention in class because the teacher is boring.', options: ['pay', 'pays', 'don\'t pay', 'doesn\'t pay'], answer: 'C' },
+            { sentence: 'He _______ his car to work because he lives very close.', options: ['drive', 'drives', 'don\'t drive', 'doesn\'t drive'], answer: 'D' },
+            { sentence: 'I _______ meat because I am a vegetarian.', options: ['eat', 'eats', 'don\'t eat', 'doesn\'t eat'], answer: 'C' },
+            { sentence: 'The baby _______ at night because he is very calm.', options: ['cry', 'cries', 'don\'t cry', 'doesn\'t cry'], answer: 'D' },
+            { sentence: 'They _______ to the gym every day because they are lazy.', options: ['go', 'goes', 'don\'t go', 'doesn\'t go'], answer: 'C' },
+            { sentence: 'My brother _______ his room because he is very messy.', options: ['tidy', 'tidies', 'don\'t tidy', 'doesn\'t tidy'], answer: 'D' }
+          ]
+        },
+        // ROUND 8: mixed (am/is/are vs do/does)
+        {
+          title: 'Mixed: am/is/are · do/does',
+          instruction: 'Choose the correct option: A, B, C, or D.',
+          type: 'mc_mixed',
+          data: [
+            { sentence: 'She _______ my best friend.', options: ['is', 'are', 'do', 'does'], answer: 'A' },
+            { sentence: 'We _______ going to the cinema.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
+            { sentence: 'I _______ not sure about that.', options: ['is', 'am', 'do', 'does'], answer: 'B' },
+            { sentence: 'The dog and the cat _______ in the garden.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
+            { sentence: 'You _______ very quiet today.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
+            { sentence: 'My parents _______ at work right now.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
+            { sentence: 'I _______ twelve years old.', options: ['is', 'am', 'do', 'does'], answer: 'B' },
+            { sentence: 'The books _______ on the shelf.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
+            { sentence: 'He _______ a good singer.', options: ['is', 'are', 'do', 'does'], answer: 'A' },
+            { sentence: 'We _______ all excited about the trip.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
+            { sentence: 'She _______ not like coffee.', options: ['is', 'are', 'do', 'does'], answer: 'D' },
+            { sentence: 'They _______ not play tennis on Sundays.', options: ['is', 'are', 'do', 'does'], answer: 'C' },
+            { sentence: 'He _______ not eat meat.', options: ['is', 'are', 'do', 'does'], answer: 'D' },
+            { sentence: 'I _______ not understand this question.', options: ['is', 'am', 'do', 'does'], answer: 'C' },
+            { sentence: 'The children _______ not want to go to bed.', options: ['is', 'are', 'do', 'does'], answer: 'C' },
+            { sentence: 'My brother _______ not like vegetables.', options: ['is', 'are', 'do', 'does'], answer: 'D' },
+            { sentence: 'We _______ not ready yet.', options: ['is', 'are', 'do', 'does'], answer: 'B' },
+            { sentence: 'She _______ not a teacher. She\'s a student.', options: ['is', 'are', 'do', 'does'], answer: 'A' },
+            { sentence: 'They _______ not live in this city.', options: ['is', 'are', 'do', 'does'], answer: 'C' },
+            { sentence: 'It _______ not rain very often here.', options: ['is', 'are', 'do', 'does'], answer: 'D' }
+          ]
+        },
+        // ROUND 9: wh- questions (with question word in brackets)
+        {
+          title: 'Wh- Questions (with question word)',
+          instruction: 'Turn each statement into a wh- question using the word in brackets.',
+          type: 'wh_question',
+          data: [
+            { statement: 'Your sister plays the piano. (What instrument)', answer: 'What instrument does your sister play?' },
+            { statement: 'He works because he needs money. (Why)', answer: 'Why does he work?' },
+            { statement: 'My friends go to the cinema once a week. (How often)', answer: 'How often do your friends go to the cinema?' },
+            { statement: 'The children eat vegetables.', answer: 'Do the children eat vegetables?' }, // no wh word, but keep as yes/no
+            { statement: 'The children play in the park. (Where)', answer: 'Where do the children play?' },
+            { statement: 'My father works on weekends.', answer: 'Does my father work on weekends?' },
+            { statement: 'The dogs sleep in the garden.', answer: 'Do the dogs sleep in the garden?' },
+            { statement: 'She teaches math and science. (What subjects)', answer: 'What subjects does she teach?' },
+            { statement: 'The students finish school at 3 pm. (When)', answer: 'When do the students finish school?' },
+            { statement: 'He goes to school by bus. (How)', answer: 'How does he go to school?' },
+            { statement: 'My mother buys groceries every Saturday. (When)', answer: 'When does your mother buy groceries?' },
+            { statement: 'They speak three languages. (How many)', answer: 'How many languages do they speak?' },
+            { statement: 'Your parents speak French.', answer: 'Do your parents speak French?' },
+            { statement: 'Those shops open on Sundays.', answer: 'Do those shops open on Sundays?' },
+            { statement: 'She likes chocolate ice cream. (What)', answer: 'What does she like?' },
+            { statement: 'The train arrives at 6 pm. (What time)', answer: 'What time does the train arrive?' }
+          ]
+        },
+        // ROUND 10: wh- questions with given question word
+        {
+          title: 'Wh- Questions with Question Words',
+          instruction: 'Turn each statement into a wh- question using the word in brackets.',
+          type: 'wh_simple',
+          data: [
+            { statement: 'She is a teacher. (What)', answer: 'What is she?' },
+            { statement: 'They live in London. (Where)', answer: 'Where do they live?' },
+            { statement: 'He eats breakfast at 7 am. (When)', answer: 'When does he eat breakfast?' },
+            { statement: 'I am tired because I worked late. (Why)', answer: 'Why are you tired?' },
+            { statement: 'She plays the piano. (What instrument)', answer: 'What instrument does she play?' },
+            { statement: 'They are in the kitchen. (Where)', answer: 'Where are they?' },
+            { statement: 'He walks to school. (How)', answer: 'How does he walk to school?' },
+            { statement: 'She has three brothers. (How many)', answer: 'How many brothers does she have?' },
+            { statement: 'We are happy about the news. (Why)', answer: 'Why are we happy about the news?' },
+            { statement: 'He reads newspapers every day. (What)', answer: 'What does he read every day?' }
+          ]
+        },
+        // ROUND 11: correct the mistakes (two errors each)
+        {
+          title: 'Correct the Mistakes (Multiple Errors)',
+          instruction: 'Each sentence has two grammar mistakes. Find and correct both.',
+          type: 'correction_two',
+          data: [
+            { wrong: 'She go to school every day but she aren\'t happy.', answer: 'She goes to school every day but she isn\'t happy.' },
+            { wrong: 'I doesn\'t like coffee, but my friends likes it.', answer: 'I don\'t like coffee, but my friends like it.' },
+            { wrong: 'He don\'t eat meat and he aren\'t a vegetarian.', answer: 'He doesn\'t eat meat and he isn\'t a vegetarian.' },
+            { wrong: 'They is always late, but we am always on time.', answer: 'They are always late, but we are always on time.' },
+            { wrong: 'She have a dog, but it don\'t like me.', answer: 'She has a dog, but it doesn\'t like me.' },
+            { wrong: 'The children plays in the garden, but the cat sleep inside.', answer: 'The children play in the garden, but the cat sleeps inside.' },
+            { wrong: 'I am not understanding the question, and she don\'t know the answer.', answer: 'I don\'t understand the question, and she doesn\'t know the answer.' },
+            { wrong: 'He go to work by bus, but his wife drive a car.', answer: 'He goes to work by bus, but his wife drives a car.' },
+            { wrong: 'We doesn\'t watch TV, but we reads books.', answer: 'We don\'t watch TV, but we read books.' },
+            { wrong: 'The teacher don\'t like noise, so the students is quiet.', answer: 'The teacher doesn\'t like noise, so the students are quiet.' }
+          ]
+        }
+      ];
+
+      // ----- state -------------------------------------------------
+      let currentRound = 0;
+      let userInputs = [];
+      let allCorrect = false;
+
+      const dynamicEl = document.getElementById('dynamicContent');
+      const messageEl = document.getElementById('messageArea');
+      const checkBtn = document.getElementById('checkBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const roundBadge = document.getElementById('roundBadge');
+      const roundTitle = document.getElementById('roundTitle');
+      const roundInstruction = document.getElementById('roundInstruction');
+
+      function normalize(str) {
+        return str.trim().replace(/[.,!?;:()"]/g, '').replace(/\s+/g, ' ').toLowerCase();
+      }
+
+      // for correction rounds (3 and 11) accept short/long
+      function isCorrectCorrection(userVal, correctFull) {
+        const normUser = normalize(userVal);
+        const full = normalize(correctFull);
+        if (normUser === full) return true;
+        // generate short variants
+        const words = full.split(' ');
+        if (words.includes('not')) {
+          const notIdx = words.indexOf('not');
+          if (notIdx > 0) {
+            const before = words[notIdx-1];
+            if (before === 'is') {
+              const copy = [...words]; copy.splice(notIdx-1, 2, 'isn\'t');
+              if (normalize(copy.join(' ')) === normUser) return true;
+            } else if (before === 'are') {
+              const copy = [...words]; copy.splice(notIdx-1, 2, 'aren\'t');
+              if (normalize(copy.join(' ')) === normUser) return true;
+            } else if (before === 'am') {
+              const copy = [...words]; copy.splice(notIdx-1, 2, 'i\'m', 'not');
+              if (normalize(copy.join(' ')) === normUser) return true;
+            }
+          }
+        }
+        const shortMap = {
+          'she is not': 'she isn\'t',
+          'they are not': 'they aren\'t',
+          'we are not': 'we aren\'t',
+          'he is not': 'he isn\'t',
+          'it is not': 'it isn\'t',
+          'you are not': 'you aren\'t',
+          'i am not': 'i\'m not',
+          'the children are not': 'the children aren\'t'
+        };
+        for (let key in shortMap) {
+          if (normalize(key) === full && normalize(shortMap[key]) === normUser) return true;
+          if (normalize(shortMap[key]) === full && normalize(key) === normUser) return true;
+        }
+        return false;
+      }
+
+      // ----- render ------------------------------------------------
+      function renderRound(roundIndex) {
+        const round = rounds[roundIndex];
+        allCorrect = false;
+        nextBtn.disabled = true;
+        messageEl.textContent = '';
+        messageEl.className = 'message-area';
+
+        roundBadge.textContent = `ROUND ${roundIndex+1} / ${rounds.length}`;
+        roundTitle.textContent = round.title;
+        roundInstruction.innerHTML = round.instruction;
+
+        let html = '';
+        userInputs = [];
+
+        const type = round.type;
+
+        if (type === 'gap') {
+          html = `<ul class="sentence-list">`;
+          round.data.forEach((item, idx) => {
+            html += `<li class="sentence-item">
+              <span class="sentence-text">${item.prefix}</span>
+              <input class="input-gap" type="text" autocomplete="off" spellcheck="false" data-answer="${item.answer}" data-idx="${idx}">
+              <span class="sentence-text">${item.suffix}</span>
+            </li>`;
+          });
+          html += `</ul>`;
+          dynamicEl.innerHTML = html;
+          document.querySelectorAll('.input-gap').forEach(inp => userInputs.push(inp));
+        }
+        else if (type === 'rewrite' || type === 'correction' || type === 'correction_two' || type === 'question' || type === 'wh_question' || type === 'wh_simple') {
+          const cls = (type === 'rewrite') ? 'input-rewrite' : 'input-correct';
+          const listCls = (type === 'rewrite') ? 'rewrite-item' : 'correction-item';
+          let label = '';
+          if (type === 'question') label = 'Example: The teacher is in the classroom. → Is the teacher in the classroom?';
+          else if (type === 'wh_question') label = 'Use the question word in brackets.';
+          else if (type === 'wh_simple') label = 'Use the question word in brackets.';
+          html = (label) ? `<div class="example-hint">${label}</div>` : '';
+          html += `<ul class="sentence-list">`;
+          round.data.forEach((item, idx) => {
+            const prompt = item.statement || item.wrong || item.prompt || '';
+            const answerKey = item.answer || '';
+            html += `<li class="${listCls}">
+              <span class="sentence-text">${prompt}</span>
+              <span class="sentence-text">→</span>
+              <input class="${cls}" type="text" autocomplete="off" spellcheck="false" data-answer="${answerKey}" data-idx="${idx}">
+            </li>`;
+          });
+          html += `</ul>`;
+          dynamicEl.innerHTML = html;
+          document.querySelectorAll(`.${cls}`).forEach(inp => userInputs.push(inp));
+        }
+        else if (type === 'ai') {
+          html = `<ul class="sentence-list">`;
+          round.data.forEach((item, idx) => {
+            html += `<li class="sentence-item">
+              <span class="sentence-text">${item.sentence}</span>
+              <span class="sentence-text">[</span>
+              <input class="input-short" type="text" maxlength="1" autocomplete="off" spellcheck="false" data-answer="${item.answer}" data-idx="${idx}" style="width:40px;text-align:center;">
+              <span class="sentence-text">]</span>
+            </li>`;
+          });
+          html += `</ul>`;
+          dynamicEl.innerHTML = html;
+          document.querySelectorAll('.input-short').forEach(inp => userInputs.push(inp));
+        }
+        else if (type === 'mc_pos' || type === 'mc_neg' || type === 'mc_mixed') {
+          html = `<ul class="sentence-list">`;
+          round.data.forEach((item, idx) => {
+            const opts = item.options;
+            html += `<li class="sentence-item" style="flex-direction:column;align-items:stretch;padding:0.5rem 0;">
+              <span class="sentence-text">${item.sentence}</span>
+              <div class="option-group">`;
+            const labels = ['A', 'B', 'C', 'D'];
+            opts.forEach((opt, oi) => {
+              const val = labels[oi];
+              html += `<label class="option-label">
+                <input type="radio" name="mc_${idx}" value="${val}" data-answer="${item.answer}" data-idx="${idx}">
+                ${val}) ${opt}
+              </label>`;
+            });
+            html += `</div></li>`;
+          });
+          html += `</ul>`;
+          dynamicEl.innerHTML = html;
+          userInputs = document.querySelectorAll('.option-group');
+        }
+
+        // attach enter key for text inputs
+        document.querySelectorAll('input[type="text"]').forEach(inp => {
+          inp.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); handleCheck(); }
+          });
+        });
+
+        checkBtn.disabled = false;
+      }
+
+      // ----- check ------------------------------------------------
+      function handleCheck() {
+        const round = rounds[currentRound];
+        const type = round.type;
+        let allOk = true;
+        let firstError = -1;
+
+        if (type === 'gap' || type === 'rewrite' || type === 'question' || type === 'wh_question' || type === 'wh_simple' || type === 'correction' || type === 'correction_two' || type === 'ai') {
+          const inputs = document.querySelectorAll('input[type="text"]');
+          inputs.forEach((inp, idx) => {
+            const userVal = inp.value;
+            const correct = inp.dataset.answer;
+            let isOk = false;
+            if (type === 'correction' || type === 'correction_two') {
+              isOk = isCorrectCorrection(userVal, correct);
+            } else if (type === 'ai') {
+              const normU = userVal.trim().toUpperCase();
+              isOk = (normU === 'A' || normU === 'I') && normU === correct;
+            } else {
+              const normU = normalize(userVal);
+              const normC = normalize(correct);
+              isOk = (normU === normC);
+            }
+            if (isOk) {
+              inp.style.borderBottomColor = '#1a6b3c';
+            } else {
+              inp.style.borderBottomColor = '#b13e3e';
+              allOk = false;
+              if (firstError === -1) firstError = idx;
+            }
+          });
+        }
+        else if (type === 'mc_pos' || type === 'mc_neg' || type === 'mc_mixed') {
+          const groups = document.querySelectorAll('.option-group');
+          groups.forEach((group, idx) => {
+            const radios = group.querySelectorAll('input[type="radio"]');
+            let selected = null;
+            radios.forEach(r => { if (r.checked) selected = r; });
+            const correct = round.data[idx].answer;
+            let isOk = false;
+            if (selected) {
+              isOk = (selected.value === correct);
+            }
+            if (isOk) {
+              group.style.borderLeft = '4px solid #1a6b3c';
+              group.style.paddingLeft = '0.5rem';
+            } else {
+              group.style.borderLeft = '4px solid #b13e3e';
+              group.style.paddingLeft = '0.5rem';
+              allOk = false;
+              if (firstError === -1) firstError = idx;
+            }
+          });
+        }
+
+        if (allOk) {
+          messageEl.textContent = '✓ All correct. You may proceed.';
+          messageEl.className = 'message-area message-success';
+          allCorrect = true;
+          nextBtn.disabled = false;
+          checkBtn.disabled = true;
+        } else {
+          messageEl.textContent = '✗ Some answers are incorrect. Review and try again.';
+          messageEl.className = 'message-area message-error';
+          allCorrect = false;
+          nextBtn.disabled = true;
+          checkBtn.disabled = false;
+        }
+      }
+
+      function goToNextRound() {
+        if (!allCorrect) return;
+        if (currentRound < rounds.length - 1) {
+          currentRound++;
+          renderRound(currentRound);
+        } else {
+          messageEl.textContent = '🎉 Well done! You completed all rounds.';
+          messageEl.className = 'message-area message-success';
+          nextBtn.disabled = true;
+          checkBtn.disabled = true;
+          document.querySelectorAll('input').forEach(inp => inp.disabled = true);
+        }
+      }
+
+      checkBtn.addEventListener('click', handleCheck);
+      nextBtn.addEventListener('click', goToNextRound);
+
+      document.addEventListener('input', function(e) {
+        if (e.target && e.target.tagName === 'INPUT' && e.target.type === 'text') {
+          e.target.style.borderBottomColor = '#1e1e1e';
+        }
+      });
+
+      renderRound(0);
+    })();
+  </script>
+</body>
+</html>
