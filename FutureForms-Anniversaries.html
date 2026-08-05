@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Future Forms – Anniversary Quiz</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #F9F9F7;
+      font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      flex-direction: column;
+    }
+
+    .quiz-header {
+      max-width: 560px;
+      width: 100%;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+    .quiz-header h1 {
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+      line-height: 1.2;
+      letter-spacing: -0.3px;
+    }
+    .quiz-header .instruction {
+      font-size: 0.95rem;
+      color: #4a4a4a;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e2de;
+      border-radius: 14px;
+      padding: 32px 28px 28px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .card.fade-out {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    .context-sentence {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: #1a1a1a;
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+    .question-text {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .option-btn {
+      background: #F5F5F2;
+      border: 1px solid #d6d6d1;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 1rem;
+      color: #1a1a1a;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      outline: none;
+    }
+    .option-btn:hover {
+      background: #eaeae5;
+    }
+    .option-btn.selected {
+      background: #e9e9e4;
+      border-color: #1a1a1a;
+      font-weight: 500;
+    }
+    .option-btn.wrong {
+      border-color: #c83c3c;
+      background: #fef5f5;
+      text-decoration: underline;
+      text-decoration-color: #c83c3c;
+      text-underline-offset: 4px;
+    }
+    .option-btn.correct {
+      border-color: #2e7d32;
+      background: #eaf6ea;
+      font-weight: 500;
+    }
+    .check-btn {
+      width: 100%;
+      background: #1a1a1a;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 0;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s ease, opacity 0.2s;
+      text-align: center;
+    }
+    .check-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+    .check-btn:not(:disabled):hover {
+      background: #2d2d2d;
+    }
+    .explanation {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: #fff7f5;
+      border-left: 3px solid #c83c3c;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: #4a2c2c;
+      display: none;
+      line-height: 1.5;
+    }
+    .explanation.visible {
+      display: block;
+    }
+    .progress-bar {
+      height: 3px;
+      background: #e0e0da;
+      border-radius: 3px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #1a1a1a;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-header">
+    <h1>Anniversary Stories</h1>
+    <p class="instruction">
+      Read each sentence carefully. The verb form (Present Continuous, going to or will) gives you some information about the situation. <br>For each question, choose the correct answer, <strong>a</strong> or <strong>b</strong>. Check the future form!
+    </p>
+  </div>
+
+  <div class="card" id="quiz-card">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="context-sentence" id="context"></div>
+    <div class="question-text" id="question"></div>
+    <div class="options" id="options"></div>
+    <button class="check-btn" id="check-btn" disabled>Check</button>
+    <div class="explanation" id="explanation"></div>
+  </div>
+
+  <script>
+    (function() {
+      const quizData = [
+        // 1. Present Continuous – arrangement (1 question)
+        {
+          context: "Mum and Dad are flying to Rome on their anniversary weekend.",
+          question: "Do they have the tickets?",
+          options: {
+            a: "Yes, they have the tickets. It's all booked.",
+            b: "No, they don't have the tickets yet. It's only an idea."
+          },
+          correct: "a",
+          explanation: "Incorrect. The Present Continuous (are flying) marks a fixed arrangement – the tickets are already booked."
+        },
+        // 2. going to – plan (2 questions)
+        {
+          context: "I'm going to cook a special dinner for our anniversary.",
+          question: "Do I have all the ingredients already?",
+          options: {
+            a: "Yes, I bought everything. The fridge is full.",
+            b: "Not necessarily. I have the plan, but I might not have the ingredients yet."
+          },
+          correct: "b",
+          explanation: "Incorrect. Going to shows a plan, but doesn't confirm the ingredients are already bought."
+        },
+        {
+          context: "I'm going to cook a special dinner for our anniversary.",
+          question: "Do I know the exact time of dinner?",
+          options: {
+            a: "Yes, dinner is at 7 p.m. sharp. I told my partner.",
+            b: "No, I haven't decided the exact time yet. It's just a plan."
+          },
+          correct: "b",
+          explanation: "Incorrect. Going to indicates a plan, not a fixed schedule with a precise time."
+        },
+        // 3. will – distant dream (2 questions)
+        {
+          context: "We'll celebrate our 50th anniversary in a big castle one day.",
+          question: "Is this a fixed arrangement with a date and a booking?",
+          options: {
+            a: "Yes, the castle is booked and the invitations are sent.",
+            b: "No, it's just a dream. I have no idea when or even if it will happen."
+          },
+          correct: "b",
+          explanation: "Incorrect. Will here describes a distant dream, not an arrangement with a booking."
+        },
+        {
+          context: "We'll celebrate our 50th anniversary in a big castle one day.",
+          question: "Do I have a specific plan for this?",
+          options: {
+            a: "Yes, I've already started planning all the details.",
+            b: "No, it's just a distant wish. Nothing is decided yet."
+          },
+          correct: "b",
+          explanation: "Incorrect. Will expresses a wish, not a detailed plan."
+        },
+        // 4. Present Continuous – arrangement (2 questions)
+        {
+          context: "We're meeting friends at the café at 6 p.m.",
+          question: "Do the friends know about the meeting?",
+          options: {
+            a: "Yes, of course. We already messaged them and they confirmed.",
+            b: "Not yet. We're going to tell them soon."
+          },
+          correct: "a",
+          explanation: "Incorrect. Present Continuous for arrangements implies the friends have been informed and have confirmed."
+        },
+        {
+          context: "We're meeting friends at the café at 6 p.m.",
+          question: "Is the time and place agreed?",
+          options: {
+            a: "Yes, it's all fixed. 6 p.m. at the café.",
+            b: "Not really. We're still thinking about where and when to meet."
+          },
+          correct: "a",
+          explanation: "Incorrect. A fixed time and place (at 6 p.m., at the café) show it's an agreed arrangement."
+        },
+        // 5. going to – prediction based on evidence (2 questions)
+        {
+          context: "Look at those dark clouds. It's going to rain during the garden party.",
+          question: "Is rain already happening?",
+          options: {
+            a: "Yes, it is raining.",
+            b: "No, but it's very likely to happen in the future."
+          },
+          correct: "b",
+          explanation: "Incorrect. Going to is based on evidence signals high likelihood."
+        },
+        {
+          context: "Look at those dark clouds. It's going to rain during the garden party.",
+          question: "Why do I think that it is going to rain?",
+          options: {
+            a: "I have evidence. I can see the dark clouds right now.",
+            b: "I have a ticket for the rain. Just kidding — no special reason."
+          },
+          correct: "a",
+          explanation: "Incorrect. The statement is made because of visible evidence – the dark clouds."
+        },
+        // 6. maybe + will – possibility (2 questions)
+        {
+          context: "Maybe we'll have a small party for our anniversary next year.",
+          question: "Is this a definite plan or just a possibility?",
+          options: {
+            a: "It's a definite plan. Everything is already decided.",
+            b: "It's just a possibility. Nothing is sure yet."
+          },
+          correct: "b",
+          explanation: "Incorrect. Maybe + will expresses uncertainty, not a definite plan."
+        },
+        {
+          context: "Maybe we'll have a small party for our anniversary next year.",
+          question: "Do I know exactly what we will do?",
+          options: {
+            a: "Yes, the guest list is ready and the music is chosen.",
+            b: "No, I'm not even sure we'll have a party. Maybe we'll just go away."
+          },
+          correct: "b",
+          explanation: "Incorrect. With maybe and will, nothing is decided yet – the details are unknown."
+        },
+        // 7. going to – plan (3 questions)
+        {
+          context: "He's going to buy her a gold necklace.",
+          question: "Has he already bought it?",
+          options: {
+            a: "Yes, it's in his pocket right now.",
+            b: "No, he hasn't bought it yet. It's still just a plan."
+          },
+          correct: "b",
+          explanation: "Incorrect. Going to refers to a future intention – the purchase hasn't happened yet."
+        },
+        {
+          context: "He's going to buy her a gold necklace.",
+          question: "Has he made the decision?",
+          options: {
+            a: "Yes, he has decided. That's exactly what he wants to do.",
+            b: "No, he's still thinking about it. Maybe flowers, maybe a necklace."
+          },
+          correct: "a",
+          explanation: "Incorrect. Going to shows the decision has been made."
+        },
+        {
+          context: "He's going to buy her a gold necklace.",
+          question: "Does he have a receipt?",
+          options: {
+            a: "Yes, he bought it this morning. Here's the receipt.",
+            b: "No, of course not. He hasn't even been to the shop yet."
+          },
+          correct: "b",
+          explanation: "Incorrect. If he hasn't bought the necklace, there can be no receipt."
+        },
+        // 8. NEW – Present Continuous arrangement (2 questions)
+        {
+          context: "We're spending our anniversary at a spa resort.",
+          question: "Is the trip already booked?",
+          options: {
+            a: "Yes, the reservation is confirmed.",
+            b: "No, we're still thinking about where to go."
+          },
+          correct: "a",
+          explanation: "Incorrect. Present Continuous (are spending) indicates a fixed arrangement, so the trip is already booked."
+        },
+        {
+          context: "We're spending our anniversary at a spa resort.",
+          question: "Do we know the exact dates?",
+          options: {
+            a: "Yes, we've arranged the specific days.",
+            b: "Not yet, it's flexible."
+          },
+          correct: "a",
+          explanation: "Incorrect. Present Continuous shows the dates are already agreed upon."
+        },
+        // 9. NEW – going to plan (2 questions)
+        {
+          context: "They will have a private ceremony.",
+          question: "Have they already arranged the ceremony?",
+          options: {
+            a: "Yes, the venue is 100% booked and the guests are invited.",
+            b: "No, it's still just a plan. Nothing is arranged yet."
+          },
+          correct: "b",
+          explanation: "Incorrect. Will refers to a plan, not an arrangement with bookings and invitations."
+        },
+        {
+          context: "They will have a private ceremony.",
+          question: "Do we know the dates of the ceremony?",
+          options: {
+            a: "Yes, and it is the near future.",
+            b: "No, or it is the distant future dates."
+          },
+          correct: "b",
+          explanation: "Incorrect. If we know the dates in the near future, we use going to or Present Continuous."
+        },
+        // 10. going to – prediction based on evidence (2 questions)
+        {
+          context: "Look at her face! She's going to cry when she sees the surprise.",
+          question: "Is she already crying?",
+          options: {
+            a: "Yes, tears are running down her face.",
+            b: "No, not yet. But I can see the emotion in her face."
+          },
+          correct: "b",
+          explanation: "Incorrect. Going to predicts an imminent reaction based on current evidence – she isn't crying yet."
+        },
+        {
+          context: "Look at her face! She's going to cry when she sees the surprise.",
+          question: "Why do I think she will cry?",
+          options: {
+            a: "It's just a random guess. No reason at all.",
+            b: "I have evidence — her expression, the big surprise coming."
+          },
+          correct: "b",
+          explanation: "Incorrect. The prediction rests on evidence (her expression), not a random guess."
+        }
+      ];
+
+      const totalSteps = quizData.length;
+      let currentStep = 0;
+      let selectedOption = null;
+      let lockInteraction = false;
+
+      const card = document.getElementById('quiz-card');
+      const contextEl = document.getElementById('context');
+      const questionEl = document.getElementById('question');
+      const optionsContainer = document.getElementById('options');
+      const checkBtn = document.getElementById('check-btn');
+      const explanationEl = document.getElementById('explanation');
+      const progressFill = document.getElementById('progress-fill');
+
+      function renderStep(index) {
+        const step = quizData[index];
+        contextEl.textContent = step.context;
+        questionEl.textContent = step.question;
+        optionsContainer.innerHTML = '';
+        explanationEl.classList.remove('visible');
+        explanationEl.textContent = '';
+        selectedOption = null;
+        lockInteraction = false;
+
+        ['a', 'b'].forEach(key => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = step.options[key];
+          btn.dataset.value = key;
+          btn.addEventListener('click', () => {
+            if (lockInteraction) return;
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected', 'wrong', 'correct'));
+            btn.classList.add('selected');
+            selectedOption = key;
+            checkBtn.disabled = false;
+          });
+          optionsContainer.appendChild(btn);
+        });
+
+        checkBtn.textContent = 'Check';
+        checkBtn.disabled = true;
+        updateProgress();
+      }
+
+      function updateProgress() {
+        const percent = (currentStep / totalSteps) * 100;
+        progressFill.style.width = percent + '%';
+      }
+
+      function markWrongAndExplain() {
+        const step = quizData[currentStep];
+        const selectedBtn = document.querySelector(`.option-btn[data-value="${selectedOption}"]`);
+        if (selectedBtn) {
+          selectedBtn.classList.add('wrong');
+        }
+        explanationEl.textContent = step.explanation;
+        explanationEl.classList.add('visible');
+        checkBtn.textContent = 'Try again';
+      }
+
+      function markCorrectAndProceed() {
+        lockInteraction = true;
+        const selectedBtn = document.querySelector(`.option-btn[data-value="${selectedOption}"]`);
+        if (selectedBtn) {
+          selectedBtn.classList.add('correct');
+        }
+        checkBtn.disabled = true;
+        checkBtn.textContent = '✓';
+
+        setTimeout(() => {
+          if (currentStep < totalSteps - 1) {
+            card.classList.add('fade-out');
+            setTimeout(() => {
+              currentStep++;
+              card.classList.remove('fade-out');
+              renderStep(currentStep);
+            }, 400);
+          } else {
+            contextEl.textContent = 'You have completed all questions.';
+            questionEl.textContent = '';
+            optionsContainer.innerHTML = '';
+            explanationEl.classList.remove('visible');
+            checkBtn.style.display = 'none';
+            progressFill.style.width = '100%';
+          }
+        }, 900);
+      }
+
+      checkBtn.addEventListener('click', () => {
+        if (lockInteraction || !selectedOption) return;
+        const step = quizData[currentStep];
+        if (selectedOption === step.correct) {
+          markCorrectAndProceed();
+        } else {
+          markWrongAndExplain();
+        }
+      });
+
+      renderStep(0);
+    })();
+  </script>
+</body>
+</html>
