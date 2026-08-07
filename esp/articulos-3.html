@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio de artículos · el / la / los / las</title>
+    <style>
+        :root {
+            --bg: #f6f3ed;
+            --card-bg: #fcfbf8;
+            --text: #1c1c1c;
+            --text-light: #8a857c;
+            --border: #d9d4ca;
+            --input-underline: #c7c1b6;
+            --input-focus: #3a3530;
+            --incorrect: #c2857a;
+            --correct: #8a9f8b;
+            --dot-color: #e3ded4;
+            --transition-speed: 0.35s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+            background-size: 22px 22px;
+            font-family: 'Helvetica Neue', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: var(--text);
+            letter-spacing: -0.01em;
+            gap: 1.8rem;
+        }
+
+        .instruction {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: #6b6560;
+            text-align: left;
+            max-width: 720px;
+            width: 100%;
+            line-height: 1.5;
+            padding: 0 0.2rem;
+            font-weight: 400;
+        }
+
+        .instruction span {
+            display: block;
+            font-weight: 400;
+            color: #8a857c;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            letter-spacing: 0.05em;
+            text-transform: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            padding: 3.2rem 2.8rem;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 8px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .progress-row {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 2.6rem;
+            padding-bottom: 1.4rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--dot-color);
+            transition: all var(--transition-speed) ease;
+            flex-shrink: 0;
+        }
+
+        .progress-dot.done {
+            background: #b0a89c;
+        }
+
+        .progress-dot.current {
+            background: #3a3530;
+            box-shadow: 0 0 0 3px rgba(58, 53, 48, 0.1);
+        }
+
+        .progress-number {
+            margin-left: auto;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-light);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .sentence-stage {
+            position: relative;
+            min-height: 90px;
+            transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+        }
+
+        .sentence-stage.fade-out {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        .sentence-stage.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .sentence-line {
+            font-size: 1.35rem;
+            line-height: 2.2;
+            text-align: left;
+            word-spacing: 0.03em;
+            margin: 0;
+        }
+
+        .blank-input {
+            display: inline-block;
+            vertical-align: baseline;
+            border: none;
+            border-bottom: 1.5px solid var(--input-underline);
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            letter-spacing: inherit;
+            text-align: center;
+            color: var(--text);
+            padding: 0.15em 0.1em;
+            margin: 0 0.25em;
+            outline: none;
+            border-radius: 0;
+            width: auto;
+            min-width: 2.5em;
+            box-sizing: content-box;
+            transition: border-color 0.2s ease, background 0.2s ease;
+            -webkit-appearance: none;
+        }
+
+        .blank-input:focus {
+            border-bottom-color: var(--input-focus);
+            border-bottom-width: 2px;
+            background: rgba(0, 0, 0, 0.015);
+        }
+
+        .blank-input.input-correct {
+            border-bottom-color: var(--correct);
+            background: rgba(138, 159, 139, 0.08);
+            transition: border-color 0.25s ease, background 0.25s ease;
+        }
+
+        .blank-input.input-incorrect {
+            border-bottom-color: var(--incorrect);
+            background: rgba(194, 133, 122, 0.07);
+            animation: subtle-shake 0.4s ease;
+        }
+
+        @keyframes subtle-shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-3px);
+            }
+            40% {
+                transform: translateX(3px);
+            }
+            60% {
+                transform: translateX(-2px);
+            }
+            80% {
+                transform: translateX(2px);
+            }
+        }
+
+        .action-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-top: 2.2rem;
+            gap: 1rem;
+        }
+
+        .btn-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 1rem;
+            color: var(--text-light);
+            transition: all 0.2s ease;
+            letter-spacing: 0;
+            line-height: 1;
+            padding: 0;
+            -webkit-appearance: none;
+            outline: none;
+            flex-shrink: 0;
+        }
+
+        .btn-check:hover {
+            border-color: #a09a90;
+            color: #3a3530;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .btn-check:active {
+            background: rgba(0, 0, 0, 0.05);
+            transform: scale(0.96);
+        }
+
+        .btn-check svg {
+            width: 15px;
+            height: 15px;
+            pointer-events: none;
+        }
+
+        .completion {
+            text-align: center;
+            padding: 2rem 0 0.5rem;
+        }
+
+        .completion-line {
+            width: 40px;
+            height: 1px;
+            background: var(--border);
+            margin: 0 auto 1.5rem;
+        }
+
+        .completion-text {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-light);
+            margin-bottom: 1.2rem;
+        }
+
+        .summary-list {
+            list-style: none;
+            text-align: left;
+            max-width: 600px;
+            margin: 1.5rem auto 0;
+            font-size: 0.95rem;
+            line-height: 2;
+            color: #6b6560;
+            letter-spacing: 0.01em;
+        }
+
+        .summary-list li {
+            padding: 0.35rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .summary-list .article-filled {
+            font-weight: 600;
+            color: #3a3530;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-restart {
+            display: inline-block;
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-light);
+            cursor: pointer;
+            background: none;
+            border: none;
+            border-bottom: 1px solid transparent;
+            padding: 0.3em 0;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            -webkit-appearance: none;
+            outline: none;
+        }
+
+        .btn-restart:hover {
+            border-bottom-color: #a09a90;
+            color: #3a3530;
+        }
+
+        .hint-text {
+            font-size: 0.7rem;
+            color: #c4bdb4;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            position: absolute;
+            bottom: -2.2rem;
+            right: 0;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1.5rem 1rem;
+                gap: 1.2rem;
+            }
+            .container {
+                padding: 2rem 1.4rem;
+            }
+            .sentence-line {
+                font-size: 1.15rem;
+                line-height: 2.2;
+            }
+            .blank-input {
+                min-width: 2.2em;
+                margin: 0 0.2em;
+            }
+            .progress-row {
+                margin-bottom: 1.8rem;
+                padding-bottom: 1rem;
+            }
+            .action-row {
+                margin-top: 1.5rem;
+            }
+            .instruction {
+                font-size: 0.75rem;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="instruction">
+        Completa los espacios con el artículo correcto: el, la, los, las
+        <br>(Заполни пропуски правильным артиклем: el, la, los, las)
+    </div>
+
+    <div class="container" id="appContainer">
+        <div class="progress-row" id="progressRow"></div>
+        <div class="sentence-stage" id="sentenceStage"></div>
+        <div class="action-row" id="actionRow">
+            <button class="btn-check" id="btnCheck" aria-label="Comprobar" title="Comprobar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="5 12 10 17 19 8"></polyline>
+                </svg>
+            </button>
+        </div>
+        <span class="hint-text" id="hintText">enter ↵</span>
+    </div>
+
+    <script>
+        (function() {
+            // Базовый массив предложений (все ответы – только определённые артикли el, la, los, las)
+            const baseSentences = [
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'El', id: 0 },
+                        { type: 'text', content: ' elefante Eduardo es grande, pero ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' ratón Félix es pequeño.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'Eduardo quiere encontrar ' },
+                        { type: 'blank', answer: 'la', id: 0 },
+                        { type: 'text', content: ' novia paciente, no ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' novia loca como Selena.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'En ' },
+                        { type: 'blank', answer: 'el', id: 0 },
+                        { type: 'text', content: ' parque hay ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' música bonita y muchas personas.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'Félix escribe ' },
+                        { type: 'blank', answer: 'el', id: 0 },
+                        { type: 'text', content: ' poema en ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' papel, pero Eduardo necesita ' },
+                        { type: 'blank', answer: 'las', id: 2 },
+                        { type: 'text', content: ' llaves de su carro.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'La', id: 0 },
+                        { type: 'text', content: ' maestra de alemán está en ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' hospital con ' },
+                        { type: 'blank', answer: 'las', id: 2 },
+                        { type: 'text', content: ' enfermeras.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'Lori no es ' },
+                        { type: 'blank', answer: 'la', id: 0 },
+                        { type: 'text', content: ' amiga buena; ella es ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' chica mala que solo quiere ' },
+                        { type: 'blank', answer: 'el', id: 2 },
+                        { type: 'text', content: ' novio perfecto.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'El', id: 0 },
+                        { type: 'text', content: ' café con sal es horrible, pero ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' café con azúcar es perfecto.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'El', id: 0 },
+                        { type: 'text', content: ' gato Simba duerme en ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' cama porque es una calefacción personal.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'En ' },
+                        { type: 'blank', answer: 'el', id: 0 },
+                        { type: 'text', content: ' zoológico, ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' león es enorme, pero ' },
+                        { type: 'blank', answer: 'los', id: 2 },
+                        { type: 'text', content: ' pingüinos son pequeños y divertidos.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'El', id: 0 },
+                        { type: 'text', content: ' conejo de Ana es pequeño, blanco y vive en ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' jaula grande.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'Las', id: 0 },
+                        { type: 'text', content: ' redes sociales son importantes, pero ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' aplicación favorita de Luis es Instagram.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'El', id: 0 },
+                        { type: 'text', content: ' zoológico tiene ' },
+                        { type: 'blank', answer: 'los', id: 1 },
+                        { type: 'text', content: ' leones enormes y ' },
+                        { type: 'blank', answer: 'los', id: 2 },
+                        { type: 'text', content: ' elefantes grises.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'Al estudiante le gusta ' },
+                        { type: 'blank', answer: 'el', id: 0 },
+                        { type: 'text', content: ' libro de aventuras, no ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' novela de ciencia ficción.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'Eurovisión es ' },
+                        { type: 'blank', answer: 'el', id: 0 },
+                        { type: 'text', content: ' concurso de música donde ' },
+                        { type: 'blank', answer: 'los', id: 1 },
+                        { type: 'text', content: ' países cantan y bailan; este año España no participa.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'Por ' },
+                        { type: 'blank', answer: 'la', id: 0 },
+                        { type: 'text', content: ' mañana bebo ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' café sin azúcar, pero por ' },
+                        { type: 'blank', answer: 'la', id: 2 },
+                        { type: 'text', content: ' tarde prefiero ' },
+                        { type: 'blank', answer: 'el', id: 3 },
+                        { type: 'text', content: ' té con limón.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'La', id: 0 },
+                        { type: 'text', content: ' vida con ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' tecnología es fácil: ' },
+                        { type: 'blank', answer: 'el', id: 2 },
+                        { type: 'text', content: ' teléfono me despierta y ' },
+                        { type: 'blank', answer: 'la', id: 3 },
+                        { type: 'text', content: ' computadora me ayuda a estudiar.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'La', id: 0 },
+                        { type: 'text', content: ' profesora Laura explica ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' gramática, mientras ' },
+                        { type: 'blank', answer: 'la', id: 2 },
+                        { type: 'text', content: ' estudiante Ana estudia en casa.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'La', id: 0 },
+                        { type: 'text', content: ' familia de Luis vive en Barcelona, y ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' amigo Carlos trabaja en ' },
+                        { type: 'blank', answer: 'el', id: 2 },
+                        { type: 'text', content: ' restaurante italiano.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'El', id: 0 },
+                        { type: 'text', content: ' sol es amarillo y caliente; ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' luna es blanca y fría.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'El', id: 0 },
+                        { type: 'text', content: ' lunes es enemigo del domingo, porque ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' domingo es día de descanso.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'En ' },
+                        { type: 'blank', answer: 'el', id: 0 },
+                        { type: 'text', content: ' aeropuerto, Pablo busca ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' pasaporte en ' },
+                        { type: 'blank', answer: 'la', id: 2 },
+                        { type: 'text', content: ' maleta azul.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'La', id: 0 },
+                        { type: 'text', content: ' tableta de Ana tiene ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' pantalla táctil y es muy rápida, ideal para estudiar.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'En ' },
+                        { type: 'blank', answer: 'la', id: 0 },
+                        { type: 'text', content: ' cocina hay ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' mesa de madera y ' },
+                        { type: 'blank', answer: 'las', id: 2 },
+                        { type: 'text', content: ' sillas blancas.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: 'Me gusta ' },
+                        { type: 'blank', answer: 'el', id: 0 },
+                        { type: 'text', content: ' chocolate, pero no me gusta ' },
+                        { type: 'blank', answer: 'la', id: 1 },
+                        { type: 'text', content: ' leche fría.' },
+                    ],
+                },
+                {
+                    segments: [
+                        { type: 'text', content: '' },
+                        { type: 'blank', answer: 'Los', id: 0 },
+                        { type: 'text', content: ' niños juegan en ' },
+                        { type: 'blank', answer: 'el', id: 1 },
+                        { type: 'text', content: ' parque con ' },
+                        { type: 'blank', answer: 'la', id: 2 },
+                        { type: 'text', content: ' pelota roja.' },
+                    ],
+                },
+            ];
+
+            // Функция перемешивания (Фишер-Йетс)
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
+            // Перемешанный массив предложений
+            let sentencesData = shuffleArray([...baseSentences]);
+            const totalSentences = sentencesData.length;
+            let currentIndex = 0;
+            let completedIndices = new Array(totalSentences).fill(false);
+            let currentInputs = [];
+            let isTransitioning = false;
+
+            const progressRow = document.getElementById('progressRow');
+            const sentenceStage = document.getElementById('sentenceStage');
+            const btnCheck = document.getElementById('btnCheck');
+            const hintText = document.getElementById('hintText');
+            const actionRow = document.getElementById('actionRow');
+
+            function buildProgressDots() {
+                progressRow.innerHTML = '';
+                for (let i = 0; i < totalSentences; i++) {
+                    const dot = document.createElement('span');
+                    dot.classList.add('progress-dot');
+                    if (completedIndices[i]) {
+                        dot.classList.add('done');
+                    }
+                    if (i === currentIndex && !completedIndices[i]) {
+                        dot.classList.add('current');
+                    }
+                    dot.setAttribute('data-index', i);
+                    progressRow.appendChild(dot);
+                }
+                const numLabel = document.createElement('span');
+                numLabel.classList.add('progress-number');
+                numLabel.textContent = (currentIndex + 1) + ' / ' + totalSentences;
+                progressRow.appendChild(numLabel);
+            }
+
+            function renderSentence(index) {
+                sentenceStage.innerHTML = '';
+                currentInputs = [];
+                const data = sentencesData[index];
+                const lineP = document.createElement('p');
+                lineP.classList.add('sentence-line');
+
+                data.segments.forEach(seg => {
+                    if (seg.type === 'text') {
+                        lineP.appendChild(document.createTextNode(seg.content));
+                    } else if (seg.type === 'blank') {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.classList.add('blank-input');
+                        input.setAttribute('data-answer', seg.answer);
+                        input.setAttribute('data-blank-id', seg.id);
+                        input.setAttribute('autocomplete', 'off');
+                        input.setAttribute('spellcheck', 'false');
+                        input.setAttribute('autocorrect', 'off');
+                        input.setAttribute('autocapitalize', 'off');
+                        input.setAttribute('size', Math.max(seg.answer.length + 2, 4));
+                        input.placeholder = '';
+                        input.addEventListener('keydown', handleInputKeydown);
+                        input.addEventListener('input', handleInputChange);
+                        lineP.appendChild(input);
+                        currentInputs.push(input);
+                    }
+                });
+
+                sentenceStage.appendChild(lineP);
+
+                if (currentInputs.length > 0) {
+                    setTimeout(() => {
+                        if (currentInputs[0] && document.activeElement !== currentInputs[0]) {
+                            currentInputs[0].focus();
+                        }
+                    }, 120);
+                }
+
+                hintText.textContent = currentInputs.length > 1 ? 'tab + enter ↵' : 'enter ↵';
+            }
+
+            function handleInputKeydown(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!isTransitioning) {
+                        checkAllBlanks();
+                    }
+                } else if (e.key === 'Tab' && currentInputs.length > 1) {
+                    e.preventDefault();
+                    const currentEl = e.target;
+                    const idx = currentInputs.indexOf(currentEl);
+                    if (idx >= 0) {
+                        const nextIdx = (idx + 1) % currentInputs.length;
+                        currentInputs[nextIdx].focus();
+                        currentInputs[nextIdx].select();
+                    }
+                }
+            }
+
+            function handleInputChange(e) {
+                const input = e.target;
+                input.classList.remove('input-correct', 'input-incorrect');
+            }
+
+            function checkAllBlanks() {
+                if (isTransitioning) return;
+                let allCorrect = true;
+                const results = [];
+
+                currentInputs.forEach(input => {
+                    const userValue = input.value.trim();
+                    const correctAnswer = input.getAttribute('data-answer');
+                    const isCorrect = userValue.toLowerCase() === correctAnswer.toLowerCase();
+                    results.push({ input, isCorrect });
+                    if (!isCorrect) allCorrect = false;
+                });
+
+                results.forEach(r => {
+                    r.input.classList.remove('input-correct', 'input-incorrect');
+                    if (r.isCorrect) {
+                        r.input.classList.add('input-correct');
+                    } else {
+                        r.input.classList.add('input-incorrect');
+                    }
+                });
+
+                if (allCorrect) {
+                    completeCurrentSentence();
+                } else {
+                    const firstIncorrect = results.find(r => !r.isCorrect);
+                    if (firstIncorrect) {
+                        firstIncorrect.input.focus();
+                        firstIncorrect.input.select();
+                    }
+                    setTimeout(() => {
+                        currentInputs.forEach(inp => {
+                            inp.classList.remove('input-incorrect');
+                        });
+                    }, 750);
+                }
+            }
+
+            function completeCurrentSentence() {
+                if (isTransitioning) return;
+                isTransitioning = true;
+
+                currentInputs.forEach(inp => {
+                    inp.classList.add('input-correct');
+                    inp.disabled = true;
+                    inp.readOnly = true;
+                });
+                btnCheck.disabled = true;
+                completedIndices[currentIndex] = true;
+                buildProgressDots();
+
+                setTimeout(() => {
+                    sentenceStage.classList.add('fade-out');
+
+                    setTimeout(() => {
+                        if (currentIndex < totalSentences - 1) {
+                            currentIndex++;
+                            sentenceStage.classList.remove('fade-out');
+                            sentenceStage.classList.add('fade-in');
+                            renderSentence(currentIndex);
+                            buildProgressDots();
+                            btnCheck.disabled = false;
+                            isTransitioning = false;
+
+                            setTimeout(() => {
+                                sentenceStage.classList.remove('fade-in');
+                            }, 380);
+                        } else {
+                            showCompletion();
+                            isTransitioning = false;
+                        }
+                    }, 360);
+                }, 1000);
+            }
+
+            function showCompletion() {
+                sentenceStage.classList.remove('fade-out');
+                sentenceStage.innerHTML = '';
+                actionRow.innerHTML = '';
+                hintText.textContent = '';
+
+                const completionDiv = document.createElement('div');
+                completionDiv.classList.add('completion');
+
+                const line = document.createElement('div');
+                line.classList.add('completion-line');
+
+                const textP = document.createElement('p');
+                textP.classList.add('completion-text');
+                textP.textContent = 'Completado';
+
+                const summaryList = document.createElement('ul');
+                summaryList.classList.add('summary-list');
+
+                sentencesData.forEach((data) => {
+                    const li = document.createElement('li');
+                    let html = '';
+                    data.segments.forEach(seg => {
+                        if (seg.type === 'text') {
+                            html += escapeHTML(seg.content);
+                        } else if (seg.type === 'blank') {
+                            html +=
+                                '<span class="article-filled">' +
+                                escapeHTML(seg.answer) +
+                                '</span>';
+                        }
+                    });
+                    li.innerHTML = html;
+                    summaryList.appendChild(li);
+                });
+
+                const restartBtn = document.createElement('button');
+                restartBtn.classList.add('btn-restart');
+                restartBtn.textContent = 'Reiniciar';
+                restartBtn.addEventListener('click', restartExercise);
+
+                completionDiv.appendChild(line);
+                completionDiv.appendChild(textP);
+                completionDiv.appendChild(summaryList);
+                completionDiv.appendChild(restartBtn);
+                sentenceStage.appendChild(completionDiv);
+
+                sentenceStage.classList.add('fade-in');
+                setTimeout(() => {
+                    sentenceStage.classList.remove('fade-in');
+                }, 400);
+
+                progressRow.querySelectorAll('.progress-dot').forEach(d => d.classList.add('done'));
+                progressRow.querySelector('.progress-dot.current')?.classList.remove('current');
+                const numLabel = progressRow.querySelector('.progress-number');
+                if (numLabel) numLabel.textContent = totalSentences + ' / ' + totalSentences;
+            }
+
+            function restartExercise() {
+                sentencesData = shuffleArray([...baseSentences]);
+                currentIndex = 0;
+                completedIndices = new Array(totalSentences).fill(false);
+                currentInputs = [];
+                isTransitioning = false;
+
+                sentenceStage.classList.remove('fade-out', 'fade-in');
+                sentenceStage.innerHTML = '';
+
+                actionRow.innerHTML = '';
+                const newBtn = document.createElement('button');
+                newBtn.classList.add('btn-check');
+                newBtn.id = 'btnCheck';
+                newBtn.setAttribute('aria-label', 'Comprobar');
+                newBtn.title = 'Comprobar';
+                newBtn.innerHTML =
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 8"></polyline></svg>';
+                newBtn.addEventListener('click', () => {
+                    if (!isTransitioning) checkAllBlanks();
+                });
+                actionRow.appendChild(newBtn);
+
+                const newHint = document.createElement('span');
+                newHint.classList.add('hint-text');
+                newHint.id = 'hintText';
+                newHint.textContent = 'enter ↵';
+                document.querySelector('.container').appendChild(newHint);
+
+                window._btnCheckRef = newBtn;
+                window._hintTextRef = newHint;
+
+                buildProgressDots();
+                renderSentence(0);
+                sentenceStage.classList.add('fade-in');
+                setTimeout(() => {
+                    sentenceStage.classList.remove('fade-in');
+                }, 400);
+            }
+
+            function escapeHTML(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            btnCheck.addEventListener('click', () => {
+                if (!isTransitioning) {
+                    checkAllBlanks();
+                }
+            });
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && document.activeElement === document.body && !isTransitioning &&
+                    currentInputs.length > 0 && !completedIndices[currentIndex]) {
+                    e.preventDefault();
+                    currentInputs[0].focus();
+                    checkAllBlanks();
+                }
+            });
+
+            buildProgressDots();
+            renderSentence(0);
+            sentenceStage.classList.add('fade-in');
+            setTimeout(() => {
+                sentenceStage.classList.remove('fade-in');
+            }, 400);
+
+            window._btnCheckRef = btnCheck;
+            window._hintTextRef = document.getElementById('hintText');
+        })();
+    </script>
+</body>
+</html>
