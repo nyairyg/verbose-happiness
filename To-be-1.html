@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESL Exercise — Verb "to be"</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f2efe9;
+            --paper: #fdfcf7;
+            --ink: #2c2416;
+            --ui-text: #2b2b2b;
+            --correct-color: #2e7d32;
+            --incorrect-color: #b71c1c;
+            --accent: #1a1a1a;
+            --gap-border: #c4bfb2;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 24px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 780px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .instruction {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #5c5c5c;
+            padding-left: 4px;
+            border-left: 2px solid #b0b0b0;
+            line-height: 1.5;
+            align-self: flex-start;
+        }
+
+        .paper-wrapper {
+            position: relative;
+            background: var(--paper);
+            border-radius: 2px;
+            box-shadow: var(--shadow);
+            padding: 44px 48px 44px 56px;
+        }
+
+        .paper-content {
+            position: relative;
+            z-index: 1;
+            font-family: 'Caveat', 'Segoe Print', cursive;
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.7;
+            color: var(--ink);
+            letter-spacing: 0.01em;
+            word-spacing: 0.04em;
+        }
+
+        .gap {
+            display: inline;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .gap-num {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            font-style: normal;
+            font-size: 9px;
+            font-weight: 500;
+            color: #b5b0a4;
+            vertical-align: super;
+            line-height: 0;
+            margin-right: 1px;
+            pointer-events: none;
+            user-select: none;
+            letter-spacing: 0;
+        }
+
+        .gap-input {
+            font-family: 'Caveat', 'Segoe Print', cursive;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--ink);
+            background: transparent;
+            border: none;
+            border-bottom: 2px dotted var(--gap-border);
+            width: 52px;
+            text-align: center;
+            outline: none;
+            padding: 0 3px;
+            margin: 0 1px;
+            line-height: inherit;
+            vertical-align: baseline;
+            transition: color 0.15s ease, border-color 0.15s ease;
+            border-radius: 0;
+            letter-spacing: 0.02em;
+        }
+
+        /* При фокусе – только лёгкое изменение цвета пунктира, без контура */
+        .gap-input:focus {
+            border-bottom: 2px dotted #8b857a;
+            background: transparent;
+        }
+
+        .gap-input::placeholder {
+            color: #d5d0c5;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+        }
+
+        /* Состояния после проверки – только цвет текста, без рамок */
+        .gap.correct .gap-input {
+            border-bottom: 2px dotted var(--gap-border); /* сохраняем исходный пунктир */
+            color: var(--correct-color);
+        }
+
+        .gap.incorrect .gap-input {
+            border-bottom: 2px dotted var(--gap-border);
+            color: var(--incorrect-color);
+        }
+
+        /* Никаких всплывающих правильных ответов */
+        .gap.incorrect::after {
+            display: none;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            padding-left: 4px;
+        }
+
+        .btn {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 10px 22px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 3px;
+            outline: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-check {
+            background: var(--accent);
+            color: #fafaf7;
+            border: 2px solid var(--accent);
+        }
+        .btn-check:hover {
+            background: #333;
+            border-color: #333;
+        }
+        .btn-check:active {
+            background: #000;
+            border-color: #000;
+            transform: scale(0.97);
+        }
+
+        .btn-reset {
+            background: transparent;
+            color: #5c5c5c;
+            border: 2px solid #c5c0b5;
+        }
+        .btn-reset:hover {
+            border-color: #8a8a8a;
+            color: #333;
+        }
+        .btn-reset:active {
+            border-color: #555;
+            color: #1a1a1a;
+            transform: scale(0.97);
+        }
+
+        @media (max-width: 640px) {
+            .paper-wrapper {
+                padding: 28px 18px 28px 30px;
+                border-radius: 1px;
+            }
+            .paper-content {
+                font-size: 17px;
+                line-height: 1.65;
+            }
+            .gap-input {
+                font-size: 17px;
+                width: 42px;
+            }
+            .gap-num {
+                font-size: 8px;
+            }
+            .btn {
+                font-size: 11px;
+                padding: 8px 16px;
+                letter-spacing: 0.04em;
+            }
+            .button-row {
+                gap: 10px;
+            }
+            .container {
+                gap: 24px;
+            }
+            .instruction {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .paper-wrapper {
+                padding: 20px 10px 20px 22px;
+            }
+            .paper-content {
+                font-size: 15px;
+                line-height: 1.6;
+            }
+            .gap-input {
+                font-size: 15px;
+                width: 36px;
+                border-bottom-width: 1.5px;
+            }
+            .gap-num {
+                font-size: 7px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p class="instruction">Fill in the correct forms of the verb <em>to be</em>.</p>
+
+        <div class="paper-wrapper">
+            <div class="paper-content">
+                Today
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">1</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                Tom's birthday. He
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">2</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                twelve years old today. All his friends
+                <span class="gap" data-answer="are">
+                    <i class="gap-num">3</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                there. His sister
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">4</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                there too. Her name
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">5</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                Kate. She
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">6</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                eleven years old. Only Jenny, his girlfriend
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">7</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                not there. Where
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">8</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                she? She
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">9</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                ill. They
+                <span class="gap" data-answer="are">
+                    <i class="gap-num">10</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                all in the kitchen; it
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">11</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                full of children. They
+                <span class="gap" data-answer="are">
+                    <i class="gap-num">12</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                all hungry and thirsty. There
+                <span class="gap" data-answer="are">
+                    <i class="gap-num">13</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                a lot of sandwiches on the table. There
+                <span class="gap" data-answer="are">
+                    <i class="gap-num">14</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                some bottles of lemonade, too. Tom's parents and grandparents
+                <span class="gap" data-answer="are">
+                    <i class="gap-num">15</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                not in the kitchen, they
+                <span class="gap" data-answer="are">
+                    <i class="gap-num">16</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                in the garden. They are having tea. Tom's little brother Timmy
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">17</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                in his bed. It
+                <span class="gap" data-answer="is">
+                    <i class="gap-num">18</i><input type="text" class="gap-input" placeholder="····" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                </span>
+                his time to sleep.
+            </div>
+        </div>
+
+        <div class="button-row">
+            <button class="btn btn-check" id="btnCheck">Check</button>
+            <button class="btn btn-reset" id="btnReset">Reset</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const gapWrappers = document.querySelectorAll('.gap');
+            const btnCheck = document.getElementById('btnCheck');
+            const btnReset = document.getElementById('btnReset');
+            const allInputs = document.querySelectorAll('.gap-input');
+
+            // При вводе сбрасываем цветовую индикацию
+            allInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    const wrapper = this.closest('.gap');
+                    if (wrapper) {
+                        wrapper.classList.remove('correct', 'incorrect');
+                    }
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        btnCheck.click();
+                    }
+                });
+            });
+
+            btnCheck.addEventListener('click', function() {
+                let allFilled = true;
+                let firstEmptyInput = null;
+
+                gapWrappers.forEach(wrapper => {
+                    const input = wrapper.querySelector('.gap-input');
+                    const correctAnswer = wrapper.getAttribute('data-answer').trim().toLowerCase();
+                    const userAnswer = input.value.trim().toLowerCase();
+
+                    // Убираем предыдущие классы
+                    wrapper.classList.remove('correct', 'incorrect');
+
+                    if (userAnswer === '') {
+                        allFilled = false;
+                        if (!firstEmptyInput) {
+                            firstEmptyInput = input;
+                        }
+                        // Не добавляем никаких рамок, просто оставляем как есть
+                    } else if (userAnswer === correctAnswer) {
+                        wrapper.classList.add('correct');
+                    } else {
+                        wrapper.classList.add('incorrect');
+                    }
+                });
+
+                // Если есть пустые поля, просто переводим фокус на первое из них
+                if (!allFilled && firstEmptyInput) {
+                    firstEmptyInput.focus();
+                }
+            });
+
+            btnReset.addEventListener('click', function() {
+                gapWrappers.forEach(wrapper => {
+                    const input = wrapper.querySelector('.gap-input');
+                    input.value = '';
+                    wrapper.classList.remove('correct', 'incorrect');
+                });
+                const firstInput = document.querySelector('.gap-input');
+                if (firstInput) firstInput.focus();
+            });
+
+            // Аккуратный автофокус на десктопе
+            const firstInput = document.querySelector('.gap-input');
+            if (firstInput) {
+                const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
+                if (!isMobile) {
+                    setTimeout(() => firstInput.focus(), 400);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
