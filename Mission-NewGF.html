@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case File — Field Interrogation</title>
+    <style>
+        :root {
+            --bg: #fafaf7;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --text-secondary: #5c5c5c;
+            --text-muted: #8a8a85;
+            --accent: #9b2c2c;
+            --accent-subtle: #f5eeed;
+            --border: #e4e4de;
+            --border-light: #efefea;
+            --input-border: #d4d4cd;
+            --input-focus: #1a1a1a;
+            --error-border: #b53535;
+            --error-bg: #fefafa;
+            --radius: 3px;
+            --radius-sm: 2px;
+            --transition: 0.2s ease;
+            --font-body: 'IBM Plex Sans', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            --font-mono: 'IBM Plex Mono', 'SF Mono', 'Consolas', 'Menlo', monospace;
+            --font-label: 'IBM Plex Sans', 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { font-size: 16px; }
+        body {
+            font-family: var(--font-body);
+            background: #f3f2ee;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .case-file {
+            width: 100%;
+            max-width: 520px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            display: flex;
+            flex-direction: column;
+            height: 88vh;
+            max-height: 720px;
+            min-height: 540px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 0 rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.02);
+        }
+
+        .top-strip { flex-shrink: 0; padding: 14px 20px 0; background: var(--surface); position: relative; z-index: 3; }
+        .strip-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+        .strip-label {
+            font-family: var(--font-label); font-size: 10px; font-weight: 600;
+            letter-spacing: 1.4px; text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
+        }
+        .strip-status {
+            font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+            letter-spacing: 0.6px; text-transform: uppercase; color: var(--accent); white-space: nowrap; opacity: 0.85;
+        }
+        .strip-divider { height: 1px; background: var(--border); margin-top: 10px; position: relative; }
+        #progressLine {
+            position: absolute; left: 0; top: 0; height: 1px; background: var(--text);
+            transition: width 0.45s cubic-bezier(0.4,0,0.2,1); width: 0%; z-index: 1;
+        }
+
+        .log-area {
+            flex: 1; overflow-y: auto; padding: 18px 20px 12px; display: flex;
+            flex-direction: column; gap: 14px; background: var(--surface); scroll-behavior: smooth; position: relative; z-index: 1;
+        }
+        .log-area::-webkit-scrollbar { width: 3px; }
+        .log-area::-webkit-scrollbar-track { background: transparent; }
+        .log-area::-webkit-scrollbar-thumb { background: #d8d8d2; border-radius: 2px; }
+
+        .log-entry { display: flex; flex-direction: column; gap: 3px; animation: logIn 0.35s cubic-bezier(0.22,0.61,0.36,1); }
+        @keyframes logIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .log-speaker {
+            font-family: var(--font-label); font-size: 9px; font-weight: 700; letter-spacing: 1.2px;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 1px;
+        }
+        .log-speaker.you { color: var(--text); }
+        .log-speaker.friend-label { color: var(--text-secondary); }
+        .log-text { font-size: 14px; line-height: 1.55; color: var(--text); padding-left: 0; letter-spacing: 0.1px; }
+        .log-rule { border: none; border-top: 1px solid var(--border-light); margin: 2px 0; width: 100%; opacity: 0.7; }
+        .log-note { text-align: center; font-size: 10px; color: var(--text-muted); letter-spacing: 0.5px; font-style: italic; padding: 4px 0 2px; }
+
+        .input-panel {
+            flex-shrink: 0; border-top: 1px solid var(--border); padding: 16px 20px 18px;
+            background: #fdfdfc; position: relative; z-index: 2; transition: opacity 0.25s ease;
+        }
+        .input-panel.idle { opacity: 0.45; pointer-events: none; user-select: none; }
+        .clue-block { margin-bottom: 10px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+        .clue-tag {
+            font-family: var(--font-label); font-size: 9px; font-weight: 700; letter-spacing: 1.3px;
+            text-transform: uppercase; color: var(--accent); white-space: nowrap;
+        }
+        .clue-word {
+            font-family: var(--font-mono); font-size: 15px; font-weight: 500; color: var(--text);
+            letter-spacing: 0.2px; background: #fafaf7; padding: 3px 10px; border-radius: 2px; border: 1px solid var(--border-light);
+        }
+        .input-row { display: flex; gap: 8px; align-items: stretch; }
+        .input-row input {
+            flex: 1; padding: 10px 14px; border: 1px solid var(--input-border); border-radius: var(--radius-sm);
+            font-size: 14px; font-family: var(--font-body); outline: none; transition: var(--transition);
+            background: #fdfdfc; color: var(--text); min-width: 0; letter-spacing: 0.1px;
+        }
+        .input-row input:focus { border-color: var(--input-focus); background: #fff; box-shadow: 0 0 0 2px rgba(0,0,0,0.04); }
+        .input-row input.error-flash { border-color: var(--error-border); background: var(--error-bg); animation: shk 0.45s cubic-bezier(0.36,0.07,0.19,0.97); }
+        @keyframes shk { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-7px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+        .btn-submit {
+            width: 42px; height: 42px; border-radius: var(--radius-sm); border: 1px solid var(--text);
+            background: var(--text); color: #fff; font-size: 18px; cursor: pointer; flex-shrink: 0;
+            transition: var(--transition); display: flex; align-items: center; justify-content: center;
+            font-weight: 600; line-height: 1; letter-spacing: 0;
+        }
+        .btn-submit:hover { background: #2d2d2d; border-color: #2d2d2d; }
+        .btn-submit:active { transform: scale(0.94); transition: 0.08s; }
+        .btn-submit:disabled { background: #c8c8c2; border-color: #c8c8c2; cursor: not-allowed; transform: none; }
+        .try-again-note {
+            font-family: var(--font-label); font-size: 9px; font-weight: 600; letter-spacing: 0.8px;
+            text-transform: uppercase; color: var(--error-border); margin-top: 6px; opacity: 0; transition: opacity 0.15s ease;
+            height: 0; overflow: hidden;
+        }
+        .try-again-note.visible { opacity: 1; height: auto; margin-top: 6px; }
+
+        .overlay {
+            position: absolute; inset: 0; background: rgba(250,250,247,0.94);
+            display: flex; align-items: center; justify-content: center; z-index: 30; animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .overlay-card {
+            background: #fff; border: 1px solid var(--border); border-radius: 2px;
+            padding: 28px 24px 24px; max-width: 380px; width: 92%; text-align: left;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06); animation: popIn 0.4s cubic-bezier(0.22,0.61,0.36,1);
+        }
+        @keyframes popIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .overlay-card .oc-tag {
+            font-family: var(--font-label); font-size: 9px; font-weight: 700; letter-spacing: 1.4px;
+            text-transform: uppercase; color: var(--accent); margin-bottom: 10px; display: block;
+        }
+        .overlay-card h2 { font-size: 18px; font-weight: 700; letter-spacing: 0.2px; color: var(--text); margin-bottom: 6px; }
+        .overlay-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+        .overlay-card .oc-note { font-size: 11px; color: var(--text-muted); margin-bottom: 16px; letter-spacing: 0.2px; }
+        .overlay-card .btn-action {
+            display: inline-block; padding: 9px 24px; background: var(--text); color: #fff;
+            border: 1px solid var(--text); border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+            cursor: pointer; letter-spacing: 0.3px; transition: var(--transition); font-family: var(--font-label);
+        }
+        .overlay-card .btn-action:hover { background: #2d2d2d; border-color: #2d2d2d; }
+        .oc-stat-row { display: flex; gap: 28px; margin: 12px 0 16px; }
+        .oc-stat .oc-num { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1; letter-spacing: -0.5px; }
+        .oc-stat .oc-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-top: 3px; }
+        .oc-complete-stamp {
+            font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.6px; text-transform: uppercase;
+            color: var(--accent); display: block; margin-bottom: 10px; opacity: 0.8;
+        }
+        .hidden { display: none !important; }
+
+        @media (max-width: 500px) {
+            .case-file { height: 94vh; max-height: none; border-radius: 0; border: none; box-shadow: none; }
+            .log-area { padding: 12px 14px; gap: 10px; }
+            .input-panel { padding: 12px 14px 14px; }
+            .log-text { font-size: 13px; }
+            .clue-word { font-size: 13px; }
+            .input-row input { font-size: 13px; padding: 9px 12px; }
+            .btn-submit { width: 38px; height: 38px; font-size: 16px; }
+            .top-strip { padding: 10px 14px 0; }
+            .strip-label { font-size: 9px; letter-spacing: 1px; }
+        }
+    </style>
+</head>
+<body>
+<div class="case-file" id="caseFile">
+    <div class="top-strip">
+        <div class="strip-row">
+            <span class="strip-label" id="missionLabel">MISSION 01 / 09</span>
+            <span class="strip-status" id="statusLabel">STATUS: ACTIVE</span>
+        </div>
+        <div class="strip-divider"><div id="progressLine" style="width:0%;"></div></div>
+    </div>
+
+    <div class="log-area" id="logArea">
+        <div class="log-note">Secure channel open. Begin the conversation.</div>
+    </div>
+
+    <div class="input-panel" id="inputPanel">
+        <div class="clue-block">
+            <span class="clue-tag">NEXT CLUE</span>
+            <span class="clue-word" id="clueWord">girlfriend / name</span>
+        </div>
+        <div class="input-row">
+            <input type="text" id="questionInput" placeholder="Form your question..." autocomplete="off" autofocus>
+            <button class="btn-submit" id="btnSubmit" title="Submit question">✓</button>
+        </div>
+        <div class="try-again-note" id="tryAgainNote">Try again</div>
+    </div>
+
+    <div class="overlay" id="introOverlay">
+        <div class="overlay-card">
+            <span class="oc-tag">CLASSIFIED — FIELD BRIEFING</span>
+            <h2>Information Extraction</h2>
+            <p>Your girlfriend asked you to find out about <strong>your best friend's new relationship</strong>. Engage him in conversation and <strong>learn who he is dating</strong>.</p>
+            <p>Look at the prompt and create a question. Use <strong>Do</strong>, <strong>Does</strong>, or <strong>Is</strong>. </p>
+            <p class="oc-note">Твоя задача  —  задать другу вопросы про его девушку. Используй <strong>Do</strong>, <strong>Does</strong> или <strong>Is</strong>. Ориентируйся на подсказку над полем для ввода. </p>
+            <button class="btn-action" id="btnBegin">Begin Mission</button>
+        </div>
+    </div>
+
+    <div class="overlay hidden" id="completeOverlay">
+        <div class="overlay-card">
+            <span class="oc-complete-stamp">MISSION COMPLETE</span>
+            <h2>Intelligence Gathered</h2>
+            <p>You successfully extracted all information about your friend's new relationship. The data has been recorded.</p>
+            <div class="oc-stat-row">
+                <div class="oc-stat"><div class="oc-num" id="statTotal">9</div><div class="oc-lbl">Questions asked</div></div>
+                <div class="oc-stat"><div class="oc-num">100%</div><div class="oc-lbl">Success rate</div></div>
+            </div>
+            <button class="btn-action" id="btnRestart">Restart Mission</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    const logArea = document.getElementById('logArea');
+    const inputPanel = document.getElementById('inputPanel');
+    const questionInput = document.getElementById('questionInput');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const clueWord = document.getElementById('clueWord');
+    const missionLabel = document.getElementById('missionLabel');
+    const statusLabel = document.getElementById('statusLabel');
+    const progressLine = document.getElementById('progressLine');
+    const tryAgainNote = document.getElementById('tryAgainNote');
+    const introOverlay = document.getElementById('introOverlay');
+    const completeOverlay = document.getElementById('completeOverlay');
+    const btnBegin = document.getElementById('btnBegin');
+    const btnRestart = document.getElementById('btnRestart');
+    const caseFile = document.getElementById('caseFile');
+
+    const stages = [
+        {
+            id: 1, prompt: 'girlfriend / name', type: 'what-is',
+            acceptable: ["what is your girlfriend's name","what's your girlfriend's name","what is the name of your girlfriend"],
+            requiredStart: 'what', requiredContains: ['girlfriend','name'], mustHaveVerb: ['is'],
+            forbiddenStart: ['who','where','when','how','do','does','are','is'],
+            friendAnswer: "Her name is Anna. She studies at the local university."
+        },
+        {
+            id: 2, prompt: 'she / pretty', type: 'is-question',
+            acceptable: ['is she pretty'],
+            requiredStart: 'is', requiredContains: ['she','pretty'], mustHaveVerb: ['is'],
+            forbiddenStart: ['what','do','does','are','who','where','when','how'],
+            friendAnswer: "Yeah, she is. Especially her eyes."
+        },
+        {
+            id: 3, prompt: 'she / like music', type: 'does-question',
+            acceptable: ['does she like music'],
+            requiredStart: 'does', requiredContains: ['she','like','music'], mustHaveVerb: ['like'],
+            forbiddenStart: ['what','do','is','are','who','where','when','how'],
+            friendAnswer: "Not really; she prefers podcasts."
+        },
+        {
+            id: 4, prompt: 'you / see her every day', type: 'do-question',
+            acceptable: ['do you see her every day'],
+            requiredStart: 'do', requiredContains: ['you','see','her','every','day'], mustHaveVerb: ['see'],
+            forbiddenStart: ['what','does','is','are','who','where','when','how'],
+            friendAnswer: "Almost every day, yes. We meet after work."
+        },
+        {
+            id: 5, prompt: 'she / have a job', type: 'does-question',
+            acceptable: ['does she have a job'],
+            requiredStart: 'does', requiredContains: ['she','have','job'], mustHaveVerb: ['have'],
+            forbiddenStart: ['what','do','is','are','who','where','when','how'],
+            friendAnswer: "She's a barista at the café on Queen Street."
+        },
+        {
+            id: 6, prompt: 'she / kind', type: 'is-question',
+            acceptable: ['is she kind'],
+            requiredStart: 'is', requiredContains: ['she','kind'], mustHaveVerb: ['is'],
+            forbiddenStart: ['what','do','does','are','who','where','when','how'],
+            friendAnswer: "Incredibly kind. The kindest person I know."
+        },
+        {
+            id: 7, prompt: 'you / love her', type: 'do-question',
+            acceptable: ['do you love her'],
+            requiredStart: 'do', requiredContains: ['you','love','her'], mustHaveVerb: ['love'],
+            forbiddenStart: ['what','does','is','are','who','where','when','how'],
+            friendAnswer: "Honestly? I think I do."
+        },
+        {
+            id: 8, prompt: 'she / have brothers', type: 'does-question',
+            acceptable: ['does she have brothers','does she have any brothers'],
+            requiredStart: 'does', requiredContains: ['she','have','brothers'], mustHaveVerb: ['have'],
+            forbiddenStart: ['what','do','is','are','who','where','when','how'],
+            friendAnswer: "No brothers. She has one sister, though."
+        },
+        {
+            id: 9, prompt: 'she / happy with you', type: 'is-question',
+            acceptable: ['is she happy with you'],
+            requiredStart: 'is', requiredContains: ['she','happy','with','you'], mustHaveVerb: ['is'],
+            forbiddenStart: ['what','do','does','are','who','where','when','how'],
+            friendAnswer: "I sincerely hope so."
+        }
+    ];
+
+    const TOTAL = stages.length;
+    let currentIndex = 0;
+    let isWaiting = false;
+    let missionComplete = false;
+
+    function norm(s) { return s.trim().toLowerCase().replace(/\s+/g,' ').replace(/[?!.]+$/,'').replace(/’/g,"'").trim(); }
+    function scrollLog() { requestAnimationFrame(() => { logArea.scrollTop = logArea.scrollHeight; }); }
+
+    function addLogEntry(speaker, text, speakerClass) {
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        const sp = document.createElement('span');
+        sp.className = 'log-speaker ' + (speakerClass||'');
+        sp.textContent = speaker;
+        const txt = document.createElement('span');
+        txt.className = 'log-text';
+        txt.textContent = text;
+        div.appendChild(sp);
+        div.appendChild(txt);
+        logArea.appendChild(div);
+        if (speaker === 'FRIEND') {
+            const hr = document.createElement('hr');
+            hr.className = 'log-rule';
+            logArea.appendChild(hr);
+        }
+        scrollLog();
+    }
+
+    function addLogNote(text) {
+        const div = document.createElement('div');
+        div.className = 'log-note';
+        div.textContent = text;
+        logArea.appendChild(div);
+        scrollLog();
+    }
+
+    function updateProgress() {
+        const done = currentIndex;
+        const pct = Math.round((done / TOTAL) * 100);
+        progressLine.style.width = pct + '%';
+        missionLabel.textContent = 'MISSION ' + String(Math.min(done+1, TOTAL)).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
+        if (done >= TOTAL) {
+            statusLabel.textContent = 'STATUS: COMPLETE';
+        }
+    }
+
+    function setPanelEnabled(enabled) {
+        if (enabled) {
+            inputPanel.classList.remove('idle');
+            questionInput.disabled = false;
+            btnSubmit.disabled = false;
+            questionInput.focus();
+        } else {
+            inputPanel.classList.add('idle');
+            questionInput.disabled = true;
+            btnSubmit.disabled = true;
+        }
+    }
+
+    function clearError() {
+        questionInput.classList.remove('error-flash');
+        tryAgainNote.classList.remove('visible');
+    }
+
+    function triggerError() {
+        questionInput.classList.remove('error-flash');
+        tryAgainNote.classList.remove('visible');
+        void questionInput.offsetWidth;
+        questionInput.classList.add('error-flash');
+        tryAgainNote.classList.add('visible');
+        questionInput.focus();
+        questionInput.select();
+        setTimeout(() => {
+            questionInput.classList.remove('error-flash');
+            tryAgainNote.classList.remove('visible');
+        }, 500);
+    }
+
+    function validate(raw, stage) {
+        const input = norm(raw);
+        if (input.length < 3) return false;
+        for (const acc of stage.acceptable) {
+            if (input === norm(acc)) return true;
+        }
+        const words = input.split(/\s+/);
+        const first = words[0];
+        if (stage.forbiddenStart.includes(first)) return false;
+        if (first !== stage.requiredStart) {
+            if (stage.type === 'what-is' && first === "what's") { /* ok */ } else return false;
+        }
+        for (const req of stage.requiredContains) {
+            if (!words.includes(req) && !input.includes(req)) return false;
+        }
+        let hasVerb = false;
+        for (const v of stage.mustHaveVerb) {
+            if (words.includes(v) || (v === 'is' && (words.includes("'s") || input.includes("'s")))) {
+                hasVerb = true;
+                break;
+            }
+        }
+        if (!hasVerb) return false;
+        if (stage.type === 'does-question') {
+            const idx = words.indexOf('does');
+            if (idx >= 0 && idx+2 < words.length) {
+                const vb = words[idx+2];
+                if (/^(likes|sees|loves|has|works|goes|does|is|are|was|were)$/i.test(vb)) return false;
+            }
+            if (!words.includes('does') && first !== 'does') return false;
+        }
+        if (stage.type === 'do-question') {
+            const idx = words.indexOf('do');
+            if (idx >= 0 && idx+2 < words.length) {
+                const vb = words[idx+2];
+                if (/^(likes|sees|loves|has|works|goes|does|is|are)$/i.test(vb)) return false;
+            }
+            if (!words.includes('do') && first !== 'do') return false;
+        }
+        if (stage.type === 'is-question') {
+            if (first !== 'is') return false;
+            if (words.filter(w => w === 'is').length > 1) return false;
+        }
+        if (stage.type === 'what-is') {
+            const hasIs = words.includes('is') || input.includes("'s") || first === "what's";
+            if (!hasIs) return false;
+            if (first === 'what' && words[1] !== 'is' && !words[1].includes("'s") && words.length >= 3 && words[2] === 'is') return false;
+        }
+        if (words.length < 3 && stage.type !== 'is-question') return false;
+        if (stage.type === 'is-question' && words.length < 3) return false;
+        return true;
+    }
+
+    function loadStage(idx) {
+        if (idx >= TOTAL) { finishMission(); return; }
+        currentIndex = idx;
+        const s = stages[idx];
+        clueWord.textContent = s.prompt;
+        questionInput.value = '';
+        clearError();
+        setPanelEnabled(true);
+        updateProgress();
+        missionLabel.textContent = 'MISSION ' + String(s.id).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
+        statusLabel.textContent = 'STATUS: ACTIVE';
+        questionInput.focus();
+    }
+
+    function handleCorrect(rawQ) {
+        const s = stages[currentIndex];
+        isWaiting = true;
+        setPanelEnabled(false);
+        clearError();
+        const displayQ = rawQ.trim().replace(/\?*$/,'') + '?';
+        addLogEntry('YOU', displayQ, 'you');
+        setTimeout(() => {
+            addLogEntry('FRIEND', s.friendAnswer, 'friend-label');
+            scrollLog();
+            updateProgress();
+            setTimeout(() => {
+                isWaiting = false;
+                const next = currentIndex + 1;
+                if (next >= TOTAL) { finishMission(); }
+                else { addLogNote('— next objective —'); loadStage(next); }
+            }, 1600);
+        }, 400);
+    }
+
+    function finishMission() {
+        missionComplete = true;
+        setPanelEnabled(false);
+        updateProgress();
+        progressLine.style.width = '100%';
+        missionLabel.textContent = 'MISSION ' + String(TOTAL).padStart(2,'0') + ' / ' + String(TOTAL).padStart(2,'0');
+        statusLabel.textContent = 'STATUS: COMPLETE';
+        document.getElementById('statTotal').textContent = TOTAL;
+        setTimeout(() => { completeOverlay.classList.remove('hidden'); }, 1400);
+    }
+
+    function submit() {
+        if (isWaiting || missionComplete || currentIndex >= TOTAL) return;
+        const raw = questionInput.value;
+        if (raw.trim().length === 0) { triggerError(); return; }
+        if (validate(raw, stages[currentIndex])) { handleCorrect(raw); }
+        else { triggerError(); }
+    }
+
+    btnSubmit.addEventListener('click', submit);
+    questionInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+    questionInput.addEventListener('input', function() { if (questionInput.classList.contains('error-flash')) clearError(); });
+    questionInput.addEventListener('focus', function() { if (questionInput.classList.contains('error-flash')) clearError(); });
+
+    btnBegin.addEventListener('click', function() {
+        introOverlay.classList.add('hidden');
+        currentIndex = 0;
+        logArea.innerHTML = '';
+        addLogNote('Secure channel open. Begin the conversation.');
+        updateProgress();
+        progressLine.style.width = '0%';
+        statusLabel.textContent = 'STATUS: ACTIVE';
+        loadStage(0);
+    });
+
+    btnRestart.addEventListener('click', function() {
+        completeOverlay.classList.add('hidden');
+        missionComplete = false;
+        isWaiting = false;
+        currentIndex = 0;
+        logArea.innerHTML = '';
+        addLogNote('Secure channel open. Begin the conversation.');
+        questionInput.value = '';
+        clearError();
+        updateProgress();
+        progressLine.style.width = '0%';
+        missionLabel.textContent = 'MISSION 01 / ' + String(TOTAL).padStart(2,'0');
+        statusLabel.textContent = 'STATUS: ACTIVE';
+        loadStage(0);
+    });
+
+    caseFile.addEventListener('submit', function(e) { e.preventDefault(); });
+    setPanelEnabled(false);
+    updateProgress();
+    questionInput.disabled = true;
+    btnSubmit.disabled = true;
+    progressLine.style.width = '0%';
+    missionLabel.textContent = 'MISSION 01 / ' + String(TOTAL).padStart(2,'0');
+    statusLabel.textContent = 'STATUS: IDLE';
+})();
+</script>
+</body>
+</html>
