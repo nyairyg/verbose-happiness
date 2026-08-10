@@ -132,8 +132,9 @@
     }
 
     .input-gap { width: 130px; }
-    .input-rewrite { width: 260px; flex: 1 1 180px; }
-    .input-correct { width: 320px; flex: 1 1 240px; }
+    /* Longer gaps for rewrite & correction tasks */
+    .input-rewrite { width: auto; flex: 1 1 320px; }
+    .input-correct { width: auto; flex: 1 1 480px; }
     .input-short { width: 60px; }
 
     .input-gap:focus, .input-rewrite:focus, .input-correct:focus, .input-short:focus {
@@ -233,8 +234,8 @@
     @media (max-width: 600px) {
       .game-container { padding: 1.8rem 1.2rem; }
       .input-gap { width: 100px; }
-      .input-rewrite { width: 160px; flex: 1 1 120px; }
-      .input-correct { width: 200px; flex: 1 1 160px; }
+      .input-rewrite { flex: 1 1 200px; }
+      .input-correct { flex: 1 1 260px; }
     }
   </style>
 </head>
@@ -257,7 +258,7 @@
 
   <script>
     (function() {
-      // ----- B1+ ROUNDS --------------------------------------------
+      // ----- B1+ ROUNDS (full set: 11 rounds) -----------------
       const rounds = [
         {
           title: 'Present Simple vs Present Continuous',
@@ -700,7 +701,6 @@
           nextBtn.disabled = true;
           checkBtn.disabled = true;
           document.querySelectorAll('input').forEach(inp => inp.disabled = true);
-          // also save final round (so reload shows last round)
           saveProgress();
         }
       }
