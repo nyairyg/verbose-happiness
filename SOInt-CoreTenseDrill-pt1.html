@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESL · B1+ Tense Review · Swiss style</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f5f5f0;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      color: #1e1e1e;
+    }
+
+    .game-container {
+      max-width: 860px;
+      width: 100%;
+      background: white;
+      padding: 2.5rem 2.8rem;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02);
+      border: 1px solid #d0d0d0;
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 2px solid #1e1e1e;
+      padding-bottom: 0.6rem;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 1.8rem;
+      letter-spacing: -0.3px;
+      text-transform: uppercase;
+      margin: 0;
+    }
+
+    .reset-btn {
+      background: transparent;
+      border: 2px solid #1e1e1e;
+      color: #1e1e1e;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.4rem 1.2rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: 0.1s;
+    }
+
+    .reset-btn:hover {
+      background: #1e1e1e;
+      color: white;
+    }
+
+    .round-badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      background: #1e1e1e;
+      color: white;
+      padding: 0.2rem 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .round-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin: 0.2rem 0 0.8rem 0;
+      letter-spacing: -0.2px;
+    }
+
+    .round-instruction {
+      font-size: 1rem;
+      border-left: 4px solid #1e1e1e;
+      padding-left: 0.8rem;
+      margin: 0.5rem 0 1.5rem 0;
+      color: #2c2c2c;
+      font-weight: 400;
+    }
+
+    .sentence-list {
+      list-style: none;
+      margin: 1.2rem 0 1.8rem 0;
+    }
+
+    .sentence-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+      padding: 0.3rem 0;
+      font-size: 1.1rem;
+      border-bottom: 1px solid #eaeaea;
+      line-height: 1.8;
+    }
+
+    .sentence-item:last-child {
+      border-bottom: none;
+    }
+
+    .sentence-text {
+      font-weight: 400;
+      white-space: pre-wrap;
+    }
+
+    .input-gap, .input-rewrite, .input-correct, .input-short {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 1rem;
+      border: none;
+      border-bottom: 2px solid #1e1e1e;
+      background: transparent;
+      padding: 0.1rem 0.2rem;
+      transition: border-color 0.1s;
+      font-weight: 400;
+      color: #1e1e1e;
+    }
+
+    .input-gap { width: 130px; }
+    .input-rewrite { width: 260px; flex: 1 1 180px; }
+    .input-correct { width: 320px; flex: 1 1 240px; }
+    .input-short { width: 60px; }
+
+    .input-gap:focus, .input-rewrite:focus, .input-correct:focus, .input-short:focus {
+      outline: none;
+      border-bottom-color: #888;
+      background: #f9f9f6;
+    }
+
+    .check-btn {
+      background: #1e1e1e;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.7rem 2rem;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+      border: 1px solid #1e1e1e;
+    }
+
+    .check-btn:hover { background: #3b3b3b; }
+    .check-btn:active { background: #000; }
+
+    .message-area {
+      margin: 1rem 0 0.4rem 0;
+      font-weight: 500;
+      font-size: 1rem;
+      min-height: 2.2rem;
+      border-top: 1px solid #ddd;
+      padding-top: 0.8rem;
+    }
+
+    .message-success { color: #1a6b3c; }
+    .message-error { color: #b13e3e; }
+
+    .next-btn {
+      background: transparent;
+      border: 2px solid #1e1e1e;
+      color: #1e1e1e;
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 0.7rem 2rem;
+      cursor: pointer;
+      transition: 0.1s;
+      font-family: inherit;
+    }
+
+    .next-btn:hover { background: #1e1e1e; color: white; }
+    .next-btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+      border-color: #aaa;
+      color: #aaa;
+    }
+
+    .button-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+
+    .example-hint {
+      font-size: 0.9rem;
+      color: #3d3d3d;
+      background: #f0f0eb;
+      padding: 0.2rem 0.6rem;
+      margin-bottom: 0.4rem;
+      display: inline-block;
+    }
+
+    .option-group {
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 0.2rem 0;
+    }
+
+    .option-label {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
+      font-size: 1rem;
+    }
+
+    .option-label input[type="radio"] {
+      margin-right: 0.1rem;
+      accent-color: #1e1e1e;
+      width: 16px;
+      height: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .game-container { padding: 1.8rem 1.2rem; }
+      .input-gap { width: 100px; }
+      .input-rewrite { width: 160px; flex: 1 1 120px; }
+      .input-correct { width: 200px; flex: 1 1 160px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-container" id="app">
+    <div class="header-row">
+      <h1>⏺ B1+ Tense Refresh</h1>
+      <button class="reset-btn" id="resetBtn">↺ Restart</button>
+    </div>
+    <div class="round-badge" id="roundBadge">ROUND 1 / 11</div>
+    <div class="round-title" id="roundTitle">Present Simple vs Present Continuous</div>
+    <div class="round-instruction" id="roundInstruction">Fill in the correct form of the verb in brackets.</div>
+    <div id="dynamicContent"></div>
+    <div class="button-row">
+      <button class="check-btn" id="checkBtn">✓ CHECK</button>
+      <button class="next-btn" id="nextBtn" disabled>➔ NEXT ROUND</button>
+    </div>
+    <div id="messageArea" class="message-area"></div>
+  </div>
+
+  <script>
+    (function() {
+      // ----- B1+ ROUNDS --------------------------------------------
+      const rounds = [
+        {
+          title: 'Present Simple vs Present Continuous',
+          instruction: 'Fill in the correct form of the verb in brackets. Use the full negative form.',
+          type: 'gap',
+          data: [
+            { prefix: 'She usually ', suffix: '(work) in an office, but this week she is working from home.', answer: 'works' },
+            { prefix: 'Look! The cat ', suffix: '(chase) a mouse.', answer: 'is chasing' },
+            { prefix: 'I ', suffix: '(not / understand) this word.', answer: 'do not understand' },
+            { prefix: 'We ', suffix: '(have) dinner at the moment.', answer: 'are having' },
+            { prefix: 'He always ', suffix: '(forget) his keys.', answer: 'forgets' },
+            { prefix: 'The children ', suffix: '(play) in the garden right now.', answer: 'are playing' },
+            { prefix: 'My parents ', suffix: '(live) in a small village.', answer: 'live' },
+            { prefix: 'It ', suffix: '(rain) heavily today.', answer: 'is raining' },
+            { prefix: 'She ', suffix: '(know) the answer.', answer: 'knows' },
+            { prefix: 'They ', suffix: '(build) a new house next to ours.', answer: 'are building' }
+          ]
+        },
+        {
+          title: 'Past Simple (Regular & Irregular)',
+          instruction: 'Write the past simple form of the verb in brackets. Use the full negative form.',
+          type: 'gap',
+          data: [
+            { prefix: 'Yesterday, I ', suffix: '(go) to the cinema.', answer: 'went' },
+            { prefix: 'She ', suffix: '(buy) a new dress last weekend.', answer: 'bought' },
+            { prefix: 'We ', suffix: '(not / see) the film.', answer: 'did not see' },
+            { prefix: 'He ', suffix: '(write) three emails this morning.', answer: 'wrote' },
+            { prefix: 'The train ', suffix: '(arrive) ten minutes late.', answer: 'arrived' },
+            { prefix: 'They ', suffix: '(have) a wonderful holiday.', answer: 'had' },
+            { prefix: 'I ', suffix: '(meet) your brother at the party.', answer: 'met' },
+            { prefix: 'She ', suffix: '(not / like) the food.', answer: 'did not like' },
+            { prefix: 'The children ', suffix: '(swim) in the lake.', answer: 'swam' },
+            { prefix: 'He ', suffix: '(drive) to the airport.', answer: 'drove' }
+          ]
+        },
+        {
+          title: 'Past Simple vs Past Continuous (when/while)',
+          instruction: 'Rewrite the sentence fully to correct the mistakes.',
+          type: 'correction',
+          data: [
+            { wrong: 'I was watching TV when the phone was ringing.', answer: 'I was watching TV when the phone rang.' },
+            { wrong: 'While she walked home, it started to rain.', answer: 'While she was walking home, it started to rain.' },
+            { wrong: 'They were playing football when it was beginning to snow.', answer: 'They were playing football when it began to snow.' },
+            { wrong: 'He fell asleep while he did his homework.', answer: 'He fell asleep while he was doing his homework.' },
+            { wrong: 'When I saw him, he talked to the teacher.', answer: 'When I saw him, he was talking to the teacher.' },
+            { wrong: 'The children were running when suddenly the dog was biting the postman.', answer: 'The children were running when suddenly the dog bit the postman.' },
+            { wrong: 'While we had dinner, the lights went out.', answer: 'While we were having dinner, the lights went out.' },
+            { wrong: 'She was cycling to school when she was falling off her bike.', answer: 'She was cycling to school when she fell off her bike.' },
+            { wrong: 'I was reading a book while my brother played the guitar.', answer: 'I was reading a book while my brother was playing the guitar.' },
+            { wrong: 'When the guests arrived, we still prepared the food.', answer: 'When the guests arrived, we were still preparing the food.' }
+          ]
+        },
+        {
+          title: 'Present Perfect (ever, never, just, already, yet)',
+          instruction: 'Complete with the present perfect form of the verb in brackets. Use the full negative form.',
+          type: 'gap',
+          data: [
+            { prefix: 'She ', suffix: '(just / finish) her homework.', answer: 'has just finished' },
+            { prefix: 'I ', suffix: '(never / be) to Asia.', answer: 'have never been' },
+            { prefix: 'They ', suffix: '(already / eat) lunch.', answer: 'have already eaten' },
+            { prefix: 'He ', suffix: '(not / arrive) yet.', answer: 'has not arrived' },
+            { prefix: 'We ', suffix: '(ever / see) a real elephant?', answer: 'Have we ever seen' },
+            { prefix: 'She ', suffix: '(just / break) her phone.', answer: 'has just broken' },
+            { prefix: 'I ', suffix: '(already / read) that book.', answer: 'have already read' },
+            { prefix: 'They ', suffix: '(not / visit) us this year.', answer: 'have not visited' },
+            { prefix: 'He ', suffix: '(write) three novels so far.', answer: 'has written' },
+            { prefix: 'We ', suffix: '(never / try) Korean food.', answer: 'have never tried' }
+          ]
+        },
+        {
+          title: 'Future Forms (will, going to, present continuous)',
+          instruction: 'Choose the correct option A, B, C or D.',
+          type: 'mc_pos',
+          data: [
+            { sentence: 'I think it _______ tomorrow.', options: ['will rain', 'is going to rain', 'is raining', 'rains'], answer: 'A' },
+            { sentence: 'Look at those clouds! It _______ any minute.', options: ['will rain', 'is going to rain', 'rains', 'is raining'], answer: 'B' },
+            { sentence: 'We _______ dinner with friends tonight. We have a reservation.', options: ['will have', 'are going to have', 'are having', 'have'], answer: 'C' },
+            { sentence: 'She promises she _______ late again.', options: ['won\'t be', 'isn\'t going to be', 'isn\'t being', 'doesn\'t be'], answer: 'A' },
+            { sentence: 'This time next week I _______ on a beach.', options: ['will lie', 'will be lying', 'am lying', 'lie'], answer: 'B' },
+            { sentence: 'Don\'t worry, I _______ the tickets tomorrow.', options: ['buy', 'will buy', 'am going to buy', 'am buying'], answer: 'B' },
+            { sentence: 'The train _______ at 7:45 according to the timetable.', options: ['leaves', 'is leaving', 'will leave', 'is going to leave'], answer: 'A' },
+            { sentence: 'I\'ve decided I _______ a new language.', options: ['learn', 'will learn', 'am going to learn', 'am learning'], answer: 'C' },
+            { sentence: 'Maybe they _______ us next summer.', options: ['visit', 'will visit', 'are visiting', 'are going to visit'], answer: 'B' },
+            { sentence: 'Hurry up! The film _______ in ten minutes.', options: ['starts', 'is starting', 'will start', 'is going to start'], answer: 'A' }
+          ]
+        },
+        {
+          title: 'First Conditional',
+          instruction: 'Choose the correct verb form.',
+          type: 'mc_pos',
+          data: [
+            { sentence: 'If it _______ tomorrow, we will stay at home.', options: ['rains', 'will rain', 'rained', 'raining'], answer: 'A' },
+            { sentence: 'She will miss the bus unless she _______ now.', options: ['leaves', 'will leave', 'left', 'leaving'], answer: 'A' },
+            { sentence: 'I _______ you if I have any questions.', options: ['call', 'will call', 'called', 'calling'], answer: 'B' },
+            { sentence: 'If you heat water to 100°C, it _______.', options: ['boils', 'will boil', 'boiled', 'boiling'], answer: 'A' },
+            { sentence: 'We won\'t go out if it _______ too cold.', options: ['is', 'will be', 'was', 'being'], answer: 'A' },
+            { sentence: 'If he _______ harder, he will pass the exam.', options: ['works', 'will work', 'worked', 'working'], answer: 'A' },
+            { sentence: 'You _______ a cold if you don\'t wear a coat.', options: ['catch', 'will catch', 'caught', 'catching'], answer: 'B' },
+            { sentence: 'If they invite me, I _______.', options: ['go', 'will go', 'went', 'going'], answer: 'B' },
+            { sentence: 'Plants die if they _______ enough water.', options: ['don\'t get', 'won\'t get', 'didn\'t get', 'aren\'t getting'], answer: 'A' },
+            { sentence: 'I\'ll call you as soon as I _______ home.', options: ['get', 'will get', 'got', 'getting'], answer: 'A' }
+          ]
+        }
+      ];
+
+      // ----- state -------------------------------------------------
+      let currentRound = 0;
+      let userInputs = [];
+      let allCorrect = false;
+
+      const STORAGE_KEY = 'eslB1round';
+      const dynamicEl = document.getElementById('dynamicContent');
+      const messageEl = document.getElementById('messageArea');
+      const checkBtn = document.getElementById('checkBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const roundBadge = document.getElementById('roundBadge');
+      const roundTitle = document.getElementById('roundTitle');
+      const roundInstruction = document.getElementById('roundInstruction');
+      const resetBtn = document.getElementById('resetBtn');
+
+      // ----- helpers -----------------------------------------------
+      function normalize(str) {
+        return str.trim().replace(/[.,!?;:()"]/g, '').replace(/\s+/g, ' ').toLowerCase();
+      }
+
+      function isCorrectCorrection(userVal, correctFull) {
+        const normUser = normalize(userVal);
+        const full = normalize(correctFull);
+        if (normUser === full) return true;
+        const words = full.split(' ');
+        if (words.includes('not')) {
+          const notIdx = words.indexOf('not');
+          if (notIdx > 0) {
+            const before = words[notIdx-1];
+            if (before === 'is') {
+              const copy = [...words]; copy.splice(notIdx-1, 2, 'isn\'t');
+              if (normalize(copy.join(' ')) === normUser) return true;
+            } else if (before === 'are') {
+              const copy = [...words]; copy.splice(notIdx-1, 2, 'aren\'t');
+              if (normalize(copy.join(' ')) === normUser) return true;
+            } else if (before === 'am') {
+              const copy = [...words]; copy.splice(notIdx-1, 2, 'i\'m', 'not');
+              if (normalize(copy.join(' ')) === normUser) return true;
+            }
+          }
+        }
+        const shortMap = {
+          'she is not': 'she isn\'t',
+          'they are not': 'they aren\'t',
+          'we are not': 'we aren\'t',
+          'he is not': 'he isn\'t',
+          'it is not': 'it isn\'t',
+          'you are not': 'you aren\'t',
+          'i am not': 'i\'m not',
+          'the children are not': 'the children aren\'t'
+        };
+        for (let key in shortMap) {
+          if (normalize(key) === full && normalize(shortMap[key]) === normUser) return true;
+          if (normalize(shortMap[key]) === full && normalize(key) === normUser) return true;
+        }
+        return false;
+      }
+
+      function saveProgress() {
+        localStorage.setItem(STORAGE_KEY, currentRound);
+      }
+
+      function loadProgress() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved !== null) {
+          const num = parseInt(saved, 10);
+          if (!isNaN(num) && num >= 0 && num < rounds.length) {
+            currentRound = num;
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // ----- render ------------------------------------------------
+      function renderRound(roundIndex) {
+        const round = rounds[roundIndex];
+        allCorrect = false;
+        nextBtn.disabled = true;
+        messageEl.textContent = '';
+        messageEl.className = 'message-area';
+
+        roundBadge.textContent = `ROUND ${roundIndex+1} / ${rounds.length}`;
+        roundTitle.textContent = round.title;
+        roundInstruction.innerHTML = round.instruction;
+
+        let html = '';
+        userInputs = [];
+
+        const type = round.type;
+
+        if (type === 'gap') {
+          html = `<ul class="sentence-list">`;
+          round.data.forEach((item, idx) => {
+            html += `<li class="sentence-item">
+              <span class="sentence-text">${item.prefix}</span>
+              <input class="input-gap" type="text" autocomplete="off" spellcheck="false" data-answer="${item.answer}" data-idx="${idx}">
+              <span class="sentence-text">${item.suffix}</span>
+            </li>`;
+          });
+          html += `</ul>`;
+          dynamicEl.innerHTML = html;
+          document.querySelectorAll('.input-gap').forEach(inp => userInputs.push(inp));
+        }
+        else if (type === 'rewrite' || type === 'correction' || type === 'correction_two' || type === 'question' || type === 'wh_question' || type === 'wh_simple') {
+          const cls = (type === 'rewrite') ? 'input-rewrite' : 'input-correct';
+          let label = '';
+          if (type === 'question') label = 'Example: The teacher is in the classroom. → Is the teacher in the classroom?';
+          else if (type === 'wh_question') label = 'Use the question word in brackets.';
+          else if (type === 'wh_simple') label = 'Use the question word in brackets.';
+          html = (label) ? `<div class="example-hint">${label}</div>` : '';
+          html += `<ul class="sentence-list">`;
+          round.data.forEach((item, idx) => {
+            const prompt = item.statement || item.wrong || item.prompt || '';
+            const answerKey = item.answer || '';
+            html += `<li class="sentence-item">
+              <span class="sentence-text">${prompt}</span>
+              <span class="sentence-text">→</span>
+              <input class="${cls}" type="text" autocomplete="off" spellcheck="false" data-answer="${answerKey}" data-idx="${idx}">
+            </li>`;
+          });
+          html += `</ul>`;
+          dynamicEl.innerHTML = html;
+          document.querySelectorAll(`.${cls}`).forEach(inp => userInputs.push(inp));
+        }
+        else if (type === 'ai') {
+          html = `<ul class="sentence-list">`;
+          round.data.forEach((item, idx) => {
+            html += `<li class="sentence-item">
+              <span class="sentence-text">${item.sentence}</span>
+              <span class="sentence-text">[</span>
+              <input class="input-short" type="text" maxlength="1" autocomplete="off" spellcheck="false" data-answer="${item.answer}" data-idx="${idx}" style="width:40px;text-align:center;">
+              <span class="sentence-text">]</span>
+            </li>`;
+          });
+          html += `</ul>`;
+          dynamicEl.innerHTML = html;
+          document.querySelectorAll('.input-short').forEach(inp => userInputs.push(inp));
+        }
+        else if (type === 'mc_pos' || type === 'mc_neg' || type === 'mc_mixed') {
+          html = `<ul class="sentence-list">`;
+          round.data.forEach((item, idx) => {
+            const opts = item.options;
+            html += `<li class="sentence-item" style="flex-direction:column;align-items:stretch;padding:0.5rem 0;">
+              <span class="sentence-text">${item.sentence}</span>
+              <div class="option-group">`;
+            const labels = ['A', 'B', 'C', 'D'];
+            opts.forEach((opt, oi) => {
+              const val = labels[oi];
+              html += `<label class="option-label">
+                <input type="radio" name="mc_${idx}" value="${val}" data-answer="${item.answer}" data-idx="${idx}">
+                ${val}) ${opt}
+              </label>`;
+            });
+            html += `</div></li>`;
+          });
+          html += `</ul>`;
+          dynamicEl.innerHTML = html;
+          userInputs = document.querySelectorAll('.option-group');
+        }
+
+        document.querySelectorAll('input[type="text"]').forEach(inp => {
+          inp.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); handleCheck(); }
+          });
+        });
+
+        checkBtn.disabled = false;
+      }
+
+      // ----- check ------------------------------------------------
+      function handleCheck() {
+        const round = rounds[currentRound];
+        const type = round.type;
+        let allOk = true;
+        let firstError = -1;
+
+        if (type === 'gap' || type === 'rewrite' || type === 'question' || type === 'wh_question' || type === 'wh_simple' || type === 'correction' || type === 'correction_two' || type === 'ai') {
+          const inputs = document.querySelectorAll('input[type="text"]');
+          inputs.forEach((inp, idx) => {
+            const userVal = inp.value;
+            const correct = inp.dataset.answer;
+            let isOk = false;
+            if (type === 'correction' || type === 'correction_two') {
+              isOk = isCorrectCorrection(userVal, correct);
+            } else if (type === 'ai') {
+              const normU = userVal.trim().toUpperCase();
+              isOk = (normU === 'A' || normU === 'I') && normU === correct;
+            } else {
+              const normU = normalize(userVal);
+              const normC = normalize(correct);
+              isOk = (normU === normC);
+            }
+            if (isOk) {
+              inp.style.borderBottomColor = '#1a6b3c';
+            } else {
+              inp.style.borderBottomColor = '#b13e3e';
+              allOk = false;
+              if (firstError === -1) firstError = idx;
+            }
+          });
+        }
+        else if (type === 'mc_pos' || type === 'mc_neg' || type === 'mc_mixed') {
+          const groups = document.querySelectorAll('.option-group');
+          groups.forEach((group, idx) => {
+            const radios = group.querySelectorAll('input[type="radio"]');
+            let selected = null;
+            radios.forEach(r => { if (r.checked) selected = r; });
+            const correct = round.data[idx].answer;
+            let isOk = false;
+            if (selected) {
+              isOk = (selected.value === correct);
+            }
+            if (isOk) {
+              group.style.borderLeft = '4px solid #1a6b3c';
+              group.style.paddingLeft = '0.5rem';
+            } else {
+              group.style.borderLeft = '4px solid #b13e3e';
+              group.style.paddingLeft = '0.5rem';
+              allOk = false;
+              if (firstError === -1) firstError = idx;
+            }
+          });
+        }
+
+        if (allOk) {
+          messageEl.textContent = '✓ All correct. You may proceed.';
+          messageEl.className = 'message-area message-success';
+          allCorrect = true;
+          nextBtn.disabled = false;
+          checkBtn.disabled = true;
+        } else {
+          messageEl.textContent = '✗ Some answers are incorrect. Review and try again.';
+          messageEl.className = 'message-area message-error';
+          allCorrect = false;
+          nextBtn.disabled = true;
+          checkBtn.disabled = false;
+        }
+      }
+
+      function goToNextRound() {
+        if (!allCorrect) return;
+        if (currentRound < rounds.length - 1) {
+          currentRound++;
+          saveProgress();
+          renderRound(currentRound);
+        } else {
+          messageEl.textContent = '🎉 Well done! You completed all rounds.';
+          messageEl.className = 'message-area message-success';
+          nextBtn.disabled = true;
+          checkBtn.disabled = true;
+          document.querySelectorAll('input').forEach(inp => inp.disabled = true);
+          // also save final round (so reload shows last round)
+          saveProgress();
+        }
+      }
+
+      // ----- reset ------------------------------------------------
+      function resetProgress() {
+        localStorage.removeItem(STORAGE_KEY);
+        window.location.reload();
+      }
+
+      // ----- init -------------------------------------------------
+      checkBtn.addEventListener('click', handleCheck);
+      nextBtn.addEventListener('click', goToNextRound);
+      resetBtn.addEventListener('click', resetProgress);
+
+      document.addEventListener('input', function(e) {
+        if (e.target && e.target.tagName === 'INPUT' && e.target.type === 'text') {
+          e.target.style.borderBottomColor = '#1e1e1e';
+        }
+      });
+
+      const resumed = loadProgress();
+      if (resumed && currentRound > 0) {
+        messageEl.textContent = `↩ Resuming from Round ${currentRound+1}.`;
+        messageEl.className = 'message-area';
+      }
+      renderRound(currentRound);
+    })();
+  </script>
+</body>
+</html>
