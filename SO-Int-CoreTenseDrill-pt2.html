@@ -132,8 +132,9 @@
     }
 
     .input-gap { width: 130px; }
-    .input-rewrite { width: 260px; flex: 1 1 180px; }
-    .input-correct { width: 320px; flex: 1 1 240px; }
+    /* Longer gaps for rewrite & correction tasks */
+    .input-rewrite { width: auto; flex: 1 1 320px; }
+    .input-correct { width: auto; flex: 1 1 480px; }
     .input-short { width: 60px; }
 
     .input-gap:focus, .input-rewrite:focus, .input-correct:focus, .input-short:focus {
@@ -233,8 +234,8 @@
     @media (max-width: 600px) {
       .game-container { padding: 1.8rem 1.2rem; }
       .input-gap { width: 100px; }
-      .input-rewrite { width: 160px; flex: 1 1 120px; }
-      .input-correct { width: 200px; flex: 1 1 160px; }
+      .input-rewrite { flex: 1 1 200px; }
+      .input-correct { flex: 1 1 260px; }
     }
   </style>
 </head>
@@ -257,8 +258,25 @@
 
   <script>
     (function() {
-      // ----- B1+ ROUNDS --------------------------------------------
+      // ----- B1+ ROUNDS (full set: 11 rounds) -----------------
       const rounds = [
+        {
+          title: 'First Conditional',
+          instruction: 'Choose the correct verb form.',
+          type: 'mc_pos',
+          data: [
+            { sentence: 'If it _______ tomorrow, we will stay at home.', options: ['rains', 'will rain', 'rained', 'raining'], answer: 'A' },
+            { sentence: 'She will miss the bus unless she _______ now.', options: ['leaves', 'will leave', 'left', 'leaving'], answer: 'A' },
+            { sentence: 'I _______ you if I have any questions.', options: ['call', 'will call', 'called', 'calling'], answer: 'B' },
+            { sentence: 'If you heat water to 100°C, it _______.', options: ['boils', 'will boil', 'boiled', 'boiling'], answer: 'A' },
+            { sentence: 'We won\'t go out if it _______ too cold.', options: ['is', 'will be', 'was', 'being'], answer: 'A' },
+            { sentence: 'If he _______ harder, he will pass the exam.', options: ['works', 'will work', 'worked', 'working'], answer: 'A' },
+            { sentence: 'You _______ a cold if you don\'t wear a coat.', options: ['catch', 'will catch', 'caught', 'catching'], answer: 'B' },
+            { sentence: 'If they invite me, I _______.', options: ['go', 'will go', 'went', 'going'], answer: 'B' },
+            { sentence: 'Plants die if they _______ enough water.', options: ['don\'t get', 'won\'t get', 'didn\'t get', 'aren\'t getting'], answer: 'A' },
+            { sentence: 'I\'ll call you as soon as I _______ home.', options: ['get', 'will get', 'got', 'getting'], answer: 'A' }
+          ]
+        },
         {
           title: 'Modals (can, could, must, have to, should, might)',
           instruction: 'Choose the best modal verb for each sentence.',
@@ -598,7 +616,6 @@
           nextBtn.disabled = true;
           checkBtn.disabled = true;
           document.querySelectorAll('input').forEach(inp => inp.disabled = true);
-          // also save final round (so reload shows last round)
           saveProgress();
         }
       }
