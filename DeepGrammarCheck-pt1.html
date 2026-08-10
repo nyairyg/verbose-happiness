@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Practice</title>
+    <style>
+        :root {
+            --bg: #F4F1EC;
+            --card-bg: #FFFFFF;
+            --text: #1C1C1C;
+            --text-secondary: #6B6560;
+            --border: #D6D0C8;
+            --border-light: #E8E3DC;
+            --correct: #3D6B35;
+            --error: #C84630;
+            --accent: #3A3A3A;
+            --btn-hover: #F9F7F4;
+            --btn-active: #F0EDE8;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 2px;
+            --font-stack: 'Inter', 'Helvetica Neue', 'Segoe UI', 'Arial', sans-serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background-color: var(--bg);
+            font-family: var(--font-stack);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.015) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+        }
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 620px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+            padding: 48px 44px 40px;
+            transition: opacity 0.3s ease;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 36px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .header-title {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .header-progress, .header-score {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.03em;
+            font-variant-numeric: tabular-nums;
+            font-family: 'SF Mono','Consolas','Menlo',monospace;
+        }
+        .header-right { display: flex; gap: 20px; }
+
+        .sentence-area { margin-bottom: 32px; min-height: 60px; display: flex; align-items: center; }
+        .sentence-text {
+            font-size: 20px;
+            font-weight: 450;
+            line-height: 1.5;
+            color: var(--text);
+            letter-spacing: 0.01em;
+            transition: color 0.25s ease;
+        }
+        .judgment-group { display: flex; gap: 12px; margin-bottom: 20px; }
+        .btn-judgment {
+            flex:1;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            background: #FAFAF8;
+            border: 1px solid var(--border);
+            color: var(--text);
+            transition: all 0.18s ease;
+            font-family: var(--font-stack);
+            border-radius: var(--radius);
+            outline: none;
+            user-select: none;
+        }
+        .btn-judgment:hover { background:#F3F1ED; border-color:#C8C3BA; }
+        .btn-judgment:active { background:#EDEAE5; transform:scale(0.985); }
+        .btn-judgment.selected {
+            background:#EDEAE5;
+            border-color:#A09A90;
+            font-weight:550;
+            box-shadow:inset 0 0 0 1px rgba(0,0,0,0.06);
+        }
+        .btn-judgment.selected::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: var(--accent);
+        }
+        .rewrite-wrapper {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.28s ease, margin-bottom 0.35s cubic-bezier(0.4,0,0.2,1);
+            margin-bottom: 0;
+        }
+        .rewrite-wrapper.visible { max-height: 120px; opacity:1; margin-bottom:20px; }
+        .rewrite-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .rewrite-input {
+            width:100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-family: var(--font-stack);
+            border:1px solid var(--border);
+            background:#FDFCFB;
+            color:var(--text);
+            resize:none;
+            outline:none;
+            border-radius: var(--radius);
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+            line-height:1.5;
+        }
+        .rewrite-input:focus { border-color:#A09A90; box-shadow:0 0 0 3px rgba(0,0,0,0.04); background:#FFFFFF; }
+        .rewrite-input.error-highlight { border-color:var(--error); box-shadow:0 0 0 3px rgba(200,70,48,0.08); background:#FFFBFB; }
+
+        .btn-check {
+            display:block;
+            width:100%;
+            padding: 15px 24px;
+            font-size:15px;
+            font-weight:550;
+            letter-spacing: 0.04em;
+            cursor:pointer;
+            background:var(--accent);
+            border:none;
+            color:#FFFFFF;
+            transition: all 0.18s ease;
+            font-family:var(--font-stack);
+            border-radius: var(--radius);
+            outline:none;
+            user-select:none;
+        }
+        .btn-check:hover { background:#2E2E2E; }
+        .btn-check:active { transform:scale(0.985); background:#252525; }
+        .btn-check.success-flash { background:var(--correct); }
+        .btn-check.error-flash { background:var(--error); }
+
+        .feedback-msg {
+            text-align:center;
+            font-size:13px;
+            font-weight:500;
+            letter-spacing:0.03em;
+            margin-top:14px;
+            min-height:20px;
+            transition: color 0.2s ease;
+        }
+        .feedback-msg.success { color:var(--correct); }
+        .feedback-msg.error { color:var(--error); }
+
+        @keyframes shakeHorizontal {
+            0%,100%{ transform:translateX(0); }
+            10%{ transform:translateX(-6px); }
+            20%{ transform:translateX(6px); }
+            30%{ transform:translateX(-5px); }
+            40%{ transform:translateX(5px); }
+            50%{ transform:translateX(-3px); }
+            60%{ transform:translateX(3px); }
+            70%{ transform:translateX(-2px); }
+            80%{ transform:translateX(2px); }
+            90%{ transform:translateX(-1px); }
+        }
+        @keyframes shakePrompt {
+            0%,100%{ transform:translateX(0); }
+            15%{ transform:translateX(-3px); }
+            30%{ transform:translateX(3px); }
+            45%{ transform:translateX(-2px); }
+            60%{ transform:translateX(2px); }
+            75%{ transform:translateX(-1px); }
+            90%{ transform:translateX(1px); }
+        }
+        .shake { animation: shakeHorizontal 0.55s ease; }
+        .shake-subtle { animation: shakePrompt 0.5s ease; }
+
+        .summary { text-align: center; padding: 20px 0; }
+        .summary-well-done {
+            font-size: 24px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .summary-score {
+            font-size: 56px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
+            font-family: 'SF Mono','Consolas','Menlo',monospace;
+        }
+        .summary-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+        .summary-detail {
+            font-size: 15px;
+            color: var(--text-secondary);
+            letter-spacing: 0.02em;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        .btn-restart {
+            display: inline-block;
+            padding: 14px 32px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            transition: all 0.18s ease;
+            font-family: var(--font-stack);
+            border-radius: var(--radius);
+            outline: none;
+            user-select: none;
+        }
+        .btn-restart:hover { background:#F3F1ED; border-color:#C8C3BA; }
+        .fade-out { opacity:0; transition: opacity 0.22s ease; }
+        .fade-in { opacity:1; transition: opacity 0.22s ease; }
+
+        @media (max-width: 640px) {
+            .container { padding: 28px 20px 24px; }
+            .sentence-text { font-size:17px; }
+            .btn-judgment { padding:12px 14px; font-size:14px; }
+            .btn-check { padding:13px 20px; font-size:14px; }
+            .judgment-group { gap:8px; }
+            .header { margin-bottom:24px; padding-bottom:12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="header">
+            <span class="header-title">Grammar Practice</span>
+            <div class="header-right">
+                <span class="header-progress" id="progressLabel">1 / 30</span>
+                <span class="header-score" id="scoreLabel">Score: 0</span>
+            </div>
+        </div>
+        <div class="sentence-area" id="sentenceArea">
+            <span class="sentence-text" id="sentenceText"></span>
+        </div>
+        <div class="judgment-group" id="judgmentGroup">
+            <button class="btn-judgment" data-judgment="correct" id="btnCorrect">Correct</button>
+            <button class="btn-judgment" data-judgment="incorrect" id="btnIncorrect">Incorrect</button>
+        </div>
+        <div class="rewrite-wrapper" id="rewriteWrapper">
+            <label class="rewrite-label" for="rewriteInput">Rewrite the full sentence without a mistake</label>
+            <textarea class="rewrite-input" id="rewriteInput" rows="2" placeholder="Type the corrected sentence here..."></textarea>
+        </div>
+        <button class="btn-check" id="btnCheck">Check</button>
+        <div class="feedback-msg" id="feedbackMsg"></div>
+    </div>
+
+    <script>
+        (function() {
+            // Updated data – sentence 15 now accepts both "I saw that film last week." and "I have seen that film."
+            const sentencesData = [{
+                id: 1, text: 'We was at the park yesterday.', isCorrect: false,
+                acceptableCorrections: ['We were at the park yesterday.']
+            }, {
+                id: 2, text: 'He might have forgotten about the meeting.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 3, text: 'If I would be you, I\'d accept the offer.', isCorrect: false,
+                acceptableCorrections: ['If I were you, I\'d accept the offer.', 'If I were you, I would accept the offer.']
+            }, {
+                id: 4, text: 'She has been studying English for five years.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 5, text: 'They didn\'t went to the concert.', isCorrect: false,
+                acceptableCorrections: ['They didn\'t go to the concert.', 'They did not go to the concert.']
+            }, {
+                id: 6, text: 'The news are very worrying.', isCorrect: false,
+                acceptableCorrections: ['The news is very worrying.']
+            }, {
+                id: 7, text: 'Unless you hurry, you will miss the bus.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 8, text: 'It calls a smartphone.', isCorrect: false,
+                acceptableCorrections: ['It is called a smartphone.', 'It\'s called a smartphone.']
+            }, {
+                id: 9, text: 'The bridge was build in 2005.', isCorrect: false,
+                acceptableCorrections: ['The bridge was built in 2005.']
+            }, {
+                id: 10, text: 'Do he go to the gym often?', isCorrect: false,
+                acceptableCorrections: ['Does he go to the gym often?']
+            }, {
+                id: 11, text: 'She can sing beautifully.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 12, text: 'If it rains, we\'ll stay at home.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 13, text: 'The children are playing in the garden now.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 14, text: 'Everyone were satisfied with the result.', isCorrect: false,
+                acceptableCorrections: ['Everyone was satisfied with the result.']
+            }, {
+                id: 15, text: 'I have seen that film last week.', isCorrect: false,
+                acceptableCorrections: [
+                    'I saw that film last week.',
+                    'I have seen that film.'
+                ]
+            }, {
+                id: 16, text: 'The letter was sent last Monday.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 17, text: 'He mustn\'t to use his mobile during the exam.', isCorrect: false,
+                acceptableCorrections: ['He mustn\'t use his mobile during the exam.', 'He must not use his mobile during the exam.']
+            }, {
+                id: 18, text: 'There is many people in the queue.', isCorrect: false,
+                acceptableCorrections: ['There are many people in the queue.']
+            }, {
+                id: 19, text: 'By the time we arrived, the film had already started.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 20, text: 'She has woken up late yesterday.', isCorrect: false,
+                acceptableCorrections: ['She woke up late yesterday.']
+            }, {
+                id: 21, text: 'They have two children.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 22, text: 'She asked me where I had bought my coat.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 23, text: 'The book was wrote by a famous author.', isCorrect: false,
+                acceptableCorrections: ['The book was written by a famous author.']
+            }, {
+                id: 24, text: 'We must to leave now.', isCorrect: false,
+                acceptableCorrections: ['We must leave now.']
+            }, {
+                id: 25, text: 'If I were taller, I would play basketball.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 26, text: 'He don\'t understand the rules.', isCorrect: false,
+                acceptableCorrections: ['He doesn\'t understand the rules.', 'He does not understand the rules.']
+            }, {
+                id: 27, text: 'I\'ve been knowing her for ten years.', isCorrect: false,
+                acceptableCorrections: ['I\'ve known her for ten years.', 'I have known her for ten years.']
+            }, {
+                id: 28, text: 'She don\'t like classical music.', isCorrect: false,
+                acceptableCorrections: ['She doesn\'t like classical music.', 'She does not like classical music.']
+            }, {
+                id: 29, text: 'He drives more carefully than his brother.', isCorrect: true, acceptableCorrections: []
+            }, {
+                id: 30, text: 'We used to live in a small village.', isCorrect: true, acceptableCorrections: []
+            }];
+
+            // Shuffle
+            function shuffle(arr) {
+                const a = arr.slice();
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            let sentences = shuffle(sentencesData);
+            let currentIndex = 0;
+            let score = 0;
+            let selectedJudgment = null;
+            let isTransitioning = false;
+
+            // DOM references (will be rebound after restart)
+            let container = document.getElementById('container');
+            let sentenceText = document.getElementById('sentenceText');
+            let sentenceArea = document.getElementById('sentenceArea');
+            let progressLabel = document.getElementById('progressLabel');
+            let scoreLabel = document.getElementById('scoreLabel');
+            let btnCorrect = document.getElementById('btnCorrect');
+            let btnIncorrect = document.getElementById('btnIncorrect');
+            let judgmentGroup = document.getElementById('judgmentGroup');
+            let rewriteWrapper = document.getElementById('rewriteWrapper');
+            let rewriteInput = document.getElementById('rewriteInput');
+            let btnCheck = document.getElementById('btnCheck');
+            let feedbackMsg = document.getElementById('feedbackMsg');
+
+            function normalizeForComparison(str) {
+                let s = str.trim();
+                if (s.endsWith('.')) s = s.slice(0, -1).trim();
+                return s.toLowerCase();
+            }
+
+            function isCorrectionAcceptable(userInput, acceptableList) {
+                const normalizedUser = normalizeForComparison(userInput);
+                for (const acc of acceptableList) {
+                    if (normalizeForComparison(acc) === normalizedUser) return true;
+                }
+                return false;
+            }
+
+            function getCurrentSentence() { return sentences[currentIndex]; }
+            function clearSelection() {
+                selectedJudgment = null;
+                btnCorrect.classList.remove('selected');
+                btnIncorrect.classList.remove('selected');
+            }
+            function hideRewriteField() {
+                rewriteWrapper.classList.remove('visible');
+                rewriteInput.value = '';
+                rewriteInput.classList.remove('error-highlight');
+            }
+            function showRewriteField() {
+                rewriteWrapper.classList.add('visible');
+                rewriteInput.classList.remove('error-highlight');
+                setTimeout(() => rewriteInput.focus(), 350);
+            }
+            function resetForCurrentSentence() {
+                clearSelection();
+                hideRewriteField();
+                feedbackMsg.textContent = '';
+                feedbackMsg.className = 'feedback-msg';
+                btnCheck.classList.remove('success-flash','error-flash');
+                btnCheck.textContent = 'Check';
+                sentenceArea.classList.remove('shake');
+                judgmentGroup.classList.remove('shake-subtle');
+                container.classList.remove('shake');
+                rewriteInput.classList.remove('error-highlight');
+                isTransitioning = false;
+            }
+            function updateProgressUI() {
+                progressLabel.textContent = (currentIndex + 1) + ' / ' + sentences.length;
+                scoreLabel.textContent = 'Score: ' + score;
+            }
+            function renderSentence() {
+                sentenceText.textContent = getCurrentSentence().text;
+                updateProgressUI();
+            }
+
+            function handleCheck() {
+                if (isTransitioning) return;
+                const sentence = getCurrentSentence();
+
+                if (selectedJudgment === null) {
+                    judgmentGroup.classList.add('shake-subtle');
+                    setTimeout(() => judgmentGroup.classList.remove('shake-subtle'), 550);
+                    feedbackMsg.textContent = 'Select "Correct" or "Incorrect" first.';
+                    feedbackMsg.className = 'feedback-msg error';
+                    return;
+                }
+
+                if (selectedJudgment === 'correct') {
+                    if (sentence.isCorrect) {
+                        handleSuccess();
+                    } else {
+                        handleJudgmentFail('This sentence contains a mistake. Try selecting "Incorrect" and rewriting it.');
+                    }
+                    return;
+                }
+
+                if (selectedJudgment === 'incorrect') {
+                    if (sentence.isCorrect) {
+                        handleJudgmentFail('This sentence is actually correct. No rewrite needed.');
+                        return;
+                    }
+                    const userRewrite = rewriteInput.value.trim();
+                    if (userRewrite === '') {
+                        rewriteInput.classList.add('error-highlight');
+                        rewriteInput.focus();
+                        feedbackMsg.textContent = 'Please write the corrected sentence.';
+                        feedbackMsg.className = 'feedback-msg error';
+                        rewriteWrapper.classList.add('shake-subtle');
+                        setTimeout(() => rewriteWrapper.classList.remove('shake-subtle'), 550);
+                        return;
+                    }
+                    if (isCorrectionAcceptable(userRewrite, sentence.acceptableCorrections)) {
+                        handleSuccess();
+                    } else {
+                        rewriteInput.classList.add('error-highlight');
+                        rewriteInput.focus();
+                        feedbackMsg.textContent = 'Not quite. Check your correction and try again.';
+                        feedbackMsg.className = 'feedback-msg error';
+                        btnCheck.classList.add('error-flash');
+                        setTimeout(() => btnCheck.classList.remove('error-flash'), 400);
+                        rewriteWrapper.classList.add('shake-subtle');
+                        setTimeout(() => rewriteWrapper.classList.remove('shake-subtle'), 550);
+                    }
+                }
+            }
+
+            function handleJudgmentFail(message) {
+                container.classList.add('shake');
+                setTimeout(() => container.classList.remove('shake'), 600);
+                feedbackMsg.textContent = message;
+                feedbackMsg.className = 'feedback-msg error';
+                btnCheck.classList.add('error-flash');
+                setTimeout(() => btnCheck.classList.remove('error-flash'), 400);
+                clearSelection();
+                hideRewriteField();
+            }
+
+            function handleSuccess() {
+                isTransitioning = true;
+                score++;
+                updateProgressUI();
+                feedbackMsg.textContent = 'Correct.';
+                feedbackMsg.className = 'feedback-msg success';
+                btnCheck.classList.add('success-flash');
+                btnCheck.textContent = '✓';
+
+                setTimeout(() => {
+                    if (currentIndex < sentences.length - 1) {
+                        container.classList.add('fade-out');
+                        setTimeout(() => {
+                            currentIndex++;
+                            resetForCurrentSentence();
+                            renderSentence();
+                            container.classList.remove('fade-out');
+                            container.classList.add('fade-in');
+                            setTimeout(() => container.classList.remove('fade-in'), 250);
+                        }, 220);
+                    } else {
+                        showSummary();
+                    }
+                }, 900);
+            }
+
+            function showSummary() {
+                isTransitioning = true;
+                container.classList.add('fade-out');
+                setTimeout(() => {
+                    const pct = Math.round((score / sentences.length) * 100);
+                    let remark = '';
+                    if (pct >= 90) remark = 'Excellent work.';
+                    else if (pct >= 70) remark = 'Good effort. Keep practicing.';
+                    else if (pct >= 50) remark = 'Solid progress. Review the tricky ones.';
+                    else remark = 'Keep at it. Practice makes progress.';
+
+                    container.innerHTML = `
+                        <div class="header">
+                            <span class="header-title">Grammar Practice</span>
+                            <span class="header-progress">Complete</span>
+                        </div>
+                        <div class="summary">
+                            <div class="summary-well-done">Well done!</div>
+                            <div class="summary-score">${score} / ${sentences.length}</div>
+                            <div class="summary-label">${remark}</div>
+                            <div class="summary-detail">You correctly identified and fixed<br>${score} out of ${sentences.length} sentences.</div>
+                            <button class="btn-restart" id="btnRestart">Start Again</button>
+                        </div>
+                    `;
+                    document.getElementById('btnRestart').addEventListener('click', restartAll);
+                }, 250);
+            }
+
+            function restartAll() {
+                sentences = shuffle(sentencesData);
+                currentIndex = 0;
+                score = 0;
+                isTransitioning = false;
+                selectedJudgment = null;
+
+                container.innerHTML = `
+                    <div class="header">
+                        <span class="header-title">Grammar Practice</span>
+                        <div class="header-right">
+                            <span class="header-progress" id="progressLabel">1 / 30</span>
+                            <span class="header-score" id="scoreLabel">Score: 0</span>
+                        </div>
+                    </div>
+                    <div class="sentence-area" id="sentenceArea">
+                        <span class="sentence-text" id="sentenceText"></span>
+                    </div>
+                    <div class="judgment-group" id="judgmentGroup">
+                        <button class="btn-judgment" data-judgment="correct" id="btnCorrect">Correct</button>
+                        <button class="btn-judgment" data-judgment="incorrect" id="btnIncorrect">Incorrect</button>
+                    </div>
+                    <div class="rewrite-wrapper" id="rewriteWrapper">
+                        <label class="rewrite-label" for="rewriteInput">Rewrite the full sentence without a mistake</label>
+                        <textarea class="rewrite-input" id="rewriteInput" rows="2" placeholder="Type the corrected sentence here..."></textarea>
+                    </div>
+                    <button class="btn-check" id="btnCheck">Check</button>
+                    <div class="feedback-msg" id="feedbackMsg"></div>
+                `;
+
+                // Rebind all DOM elements
+                container = document.getElementById('container');
+                sentenceText = document.getElementById('sentenceText');
+                sentenceArea = document.getElementById('sentenceArea');
+                progressLabel = document.getElementById('progressLabel');
+                scoreLabel = document.getElementById('scoreLabel');
+                btnCorrect = document.getElementById('btnCorrect');
+                btnIncorrect = document.getElementById('btnIncorrect');
+                judgmentGroup = document.getElementById('judgmentGroup');
+                rewriteWrapper = document.getElementById('rewriteWrapper');
+                rewriteInput = document.getElementById('rewriteInput');
+                btnCheck = document.getElementById('btnCheck');
+                feedbackMsg = document.getElementById('feedbackMsg');
+
+                judgmentGroup.addEventListener('click', onJudgmentClick);
+                btnCheck.addEventListener('click', onCheckClick);
+                rewriteInput.addEventListener('keydown', onRewriteKeydown);
+
+                renderSentence();
+                container.classList.remove('fade-out');
+                container.classList.add('fade-in');
+                setTimeout(() => container.classList.remove('fade-in'), 250);
+            }
+
+            function onJudgmentClick(e) {
+                if (isTransitioning) return;
+                const btn = e.target.closest('.btn-judgment');
+                if (!btn) return;
+                const judgment = btn.dataset.judgment;
+                feedbackMsg.textContent = '';
+                feedbackMsg.className = 'feedback-msg';
+                btnCheck.classList.remove('success-flash','error-flash');
+                btnCheck.textContent = 'Check';
+                container.classList.remove('shake');
+                judgmentGroup.classList.remove('shake-subtle');
+
+                if (selectedJudgment === judgment) {
+                    clearSelection();
+                    hideRewriteField();
+                    return;
+                }
+                clearSelection();
+                selectedJudgment = judgment;
+                if (judgment === 'correct') {
+                    btnCorrect.classList.add('selected');
+                    hideRewriteField();
+                } else {
+                    btnIncorrect.classList.add('selected');
+                    showRewriteField();
+                }
+            }
+
+            function onCheckClick() {
+                if (isTransitioning) return;
+                if (btnCorrect.classList.contains('selected')) selectedJudgment = 'correct';
+                else if (btnIncorrect.classList.contains('selected')) selectedJudgment = 'incorrect';
+                else selectedJudgment = null;
+                handleCheck();
+            }
+
+            function onRewriteKeydown(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    onCheckClick();
+                }
+            }
+
+            // initial bindings
+            judgmentGroup.addEventListener('click', onJudgmentClick);
+            btnCheck.addEventListener('click', onCheckClick);
+            rewriteInput.addEventListener('keydown', onRewriteKeydown);
+            renderSentence();
+            hideRewriteField();
+        })();
+    </script>
+</body>
+</html>
