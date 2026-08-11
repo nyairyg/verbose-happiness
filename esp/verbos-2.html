@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Actividad</title>
+    <style>
+        :root {
+            --bg: #EDE9E2;
+            --surface: #FFFFFF;
+            --text: #1a1a1a;
+            --text-secondary: #6b6560;
+            --border: #d4cfc7;
+            --border-strong: #3a3a3a;
+            --gap-underline: #5c5750;
+            --selected-bg: #1a1a1a;
+            --selected-text: #ffffff;
+            --correct-bg: #e8f0e9;
+            --correct-border: #3d7a4a;
+            --correct-text: #2d5a35;
+            --incorrect-bg: #f7e9e9;
+            --incorrect-border: #c0392b;
+            --incorrect-text: #a83027;
+            --word-used-bg: #e8e5df;
+            --word-used-text: #b5b0a8;
+            --word-used-border: #ddd9d1;
+            --word-available-bg: #ffffff;
+            --word-available-border: #c4bfb6;
+            --word-hover-bg: #f7f5f1;
+            --drag-over-bg: #eef3ea;
+            --drag-over-border: #3d7a4a;
+            --font-stack: 'Helvetica Neue', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --gap-min-width: 72px;
+            --btn-height: 46px;
+            --radius: 0px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+            background: var(--bg);
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: var(--font-stack);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 28px 16px 60px;
+            line-height: 1.7;
+            letter-spacing: 0.01em;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 36px 32px 32px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .round-indicator {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .round-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text);
+            letter-spacing: 0.02em;
+        }
+
+        .text-block {
+            font-size: 18px;
+            line-height: 2.3;
+            letter-spacing: 0.015em;
+            margin-bottom: 36px;
+            word-wrap: break-word;
+            color: var(--text);
+        }
+
+        .gap {
+            display: inline-block;
+            min-width: var(--gap-min-width);
+            text-align: center;
+            border-bottom: 2px solid var(--gap-underline);
+            padding: 6px 10px 5px;
+            margin: 0 3px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: var(--text);
+            background: transparent;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, outline 0.1s ease;
+            vertical-align: baseline;
+            position: relative;
+            border-radius: var(--radius);
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .gap:empty::before {
+            content: '____________';
+            color: #c7c2b9;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .gap.filled {
+            color: var(--text);
+            border-bottom-color: var(--border-strong);
+            background: #fafaf8;
+        }
+
+        .gap.selected {
+            border-bottom-color: var(--border-strong);
+            border-bottom-width: 3px;
+            background: #f3f1ec;
+            outline: 2px solid var(--border-strong);
+        }
+
+        .gap.drag-over {
+            background: var(--drag-over-bg);
+            border-bottom-color: var(--drag-over-border);
+            border-bottom-width: 3px;
+            outline: 2px solid var(--drag-over-border);
+        }
+
+        .gap.correct {
+            background: var(--correct-bg);
+            border-bottom-color: var(--correct-border);
+            color: var(--correct-text);
+            border-bottom-width: 2px;
+            outline: none;
+        }
+
+        .gap.incorrect {
+            background: var(--incorrect-bg);
+            border-bottom-color: var(--incorrect-border);
+            color: var(--incorrect-text);
+            border-bottom-width: 2px;
+            outline: none;
+            animation: shake 0.45s ease;
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            12% {
+                transform: translateX(-6px);
+            }
+            25% {
+                transform: translateX(5px);
+            }
+            37% {
+                transform: translateX(-4px);
+            }
+            50% {
+                transform: translateX(3px);
+            }
+            62% {
+                transform: translateX(-2px);
+            }
+            75% {
+                transform: translateX(2px);
+            }
+            87% {
+                transform: translateX(-1px);
+            }
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 32px;
+            padding: 20px 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            min-height: 60px;
+        }
+
+        .word-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: var(--btn-height);
+            padding: 10px 18px;
+            font-size: 15px;
+            font-family: var(--font-stack);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            cursor: grab;
+            border: 1px solid var(--word-available-border);
+            background: var(--word-available-bg);
+            color: var(--text);
+            transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, opacity 0.1s ease, transform 0.15s ease, box-shadow 0.15s ease;
+            border-radius: var(--radius);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            white-space: nowrap;
+            touch-action: none;
+        }
+
+        .word-btn:active {
+            cursor: grabbing;
+        }
+        .word-btn.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            cursor: grabbing;
+        }
+
+        .word-btn:hover {
+            background: var(--word-hover-bg);
+            border-color: #a8a39b;
+        }
+
+        .word-btn.used {
+            background: var(--word-used-bg);
+            color: var(--word-used-text);
+            border-color: var(--word-used-border);
+            cursor: default;
+            pointer-events: none;
+            opacity: 0.55;
+        }
+
+        .word-btn.selected-word {
+            background: var(--selected-bg);
+            color: var(--selected-text);
+            border-color: var(--selected-bg);
+            outline: 2px solid var(--selected-bg);
+            outline-offset: 2px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 14px;
+            justify-content: flex-end;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: var(--btn-height);
+            padding: 10px 28px;
+            font-size: 14px;
+            font-family: var(--font-stack);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: 1px solid var(--border-strong);
+            background: var(--surface);
+            color: var(--text);
+            transition: background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+            border-radius: var(--radius);
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            background: #f5f3ef;
+        }
+        .action-btn:active {
+            background: #e8e4dc;
+        }
+
+        .action-btn.primary {
+            background: var(--selected-bg);
+            color: var(--selected-text);
+            border-color: var(--selected-bg);
+        }
+        .action-btn.primary:hover {
+            background: #333;
+            border-color: #333;
+        }
+        .action-btn.primary:active {
+            background: #000;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.35;
+            pointer-events: none;
+            cursor: default;
+        }
+
+        .completion-msg {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            color: var(--correct-text);
+            padding: 12px 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+        .completion-msg.visible {
+            opacity: 1;
+        }
+
+        .all-correct-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--correct-border);
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        /* Ghost element that follows finger during drag */
+        .drag-ghost {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            font-family: var(--font-stack);
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            padding: 10px 18px;
+            background: var(--surface);
+            border: 2px solid var(--border-strong);
+            color: var(--text);
+            white-space: nowrap;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            transform: translate(-50%, -50%);
+            border-radius: var(--radius);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px 18px 24px;
+            }
+            .text-block {
+                font-size: 16px;
+                line-height: 2.1;
+            }
+            .gap {
+                min-width: 56px;
+                font-size: 15px;
+                padding: 4px 8px 3px;
+            }
+            .gap:empty::before {
+                font-size: 14px;
+                letter-spacing: 0.03em;
+            }
+            .word-btn {
+                min-height: 40px;
+                padding: 8px 14px;
+                font-size: 14px;
+            }
+            .action-btn {
+                min-height: 42px;
+                padding: 8px 20px;
+                font-size: 13px;
+            }
+            .word-bank {
+                gap: 7px;
+                padding: 14px 0;
+            }
+            .header {
+                margin-bottom: 20px;
+                padding-bottom: 12px;
+            }
+            .drag-ghost {
+                font-size: 14px;
+                padding: 8px 14px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .container {
+                padding: 16px 12px 18px;
+            }
+            .text-block {
+                font-size: 15px;
+                line-height: 1.95;
+            }
+            .gap {
+                min-width: 48px;
+                font-size: 14px;
+                padding: 3px 6px 2px;
+            }
+            .gap:empty::before {
+                font-size: 13px;
+                letter-spacing: 0.02em;
+            }
+            .word-btn {
+                min-height: 36px;
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+            .action-btn {
+                min-height: 38px;
+                padding: 6px 16px;
+                font-size: 12px;
+            }
+            .word-bank {
+                gap: 5px;
+                padding: 10px 0;
+            }
+            .drag-ghost {
+                font-size: 13px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <div class="header">
+            <span class="round-indicator" id="roundIndicator">1 / 6</span>
+            <span class="round-title" id="roundTitle"></span>
+        </div>
+        <div class="text-block" id="textBlock"></div>
+        <div class="word-bank" id="wordBank"></div>
+        <div class="actions">
+            <span class="completion-msg" id="completionMsg"></span>
+            <button class="action-btn" id="checkBtn">Comprobar</button>
+            <button class="action-btn primary" id="nextBtn">Siguiente</button>
+        </div>
+    </div>
+    <div class="drag-ghost" id="dragGhost" style="display:none;"></div>
+
+    <script>
+        (function() {
+            const exercises = [
+                {
+                    id: 1,
+                    text: 'Me llamo Liliana. ____________ argentina pero ____________ y ____________ en Londres, Inglaterra. ____________ inglés muy bien. Mi familia ____________ en Buenos Aires. Yo ____________ los fines de semana en un restaurante italiano. ____________ un poco de italiano también. Mi jefe ____________ de Milán. Nosotros ____________ inglés en la oficina. Mis compañeros ____________ muy amables. Yo ____________ contenta con mi vida en Londres. ____________ cerca del río Támesis. Los sábados ____________ al parque. No ____________ mucho tiempo libre entre semana. ____________ una taza de café cada mañana. ____________ música pop en mi teléfono. ____________ novelas románticas. Mi hermana ____________ en París. Ella ____________ francés y alemán. Yo no ____________ francés, solo inglés y español. ____________ visitarla este verano.',
+                    words: [
+                        'hablo', 'soy', 'trabajo', 'vivo', 'está', 'como', 'tomo', 'es',
+                        'hablamos', 'son', 'estoy', 'vivo', 'voy', 'tengo', 'tomo', 'escucho',
+                        'leo', 'vive', 'habla', 'hablo', 'quiero'
+                    ],
+                    answers: [
+                        'soy', 'trabajo', 'vivo', 'hablo', 'está', 'como', 'tomo', 'es',
+                        'hablamos', 'son', 'estoy', 'vivo', 'voy', 'tengo', 'tomo', 'escucho',
+                        'leo', 'vive', 'habla', 'hablo', 'quiero'
+                    ]
+                },
+                {
+                    id: 2,
+                    text: 'Tú ____________ estadounidense, ¿verdad? ¿Dónde ____________? ¿Qué tal ____________ español? ____________ en Nueva York o en otra ciudad? Tus padres ____________ de México, ¿no? ____________ bien el español en tu casa. Yo ____________ que tú ____________ muy inteligente. ____________ muchos idiomas. ____________ clases particulares los viernes. ____________ un poco nervioso antes de los exámenes. ____________ mucho vocabulario nuevo cada semana. Tus amigos ____________ contigo en español. Ellos ____________ que tú ____________ muy buen acento. ____________ a menudo a España de vacaciones. ____________ paella en los restaurantes. ____________ una libreta para escribir todo. ____________ practicar todos los días. ____________ muy importante para aprender. ____________ seguro de que tú ____________ mejorar rápido.',
+                    words: [
+                        'eres', 'vives', 'hablas', 'vives', 'son', 'hablas', 'sé', 'eres',
+                        'estudias', 'tienes', 'estás', 'aprendes', 'practican', 'dicen', 'tienes',
+                        'viajas', 'comes', 'usas', 'debes', 'es', 'estoy', 'vas a'
+                    ],
+                    answers: [
+                        'eres', 'vives', 'hablas', 'vives', 'son', 'hablas', 'sé', 'eres',
+                        'estudias', 'tienes', 'estás', 'aprendes', 'practican', 'dicen', 'tienes',
+                        'viajas', 'comes', 'usas', 'debes', 'es', 'estoy', 'vas a'
+                    ]
+                },
+                {
+                    id: 3,
+                    text: 'Mi amigo cubano ____________ Andrés. Andrés no ____________ en Cuba, ____________ y ____________ en Estados Unidos. ____________ inglés muy bien. ____________ en Miami desde hace cinco años. ____________ en un hospital como enfermero. ____________ mucho y ____________ muy cansado. ____________ a su familia en Cuba por teléfono. ____________ todos los domingos. ____________ una casa cerca de la playa. ____________ a la playa los fines de semana. ____________ pescado fresco en el mercado. ____________ con sus vecinos en inglés. ____________ una bicicleta para ir al trabajo. ____________ el clima de Florida. ____________ calor casi todo el año. ____________ nadar muy bien. ____________ clases de yoga por las mañanas. ____________ feliz en Estados Unidos. ____________ volver a Cuba de visita pronto. ____________ a su abuela especialmente.',
+                    words: [
+                        'se llama', 'vive', 'vive', 'trabaja', 'habla', 'vive', 'trabaja', 'trabaja',
+                        'está', 'llama', 'habla', 'tiene', 'va', 'compra', 'habla', 'tiene',
+                        'le gusta', 'hace', 'sabe', 'toma', 'está', 'quiere', 'extraña'
+                    ],
+                    answers: [
+                        'se llama', 'vive', 'vive', 'trabaja', 'habla', 'vive', 'trabaja', 'trabaja',
+                        'está', 'llama', 'habla', 'tiene', 'va', 'compra', 'habla', 'tiene',
+                        'le gusta', 'hace', 'sabe', 'toma', 'está', 'quiere', 'extraña'
+                    ]
+                },
+                {
+                    id: 4,
+                    text: 'Pepe y yo ____________ españoles pero ____________ en Edimburgo donde ____________ inglés. ____________ inglés muy mal. ____________ estudiantes de medicina. ____________ clases todas las mañanas. ____________ en una residencia universitaria. ____________ muy lejos del centro. ____________ el autobús para llegar a la universidad. ____________ amigos escoceses muy simpáticos. ____________ con ellos en inglés aunque ____________ muchos errores. ____________ el acento escocés con dificultad. ____________ de España cada dos meses. ____________ a nuestros padres por videollamada. ____________ paella los domingos para recordar nuestra tierra. ____________ mucho frío en invierno. ____________ ropa de abrigo siempre. ____________ salir los fines de semana. ____________ bailar música española. ____________ un poco de nostalgia a veces. ____________ mejorar nuestro inglés este año. ____________ aprobar todos los exámenes.',
+                    words: [
+                        'somos', 'vivimos', 'estudiamos', 'hablamos', 'somos', 'tenemos', 'vivimos',
+                        'está', 'tomamos', 'tenemos', 'hablamos', 'cometemos', 'entendemos',
+                        'llamamos', 'hablamos', 'cocinamos', 'hace', 'usamos', 'nos gusta',
+                        'nos gusta', 'sentimos', 'queremos', 'esperamos'
+                    ],
+                    answers: [
+                        'somos', 'vivimos', 'estudiamos', 'hablamos', 'somos', 'tenemos', 'vivimos',
+                        'está', 'tomamos', 'tenemos', 'hablamos', 'cometemos', 'entendemos',
+                        'llamamos', 'hablamos', 'cocinamos', 'hace', 'usamos', 'nos gusta',
+                        'nos gusta', 'sentimos', 'queremos', 'esperamos'
+                    ]
+                },
+                {
+                    id: 5,
+                    text: '¡Hola amigos! ¿Cómo ____________? ¿Qué tal ____________ inglés? ____________ inglés aquí en Vancouver, ¿verdad? ¿____________ mucho? ____________ muy buenos profesores. Las clases ____________ muy dinámicas. ____________ muchas actividades en grupo. ____________ vocabulario nuevo cada día. ____________ tarea todas las noches. ____________ muy tarde estudiando. El profesor ____________ que ____________ mucho progreso. ____________ entre compañeros durante los descansos. ____________ películas en inglés sin subtítulos. ____________ canciones en inglés también. ____________ el acento canadiense un poco diferente. ____________ a la biblioteca los fines de semana. ____________ un diccionario siempre con ____________. ____________ preguntas cuando no ____________ algo. ____________ respuesta muy clara y útil. ____________ mucho en poco tiempo. ____________ orgullosos de ____________ mismos. ____________ juntos a tomar un café después de clase. ____________ amigos para siempre.',
+                    words: [
+                        'están', 'hablan', 'estudian', 'aprenden', 'tienen', 'son', 'hacen',
+                        'aprenden', 'tienen', 'estudian', 'dice', 'han', 'practican', 'ven',
+                        'escuchan', 'notan', 'van', 'usan', 'ustedes', 'hacen', 'entienden',
+                        'dan', 'avanzan', 'están', 'ustedes', 'van', 'serán'
+                    ],
+                    answers: [
+                        'están', 'hablan', 'estudian', 'aprenden', 'tienen', 'son', 'hacen',
+                        'aprenden', 'tienen', 'estudian', 'dice', 'han', 'practican', 'ven',
+                        'escuchan', 'notan', 'van', 'usan', 'ustedes', 'hacen', 'entienden',
+                        'dan', 'avanzan', 'están', 'ustedes', 'van', 'serán'
+                    ]
+                },
+                {
+                    id: 6,
+                    text: 'Gloria y Paco ____________ colombianos pero ____________ en Nueva York. No ____________ ; ____________ inglés en una escuela de idiomas y ____________ mucho. ____________ una pareja muy simpática. ____________ en Queens en un apartamento pequeño. ____________ vecinos de muchos países. ____________ con ellos en inglés siempre. ____________ a su familia por WhatsApp. ____________ mucho sus comidas típicas. ____________ un restaurante colombiano los fines de semana. ____________ arepas y bandeja paisa. ____________ música de su tierra en casa. ____________ añorar a su país a veces. ____________ muy trabajadores y disciplinados. ____________ todas las mañanas a las seis. ____________ al metro para ir a la escuela. ____________ los profesores de la academia. ____________ muchas ganas de aprender. ____________ mejorar su pronunciación. ____________ la gramática con ejercicios. ____________ películas para practicar el oído. ____________ muy felices con su nueva vida.',
+                    words: [
+                        'son', 'viven', 'trabajan', 'estudian', 'aprenden', 'son', 'viven', 'tienen',
+                        'hablan', 'llaman', 'extrañan', 'visitan', 'comen', 'escuchan', 'suelen',
+                        'son', 'se levantan', 'van', 'les gustan', 'tienen', 'quieren', 'estudian',
+                        'ven', 'están'
+                    ],
+                    answers: [
+                        'son', 'viven', 'trabajan', 'estudian', 'aprenden', 'son', 'viven', 'tienen',
+                        'hablan', 'llaman', 'extrañan', 'visitan', 'comen', 'escuchan', 'suelen',
+                        'son', 'se levantan', 'van', 'les gustan', 'tienen', 'quieren', 'estudian',
+                        'ven', 'están'
+                    ]
+                }
+            ];
+
+            let currentRound = 0;
+            let selectedGapIndex = null;
+            let selectedWordIndex = null;
+            let gapStates = [];
+            let wordBankUsed = [];
+            let checkedState = [];
+            let allRoundsCompleted = false;
+
+            // Drag state
+            let dragInfo = null;
+
+            const roundIndicator = document.getElementById('roundIndicator');
+            const roundTitle = document.getElementById('roundTitle');
+            const textBlock = document.getElementById('textBlock');
+            const wordBankEl = document.getElementById('wordBank');
+            const checkBtn = document.getElementById('checkBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const completionMsg = document.getElementById('completionMsg');
+            const dragGhost = document.getElementById('dragGhost');
+
+            function initRound() {
+                const ex = exercises[currentRound];
+                const numGaps = ex.answers.length;
+
+                gapStates = new Array(numGaps).fill(null);
+                wordBankUsed = new Array(ex.words.length).fill(false);
+                checkedState = new Array(numGaps).fill(null);
+                selectedGapIndex = null;
+                selectedWordIndex = null;
+                dragInfo = null;
+                completionMsg.classList.remove('visible');
+                completionMsg.textContent = '';
+
+                roundIndicator.textContent = (currentRound + 1) + ' / ' + exercises.length;
+                roundTitle.textContent = 'Ejercicio ' + ex.id;
+
+                renderTextBlock(ex);
+                renderWordBank(ex);
+                updateNextButton();
+            }
+
+            function renderTextBlock(ex) {
+                const segments = ex.text.split('____________');
+                textBlock.innerHTML = '';
+
+                segments.forEach((seg, i) => {
+                    if (seg) {
+                        const textNode = document.createTextNode(seg);
+                        textBlock.appendChild(textNode);
+                    }
+                    if (i < segments.length - 1) {
+                        const gapSpan = document.createElement('span');
+                        gapSpan.className = 'gap';
+                        gapSpan.dataset.gapIndex = i;
+                        gapSpan.setAttribute('draggable', 'false');
+                        if (gapStates[i] !== null) {
+                            gapSpan.textContent = gapStates[i].text;
+                            gapSpan.classList.add('filled');
+                        }
+                        if (checkedState[i] === 'correct') {
+                            gapSpan.classList.add('correct');
+                        } else if (checkedState[i] === 'incorrect') {
+                            gapSpan.classList.add('incorrect');
+                        }
+                        if (selectedGapIndex === i) {
+                            gapSpan.classList.add('selected');
+                        }
+                        if (dragInfo && dragInfo.targetType === 'gap' && dragInfo.targetIndex === i) {
+                            gapSpan.classList.add('drag-over');
+                        }
+
+                        // Click handler
+                        gapSpan.addEventListener('pointerdown', function(e) {
+                            if (dragInfo) return;
+                            handleGapClick(i);
+                        });
+
+                        // Drop target events
+                        gapSpan.addEventListener('pointerenter', function(e) {
+                            if (dragInfo && dragInfo.targetType !== 'gap' && dragInfo.targetIndex !== i) {
+                                gapSpan.classList.add('drag-over');
+                            }
+                        });
+                        gapSpan.addEventListener('pointerleave', function(e) {
+                            gapSpan.classList.remove('drag-over');
+                        });
+                        gapSpan.addEventListener('pointerup', function(e) {
+                            if (dragInfo) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const wasOver = gapSpan.classList.contains('drag-over');
+                                gapSpan.classList.remove('drag-over');
+                                if (wasOver) {
+                                    dropOnGap(i);
+                                }
+                            }
+                        });
+
+                        textBlock.appendChild(gapSpan);
+                    }
+                });
+            }
+
+            function renderWordBank(ex) {
+                wordBankEl.innerHTML = '';
+                ex.words.forEach((word, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'word-btn';
+                    btn.textContent = word;
+                    btn.dataset.wordIndex = i;
+                    btn.setAttribute('draggable', 'false');
+                    if (wordBankUsed[i]) {
+                        btn.classList.add('used');
+                    }
+                    if (selectedWordIndex === i) {
+                        btn.classList.add('selected-word');
+                    }
+
+                    // Drag start
+                    btn.addEventListener('pointerdown', function(e) {
+                        if (wordBankUsed[i]) return;
+                        e.preventDefault();
+                        startDrag(e, 'word', i, word);
+                    });
+
+                    // Click fallback
+                    btn.addEventListener('click', function(e) {
+                        if (dragInfo) return;
+                        handleWordClick(i);
+                    });
+
+                    wordBankEl.appendChild(btn);
+                });
+            }
+
+            function startDrag(e, type, index, text) {
+                dragInfo = {
+                    sourceType: type,
+                    sourceIndex: index,
+                    text: text,
+                    targetType: null,
+                    targetIndex: null,
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    moved: false
+                };
+
+                dragGhost.textContent = text;
+                dragGhost.style.display = 'block';
+                updateGhostPosition(e.clientX, e.clientY);
+
+                if (type === 'word') {
+                    const btn = document.querySelector(`.word-btn[data-word-index="${index}"]`);
+                    if (btn) btn.classList.add('dragging');
+                } else if (type === 'gap') {
+                    const gap = document.querySelector(`.gap[data-gap-index="${index}"]`);
+                    if (gap) gap.classList.add('dragging');
+                }
+            }
+
+            function updateGhostPosition(x, y) {
+                dragGhost.style.left = x + 'px';
+                dragGhost.style.top = y + 'px';
+            }
+
+            function endDrag(commit = true) {
+                if (!dragInfo) return;
+
+                // Clean up visual states
+                document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+                dragGhost.style.display = 'none';
+
+                if (commit && dragInfo.moved && dragInfo.targetType && dragInfo.targetIndex !== null) {
+                    if (dragInfo.targetType === 'gap') {
+                        dropOnGap(dragInfo.targetIndex);
+                    } else if (dragInfo.targetType === 'wordbank') {
+                        dropOnWordBank();
+                    }
+                }
+
+                dragInfo = null;
+                refreshAll();
+            }
+
+            function dropOnGap(gapIndex) {
+                const sourceType = dragInfo.sourceType;
+                const sourceIndex = dragInfo.sourceIndex;
+
+                if (sourceType === 'word') {
+                    const wordIndex = sourceIndex;
+                    if (wordBankUsed[wordIndex]) return;
+
+                    // If gap already has a word, return it
+                    if (gapStates[gapIndex] !== null) {
+                        const oldWbIndex = gapStates[gapIndex].wordBankIndex;
+                        wordBankUsed[oldWbIndex] = false;
+                    }
+
+                    gapStates[gapIndex] = {
+                        wordBankIndex: wordIndex,
+                        text: exercises[currentRound].words[wordIndex]
+                    };
+                    wordBankUsed[wordIndex] = true;
+                    checkedState[gapIndex] = null;
+
+                } else if (sourceType === 'gap') {
+                    const fromGap = sourceIndex;
+                    if (fromGap === gapIndex) return;
+                    if (gapStates[fromGap] === null) return;
+
+                    // Swap or move
+                    const fromData = gapStates[fromGap];
+                    const toData = gapStates[gapIndex];
+
+                    if (toData !== null) {
+                        // Swap
+                        gapStates[gapIndex] = fromData;
+                        gapStates[fromGap] = toData;
+                    } else {
+                        // Move
+                        gapStates[gapIndex] = fromData;
+                        gapStates[fromGap] = null;
+                    }
+                    checkedState[gapIndex] = null;
+                    checkedState[fromGap] = null;
+                }
+
+                selectedGapIndex = null;
+                selectedWordIndex = null;
+            }
+
+            function dropOnWordBank() {
+                if (dragInfo.sourceType === 'gap') {
+                    const fromGap = dragInfo.sourceIndex;
+                    if (gapStates[fromGap] !== null) {
+                        const wbIndex = gapStates[fromGap].wordBankIndex;
+                        wordBankUsed[wbIndex] = false;
+                        gapStates[fromGap] = null;
+                        checkedState[fromGap] = null;
+                    }
+                }
+                selectedGapIndex = null;
+                selectedWordIndex = null;
+            }
+
+            // Global pointer events for drag tracking
+            document.addEventListener('pointermove', function(e) {
+                if (!dragInfo) return;
+                e.preventDefault();
+
+                const dx = e.clientX - dragInfo.startX;
+                const dy = e.clientY - dragInfo.startY;
+                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+                    dragInfo.moved = true;
+                }
+
+                updateGhostPosition(e.clientX, e.clientY);
+
+                // Determine what's under the pointer
+                const elem = document.elementFromPoint(e.clientX, e.clientY);
+                if (!elem) return;
+
+                // Check if over a gap
+                const gapEl = elem.closest('.gap');
+                const wordBtnEl = elem.closest('.word-btn');
+
+                // Reset previous highlights
+                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove(
+                'drag-over'));
+
+                if (gapEl && gapEl.dataset.gapIndex !== undefined) {
+                    const gapIdx = parseInt(gapEl.dataset.gapIndex);
+                    if (dragInfo.sourceType === 'gap' && dragInfo.sourceIndex === gapIdx) {
+                        dragInfo.targetType = null;
+                        dragInfo.targetIndex = null;
+                    } else {
+                        dragInfo.targetType = 'gap';
+                        dragInfo.targetIndex = gapIdx;
+                        gapEl.classList.add('drag-over');
+                    }
+                } else if (wordBtnEl && wordBtnEl.dataset.wordIndex !== undefined) {
+                    // Dropping on word bank — only valid if source is gap
+                    if (dragInfo.sourceType === 'gap') {
+                        dragInfo.targetType = 'wordbank';
+                        dragInfo.targetIndex = null;
+                    } else {
+                        dragInfo.targetType = null;
+                        dragInfo.targetIndex = null;
+                    }
+                } else if (elem.closest('#wordBank') && dragInfo.sourceType === 'gap') {
+                    dragInfo.targetType = 'wordbank';
+                    dragInfo.targetIndex = null;
+                } else {
+                    dragInfo.targetType = null;
+                    dragInfo.targetIndex = null;
+                }
+            });
+
+            document.addEventListener('pointerup', function(e) {
+                if (!dragInfo) return;
+
+                // Small delay to let gap pointerup fire first
+                setTimeout(() => {
+                    if (dragInfo) {
+                        endDrag(true);
+                    }
+                }, 50);
+            });
+
+            document.addEventListener('pointercancel', function(e) {
+                if (dragInfo) {
+                    endDrag(false);
+                }
+            });
+
+            // Prevent default drag behaviors
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+            });
+
+            function handleGapClick(gapIndex) {
+                if (dragInfo) return;
+
+                if (gapStates[gapIndex] !== null && selectedWordIndex === null) {
+                    // Clear the gap
+                    const wbIndex = gapStates[gapIndex].wordBankIndex;
+                    wordBankUsed[wbIndex] = false;
+                    gapStates[gapIndex] = null;
+                    checkedState[gapIndex] = null;
+                    selectedGapIndex = gapIndex;
+                    selectedWordIndex = null;
+                    refreshAll();
+                    return;
+                }
+
+                if (selectedWordIndex !== null && !wordBankUsed[selectedWordIndex]) {
+                    if (gapStates[gapIndex] !== null) {
+                        const oldWbIndex = gapStates[gapIndex].wordBankIndex;
+                        wordBankUsed[oldWbIndex] = false;
+                    }
+                    gapStates[gapIndex] = {
+                        wordBankIndex: selectedWordIndex,
+                        text: exercises[currentRound].words[selectedWordIndex]
+                    };
+                    wordBankUsed[selectedWordIndex] = true;
+                    checkedState[gapIndex] = null;
+                    selectedGapIndex = null;
+                    selectedWordIndex = null;
+                    refreshAll();
+                    return;
+                }
+
+                if (selectedWordIndex !== null && wordBankUsed[selectedWordIndex]) {
+                    selectedWordIndex = null;
+                    selectedGapIndex = gapIndex;
+                    refreshAll();
+                    return;
+                }
+
+                if (selectedGapIndex === gapIndex) {
+                    selectedGapIndex = null;
+                } else {
+                    selectedGapIndex = gapIndex;
+                    selectedWordIndex = null;
+                }
+                refreshAll();
+            }
+
+            function handleWordClick(wordIndex) {
+                if (dragInfo) return;
+                if (wordBankUsed[wordIndex]) return;
+
+                if (selectedGapIndex !== null) {
+                    const gapIndex = selectedGapIndex;
+                    if (gapStates[gapIndex] !== null) {
+                        const oldWbIndex = gapStates[gapIndex].wordBankIndex;
+                        wordBankUsed[oldWbIndex] = false;
+                    }
+                    gapStates[gapIndex] = {
+                        wordBankIndex: wordIndex,
+                        text: exercises[currentRound].words[wordIndex]
+                    };
+                    wordBankUsed[wordIndex] = true;
+                    checkedState[gapIndex] = null;
+                    selectedGapIndex = null;
+                    selectedWordIndex = null;
+                    refreshAll();
+                    return;
+                }
+
+                if (selectedWordIndex === wordIndex) {
+                    selectedWordIndex = null;
+                } else {
+                    selectedWordIndex = wordIndex;
+                    selectedGapIndex = null;
+                }
+                refreshAll();
+            }
+
+            function refreshAll() {
+                const ex = exercises[currentRound];
+                renderTextBlock(ex);
+                renderWordBank(ex);
+                updateNextButton();
+            }
+
+            function checkAnswers() {
+                const ex = exercises[currentRound];
+                const numGaps = ex.answers.length;
+                let allFilled = true;
+                let allCorrect = true;
+
+                for (let i = 0; i < numGaps; i++) {
+                    if (gapStates[i] === null) {
+                        allFilled = false;
+                        allCorrect = false;
+                        checkedState[i] = 'incorrect';
+                    } else if (gapStates[i].text.trim().toLowerCase() === ex.answers[i].trim().toLowerCase()) {
+                        checkedState[i] = 'correct';
+                    } else {
+                        checkedState[i] = 'incorrect';
+                        allCorrect = false;
+                    }
+                }
+
+                selectedGapIndex = null;
+                selectedWordIndex = null;
+
+                refreshAll();
+
+                setTimeout(() => {
+                    const gapEls = textBlock.querySelectorAll('.gap.incorrect');
+                    gapEls.forEach(el => {
+                        el.classList.remove('incorrect');
+                        void el.offsetWidth;
+                        el.classList.add('incorrect');
+                    });
+                }, 30);
+
+                if (allFilled && allCorrect) {
+                    completionMsg.innerHTML =
+                        '<span class="all-correct-indicator"></span>Completado';
+                    completionMsg.classList.add('visible');
+                } else {
+                    completionMsg.classList.remove('visible');
+                    completionMsg.textContent = '';
+                }
+
+                updateNextButton();
+            }
+
+            function updateNextButton() {
+                const ex = exercises[currentRound];
+                const allFilled = gapStates.every(g => g !== null);
+                const allCorrect = gapStates.every((g, i) =>
+                    g !== null && g.text.trim().toLowerCase() === ex.answers[i].trim().toLowerCase()
+                );
+
+                if (currentRound >= exercises.length - 1 && allFilled && allCorrect && allRoundsCompleted) {
+                    nextBtn.textContent = 'Finalizado';
+                    nextBtn.disabled = true;
+                    nextBtn.style.opacity = '0.5';
+                } else if (currentRound >= exercises.length - 1 && allFilled && allCorrect) {
+                    nextBtn.textContent = 'Finalizar';
+                    nextBtn.disabled = false;
+                    nextBtn.style.opacity = '1';
+                } else {
+                    nextBtn.textContent = 'Siguiente';
+                    nextBtn.disabled = false;
+                    nextBtn.style.opacity = '1';
+                }
+            }
+
+            function goToNextRound() {
+                const ex = exercises[currentRound];
+                const allFilled = gapStates.every(g => g !== null);
+                const allCorrect = gapStates.every((g, i) =>
+                    g !== null && g.text.trim().toLowerCase() === ex.answers[i].trim().toLowerCase()
+                );
+
+                if (!allFilled || !allCorrect) {
+                    checkAnswers();
+                    const stillAllCorrect = gapStates.every((g, i) =>
+                        g !== null && g.text.trim().toLowerCase() === ex.answers[i].trim().toLowerCase()
+                    );
+                    if (!stillAllCorrect) return;
+                }
+
+                if (currentRound < exercises.length - 1) {
+                    currentRound++;
+                    initRound();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    allRoundsCompleted = true;
+                    completionMsg.innerHTML =
+                        '<span class="all-correct-indicator"></span>Todos los ejercicios completados';
+                    completionMsg.classList.add('visible');
+                    nextBtn.textContent = 'Finalizado';
+                    nextBtn.disabled = true;
+                    nextBtn.style.opacity = '0.5';
+                    updateNextButton();
+                }
+            }
+
+            checkBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                checkAnswers();
+            });
+
+            nextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                goToNextRound();
+            });
+
+            initRound();
+
+            document.addEventListener('touchstart', function(e) {
+                if (e.target.tagName === 'BUTTON' || e.target.classList.contains('gap')) {
+                    if (e.target.classList.contains('gap') && dragInfo) {
+                        e.preventDefault();
+                    }
+                }
+            }, { passive: false });
+
+        })();
+    </script>
+</body>
+</html>
