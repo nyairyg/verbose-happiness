@@ -27,8 +27,6 @@
             --word-available-bg: #ffffff;
             --word-available-border: #c4bfb6;
             --word-hover-bg: #f7f5f1;
-            --drag-over-bg: #eef3ea;
-            --drag-over-border: #3d7a4a;
             --font-stack: 'Helvetica Neue', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             --gap-min-width: 72px;
             --btn-height: 46px;
@@ -45,7 +43,6 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-text-size-adjust: 100%;
             background: var(--bg);
-            touch-action: manipulation;
         }
 
         body {
@@ -57,21 +54,19 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            padding: 28px 16px 60px;
+            padding: 28px 20px 60px;
             line-height: 1.7;
             letter-spacing: 0.01em;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            -webkit-user-select: none;
-            user-select: none;
         }
 
         .container {
             width: 100%;
-            max-width: 680px;
+            max-width: 920px;
             background: var(--surface);
             border: 1px solid var(--border);
-            padding: 36px 32px 32px;
+            padding: 44px 48px 40px;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
         }
 
@@ -100,10 +95,10 @@
         }
 
         .text-block {
-            font-size: 18px;
-            line-height: 2.3;
+            font-size: 19px;
+            line-height: 2.2;
             letter-spacing: 0.015em;
-            margin-bottom: 36px;
+            margin-bottom: 40px;
             word-wrap: break-word;
             color: var(--text);
         }
@@ -113,7 +108,7 @@
             min-width: var(--gap-min-width);
             text-align: center;
             border-bottom: 2px solid var(--gap-underline);
-            padding: 6px 10px 5px;
+            padding: 4px 10px 3px;
             margin: 0 3px;
             cursor: pointer;
             font-size: 17px;
@@ -121,12 +116,13 @@
             letter-spacing: 0.02em;
             color: var(--text);
             background: transparent;
-            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, outline 0.1s ease;
+            transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
             vertical-align: baseline;
             position: relative;
+            user-select: none;
+            -webkit-user-select: none;
             border-radius: var(--radius);
-            outline: 2px solid transparent;
-            outline-offset: 2px;
+            outline: none;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -136,7 +132,6 @@
             font-weight: 400;
             letter-spacing: 0.04em;
             font-size: 16px;
-            pointer-events: none;
         }
 
         .gap.filled {
@@ -150,13 +145,7 @@
             border-bottom-width: 3px;
             background: #f3f1ec;
             outline: 2px solid var(--border-strong);
-        }
-
-        .gap.drag-over {
-            background: var(--drag-over-bg);
-            border-bottom-color: var(--drag-over-border);
-            border-bottom-width: 3px;
-            outline: 2px solid var(--drag-over-border);
+            outline-offset: 2px;
         }
 
         .gap.correct {
@@ -207,12 +196,13 @@
         .word-bank {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 32px;
-            padding: 20px 0;
+            gap: 12px;
+            margin-bottom: 36px;
+            padding: 24px 0;
             border-top: 1px solid var(--border);
             border-bottom: 1px solid var(--border);
-            min-height: 60px;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         .word-btn {
@@ -220,36 +210,29 @@
             align-items: center;
             justify-content: center;
             min-height: var(--btn-height);
-            padding: 10px 18px;
+            padding: 12px 22px;
             font-size: 15px;
             font-family: var(--font-stack);
             font-weight: 500;
             letter-spacing: 0.02em;
-            cursor: grab;
+            cursor: pointer;
             border: 1px solid var(--word-available-border);
             background: var(--word-available-bg);
             color: var(--text);
-            transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, opacity 0.1s ease, transform 0.15s ease, box-shadow 0.15s ease;
+            transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease, opacity 0.1s ease;
             border-radius: var(--radius);
             outline: none;
             -webkit-tap-highlight-color: transparent;
             white-space: nowrap;
-            touch-action: none;
-        }
-
-        .word-btn:active {
-            cursor: grabbing;
-        }
-        .word-btn.dragging {
-            opacity: 0.5;
-            transform: scale(0.95);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            cursor: grabbing;
         }
 
         .word-btn:hover {
             background: var(--word-hover-bg);
             border-color: #a8a39b;
+        }
+
+        .word-btn:active {
+            background: #e8e4dc;
         }
 
         .word-btn.used {
@@ -271,10 +254,9 @@
 
         .actions {
             display: flex;
-            gap: 14px;
+            gap: 16px;
             justify-content: flex-end;
             align-items: center;
-            flex-wrap: wrap;
         }
 
         .action-btn {
@@ -282,7 +264,7 @@
             align-items: center;
             justify-content: center;
             min-height: var(--btn-height);
-            padding: 10px 28px;
+            padding: 12px 34px;
             font-size: 14px;
             font-family: var(--font-stack);
             font-weight: 600;
@@ -334,8 +316,6 @@
             padding: 12px 0;
             opacity: 0;
             transition: opacity 0.3s ease;
-            flex: 1;
-            min-width: 120px;
         }
         .completion-msg.visible {
             opacity: 1;
@@ -346,41 +326,58 @@
             width: 8px;
             height: 8px;
             background: var(--correct-border);
-            margin-right: 8px;
+            margin-right: 10px;
             vertical-align: middle;
         }
 
-        /* Ghost element that follows finger during drag */
-        .drag-ghost {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1000;
-            font-family: var(--font-stack);
-            font-size: 15px;
-            font-weight: 500;
-            letter-spacing: 0.02em;
-            padding: 10px 18px;
-            background: var(--surface);
-            border: 2px solid var(--border-strong);
-            color: var(--text);
-            white-space: nowrap;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            transform: translate(-50%, -50%);
-            border-radius: var(--radius);
+        @media (max-width: 900px) {
+            .container {
+                padding: 34px 32px 32px;
+                max-width: 100%;
+            }
+            .text-block {
+                font-size: 17px;
+                line-height: 2.0;
+            }
+            .gap {
+                min-width: 60px;
+                font-size: 16px;
+                padding: 3px 8px 2px;
+            }
+            .gap:empty::before {
+                font-size: 15px;
+            }
+            .word-btn {
+                min-height: 42px;
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+            .action-btn {
+                min-height: 42px;
+                padding: 10px 26px;
+                font-size: 13px;
+            }
+            .word-bank {
+                gap: 9px;
+                padding: 18px 0;
+            }
         }
 
         @media (max-width: 600px) {
+            body {
+                padding: 16px 8px 40px;
+            }
             .container {
-                padding: 24px 18px 24px;
+                padding: 24px 18px 28px;
             }
             .text-block {
                 font-size: 16px;
-                line-height: 2.1;
+                line-height: 1.95;
             }
             .gap {
-                min-width: 56px;
+                min-width: 52px;
                 font-size: 15px;
-                padding: 4px 8px 3px;
+                padding: 3px 6px 2px;
             }
             .gap:empty::before {
                 font-size: 14px;
@@ -404,10 +401,6 @@
                 margin-bottom: 20px;
                 padding-bottom: 12px;
             }
-            .drag-ghost {
-                font-size: 14px;
-                padding: 8px 14px;
-            }
         }
 
         @media (max-width: 380px) {
@@ -416,12 +409,12 @@
             }
             .text-block {
                 font-size: 15px;
-                line-height: 1.95;
+                line-height: 1.85;
             }
             .gap {
-                min-width: 48px;
+                min-width: 44px;
                 font-size: 14px;
-                padding: 3px 6px 2px;
+                padding: 2px 4px 1px;
             }
             .gap:empty::before {
                 font-size: 13px;
@@ -441,10 +434,6 @@
                 gap: 5px;
                 padding: 10px 0;
             }
-            .drag-ghost {
-                font-size: 13px;
-                padding: 6px 10px;
-            }
         }
     </style>
 </head>
@@ -462,7 +451,6 @@
             <button class="action-btn primary" id="nextBtn">Siguiente</button>
         </div>
     </div>
-    <div class="drag-ghost" id="dragGhost" style="display:none;"></div>
 
     <script>
         (function() {
@@ -567,9 +555,6 @@
             let checkedState = [];
             let allRoundsCompleted = false;
 
-            // Drag state
-            let dragInfo = null;
-
             const roundIndicator = document.getElementById('roundIndicator');
             const roundTitle = document.getElementById('roundTitle');
             const textBlock = document.getElementById('textBlock');
@@ -577,7 +562,6 @@
             const checkBtn = document.getElementById('checkBtn');
             const nextBtn = document.getElementById('nextBtn');
             const completionMsg = document.getElementById('completionMsg');
-            const dragGhost = document.getElementById('dragGhost');
 
             function initRound() {
                 const ex = exercises[currentRound];
@@ -588,7 +572,6 @@
                 checkedState = new Array(numGaps).fill(null);
                 selectedGapIndex = null;
                 selectedWordIndex = null;
-                dragInfo = null;
                 completionMsg.classList.remove('visible');
                 completionMsg.textContent = '';
 
@@ -613,7 +596,6 @@
                         const gapSpan = document.createElement('span');
                         gapSpan.className = 'gap';
                         gapSpan.dataset.gapIndex = i;
-                        gapSpan.setAttribute('draggable', 'false');
                         if (gapStates[i] !== null) {
                             gapSpan.textContent = gapStates[i].text;
                             gapSpan.classList.add('filled');
@@ -626,37 +608,10 @@
                         if (selectedGapIndex === i) {
                             gapSpan.classList.add('selected');
                         }
-                        if (dragInfo && dragInfo.targetType === 'gap' && dragInfo.targetIndex === i) {
-                            gapSpan.classList.add('drag-over');
-                        }
-
-                        // Click handler
-                        gapSpan.addEventListener('pointerdown', function(e) {
-                            if (dragInfo) return;
+                        gapSpan.addEventListener('click', function(e) {
+                            e.preventDefault();
                             handleGapClick(i);
                         });
-
-                        // Drop target events
-                        gapSpan.addEventListener('pointerenter', function(e) {
-                            if (dragInfo && dragInfo.targetType !== 'gap' && dragInfo.targetIndex !== i) {
-                                gapSpan.classList.add('drag-over');
-                            }
-                        });
-                        gapSpan.addEventListener('pointerleave', function(e) {
-                            gapSpan.classList.remove('drag-over');
-                        });
-                        gapSpan.addEventListener('pointerup', function(e) {
-                            if (dragInfo) {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                const wasOver = gapSpan.classList.contains('drag-over');
-                                gapSpan.classList.remove('drag-over');
-                                if (wasOver) {
-                                    dropOnGap(i);
-                                }
-                            }
-                        });
-
                         textBlock.appendChild(gapSpan);
                     }
                 });
@@ -669,222 +624,22 @@
                     btn.className = 'word-btn';
                     btn.textContent = word;
                     btn.dataset.wordIndex = i;
-                    btn.setAttribute('draggable', 'false');
                     if (wordBankUsed[i]) {
                         btn.classList.add('used');
                     }
                     if (selectedWordIndex === i) {
                         btn.classList.add('selected-word');
                     }
-
-                    // Drag start
-                    btn.addEventListener('pointerdown', function(e) {
-                        if (wordBankUsed[i]) return;
-                        e.preventDefault();
-                        startDrag(e, 'word', i, word);
-                    });
-
-                    // Click fallback
                     btn.addEventListener('click', function(e) {
-                        if (dragInfo) return;
+                        e.preventDefault();
                         handleWordClick(i);
                     });
-
                     wordBankEl.appendChild(btn);
                 });
             }
 
-            function startDrag(e, type, index, text) {
-                dragInfo = {
-                    sourceType: type,
-                    sourceIndex: index,
-                    text: text,
-                    targetType: null,
-                    targetIndex: null,
-                    startX: e.clientX,
-                    startY: e.clientY,
-                    moved: false
-                };
-
-                dragGhost.textContent = text;
-                dragGhost.style.display = 'block';
-                updateGhostPosition(e.clientX, e.clientY);
-
-                if (type === 'word') {
-                    const btn = document.querySelector(`.word-btn[data-word-index="${index}"]`);
-                    if (btn) btn.classList.add('dragging');
-                } else if (type === 'gap') {
-                    const gap = document.querySelector(`.gap[data-gap-index="${index}"]`);
-                    if (gap) gap.classList.add('dragging');
-                }
-            }
-
-            function updateGhostPosition(x, y) {
-                dragGhost.style.left = x + 'px';
-                dragGhost.style.top = y + 'px';
-            }
-
-            function endDrag(commit = true) {
-                if (!dragInfo) return;
-
-                // Clean up visual states
-                document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
-                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-                dragGhost.style.display = 'none';
-
-                if (commit && dragInfo.moved && dragInfo.targetType && dragInfo.targetIndex !== null) {
-                    if (dragInfo.targetType === 'gap') {
-                        dropOnGap(dragInfo.targetIndex);
-                    } else if (dragInfo.targetType === 'wordbank') {
-                        dropOnWordBank();
-                    }
-                }
-
-                dragInfo = null;
-                refreshAll();
-            }
-
-            function dropOnGap(gapIndex) {
-                const sourceType = dragInfo.sourceType;
-                const sourceIndex = dragInfo.sourceIndex;
-
-                if (sourceType === 'word') {
-                    const wordIndex = sourceIndex;
-                    if (wordBankUsed[wordIndex]) return;
-
-                    // If gap already has a word, return it
-                    if (gapStates[gapIndex] !== null) {
-                        const oldWbIndex = gapStates[gapIndex].wordBankIndex;
-                        wordBankUsed[oldWbIndex] = false;
-                    }
-
-                    gapStates[gapIndex] = {
-                        wordBankIndex: wordIndex,
-                        text: exercises[currentRound].words[wordIndex]
-                    };
-                    wordBankUsed[wordIndex] = true;
-                    checkedState[gapIndex] = null;
-
-                } else if (sourceType === 'gap') {
-                    const fromGap = sourceIndex;
-                    if (fromGap === gapIndex) return;
-                    if (gapStates[fromGap] === null) return;
-
-                    // Swap or move
-                    const fromData = gapStates[fromGap];
-                    const toData = gapStates[gapIndex];
-
-                    if (toData !== null) {
-                        // Swap
-                        gapStates[gapIndex] = fromData;
-                        gapStates[fromGap] = toData;
-                    } else {
-                        // Move
-                        gapStates[gapIndex] = fromData;
-                        gapStates[fromGap] = null;
-                    }
-                    checkedState[gapIndex] = null;
-                    checkedState[fromGap] = null;
-                }
-
-                selectedGapIndex = null;
-                selectedWordIndex = null;
-            }
-
-            function dropOnWordBank() {
-                if (dragInfo.sourceType === 'gap') {
-                    const fromGap = dragInfo.sourceIndex;
-                    if (gapStates[fromGap] !== null) {
-                        const wbIndex = gapStates[fromGap].wordBankIndex;
-                        wordBankUsed[wbIndex] = false;
-                        gapStates[fromGap] = null;
-                        checkedState[fromGap] = null;
-                    }
-                }
-                selectedGapIndex = null;
-                selectedWordIndex = null;
-            }
-
-            // Global pointer events for drag tracking
-            document.addEventListener('pointermove', function(e) {
-                if (!dragInfo) return;
-                e.preventDefault();
-
-                const dx = e.clientX - dragInfo.startX;
-                const dy = e.clientY - dragInfo.startY;
-                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-                    dragInfo.moved = true;
-                }
-
-                updateGhostPosition(e.clientX, e.clientY);
-
-                // Determine what's under the pointer
-                const elem = document.elementFromPoint(e.clientX, e.clientY);
-                if (!elem) return;
-
-                // Check if over a gap
-                const gapEl = elem.closest('.gap');
-                const wordBtnEl = elem.closest('.word-btn');
-
-                // Reset previous highlights
-                document.querySelectorAll('.drag-over').forEach(el => el.classList.remove(
-                'drag-over'));
-
-                if (gapEl && gapEl.dataset.gapIndex !== undefined) {
-                    const gapIdx = parseInt(gapEl.dataset.gapIndex);
-                    if (dragInfo.sourceType === 'gap' && dragInfo.sourceIndex === gapIdx) {
-                        dragInfo.targetType = null;
-                        dragInfo.targetIndex = null;
-                    } else {
-                        dragInfo.targetType = 'gap';
-                        dragInfo.targetIndex = gapIdx;
-                        gapEl.classList.add('drag-over');
-                    }
-                } else if (wordBtnEl && wordBtnEl.dataset.wordIndex !== undefined) {
-                    // Dropping on word bank — only valid if source is gap
-                    if (dragInfo.sourceType === 'gap') {
-                        dragInfo.targetType = 'wordbank';
-                        dragInfo.targetIndex = null;
-                    } else {
-                        dragInfo.targetType = null;
-                        dragInfo.targetIndex = null;
-                    }
-                } else if (elem.closest('#wordBank') && dragInfo.sourceType === 'gap') {
-                    dragInfo.targetType = 'wordbank';
-                    dragInfo.targetIndex = null;
-                } else {
-                    dragInfo.targetType = null;
-                    dragInfo.targetIndex = null;
-                }
-            });
-
-            document.addEventListener('pointerup', function(e) {
-                if (!dragInfo) return;
-
-                // Small delay to let gap pointerup fire first
-                setTimeout(() => {
-                    if (dragInfo) {
-                        endDrag(true);
-                    }
-                }, 50);
-            });
-
-            document.addEventListener('pointercancel', function(e) {
-                if (dragInfo) {
-                    endDrag(false);
-                }
-            });
-
-            // Prevent default drag behaviors
-            document.addEventListener('dragstart', function(e) {
-                e.preventDefault();
-            });
-
             function handleGapClick(gapIndex) {
-                if (dragInfo) return;
-
                 if (gapStates[gapIndex] !== null && selectedWordIndex === null) {
-                    // Clear the gap
                     const wbIndex = gapStates[gapIndex].wordBankIndex;
                     wordBankUsed[wbIndex] = false;
                     gapStates[gapIndex] = null;
@@ -929,8 +684,9 @@
             }
 
             function handleWordClick(wordIndex) {
-                if (dragInfo) return;
-                if (wordBankUsed[wordIndex]) return;
+                if (wordBankUsed[wordIndex]) {
+                    return;
+                }
 
                 if (selectedGapIndex !== null) {
                     const gapIndex = selectedGapIndex;
@@ -987,7 +743,6 @@
 
                 selectedGapIndex = null;
                 selectedWordIndex = null;
-
                 refreshAll();
 
                 setTimeout(() => {
@@ -1041,11 +796,18 @@
                 );
 
                 if (!allFilled || !allCorrect) {
-                    checkAnswers();
-                    const stillAllCorrect = gapStates.every((g, i) =>
-                        g !== null && g.text.trim().toLowerCase() === ex.answers[i].trim().toLowerCase()
-                    );
-                    if (!stillAllCorrect) return;
+                    if (!allFilled || gapStates.some((g, i) =>
+                            g === null || g.text.trim().toLowerCase() !== ex.answers[i].trim().toLowerCase()
+                        )) {
+                        checkAnswers();
+                        const stillAllCorrect = gapStates.every((g, i) =>
+                            g !== null && g.text.trim().toLowerCase() === ex.answers[i].trim()
+                            .toLowerCase()
+                        );
+                        if (!stillAllCorrect) {
+                            return;
+                        }
+                    }
                 }
 
                 if (currentRound < exercises.length - 1) {
@@ -1078,9 +840,8 @@
 
             document.addEventListener('touchstart', function(e) {
                 if (e.target.tagName === 'BUTTON' || e.target.classList.contains('gap')) {
-                    if (e.target.classList.contains('gap') && dragInfo) {
-                        e.preventDefault();
-                    }
+                    e.preventDefault();
+                    e.target.click();
                 }
             }, { passive: false });
 
