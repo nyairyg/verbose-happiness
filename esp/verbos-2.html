@@ -550,6 +550,7 @@
             let wordBankUsed = [];
             let checkedState = [];
             let allRoundsCompleted = false;
+            let currentShuffledWords = [];
 
             const roundIndicator = document.getElementById('roundIndicator');
             const roundTitle = document.getElementById('roundTitle');
@@ -559,12 +560,22 @@
             const nextBtn = document.getElementById('nextBtn');
             const completionMsg = document.getElementById('completionMsg');
 
+            function shuffleArray(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                return arr;
+            }
+
             function initRound() {
                 const ex = exercises[currentRound];
                 const numGaps = ex.answers.length;
 
+                currentShuffledWords = shuffleArray([...ex.words]);
+
                 gapStates = new Array(numGaps).fill(null);
-                wordBankUsed = new Array(ex.words.length).fill(false);
+                wordBankUsed = new Array(currentShuffledWords.length).fill(false);
                 checkedState = new Array(numGaps).fill(null);
                 selectedGapIndex = null;
                 selectedWordIndex = null;
@@ -575,7 +586,7 @@
                 roundTitle.textContent = 'Ejercicio ' + ex.id;
 
                 renderTextBlock(ex);
-                renderWordBank(ex);
+                renderWordBank();
                 updateNextButton();
             }
 
@@ -613,9 +624,9 @@
                 });
             }
 
-            function renderWordBank(ex) {
+            function renderWordBank() {
                 wordBankEl.innerHTML = '';
-                ex.words.forEach((word, i) => {
+                currentShuffledWords.forEach((word, i) => {
                     const btn = document.createElement('button');
                     btn.className = 'word-btn';
                     btn.textContent = word;
@@ -653,7 +664,7 @@
                     }
                     gapStates[gapIndex] = {
                         wordBankIndex: selectedWordIndex,
-                        text: exercises[currentRound].words[selectedWordIndex]
+                        text: currentShuffledWords[selectedWordIndex]
                     };
                     wordBankUsed[selectedWordIndex] = true;
                     checkedState[gapIndex] = null;
@@ -692,7 +703,7 @@
                     }
                     gapStates[gapIndex] = {
                         wordBankIndex: wordIndex,
-                        text: exercises[currentRound].words[wordIndex]
+                        text: currentShuffledWords[wordIndex]
                     };
                     wordBankUsed[wordIndex] = true;
                     checkedState[gapIndex] = null;
@@ -714,7 +725,7 @@
             function refreshAll() {
                 const ex = exercises[currentRound];
                 renderTextBlock(ex);
-                renderWordBank(ex);
+                renderWordBank();
                 updateNextButton();
             }
 
