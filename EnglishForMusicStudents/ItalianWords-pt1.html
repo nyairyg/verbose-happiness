@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Music Theory: Italian Words | Unscramble Activity</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #f4f2ef;
+            min-height: 100vh;
+            padding: 24px 32px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .main-container {
+            width: 900px;
+            max-width: 95vw;
+            background: #fffefc;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #ece4df;
+            padding: 20px 28px 28px 28px;
+            height: auto;
+            overflow: visible;
+        }
+
+        .section-header {
+            padding: 24px 28px 12px 28px;
+            border-bottom: 2px solid #f0e7e2;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 1.65rem;
+            font-weight: 600;
+            color: #3f2e2a;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h2 i {
+            color: #b28b7a;
+            font-size: 1.5rem;
+        }
+
+        .passage {
+            font-size: 1rem;
+            line-height: 1.65;
+            color: #2c241f;
+            background: #fefaf8;
+            border-radius: 20px;
+            padding: 4px 0;
+        }
+
+        .passage p {
+            margin-bottom: 1.2rem;
+        }
+
+        .term-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 1.1rem;
+            padding: 8px 12px;
+            background: #fdf9f7;
+            border-radius: 16px;
+            border: 1px solid #f0e3dd;
+            transition: all 0.2s;
+        }
+
+        .term-row.correct {
+            background: #e8f5e9;
+            border-color: #81c784;
+        }
+
+        .term-number {
+            font-weight: 700;
+            color: #8b6e62;
+            min-width: 24px;
+        }
+
+        .scrambled-word {
+            background: #f0e7e2;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #4d3730;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .answer-input {
+            border: 2px solid #e1d5cf;
+            background: white;
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #3f2e2a;
+            width: 140px;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        .answer-input:focus {
+            border-color: #b28b7a;
+            box-shadow: 0 2px 8px rgba(178, 139, 122, 0.2);
+        }
+
+        .answer-input.correct-input {
+            background: #e8f5e9;
+            border-color: #81c784;
+            color: #2e7d32;
+        }
+
+        .definition-text {
+            flex: 1;
+            min-width: 180px;
+            font-size: 0.92rem;
+            color: #3f2e2a;
+        }
+
+        .definition-text strong {
+            color: #b28b7a;
+        }
+
+        .activity-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .counter-badge {
+            background: #e8e0da;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            color: #4d3730;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-secondary {
+            background: #d9cdc5;
+            color: #4c3a34;
+        }
+
+        .btn-secondary:hover {
+            background: #cbbbb0;
+        }
+
+        .section-divider {
+            margin: 12px 0 8px;
+            font-weight: 600;
+            color: #8b6e62;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 950px) {
+            body {
+                padding: 16px;
+            }
+            .main-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="section-header">
+            <h2><i class="fas fa-music"></i> Italian Words in Music (pt 1)</h2>
+        </div>
+        <div class="activity-header">
+            <div class="section-divider" style="margin:0;">
+                <i class="fas fa-info-circle" style="color:#b28b7a;"></i> 
+                <span style="font-size: 1rem; font-weight:500;">Read the scrambled word, type the correct Italian term.</span>
+            </div>
+            <div class="counter-badge" id="progress-badge"><i class="fas fa-check-circle"></i> Progress: 0/11 answered</div>
+        </div>
+        <div class="passage">
+            <p>Many of the musical terms used in English are of Italian origin. Here are just a few examples of Italian musical terms ending in ‘-o’ together with English meanings for each:</p>
+            <div id="terms-container"></div>
+        </div>
+        <div style="margin-top: 20px; text-align: right;">
+            <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset All</button>
+        </div>
+    </div>
+
+    <script>
+        // --------------------------------------------------------------
+        // Data: Italian terms and definitions
+        const terms = [
+            {
+                word: "Alto",
+                definition: "the highest adult male singing voice; lowest female voice; singer with an alto voice; piece of music written for an alto voice"
+            },
+            {
+                word: "Arco",
+                definition: "a bow for a stringed instrument; played on a violin or other stringed instrument using the bow"
+            },
+            {
+                word: "Cello",
+                definition: "bass instrument of the violin family"
+            },
+            {
+                word: "Duo",
+                definition: "a group of two; duet"
+            },
+            {
+                word: "Falsetto",
+                definition: "a method of voice production used by male singers, especially tenors, to sing notes higher than their normal range"
+            },
+            {
+                word: "Motto",
+                definition: "a phrase which recurs throughout a musical work and has some symbolical significance"
+            },
+            {
+                word: "Pizzicato",
+                definition: "plucking the strings of a violin or other stringed instrument with one's finger; a note or passage played in this way"
+            },
+            {
+                word: "Solo",
+                definition: "a piece of music for one performer"
+            },
+            {
+                word: "Soprano",
+                definition: "the highest singing voice of women or boys"
+            },
+            {
+                word: "Tempo",
+                definition: "the speed at which a passage of music is or should be played"
+            },
+            {
+                word: "Trio",
+                definition: "a group of three; composition for three performers"
+            }
+        ];
+
+        let inputElements = [];
+
+        const termsContainer = document.getElementById('terms-container');
+        const progressBadge = document.getElementById('progress-badge');
+
+        // Fisher–Yates shuffle returning a string different from the original
+        function shuffleWord(word) {
+            if (word.length <= 1) return word;
+            const arr = word.split('');
+            let shuffled;
+            do {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+                shuffled = arr.join('');
+            } while (shuffled === word);
+            return shuffled;
+        }
+
+        function updateProgress() {
+            const answered = inputElements.filter(inp => inp.value.trim() !== '').length;
+            const correctCount = inputElements.filter(inp => inp.classList.contains('correct-input')).length;
+            progressBadge.innerHTML = `<i class="fas fa-check-circle"></i> Progress: ${answered}/${terms.length} answered | ${correctCount} correct`;
+        }
+
+        function autoValidate(input, index) {
+            const userAnswer = input.value.trim().toLowerCase();
+            const correctWord = terms[index].word.toLowerCase();
+            const row = input.closest('.term-row');
+            
+            if (userAnswer === '') {
+                row.classList.remove('correct');
+                input.classList.remove('correct-input');
+            } else if (userAnswer === correctWord) {
+                row.classList.add('correct');
+                input.classList.add('correct-input');
+            } else {
+                row.classList.remove('correct');
+                input.classList.remove('correct-input');
+            }
+            updateProgress();
+        }
+
+        function renderTerms() {
+            termsContainer.innerHTML = '';
+            inputElements = [];
+            terms.forEach((term, index) => {
+                const row = document.createElement('div');
+                row.className = 'term-row';
+                row.dataset.index = index;
+
+                const numberSpan = document.createElement('span');
+                numberSpan.className = 'term-number';
+                numberSpan.textContent = `${index + 1}.`;
+
+                const scrambledSpan = document.createElement('span');
+                scrambledSpan.className = 'scrambled-word';
+                scrambledSpan.textContent = shuffleWord(term.word);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'answer-input';
+                input.placeholder = 'unscramble';
+                input.dataset.index = index;
+                input.addEventListener('input', () => {
+                    autoValidate(input, index);
+                });
+
+                const definitionSpan = document.createElement('span');
+                definitionSpan.className = 'definition-text';
+                definitionSpan.innerHTML = term.definition;
+
+                row.appendChild(numberSpan);
+                row.appendChild(scrambledSpan);
+                row.appendChild(input);
+                row.appendChild(definitionSpan);
+
+                termsContainer.appendChild(row);
+                inputElements.push(input);
+            });
+            updateProgress();
+        }
+
+        function resetAll() {
+            inputElements.forEach(input => {
+                input.value = '';
+                input.classList.remove('correct-input');
+                const row = input.closest('.term-row');
+                if (row) row.classList.remove('correct');
+            });
+            updateProgress();
+        }
+
+        document.getElementById('resetBtn').addEventListener('click', resetAll);
+
+        // Initialize
+        renderTerms();
+    </script>
+</body>
+</html>
