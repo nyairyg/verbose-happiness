@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phrasal Verbs — Quiz</title>
+    <style>
+        :root {
+            --bg: #F4F3EF;
+            --card-bg: #FCFBF9;
+            --text: #1A1A1A;
+            --text-secondary: #6E6B64;
+            --border: #D6D3CB;
+            --border-strong: #B8B5AC;
+            --accent-red: #B32424;
+            --accent-green: #1F6E43;
+            --button-hover: #1A1A1A;
+            --button-hover-text: #FCFBF9;
+            --font-sans: "Helvetica Neue", Helvetica, "Segoe UI", Arial, sans-serif;
+            --font-mono: "SF Mono", "Cascadia Code", "Liberation Mono", monospace;
+            --max-width: 680px;
+            --border-radius: 0px;
+            --transition-speed: 0.18s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: var(--font-sans);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2rem 1.25rem;
+            line-height: 1.5;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: var(--max-width);
+            display: flex;
+            flex-direction: column;
+            min-height: 480px;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--text);
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--text);
+        }
+
+        .quiz-count {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 2.25rem 2.25rem 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+            flex: 1;
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        .card.shake {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        .sentence-wrapper {
+            position: relative;
+            padding-left: 1.25rem;
+            border-left: 3px solid var(--text);
+        }
+
+        .sentence {
+            font-size: 1.2rem;
+            font-weight: 400;
+            line-height: 1.65;
+            letter-spacing: 0.01em;
+            color: var(--text);
+            word-wrap: break-word;
+        }
+
+        .sentence b {
+            font-weight: 700;
+            color: var(--text);
+            background: transparent;
+        }
+
+        .buttons-row {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+        }
+
+        .btn-answer {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.8rem 1.25rem;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            text-align: center;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--border-radius);
+            transition: background-color var(--transition-speed) ease,
+                color var(--transition-speed) ease,
+                border-color var(--transition-speed) ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-answer:hover:not(:disabled) {
+            background: var(--button-hover);
+            color: var(--button-hover-text);
+            border-color: var(--button-hover);
+        }
+
+        .btn-answer:focus-visible {
+            outline: 2px solid var(--text);
+            outline-offset: 2px;
+        }
+
+        .btn-answer:disabled {
+            cursor: default;
+            opacity: 0.75;
+        }
+
+        .btn-answer.is-correct {
+            background: var(--text);
+            color: var(--card-bg);
+            border-color: var(--text);
+            opacity: 1;
+        }
+
+        .btn-answer.is-wrong {
+            background: var(--accent-red);
+            color: #FFFFFF;
+            border-color: var(--accent-red);
+            opacity: 1;
+        }
+
+        .btn-answer.is-dimmed {
+            opacity: 0.4;
+        }
+
+        .feedback-area {
+            min-height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-next {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.6rem 1.5rem;
+            cursor: pointer;
+            background: var(--text);
+            color: var(--card-bg);
+            border: 1px solid var(--text);
+            border-radius: var(--border-radius);
+            transition: background-color var(--transition-speed) ease,
+                color var(--transition-speed) ease,
+                opacity var(--transition-speed) ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            background: #333;
+            border-color: #333;
+        }
+
+        .btn-next:focus-visible {
+            outline: 2px solid var(--text);
+            outline-offset: 2px;
+        }
+
+        .btn-next:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-next.is-hidden {
+            display: none;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 3px;
+            background: var(--border);
+            margin-top: 1rem;
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--text);
+            transition: width 0.35s ease;
+            border-radius: 0;
+        }
+
+        .quiz-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+            font-size: 0.78rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+
+        .score-display {
+            font-variant-numeric: tabular-nums;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            letter-spacing: 0.03em;
+        }
+
+        .results-screen {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+            align-items: center;
+            padding: 3rem 1.5rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .results-screen.is-visible {
+            display: flex;
+        }
+
+        .results-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--text);
+        }
+
+        .results-score {
+            font-family: var(--font-mono);
+            font-size: 3rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .results-sub {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            letter-spacing: 0.03em;
+        }
+
+        .results-message {
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: var(--text);
+            letter-spacing: 0.01em;
+            max-width: 420px;
+            line-height: 1.6;
+        }
+
+        .phrasal-list {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 0.5rem;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .phrasal-category {
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        .phrasal-category h3 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .phrasal-category ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .phrasal-category li {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            padding: 0.25rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+        }
+
+        .phrasal-category li strong {
+            font-weight: 700;
+            min-width: 120px;
+            display: inline-block;
+        }
+
+        .phrasal-category li span {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .btn-restart {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.7rem 2rem;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--text);
+            border-radius: var(--border-radius);
+            transition: background-color var(--transition-speed) ease,
+                color var(--transition-speed) ease;
+            margin-top: 0.5rem;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn-restart:hover {
+            background: var(--text);
+            color: var(--card-bg);
+        }
+
+        .btn-restart:focus-visible {
+            outline: 2px solid var(--text);
+            outline-offset: 2px;
+        }
+
+        .card.is-hidden {
+            display: none;
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 1rem 0.75rem;
+            }
+
+            .card {
+                padding: 1.5rem 1.25rem 1.25rem;
+                gap: 1.25rem;
+            }
+
+            .sentence {
+                font-size: 1rem;
+                line-height: 1.55;
+            }
+
+            .sentence-wrapper {
+                padding-left: 0.85rem;
+                border-left-width: 2px;
+            }
+
+            .buttons-row {
+                gap: 0.5rem;
+                flex-direction: column;
+            }
+
+            .btn-answer {
+                min-width: 100%;
+                padding: 0.7rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .feedback-area {
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 0.75rem;
+            }
+
+            .quiz-header {
+                margin-bottom: 1rem;
+            }
+
+            .results-score {
+                font-size: 2.25rem;
+            }
+
+            .phrasal-category li strong {
+                min-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-container">
+
+        <!-- Header -->
+        <header class="quiz-header">
+            <span class="quiz-title">Phrasal Verb Quiz</span>
+            <span class="quiz-count" id="quizCount">01 / 14</span>
+        </header>
+
+        <!-- Quiz Card -->
+        <div class="card" id="quizCard">
+            <div class="sentence-wrapper">
+                <p class="sentence" id="sentenceText"></p>
+            </div>
+
+            <div class="buttons-row" id="buttonsRow">
+                <button class="btn-answer" data-answer="clothes" type="button">Clothes &amp; Dressing</button>
+                <button class="btn-answer" data-answer="computers" type="button">Computers &amp; Technology</button>
+                <button class="btn-answer" data-answer="lr" type="button">Love &amp; Relationships</button>
+            </div>
+
+            <div class="feedback-area">
+                <button class="btn-next is-hidden" id="btnNext" type="button">Next &rarr;</button>
+            </div>
+
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <!-- Results Screen -->
+        <div class="results-screen" id="resultsScreen">
+            <span class="results-title">Quiz Complete</span>
+            <span class="results-score" id="resultsScore">0 / 14</span>
+            <span class="results-sub" id="resultsSub">0% correct</span>
+            <p class="results-message" id="resultsMessage"></p>
+
+            <!-- Phrasal verb list -->
+            <div class="phrasal-list" id="phrasalList"></div>
+
+            <button class="btn-restart" id="btnRestart" type="button">Restart</button>
+        </div>
+
+        <!-- Footer -->
+        <footer class="quiz-footer">
+            <span>Score</span>
+            <span class="score-display" id="scoreDisplay">0 / 0</span>
+        </footer>
+
+    </div>
+
+    <script>
+        (function() {
+            // ── Data ──────────────────────────────────────────────
+            const items = [{
+                text: 'I was so embarrassed when I arrived and the receptionist told me to <b>take it off</b> because everyone <b>dresses down</b> at the company!',
+                answer: 'clothes'
+            }, {
+                text: 'Then I got bored and <b>went off</b> him. Switched my interest to his colleague.',
+                answer: 'lr'
+            }, {
+                text: 'It\'s a bit confusing – you have to <b>scroll up</b> and then click on the button.',
+                answer: 'computers'
+            }, {
+                text: 'We were together for two years and we were planning to <b>settle down</b>.',
+                answer: 'lr'
+            }, {
+                text: 'We <b>got on</b> really well. Not a single argument in 4 years we worked together.',
+                answer: 'lr'
+            }, {
+                text: 'I love <b>dressing up</b> so when I <b>tried on</b> that purple thing, I thought it was perfect for my first day at work.',
+                answer: 'clothes'
+            }, {
+                text: 'He <b>chatted me up</b> in a bar.',
+                answer: 'lr'
+            }, {
+                text: 'If you want, you can <b>log off</b> before you <b>shut down</b>.',
+                answer: 'computers'
+            }, {
+                text: 'I didn\'t want us to <b>drift apart</b>, but it happened.',
+                answer: 'lr'
+            }, {
+                text: 'At that point with us, it was either <b>tie the knot</b> and work through the problems, or <b>split up</b> and try building something new.',
+                answer: 'lr'
+            }, {
+                text: 'You need to test it by <b>zooming in</b> or <b>out</b> – if it\'s not rendered properly, you\'ll see the pixels.',
+                answer: 'computers'
+            }, {
+                text: 'Guess I\'ll have to <b>wrap up</b> as the heating isn\'t on yet.',
+                answer: 'clothes'
+            }, {
+                text: 'He couldn\'t <b>hook up</b> the projector, so we had to google how to do so, but the PC took forever to <b>boot up</b>.',
+                answer: 'computers'
+            }, {
+                text: 'You\'re not going anywhere unless you <b>do it up</b>, it\'s windy outside!',
+                answer: 'clothes'
+            }];
+
+            // ── Phrasal verb meanings ─────────────────────────────
+            const phrasalMeanings = {
+                clothes: [
+                    { verb: 'take off', meaning: 'remove an item of clothing' },
+                    { verb: 'dress down', meaning: 'wear casual clothes' },
+                    { verb: 'dress up', meaning: 'wear formal or fancy clothes' },
+                    { verb: 'try on', meaning: 'put on clothing to test the fit' },
+                    { verb: 'wrap up', meaning: 'dress warmly' },
+                    { verb: 'do up', meaning: 'fasten (a coat, buttons)' }
+                ],
+                computers: [
+                    { verb: 'scroll up', meaning: 'move content upwards on a screen' },
+                    { verb: 'log off', meaning: 'sign out of a computer system' },
+                    { verb: 'shut down', meaning: 'turn off a computer' },
+                    { verb: 'zoom in / out', meaning: 'adjust magnification on screen' },
+                    { verb: 'hook up', meaning: 'connect devices' },
+                    { verb: 'boot up', meaning: 'start a computer' }
+                ],
+                lr: [
+                    { verb: 'go off (someone)', meaning: 'lose interest in someone (British English)' },
+                    { verb: 'settle down', meaning: 'become stable in a relationship' },
+                    { verb: 'get on', meaning: 'have a good relationship' },
+                    { verb: 'chat up', meaning: 'flirt with someone' },
+                    { verb: 'drift apart', meaning: 'gradually become less close' },
+                    { verb: 'tie the knot', meaning: 'get married' },
+                    { verb: 'split up', meaning: 'end a relationship' }
+                ]
+            };
+
+            // ── State ─────────────────────────────────────────────
+            let currentIndex = 0;
+            let score = 0;
+            let answered = false;
+            let shuffledIndices = [];
+
+            // ── DOM refs ──────────────────────────────────────────
+            const quizCard = document.getElementById('quizCard');
+            const resultsScreen = document.getElementById('resultsScreen');
+            const sentenceEl = document.getElementById('sentenceText');
+            const buttonsRow = document.getElementById('buttonsRow');
+            const answerButtons = Array.from(document.querySelectorAll('.btn-answer'));
+            const btnNext = document.getElementById('btnNext');
+            const progressFill = document.getElementById('progressFill');
+            const quizCount = document.getElementById('quizCount');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const resultsScore = document.getElementById('resultsScore');
+            const resultsSub = document.getElementById('resultsSub');
+            const resultsMessage = document.getElementById('resultsMessage');
+            const phrasalList = document.getElementById('phrasalList');
+            const btnRestart = document.getElementById('btnRestart');
+
+            // ── Helpers ───────────────────────────────────────────
+            function shuffleArray(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            function initShuffled() {
+                const indices = items.map((_, i) => i);
+                shuffledIndices = shuffleArray(indices);
+            }
+
+            function getCurrentItem() {
+                const idx = shuffledIndices[currentIndex];
+                return items[idx];
+            }
+
+            function getTotalItems() {
+                return items.length;
+            }
+
+            function updateProgressBar() {
+                const total = getTotalItems();
+                const pct = ((currentIndex) / total) * 100;
+                progressFill.style.width = pct + '%';
+            }
+
+            function updateCountDisplay() {
+                const total = getTotalItems();
+                const displayNum = String(currentIndex + 1).padStart(2, '0');
+                const totalNum = String(total).padStart(2, '0');
+                quizCount.textContent = displayNum + ' / ' + totalNum;
+            }
+
+            function updateScoreDisplay() {
+                scoreDisplay.textContent = score + ' / ' + getTotalItems();
+            }
+
+            function resetButtons() {
+                answerButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('is-correct', 'is-wrong', 'is-dimmed');
+                });
+            }
+
+            function disableButtons() {
+                answerButtons.forEach(btn => {
+                    btn.disabled = true;
+                });
+            }
+
+            function showNextButton(show) {
+                if (show) {
+                    btnNext.classList.remove('is-hidden');
+                } else {
+                    btnNext.classList.add('is-hidden');
+                }
+            }
+
+            // ── Render phrasal list in results ────────────────────
+            function populatePhrasalList() {
+                const categoryNames = {
+                    clothes: 'Clothes & Dressing',
+                    computers: 'Computers & Technology',
+                    lr: 'Love & Relationships'
+                };
+
+                let html = '';
+                for (const [catKey, catName] of Object.entries(categoryNames)) {
+                    const verbs = phrasalMeanings[catKey];
+                    if (verbs && verbs.length) {
+                        html += `<div class="phrasal-category"><h3>${catName}</h3><ul>`;
+                        verbs.forEach(item => {
+                            html += `<li><strong>${item.verb}</strong> <span>${item.meaning}</span></li>`;
+                        });
+                        html += `</ul></div>`;
+                    }
+                }
+                phrasalList.innerHTML = html;
+            }
+
+            // ── Render ────────────────────────────────────────────
+            function renderCurrentItem() {
+                const item = getCurrentItem();
+                sentenceEl.innerHTML = item.text;
+                resetButtons();
+                showNextButton(false);
+                answered = false;
+                updateProgressBar();
+                updateCountDisplay();
+                updateScoreDisplay();
+
+                quizCard.classList.remove('is-hidden');
+                resultsScreen.classList.remove('is-visible');
+            }
+
+            function showResults() {
+                quizCard.classList.add('is-hidden');
+                resultsScreen.classList.add('is-visible');
+
+                const total = getTotalItems();
+                const pct = Math.round((score / total) * 100);
+
+                resultsScore.textContent = score + ' / ' + total;
+                resultsSub.textContent = pct + '% correct';
+
+                let msg = '';
+                if (pct === 100) {
+                    msg = 'Flawless. You have a sharp eye for phrasal verbs across every domain.';
+                } else if (pct >= 80) {
+                    msg = 'Excellent work. You clearly grasp how context shapes meaning.';
+                } else if (pct >= 60) {
+                    msg = 'Solid effort. A few more rounds and you\u2019ll have them all down.';
+                } else if (pct >= 40) {
+                    msg = 'A decent start. Try reviewing the phrasal verbs you missed.';
+                } else {
+                    msg = 'Every mistake is a step toward mastery. Review and try again.';
+                }
+                resultsMessage.textContent = msg;
+
+                // Populate phrasal verb list
+                populatePhrasalList();
+            }
+
+            // ── Handle Answer ─────────────────────────────────────
+            function handleAnswer(selectedAnswer, buttonEl) {
+                if (answered) return;
+
+                const item = getCurrentItem();
+                const isCorrect = (selectedAnswer === item.answer);
+
+                if (isCorrect) {
+                    answered = true;
+                    answerButtons.forEach(btn => {
+                        const btnAnswer = btn.getAttribute('data-answer');
+                        btn.disabled = true;
+                        if (btnAnswer === item.answer) {
+                            btn.classList.add('is-correct');
+                        } else {
+                            btn.classList.add('is-dimmed');
+                        }
+                    });
+                    score++;
+                    updateScoreDisplay();
+                    showNextButton(true);
+
+                    if (currentIndex === getTotalItems() - 1) {
+                        btnNext.textContent = 'Finish \u2192';
+                    } else {
+                        btnNext.textContent = 'Next \u2192';
+                    }
+                } else {
+                    answered = true;
+                    disableButtons();
+                    buttonEl.classList.add('is-wrong');
+                    quizCard.classList.add('shake');
+
+                    setTimeout(() => {
+                        quizCard.classList.remove('shake');
+                        resetButtons();
+                        answered = false;
+                        showNextButton(false);
+                    }, 400);
+                }
+            }
+
+            function goToNext() {
+                if (!answered) return;
+                if (currentIndex < getTotalItems() - 1) {
+                    currentIndex++;
+                    renderCurrentItem();
+                } else {
+                    showResults();
+                    progressFill.style.width = '100%';
+                    updateCountDisplay();
+                }
+            }
+
+            function restartQuiz() {
+                initShuffled();
+                currentIndex = 0;
+                score = 0;
+                answered = false;
+                btnNext.textContent = 'Next \u2192';
+                renderCurrentItem();
+            }
+
+            // ── Event Listeners ────────────────────────────────────
+            answerButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const answer = this.getAttribute('data-answer');
+                    handleAnswer(answer, this);
+                });
+            });
+
+            btnNext.addEventListener('click', goToNext);
+            btnRestart.addEventListener('click', restartQuiz);
+
+            // Keyboard controls
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === 'ArrowRight') {
+                    if (!btnNext.classList.contains('is-hidden') && answered) {
+                        e.preventDefault();
+                        goToNext();
+                    }
+                }
+                if (e.key === '1' || e.key === '2' || e.key === '3') {
+                    if (!answered) {
+                        const idx = (e.key === '1') ? 0 : (e.key === '2' ? 1 : 2);
+                        if (idx < answerButtons.length && !answerButtons[idx].disabled) {
+                            const btn = answerButtons[idx];
+                            const answer = btn.getAttribute('data-answer');
+                            handleAnswer(answer, btn);
+                        }
+                    }
+                }
+                if (e.key === 'r' || e.key === 'R') {
+                    if (resultsScreen.classList.contains('is-visible')) {
+                        e.preventDefault();
+                        restartQuiz();
+                    }
+                }
+            });
+
+            // ── Init ───────────────────────────────────────────────
+            initShuffled();
+            renderCurrentItem();
+        })();
+    </script>
+
+</body>
+</html>
