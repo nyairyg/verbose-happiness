@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eduardo y Félix — Lectura Interactiva</title>
+    <style>
+        :root {
+            --bg: #FAFAF8;
+            --text: #1A1917;
+            --text-secondary: #8A8780;
+            --border: #DDDAD4;
+            --border-light: #E8E5DF;
+            --accent: #C43D1B;
+            --accent-dark: #A63215;
+            --accent-tint: rgba(196, 61, 27, 0.05);
+            --success: #5E7D5E;
+            --success-tint: rgba(94, 125, 94, 0.08);
+            --error: #C43D1B;
+            --mono: 'SF Mono', 'Cascadia Mono', 'Roboto Mono', 'Courier New', monospace;
+            --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --serif: Georgia, 'Times New Roman', serif;
+            --max-width: 740px;
+            --progress-height: 2px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 17px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            letter-spacing: -0.01em;
+        }
+
+        /* ─── Top thin rule ─── */
+        .top-rule {
+            height: 4px;
+            background: var(--accent);
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        /* ─── Header ─── */
+        header {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 2.2rem 1.5rem 1.2rem;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.9rem;
+        }
+
+        .title-group {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+        }
+
+        .title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .title-accent {
+            color: var(--accent);
+            font-weight: 400;
+        }
+
+        .issue-tag {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .counter {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-variant-numeric: tabular-nums;
+        }
+        .counter strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        /* ─── Progress line ─── */
+        .progress-track {
+            margin-top: 0.7rem;
+            height: var(--progress-height);
+            background: var(--border-light);
+            position: relative;
+            overflow: hidden;
+            border-radius: 1px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            border-radius: 1px;
+        }
+
+        /* ─── Main content ─── */
+        main {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0.5rem 1.5rem 2rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .story {
+            font-family: var(--serif);
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: #21201D;
+        }
+
+        .story p {
+            margin-bottom: 1.5rem;
+            text-indent: 0;
+        }
+
+        .story p:first-of-type::first-letter {
+            font-size: 3.2rem;
+            font-weight: 700;
+            float: left;
+            line-height: 0.85;
+            margin-right: 0.55rem;
+            margin-top: 0.15rem;
+            color: var(--accent);
+            font-family: var(--serif);
+        }
+
+        /* ─── Scrambled word styling ─── */
+        .scrambled {
+            font-family: var(--mono);
+            font-size: 0.85em;
+            letter-spacing: 0.04em;
+            font-weight: 500;
+            color: var(--accent-dark);
+            border-bottom: 1.5px solid var(--accent);
+            cursor: pointer;
+            padding: 0 0.1em;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            text-transform: uppercase;
+            white-space: nowrap;
+            display: inline;
+            position: relative;
+            border-radius: 1px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .scrambled:hover {
+            background: var(--accent-tint);
+            color: var(--accent);
+        }
+        .scrambled:focus-visible {
+            outline: 1.5px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        /* Solved state */
+        .scrambled.solved {
+            color: var(--success);
+            border-bottom-color: var(--success);
+            cursor: default;
+            font-weight: 500;
+            background: transparent;
+            text-transform: none;
+            font-style: italic;
+        }
+        .scrambled.solved:hover {
+            background: transparent;
+            color: var(--success);
+        }
+
+        /* ─── Input field (inline replacement) ─── */
+        .scrambled-input {
+            font-family: var(--mono);
+            font-size: 0.85em;
+            letter-spacing: 0.04em;
+            font-weight: 500;
+            color: var(--text);
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px solid var(--accent);
+            padding: 0 0.1em;
+            outline: none;
+            caret-color: var(--accent);
+            text-transform: none;
+            min-width: 4ch;
+            width: auto;
+            border-radius: 1px;
+            transition: border-color 0.2s ease;
+            line-height: inherit;
+        }
+        .scrambled-input:focus {
+            border-bottom-color: var(--accent);
+            border-bottom-width: 2px;
+        }
+        .scrambled-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 400;
+        }
+
+        /* Error state on input */
+        .scrambled-input.error {
+            border-bottom-color: var(--error);
+            animation: shake 0.35s ease;
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-4px);
+            }
+            40% {
+                transform: translateX(4px);
+            }
+            60% {
+                transform: translateX(-2px);
+            }
+            80% {
+                transform: translateX(2px);
+            }
+        }
+
+        /* ─── Try again hint ─── */
+        .try-again {
+            font-family: var(--sans);
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--error);
+            font-weight: 600;
+            margin-left: 0.5em;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            display: inline-block;
+            pointer-events: none;
+        }
+        .try-again.visible {
+            opacity: 1;
+        }
+
+        /* ─── Footer ─── */
+        footer {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0.8rem 1.5rem 2.5rem;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        .footer-inner {
+            border-top: 1px solid var(--border);
+            padding-top: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        .footer-inner .foot-note {
+            color: var(--text-secondary);
+        }
+        .completion-note {
+            color: var(--success);
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            letter-spacing: 0.08em;
+        }
+        .completion-note.visible {
+            opacity: 1;
+        }
+
+        /* ─── Responsive tweaks ─── */
+        @media (max-width: 600px) {
+            html {
+                font-size: 15px;
+            }
+            header {
+                padding: 1.5rem 1rem 1rem;
+            }
+            main {
+                padding: 0.3rem 1rem 1.5rem;
+            }
+            footer {
+                padding: 0.5rem 1rem 2rem;
+            }
+            .story {
+                font-size: 0.98rem;
+                line-height: 1.8;
+            }
+            .story p:first-of-type::first-letter {
+                font-size: 2.4rem;
+                margin-right: 0.4rem;
+            }
+            .title {
+                font-size: 0.7rem;
+            }
+            .counter {
+                font-size: 0.62rem;
+            }
+            .scrambled,
+            .scrambled-input {
+                font-size: 0.8em;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .header-inner {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+            .title-group {
+                flex-wrap: wrap;
+                gap: 0.4rem;
+            }
+            .footer-inner {
+                flex-direction: column;
+                gap: 0.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-rule" aria-hidden="true"></div>
+
+    <header>
+        <div class="header-inner">
+            <div class="title-group">
+                <span class="title">Eduardo y Félix <span class="title-accent">— Lectura Interactiva</span></span>
+                <span class="issue-tag">Español · A1</span>
+            </div>
+            <span class="counter" id="wordCounter"><strong id="solvedCount">0</strong> / 23</span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="story" id="story">
+
+            <p>Félix y Eduardo son amigos; son <span class="scrambled" data-scrambled="BENOUS" data-answer="buenos" tabindex="0">BENOUS</span> amigos.</p>
+
+            <p>Eduardo es un elefante. Es muy grande y el color <span class="scrambled" data-scrambled="RISG" data-answer="gris" tabindex="0">RISG</span>. Eduardo es amable, <span class="scrambled" data-scrambled="PAINTEEC" data-answer="paciente" tabindex="0">PAINTEEC</span> y trabajador.</p>
+
+            <p>Félix es el color <span class="scrambled" data-scrambled="RISG" data-answer="gris" tabindex="0">RISG</span> también. Pero es muy diferente de Eduardo. Eduardo es un elefante y Félix es un ratón. Eduardo es muy grande y Félix es pequeño. Eduardo es amable, <span class="scrambled" data-scrambled="PAINTEEC" data-answer="paciente" tabindex="0">PAINTEEC</span> y trabajador. Félix es malo, impaciente y perezoso.</p>
+
+            <p>Eduardo y Félix están en el parque. Les gusta estar en el parque. Les gusta <span class="scrambled" data-scrambled="MIARR" data-answer="mirar" tabindex="0">MIARR</span> las personas en el parque. También les gusta <span class="scrambled" data-scrambled="SCEUHRCA" data-answer="escuchar" tabindex="0">SCEUHRCA</span> la música y hablar.</p>
+
+            <p>Félix mira su amigo Eduardo. Eduardo es mucho más grande que Félix, <span class="scrambled" data-scrambled="ESECEINTPMEAL" data-answer="especialmente" tabindex="0">ESECEINTPMEAL</span> en el estómago. Félix piensa que es un problema.</p>
+
+            <p>—Tú eres muy gordo, Eduardo.</p>
+
+            <p>Eduardo está <span class="scrambled" data-scrambled="SODIDRREONP" data-answer="sorprendido" tabindex="0">SODIDRREONP</span>. Eduardo es un elefante, ¡obviamente es grande! Eduardo está triste y piensa que Félix es malo. Pero después mira su estómago.</p>
+
+            <p>«Posiblemente soy un poco gordo» piensa Eduardo.</p>
+
+            <p>Eduardo no quiere ser gordo. Eduardo quiere ser normal. Eduardo es muy trabajador, entonces, Eduardo decide <span class="scrambled" data-scrambled="CRROER" data-answer="correr" tabindex="0">CRROER</span>. Corre en el parque. Escucha la música rápida y corre. Corre por dos <span class="scrambled" data-scrambled="HROSA" data-answer="horas" tabindex="0">HROSA</span> todas las mañanas.</p>
+
+            <p>Eduardo también decide comer <span class="scrambled" data-scrambled="OMICDA" data-answer="comida" tabindex="0">OMICDA</span> buena. Come las <span class="scrambled" data-scrambled="EASALNADS" data-answer="ensaladas" tabindex="0">EASALNADS</span>. Come vegetales y <span class="scrambled" data-scrambled="FUTRAS" data-answer="frutas" tabindex="0">FUTRAS</span>. No come <span class="scrambled" data-scrambled="OMICDA" data-answer="comida" tabindex="0">OMICDA</span> mala.</p>
+
+            <p>Félix no corre. Él es muy perezoso y no le gusta correr. Félix no corre en el parque. Félix mira la televisión en su casa. Mira la televisión por ocho horas todos los días.</p>
+
+            <p>Félix no come comida buena. No le gustan las ensaladas. Félix va a McDonald's. En McDonald's come hamburguesas con <span class="scrambled" data-scrambled="SEOUQ" data-answer="queso" tabindex="0">SEOUQ</span> y papas <span class="scrambled" data-scrambled="FITRSA" data-answer="fritas" tabindex="0">FITRSA</span>. Come muchas hamburguesas con <span class="scrambled" data-scrambled="SEOUQ" data-answer="queso" tabindex="0">SEOUQ</span> y muchas papas <span class="scrambled" data-scrambled="FITRSA" data-answer="fritas" tabindex="0">FITRSA</span> con ketchup. No come vegetales y no come frutas. Come comida mala porque es <span class="scrambled" data-scrambled="DLIEOSCAI" data-answer="deliciosa" tabindex="0">DLIEOSCAI</span>.</p>
+
+            <p>Después de seis <span class="scrambled" data-scrambled="EMANSAS" data-answer="semanas" tabindex="0">EMANSAS</span>, Eduardo va a la casa de Félix. Va a la casa de Félix porque Félix no va al parque. Eduardo quiere ver su amigo. Eduardo corre a la casa de Félix.</p>
+
+            <p>Félix <span class="scrambled" data-scrambled="RIMA" data-answer="mira" tabindex="0">RIMA</span> la televisión y <span class="scrambled" data-scrambled="OMCE" data-answer="come" tabindex="0">OMCE</span> una <span class="scrambled" data-scrambled="HABAURSUEGM" data-answer="hamburguesa" tabindex="0">HABAURSUEGM</span> con queso cuando mira Eduardo. ¡Eduardo corre!</p>
+
+            <p>—¡Guau, Eduardo! ¡Tú eres muy <span class="scrambled" data-scrambled="FACLO" data-answer="flaco" tabindex="0">FACLO</span>! —dice Félix.</p>
+
+            <p>Eduardo es feliz. Le gusta correr. Le gusta la comida buena y la gusta su figura. Eduardo mira Félix. Félix tiene partes de una hamburguesa con queso en su estómago <span class="scrambled" data-scrambled="GANRDE" data-answer="grande" tabindex="0">GANRDE</span>. ¡Félix es súper gordo! Pero, Eduardo es un amigo bueno <span class="scrambled" data-scrambled="ENCSOENT" data-answer="entonces" tabindex="0">ENCSOENT</span> él simplemente dice:</p>
+
+            <p>—Gracias, Félix. Tú eres un buen amigo. ¿Puedo <span class="scrambled" data-scrambled="ENTER" data-answer="tener" tabindex="0">ENTER</span> tener una papa frita?</p>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <span class="foot-note">Español A1 · Lectura · Desenreda las palabras</span>
+            <span class="completion-note" id="completionNote">● Todas las palabras resueltas</span>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            const uniqueWords = {
+                'BENOUS': 'buenos',
+                'RISG': 'gris',
+                'PAINTEEC': 'paciente',
+                'MIARR': 'mirar',
+                'SCEUHRCA': 'escuchar',
+                'ESECEINTPMEAL': 'especialmente',
+                'SODIDRREONP': 'sorprendido',
+                'CRROER': 'correr',
+                'HROSA': 'horas',
+                'OMICDA': 'comida',
+                'EASALNADS': 'ensaladas',
+                'FUTRAS': 'frutas',
+                'SEOUQ': 'queso',
+                'FITRSA': 'fritas',
+                'DLIEOSCAI': 'deliciosa',
+                'EMANSAS': 'semanas',
+                'RIMA': 'mira',
+                'OMCE': 'come',
+                'HABAURSUEGM': 'hamburguesa',
+                'FACLO': 'flaco',
+                'GANRDE': 'grande',
+                'ENCSOENT': 'entonces',
+                'ENTER': 'tener'
+            };
+
+            const totalUnique = Object.keys(uniqueWords).length;
+            const solvedSet = new Set();
+            const storyEl = document.getElementById('story');
+            const solvedCountEl = document.getElementById('solvedCount');
+            const progressFillEl = document.getElementById('progressFill');
+            const completionNoteEl = document.getElementById('completionNote');
+
+            function updateProgress() {
+                const count = solvedSet.size;
+                solvedCountEl.textContent = count;
+                const pct = (count / totalUnique) * 100;
+                progressFillEl.style.width = pct + '%';
+                if (count === totalUnique) {
+                    completionNoteEl.classList.add('visible');
+                } else {
+                    completionNoteEl.classList.remove('visible');
+                }
+            }
+
+            function normalizeAnswer(str) {
+                return str.trim().toLowerCase().replace(/\s+/g, ' ');
+            }
+
+            function isValidAnswer(input, answer) {
+                return normalizeAnswer(input) === answer;
+            }
+
+            function markAllInstancesSolved(scrambled, answer) {
+                const allSpans = storyEl.querySelectorAll('.scrambled[data-scrambled="' + scrambled + '"]');
+                allSpans.forEach(span => {
+                    span.textContent = answer;
+                    span.classList.add('solved');
+                    span.classList.remove('scrambled-active');
+                    span.setAttribute('aria-label', 'Resuelto: ' + answer);
+                    span.removeAttribute('tabindex');
+                    span.style.cursor = 'default';
+                });
+            }
+
+            function handleScrambledClick(span) {
+                if (span.classList.contains('solved')) return;
+
+                const scrambled = span.dataset.scrambled;
+                const answer = span.dataset.answer;
+                const currentText = span.textContent;
+
+                // Create input
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'scrambled-input';
+                input.placeholder = scrambled;
+                input.setAttribute('aria-label', 'Escribe la palabra correcta para ' + scrambled);
+                input.autocomplete = 'off';
+                input.spellcheck = false;
+                input.autocapitalize = 'off';
+                input.autocorrect = 'off';
+
+                // Set input width based on answer length
+                const minWidth = Math.max(scrambled.length, answer.length);
+                input.style.width = (minWidth * 1.1 + 1) + 'ch';
+
+                // Replace span with input
+                span.replaceWith(input);
+                input.focus();
+
+                let isResolved = false;
+                let tryAgainEl = null;
+
+                function validateAndResolve() {
+                    if (isResolved) return;
+                    const typed = input.value;
+                    if (isValidAnswer(typed, answer)) {
+                        isResolved = true;
+                        // Create solved span
+                        const newSpan = document.createElement('span');
+                        newSpan.className = 'scrambled solved';
+                        newSpan.dataset.scrambled = scrambled;
+                        newSpan.dataset.answer = answer;
+                        newSpan.textContent = answer;
+                        newSpan.setAttribute('aria-label', 'Resuelto: ' + answer);
+                        input.replaceWith(newSpan);
+
+                        // Mark all instances
+                        markAllInstancesSolved(scrambled, answer);
+
+                        // Add to solved set and update progress
+                        if (!solvedSet.has(scrambled)) {
+                            solvedSet.add(scrambled);
+                            updateProgress();
+                        }
+                    } else {
+                        // Error state
+                        input.classList.add('error');
+                        // Remove error class after animation
+                        setTimeout(() => {
+                            input.classList.remove('error');
+                        }, 400);
+
+                        // Show try again
+                        if (!tryAgainEl) {
+                            tryAgainEl = document.createElement('span');
+                            tryAgainEl.className = 'try-again';
+                            tryAgainEl.textContent = 'Try again';
+                            input.after(tryAgainEl);
+                            requestAnimationFrame(() => {
+                                tryAgainEl.classList.add('visible');
+                            });
+                            // Hide after 1.2 seconds
+                            setTimeout(() => {
+                                if (tryAgainEl && tryAgainEl.isConnected) {
+                                    tryAgainEl.classList.remove('visible');
+                                    setTimeout(() => {
+                                        if (tryAgainEl && tryAgainEl.isConnected) {
+                                            tryAgainEl.remove();
+                                            tryAgainEl = null;
+                                        }
+                                    }, 300);
+                                }
+                            }, 1200);
+                        }
+
+                        // Clear input for retry
+                        input.value = '';
+                        input.focus();
+                    }
+                }
+
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        validateAndResolve();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        if (tryAgainEl && tryAgainEl.isConnected) tryAgainEl.remove();
+                        const revertSpan = document.createElement('span');
+                        revertSpan.className = 'scrambled';
+                        revertSpan.dataset.scrambled = scrambled;
+                        revertSpan.dataset.answer = answer;
+                        revertSpan.textContent = scrambled;
+                        revertSpan.setAttribute('tabindex', '0');
+                        revertSpan.setAttribute('aria-label', 'Palabra desordenada: ' + scrambled);
+                        input.replaceWith(revertSpan);
+                        attachSpanEvents(revertSpan);
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    if (!isResolved) {
+                        validateAndResolve();
+                    }
+                });
+            }
+
+            function attachSpanEvents(span) {
+                span.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleScrambledClick(span);
+                });
+                span.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleScrambledClick(span);
+                    }
+                });
+            }
+
+            function init() {
+                const allScrambled = storyEl.querySelectorAll('.scrambled:not(.solved)');
+                allScrambled.forEach(span => {
+                    attachSpanEvents(span);
+                });
+                updateProgress();
+            }
+
+            // Also handle click on already-solved spans (should be inert)
+            storyEl.addEventListener('click', function(e) {
+                const solvedSpan = e.target.closest('.scrambled.solved');
+                if (solvedSpan) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+
+            init();
+        })();
+    </script>
+</body>
+</html>
