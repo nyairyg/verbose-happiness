@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adjective Forms — Practice</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #F6F4EF;
+            --text: #1A1917;
+            --text-muted: #7A756E;
+            --border: #DEDBD4;
+            --accent: #C03A2B;
+            --accent-dim: rgba(192, 58, 43, 0.07);
+            --success: #3D7A4E;
+            --success-dim: rgba(61, 122, 78, 0.08);
+            --font-sans: 'Inter', 'Helvetica Neue', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 0 24px;
+            margin: 0;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 660px;
+            padding: 56px 0 100px;
+            position: relative;
+        }
+
+        /* ---- Progress ---- */
+        .progress-area {
+            margin-bottom: 56px;
+        }
+
+        .progress-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .progress-line {
+            width: 100%;
+            height: 2px;
+            background: var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-line-fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            width: 0%;
+        }
+
+        /* ---- Main Content ---- */
+        .content {
+            position: relative;
+        }
+
+        .content.fade-out {
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.18s ease, transform 0.18s ease;
+        }
+
+        .content.fade-in {
+            animation: fadeSlideIn 0.28s ease forwards;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .clue-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .clue-label::before {
+            content: '';
+            display: inline-block;
+            width: 14px;
+            height: 1.5px;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .sentence {
+            font-size: 28px;
+            font-weight: 400;
+            line-height: 1.55;
+            letter-spacing: -0.015em;
+            color: var(--text);
+            margin-bottom: 52px;
+            min-height: 88px;
+        }
+
+        .sentence .blank {
+            display: inline-block;
+            min-width: 150px;
+            border-bottom: 1.5px solid var(--text);
+            margin: 0 4px;
+            transition: border-color 0.25s ease, color 0.25s ease, min-width 0.25s ease;
+            text-align: center;
+            font-weight: 400;
+            line-height: 1.4;
+            vertical-align: baseline;
+            padding-bottom: 1px;
+        }
+
+        .sentence .blank.filled {
+            border-bottom-color: var(--success);
+            color: var(--success);
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        /* ---- Options ---- */
+        .options {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .options.shake {
+            animation: shakeContainer 0.35s ease;
+        }
+
+        @keyframes shakeContainer {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-5px);
+            }
+            40% {
+                transform: translateX(4px);
+            }
+            60% {
+                transform: translateX(-3px);
+            }
+            80% {
+                transform: translateX(2px);
+            }
+        }
+
+        .option-btn {
+            font-family: var(--font-sans);
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text);
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 15px 32px;
+            cursor: pointer;
+            transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+            letter-spacing: 0.01em;
+            border-radius: 2px;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+            user-select: none;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--text);
+        }
+
+        .option-btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .option-btn.correct {
+            border-color: var(--success);
+            background: var(--success-dim);
+            color: var(--success);
+            pointer-events: none;
+        }
+
+        .option-btn.correct::after {
+            content: '✓';
+            margin-left: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .option-btn.wrong {
+            border-color: var(--accent);
+            pointer-events: none;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        .option-btn.dimmed {
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* ---- Error Message ---- */
+        .error-message {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--accent);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .error-message.visible {
+            visibility: visible;
+            opacity: 1;
+            height: auto;
+            margin-top: 2px;
+        }
+
+        /* ---- Completion ---- */
+        .completion {
+            padding: 60px 0 40px;
+        }
+
+        .completion-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 500;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .completion-label::before {
+            content: '';
+            display: inline-block;
+            width: 14px;
+            height: 1.5px;
+            background: var(--accent);
+        }
+
+        .completion-title {
+            font-size: 34px;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            margin-bottom: 12px;
+            color: var(--text);
+        }
+
+        .completion-line {
+            width: 60px;
+            height: 1.5px;
+            background: var(--accent);
+            margin-top: 8px;
+        }
+
+        /* ---- Results List ---- */
+        .results-list {
+            margin-top: 48px;
+            border-top: 1px solid var(--border);
+            padding-top: 32px;
+        }
+
+        .results-list-title {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .result-item {
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--text);
+            margin-bottom: 16px;
+            letter-spacing: -0.005em;
+        }
+
+        .result-item .correct-word {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .result-item .mistake-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.75;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .no-break {
+            white-space: nowrap;
+        }
+
+        .restart-btn {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 48px;
+            transition: border-color 0.18s ease, color 0.18s ease;
+            border-radius: 2px;
+        }
+
+        .restart-btn:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 540px) {
+            .page {
+                padding: 32px 0 60px;
+            }
+            .sentence {
+                font-size: 21px;
+                line-height: 1.55;
+                margin-bottom: 36px;
+                min-height: 70px;
+            }
+            .sentence .blank {
+                min-width: 100px;
+            }
+            .sentence .blank.filled {
+                min-width: 80px;
+            }
+            .option-btn {
+                padding: 13px 22px;
+                font-size: 15px;
+                flex: 1 1 auto;
+                text-align: center;
+            }
+            .options {
+                gap: 8px;
+            }
+            .progress-area {
+                margin-bottom: 40px;
+            }
+            .completion-title {
+                font-size: 28px;
+            }
+            .result-item {
+                font-size: 16px;
+            }
+            .result-item .mistake-dot {
+                width: 5px;
+                height: 5px;
+                margin-left: 4px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .sentence {
+                font-size: 18px;
+            }
+            .sentence .blank {
+                min-width: 80px;
+            }
+            .result-item {
+                font-size: 14px;
+            }
+            .result-item .mistake-dot {
+                width: 4px;
+                height: 4px;
+                margin-left: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="progress-area">
+            <div class="progress-label" id="progressLabel">01 / 15</div>
+            <div class="progress-line">
+                <div class="progress-line-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <main class="content" id="content">
+            <div class="clue-label">YOUR CHOICE</div>
+            <div class="sentence" id="sentence"></div>
+            <div class="options" id="options"></div>
+            <div class="error-message" id="errorMessage">TRY AGAIN</div>
+        </main>
+    </div>
+
+    <script>
+        (function() {
+            const questions = [
+                { text: "Even though I liked the joke, she felt ______ by it.", options: ["offending",
+                        "offended"], answer: "offended" },
+                { text: "Although everything looked safe at first, the situation quickly became ______ once the storm started.",
+                    options: ["terrifying", "terrified"], answer: "terrifying" },
+                { text: "______ at first, he stopped worrying, assessed the information and proceeded without hesitation.",
+                    options: ["Overwhelming", "Overwhelmed"], answer: "Overwhelmed" },
+                { text: "After listening to the speech, I felt ______ to start working on my own ideas.",
+                    options: ["inspiring", "inspired"], answer: "inspired" },
+                { text: "The question is actually quite ______ when you think about it… I don't know what to say!",
+                    options: ["puzzling", "puzzled"], answer: "puzzling" },
+                { text: "Her ______ boss always expects too much. It's hard.", options: ["demanding",
+                        "demanded"], answer: "demanding" },
+                { text: "After a few minutes in the jacuzzi I felt completely ______.", options: ["relaxing",
+                        "relaxed"], answer: "relaxed" },
+                { text: "Even a person who doesn't like history will find this book quite ______.",
+                    options: ["fascinating", "fascinated"], answer: "fascinating" },
+                { text: "Although his argument sounded logical, his tone was not entirely ______.",
+                    options: ["convincing", "convinced"], answer: "convincing" },
+                { text: "I am really ______. Can you tell me more about how it might work in practice?",
+                    options: ["intriguing", "intrigued"], answer: "intrigued" },
+                { text: "Even though the comment was meant as a joke, it sounded rather ______.",
+                    options: ["insulting", "insulted"], answer: "insulting" },
+                { text: "Their ______ arrival messed with our plans, so we had to spend the whole evening at home.",
+                    options: ["unexpecting", "unexpected"], answer: "unexpected" },
+                { text: "The way he was acting left me ______.", options: ["disturbing", "disturbed"],
+                    answer: "disturbed" },
+                { text: "She felt deeply ______ when she saw the final score. Thankfully, we didn't have high expectations.",
+                    options: ["disappointing", "disappointed"], answer: "disappointed" },
+                { text: "It took me some time to complete this ______ task.", options: ["challenging",
+                        "challenged"], answer: "challenging" }
+            ];
+
+            const totalQuestions = questions.length;
+            let currentIndex = 0;
+            let isTransitioning = false;
+            let shuffledOrder = [];
+            let mistakes = [];
+
+            // DOM elements
+            const progressLabelEl = document.getElementById('progressLabel');
+            const progressFillEl = document.getElementById('progressFill');
+            const contentEl = document.getElementById('content');
+            let sentenceEl = document.getElementById('sentence');
+            let optionsEl = document.getElementById('options');
+            let errorMessageEl = document.getElementById('errorMessage');
+
+            function shuffleArray(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            function escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            function padNumber(num) {
+                return String(num).padStart(2, '0');
+            }
+
+            function renderSentence(text) {
+                const parts = text.split('______');
+                let html = '';
+                parts.forEach((part, i) => {
+                    html += escapeHtml(part);
+                    if (i < parts.length - 1) {
+                        html += '<span class="blank" id="blank"></span>';
+                    }
+                });
+                sentenceEl.innerHTML = html;
+                return document.getElementById('blank');
+            }
+
+            function renderOptions(options) {
+                optionsEl.innerHTML = '';
+                shuffledOrder = shuffleArray(options);
+                shuffledOrder.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = option;
+                    btn.setAttribute('data-value', option);
+                    btn.addEventListener('click', () => handleOptionClick(btn, option));
+                    optionsEl.appendChild(btn);
+                });
+            }
+
+            function updateProgress() {
+                const displayNum = padNumber(currentIndex + 1);
+                progressLabelEl.textContent = `${displayNum} / ${padNumber(totalQuestions)}`;
+                const pct = (currentIndex / totalQuestions) * 100;
+                progressFillEl.style.width = pct + '%';
+            }
+
+            function hideError() {
+                errorMessageEl.classList.remove('visible');
+            }
+
+            function showError() {
+                errorMessageEl.classList.add('visible');
+            }
+
+            function fillBlank(word) {
+                const blank = document.getElementById('blank');
+                if (blank) {
+                    blank.textContent = word;
+                    blank.classList.add('filled');
+                }
+            }
+
+            function handleOptionClick(btn, selectedValue) {
+                if (isTransitioning) return;
+                const question = questions[currentIndex];
+                const isCorrect = selectedValue === question.answer;
+
+                if (isCorrect) {
+                    isTransitioning = true;
+                    hideError();
+                    btn.classList.add('correct');
+                    const allBtns = optionsEl.querySelectorAll('.option-btn');
+                    allBtns.forEach(b => {
+                        if (b !== btn) b.classList.add('dimmed');
+                    });
+                    fillBlank(question.answer);
+                    setTimeout(() => {
+                        advanceQuestion();
+                    }, 1400);
+                } else {
+                    mistakes[currentIndex] = true;
+                    btn.classList.add('wrong');
+                    optionsEl.classList.add('shake');
+                    showError();
+                    setTimeout(() => {
+                        btn.classList.remove('wrong');
+                        optionsEl.classList.remove('shake');
+                        btn.disabled = false;
+                        btn.style.pointerEvents = '';
+                    }, 400);
+                    const allBtns = optionsEl.querySelectorAll('.option-btn');
+                    allBtns.forEach(b => b.disabled = true);
+                    setTimeout(() => {
+                        allBtns.forEach(b => {
+                            b.disabled = false;
+                            b.style.pointerEvents = '';
+                        });
+                        btn.disabled = false;
+                        btn.style.pointerEvents = '';
+                    }, 420);
+                }
+            }
+
+            function advanceQuestion() {
+                currentIndex++;
+                if (currentIndex >= totalQuestions) {
+                    showCompletion();
+                    return;
+                }
+                renderQuestion();
+            }
+
+            function renderQuestion() {
+                isTransitioning = false;
+                hideError();
+                const question = questions[currentIndex];
+                renderSentence(question.text);
+                renderOptions(question.options);
+                updateProgress();
+                contentEl.classList.remove('fade-in');
+                void contentEl.offsetWidth;
+                contentEl.classList.add('fade-in');
+            }
+
+            function showCompletion() {
+                progressLabelEl.textContent = `${padNumber(totalQuestions)} / ${padNumber(totalQuestions)}`;
+                progressFillEl.style.width = '100%';
+
+                let resultsHtml = '';
+                questions.forEach((q, idx) => {
+                    const hadMistake = mistakes[idx] === true;
+                    const correctWordHtml = `<span class="correct-word">${escapeHtml(q.answer)}</span>`;
+                    const dotHtml = hadMistake ? '<span class="mistake-dot"></span>' : '';
+                    const combined = `<span class="no-break">${correctWordHtml}${dotHtml}</span>`;
+                    const filledText = q.text.replace('______', combined);
+                    resultsHtml += `<div class="result-item">${filledText}</div>`;
+                });
+
+                contentEl.innerHTML = `
+                    <div class="completion">
+                        <div class="completion-label">COMPLETE</div>
+                        <div class="completion-title">All tasks cleared.</div>
+                        <div class="completion-line"></div>
+                        <div class="results-list">
+                            <div class="results-list-title">Review</div>
+                            ${resultsHtml}
+                        </div>
+                        <button class="restart-btn" id="restartBtn">RESTART</button>
+                    </div>
+                `;
+
+                const restartBtn = document.getElementById('restartBtn');
+                restartBtn.addEventListener('click', () => {
+                    currentIndex = 0;
+                    mistakes = [];
+                    contentEl.innerHTML = `
+                        <div class="clue-label">YOUR CHOICE</div>
+                        <div class="sentence" id="sentence"></div>
+                        <div class="options" id="options"></div>
+                        <div class="error-message" id="errorMessage">TRY AGAIN</div>
+                    `;
+                    sentenceEl = document.getElementById('sentence');
+                    optionsEl = document.getElementById('options');
+                    errorMessageEl = document.getElementById('errorMessage');
+                    renderQuestion();
+                });
+            }
+
+            renderQuestion();
+        })();
+    </script>
+</body>
+</html>
