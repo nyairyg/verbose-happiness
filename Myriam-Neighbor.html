@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Myriam — Interactive Reading</title>
+    <style>
+        :root {
+            --bg: #FAFAF8;
+            --text: #1A1917;
+            --text-secondary: #8A8780;
+            --border: #DDDAD4;
+            --border-light: #E8E5DF;
+            --accent: #2D6A4F;
+            --accent-dark: #1B4332;
+            --accent-tint: rgba(45, 106, 79, 0.06);
+            --success: #2D6A4F;
+            --error: #C43D1B;
+            --mono: 'SF Mono', 'Cascadia Mono', 'Roboto Mono', 'Courier New', monospace;
+            --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --serif: Georgia, 'Times New Roman', serif;
+            --max-width: 760px;
+            --progress-height: 2px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 17px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            letter-spacing: -0.01em;
+        }
+
+        .top-rule {
+            height: 4px;
+            background: var(--accent);
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        header {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 2.2rem 1.5rem 1.2rem;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.9rem;
+        }
+
+        .title-group {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+        }
+
+        .title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--text);
+            line-height: 1.2;
+        }
+
+        .title-accent {
+            color: var(--accent);
+            font-weight: 400;
+        }
+
+        .issue-tag {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .counter {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            font-variant-numeric: tabular-nums;
+        }
+        .counter strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .progress-track {
+            margin-top: 0.7rem;
+            height: var(--progress-height);
+            background: var(--border-light);
+            position: relative;
+            overflow: hidden;
+            border-radius: 1px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            border-radius: 1px;
+        }
+
+        main {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0.5rem 1.5rem 1rem;
+            width: 100%;
+            flex: 1;
+        }
+
+        .story {
+            font-family: var(--serif);
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: #21201D;
+        }
+
+        .story p {
+            margin-bottom: 1.5rem;
+            text-indent: 0;
+        }
+
+        .story p:first-of-type::first-letter {
+            font-size: 3.2rem;
+            font-weight: 700;
+            float: left;
+            line-height: 0.85;
+            margin-right: 0.55rem;
+            margin-top: 0.15rem;
+            color: var(--accent);
+            font-family: var(--serif);
+        }
+
+        .story h2 {
+            font-family: var(--sans);
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent-dark);
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid var(--border-light);
+            line-height: 1.4;
+        }
+
+        .page {
+            animation: fadeIn 0.35s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scrambled {
+            font-family: var(--mono);
+            font-size: 0.85em;
+            letter-spacing: 0.04em;
+            font-weight: 500;
+            color: var(--accent-dark);
+            border-bottom: 1.5px solid var(--accent);
+            cursor: pointer;
+            padding: 0 0.1em;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+            text-transform: uppercase;
+            white-space: nowrap;
+            display: inline;
+            position: relative;
+            border-radius: 1px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .scrambled:hover {
+            background: var(--accent-tint);
+            color: var(--accent);
+        }
+        .scrambled:focus-visible {
+            outline: 1.5px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .scrambled.solved {
+            color: var(--success);
+            border-bottom-color: var(--success);
+            cursor: default;
+            font-weight: 500;
+            background: transparent;
+            text-transform: none;
+            font-style: italic;
+        }
+        .scrambled.solved:hover {
+            background: transparent;
+            color: var(--success);
+        }
+
+        .scrambled-input {
+            font-family: var(--mono);
+            font-size: 0.85em;
+            letter-spacing: 0.04em;
+            font-weight: 500;
+            color: var(--text);
+            background: transparent;
+            border: none;
+            border-bottom: 1.5px solid var(--accent);
+            padding: 0 0.1em;
+            outline: none;
+            caret-color: var(--accent);
+            text-transform: none;
+            min-width: 4ch;
+            width: auto;
+            border-radius: 1px;
+            transition: border-color 0.2s ease;
+            line-height: inherit;
+        }
+        .scrambled-input:focus {
+            border-bottom-color: var(--accent);
+            border-bottom-width: 2px;
+        }
+        .scrambled-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 400;
+        }
+
+        .scrambled-input.error {
+            border-bottom-color: var(--error);
+            animation: shake 0.35s ease;
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-4px);
+            }
+            40% {
+                transform: translateX(4px);
+            }
+            60% {
+                transform: translateX(-2px);
+            }
+            80% {
+                transform: translateX(2px);
+            }
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 1.8rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+
+        .pagination-btn {
+            font-family: var(--sans);
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.6rem 1.2rem;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-tint);
+        }
+        .pagination-btn:active:not(:disabled) {
+            background: rgba(45, 106, 79, 0.12);
+        }
+        .pagination-btn:focus-visible {
+            outline: 1.5px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .pagination-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            border-color: var(--border-light);
+            color: var(--text-secondary);
+        }
+
+        .pagination-btn.next-btn:not(:disabled) {
+            border-color: var(--accent);
+            color: #fff;
+            background: var(--accent);
+        }
+        .pagination-btn.next-btn:not(:disabled):hover {
+            background: var(--accent-dark);
+            border-color: var(--accent-dark);
+            color: #fff;
+        }
+        .pagination-btn.next-btn:not(:disabled):active {
+            background: var(--accent-dark);
+            border-color: var(--accent-dark);
+        }
+
+        .page-indicator {
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+        .page-indicator strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .page-hint {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            text-align: center;
+            margin-top: 0.3rem;
+        }
+
+        footer {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0.8rem 1.5rem 2.5rem;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        .footer-inner {
+            border-top: 1px solid var(--border);
+            padding-top: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+        .footer-inner .foot-note {
+            color: var(--text-secondary);
+        }
+        .completion-note {
+            color: var(--success);
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            letter-spacing: 0.08em;
+        }
+        .completion-note.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            html {
+                font-size: 15px;
+            }
+            header {
+                padding: 1.5rem 1rem 1rem;
+            }
+            main {
+                padding: 0.3rem 1rem 0.5rem;
+            }
+            footer {
+                padding: 0.5rem 1rem 2rem;
+            }
+            .story {
+                font-size: 0.98rem;
+                line-height: 1.8;
+            }
+            .story p:first-of-type::first-letter {
+                font-size: 2.4rem;
+                margin-right: 0.4rem;
+            }
+            .title {
+                font-size: 0.7rem;
+            }
+            .counter {
+                font-size: 0.62rem;
+            }
+            .scrambled,
+            .scrambled-input {
+                font-size: 0.8em;
+            }
+            .pagination-btn {
+                font-size: 0.65rem;
+                padding: 0.5rem 0.9rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .header-inner {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+            .title-group {
+                flex-wrap: wrap;
+                gap: 0.4rem;
+            }
+            .footer-inner {
+                flex-direction: column;
+                gap: 0.2rem;
+            }
+            .pagination {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+            .pagination-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-rule" aria-hidden="true"></div>
+
+    <header>
+        <div class="header-inner">
+            <div class="title-group">
+                <span class="title">Myriam <span class="title-accent">— Interactive Reading</span></span>
+                <span class="issue-tag">English · B2</span>
+            </div>
+            <span class="counter" id="wordCounter"><strong id="solvedCount">0</strong> / <span id="totalCount">17</span></span>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </header>
+
+    <main>
+        <div class="story" id="story">
+
+            <!-- PAGE 1 -->
+            <div class="page" data-page="1" id="page1">
+                <p>In the heart of Colombia's Quindío department lies the city of Armenia, a place known for its coffee-growing <span class="scrambled" data-answer="heritage" tabindex="0">HTAEGEIR</span> and warm, welcoming people. But recently, one of its residents has gained international attention for a rather unconventional profession. Meet Myriam, a 67-year-old woman who has turned neighbourhood <span class="scrambled" data-answer="gossip" tabindex="0">PISGOS</span> into a full-fledged business — and claims it has made her wealthy enough to buy two houses.</p>
+
+                <h2>A Business Born from a Natural Talent</h2>
+
+                <p>Myriam's story came to light after an interview with a TikTok content creator named Lady Daniella went viral, amassing millions of views. In the interview, Myriam openly admitted: "I really like gossip, I'm a gossiper, and I turned that into a business and started charging".</p>
+
+                <p>What started as a personal interest in knowing what was happening around her neighbourhood gradually evolved into a structured <span class="scrambled" data-answer="enterprise" tabindex="0">RENPTRIESE</span>. Myriam sits outside her home each morning with a notebook, carefully observing and recording conversations, <span class="scrambled" data-answer="disputes" tabindex="0">SUDPITES</span>, and relationships in her community. She doesn't just rely on memory — she keeps detailed records, including photographs and relationship charts, to <span class="scrambled" data-answer="track" tabindex="0">KTRAC</span> family connections, friendships, and personal dramas. In her own words: "I can be here talking to you, but my little ears are wide open to hear what they say here, what they say there, and what's going on".</p>
+            </div>
+
+            <!-- PAGE 2 -->
+            <div class="page" data-page="2" id="page2" style="display:none;">
+                <h2>Pricing the Gossip</h2>
+
+                <p>Like any savvy businesswoman, Myriam has developed a pricing structure. According to her, she charges between 5,000 and 10,000 Colombian pesos for what she calls "soft" gossip, with prices increasing depending on how "juicy" or sensitive the information is. The more <span class="scrambled" data-answer="controversial" tabindex="0">ROVCLATRIESON</span> or damaging the story, the higher the fee.</p>
+
+                <p>Perhaps more intriguingly, Myriam has also revealed that she sometimes receives payments to keep certain information private. In one reported case, she was paid 700,000 Colombian pesos to remain <span class="scrambled" data-answer="silent" tabindex="0">NELTIS</span> about a sensitive matter. This dual revenue stream — selling gossip to those who want to know, and accepting money from those who don't want certain stories told — has proven remarkably <span class="scrambled" data-answer="profitable" tabindex="0">FIPRLOABTE</span>.</p>
+
+                <h2>A Methodical Approach to Information</h2>
+
+                <p>Myriam's operation is far from <span class="scrambled" data-answer="casual" tabindex="0">SUACAL</span>. She maintains what she calls a "croquis" — a detailed chart or map — in her home, complete with photographs of her neighbours and evidence of the stories she collects. In her interview, she pointed to photos and explained relationships: "This is the holier-than-thou woman of the neighbourhood, and she's having an <span class="scrambled" data-answer="affair" tabindex="0">FRAIFFA</span> with this gentleman who is the husband of that lady".</p>
+
+                <p>This systematic approach has earned her a reputation as a <span class="scrambled" data-answer="reliable" tabindex="0">LEBALIRE</span> source of information within her community. As she herself puts it: "a gossiper who respects herself in the neighbourhood knows everything".</p>
+            </div>
+
+            <!-- PAGE 3 -->
+            <div class="page" data-page="3" id="page3" style="display:none;">
+                <h2>Mixed Reactions and Ethical Questions</h2>
+
+                <p>Myriam's story has sparked a lively <span class="scrambled" data-answer="debate" tabindex="0">BETADE</span> across social media and news outlets. Some have praised her as a creative entrepreneur who found an unconventional way to make money. Comments on TikTok included reactions like "My new business venture, coming soon" and "My neighbour is losing money".</p>
+
+                <p>However, others have expressed serious ethical <span class="scrambled" data-answer="concerns" tabindex="0">CNORCENS</span>. Critics argue that profiting from other people's private lives crosses a line. Myriam herself admits that her work has caused problems: "I've had problems, and they act all dignified". Nevertheless, she maintains that since she started charging, people have stopped confronting her directly: "since I started charging, nobody has bothered me about it anymore".</p>
+
+                <p>Some online commentators have also raised the question of whether <span class="scrambled" data-answer="accepting" tabindex="0">CACEPTNIG</span> money to keep secrets could be considered a form of extortion. While Myriam's financial claims have been widely reported, they have not been independently verified.</p>
+
+                <h2>A Story That Transcends Borders</h2>
+
+                <p>Regardless of where one stands on the ethical debate, Myriam's story has resonated far beyond her neighbourhood in Armenia, Colombia. It has been picked up by media outlets across Latin America and even internationally. Her story raises interesting questions about <span class="scrambled" data-answer="privacy" tabindex="0">RYVIPAC</span>, <span class="scrambled" data-answer="reputation" tabindex="0">RENOTPUITA</span>, and the <span class="scrambled" data-answer="value" tabindex="0">LUAVE</span> of information in today's world.</p>
+
+                <p>For now, Myriam continues her unusual trade from her home in Armenia, a self-proclaimed "professional gossiper" who has proven that sometimes, even the most unexpected talents can become profitable businesses.</p>
+            </div>
+
+        </div>
+
+        <nav class="pagination" aria-label="Page navigation">
+            <button class="pagination-btn prev-btn" id="prevBtn" disabled aria-label="Previous page">← Previous</button>
+            <span class="page-indicator" id="pageIndicator">Page <strong>1</strong> of <strong>3</strong></span>
+            <button class="pagination-btn next-btn" id="nextBtn" disabled aria-label="Next page">Next →</button>
+        </nav>
+        <p class="page-hint" id="pageHint">Solve all the words to continue</p>
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            <span class="foot-note">English B2 · Reading · Unscramble the words</span>
+            <span class="completion-note" id="completionNote">● All words solved</span>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            const storyEl = document.getElementById('story');
+            const solvedCountEl = document.getElementById('solvedCount');
+            const totalCountEl = document.getElementById('totalCount');
+            const progressFillEl = document.getElementById('progressFill');
+            const completionNoteEl = document.getElementById('completionNote');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const pageIndicator = document.getElementById('pageIndicator');
+            const pageHint = document.getElementById('pageHint');
+
+            const allScrambledSpans = Array.from(document.querySelectorAll('.scrambled'));
+            const totalInstances = allScrambledSpans.length;
+            totalCountEl.textContent = totalInstances;
+
+            const totalPages = 3;
+            let currentPage = 1;
+
+            function normalizeAnswer(str) {
+                return str.trim().toLowerCase().replace(/\s+/g, ' ');
+            }
+
+            function isValidAnswer(input, answer) {
+                return normalizeAnswer(input) === answer;
+            }
+
+            function countSolvedInstances() {
+                return document.querySelectorAll('.scrambled.solved').length;
+            }
+
+            function updateProgress() {
+                const solved = countSolvedInstances();
+                solvedCountEl.textContent = solved;
+                const pct = (solved / totalInstances) * 100;
+                progressFillEl.style.width = pct + '%';
+                if (solved === totalInstances) {
+                    completionNoteEl.classList.add('visible');
+                } else {
+                    completionNoteEl.classList.remove('visible');
+                }
+            }
+
+            function isPageComplete(pageNum) {
+                const page = document.querySelector('.page[data-page="' + pageNum + '"]');
+                if (!page) return false;
+                return page.querySelectorAll('.scrambled:not(.solved)').length === 0;
+            }
+
+            function updatePaginationUI() {
+                const complete = isPageComplete(currentPage);
+
+                prevBtn.disabled = currentPage === 1;
+                nextBtn.disabled = currentPage === totalPages || !complete;
+
+                pageIndicator.innerHTML = 'Page <strong>' + currentPage + '</strong> of <strong>' + totalPages + '</strong>';
+
+                if (currentPage === totalPages) {
+                    if (complete) {
+                        pageHint.textContent = 'You have completed all pages! 🎉';
+                        pageHint.style.color = 'var(--success)';
+                    } else {
+                        pageHint.textContent = 'Solve all the words to finish';
+                        pageHint.style.color = 'var(--text-secondary)';
+                    }
+                } else {
+                    pageHint.textContent = complete ? 'Page complete! You can continue.' :
+                        'Solve all the words to continue';
+                    pageHint.style.color = 'var(--text-secondary)';
+                }
+            }
+
+            function showPage(pageNum) {
+                const allPages = storyEl.querySelectorAll('.page');
+                allPages.forEach(page => {
+                    const p = parseInt(page.dataset.page, 10);
+                    if (p === pageNum) {
+                        page.style.display = 'block';
+                        page.classList.add('active-page');
+                    } else {
+                        page.style.display = 'none';
+                        page.classList.remove('active-page');
+                    }
+                });
+                currentPage = pageNum;
+                updatePaginationUI();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function handleScrambledClick(span) {
+                if (span.classList.contains('solved') || !span.isConnected) return;
+
+                const answer = span.dataset.answer;
+                const scrambled = span.textContent.trim();
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'scrambled-input';
+                input.placeholder = scrambled;
+                input.setAttribute('aria-label', 'Type the correct word for ' + scrambled);
+                input.autocomplete = 'off';
+                input.spellcheck = false;
+                input.autocapitalize = 'off';
+                input.autocorrect = 'off';
+
+                const minWidth = Math.max(scrambled.length, answer.length);
+                input.style.width = (minWidth * 1.1 + 1) + 'ch';
+
+                span.replaceWith(input);
+                input.focus();
+
+                let isResolved = false;
+
+                function validateAndResolve() {
+                    if (isResolved) return;
+                    const typed = input.value;
+                    if (isValidAnswer(typed, answer)) {
+                        isResolved = true;
+                        const newSpan = document.createElement('span');
+                        newSpan.className = 'scrambled solved';
+                        newSpan.dataset.answer = answer;
+                        newSpan.textContent = answer;
+                        newSpan.setAttribute('aria-label', 'Solved: ' + answer);
+                        input.replaceWith(newSpan);
+
+                        updateProgress();
+                        updatePaginationUI();
+                    } else {
+                        input.classList.add('error');
+                        setTimeout(() => {
+                            input.classList.remove('error');
+                        }, 400);
+                        input.value = '';
+                    }
+                }
+
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        validateAndResolve();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        const revertSpan = document.createElement('span');
+                        revertSpan.className = 'scrambled';
+                        revertSpan.dataset.answer = answer;
+                        revertSpan.textContent = scrambled;
+                        revertSpan.setAttribute('tabindex', '0');
+                        revertSpan.setAttribute('aria-label', 'Scrambled word: ' + scrambled);
+                        input.replaceWith(revertSpan);
+                        attachSpanEvents(revertSpan);
+                    }
+                });
+
+                input.addEventListener('blur', function() {
+                    if (isResolved) return;
+
+                    if (input.value.trim() !== '') {
+                        validateAndResolve();
+                        if (!isResolved && document.body.contains(input)) {
+                            setTimeout(() => {
+                                if (!isResolved && document.body.contains(input)) {
+                                    input.focus();
+                                }
+                            }, 0);
+                        }
+                    } else {
+                        const revertSpan = document.createElement('span');
+                        revertSpan.className = 'scrambled';
+                        revertSpan.dataset.answer = answer;
+                        revertSpan.textContent = scrambled;
+                        revertSpan.setAttribute('tabindex', '0');
+                        revertSpan.setAttribute('aria-label', 'Scrambled word: ' + scrambled);
+                        input.replaceWith(revertSpan);
+                        attachSpanEvents(revertSpan);
+                    }
+                });
+            }
+
+            function attachSpanEvents(span) {
+                span.addEventListener('focus', function(e) {
+                    if (span.classList.contains('solved')) return;
+                    handleScrambledClick(span);
+                });
+
+                span.addEventListener('click', function(e) {
+                    if (span.classList.contains('solved')) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleScrambledClick(span);
+                });
+            }
+
+            function init() {
+                allScrambledSpans.forEach(span => {
+                    attachSpanEvents(span);
+                });
+
+                prevBtn.addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        showPage(currentPage - 1);
+                    }
+                });
+
+                nextBtn.addEventListener('click', function() {
+                    if (currentPage < totalPages && isPageComplete(currentPage)) {
+                        showPage(currentPage + 1);
+                    }
+                });
+
+                updateProgress();
+                updatePaginationUI();
+                showPage(1);
+            }
+
+            storyEl.addEventListener('click', function(e) {
+                const solvedSpan = e.target.closest('.scrambled.solved');
+                if (solvedSpan) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+
+            init();
+        })();
+    </script>
+</body>
+</html>
