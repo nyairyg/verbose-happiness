@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Future Forms — Editorial Exercise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --surface: #ffffff;
+            --text: #1c1a17;
+            --text-muted: #6b6560;
+            --text-light: #8a847d;
+            --border: #d8d3cc;
+            --border-strong: #bdb7af;
+            --accent: #2b4c6f;
+            --accent-hover: #1c344b;
+            --accent-bg: #eef3f7;
+            --success: #2d6a4f;
+            --success-bg: #f0f7f3;
+            --error: #c0392b;
+            --error-bg: #fdf2f1;
+            --radius: 3px;
+            --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+            --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --max-width: 720px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 48px 20px 64px;
+        }
+
+        .page {
+            width: 100%;
+            max-width: var(--max-width);
+        }
+
+        .page-header {
+            margin-bottom: 48px;
+            border-top: 3px double var(--border-strong);
+            padding-top: 32px;
+        }
+
+        .page-header__label {
+            font-family: var(--sans);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .page-header__title {
+            font-family: var(--serif);
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .page-header__instructions {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 400;
+            max-width: 520px;
+        }
+
+        .progress {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 36px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 18px;
+        }
+
+        .progress__label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .progress__track {
+            flex: 1;
+            height: 2px;
+            background: var(--border);
+            border-radius: 0;
+            overflow: hidden;
+        }
+
+        .progress__fill {
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            width: 0%;
+        }
+
+        .progress__count {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .exercise {
+            margin-bottom: 24px;
+        }
+
+        .pair {
+            display: none;
+            animation: pairFadeIn 0.3s ease;
+        }
+
+        .pair.active {
+            display: block;
+        }
+
+        @keyframes pairFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pair__header {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .pair__number {
+            font-family: var(--serif);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .pair__title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+        }
+
+        .pair__options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 560px) {
+            .pair__options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 18px 16px;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background-color 0.15s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            position: relative;
+        }
+
+        .option:hover {
+            border-color: var(--border-strong);
+        }
+
+        .option.selected {
+            border-color: var(--accent);
+            background: var(--accent-bg);
+        }
+
+        .option.correct-reveal {
+            border-color: var(--success);
+            background: var(--success-bg);
+        }
+
+        .option.incorrect-reveal {
+            border-color: var(--error);
+            background: var(--error-bg);
+        }
+
+        .option__top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .option__label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        .option__subtitle {
+            font-size: 12px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .option__dialogue {
+            font-family: var(--serif);
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text);
+            margin-bottom: 14px;
+        }
+
+        .option__dialogue .speaker {
+            font-weight: 600;
+            font-family: var(--sans);
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-right: 2px;
+        }
+
+        .option__checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .option__checkbox-box {
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid var(--border-strong);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+            background: transparent;
+        }
+
+        .option.selected .option__checkbox-box {
+            border-color: var(--accent);
+            background: var(--accent);
+        }
+
+        .option.correct-reveal .option__checkbox-box {
+            border-color: var(--success);
+            background: var(--success);
+        }
+
+        .option.incorrect-reveal .option__checkbox-box {
+            border-color: var(--error);
+            background: var(--error);
+        }
+
+        .option__checkbox-box svg {
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .option.selected .option__checkbox-box svg,
+        .option.correct-reveal .option__checkbox-box svg,
+        .option.incorrect-reveal .option__checkbox-box svg {
+            opacity: 1;
+        }
+
+        .pair__actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            font-family: var(--sans);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 10px 22px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+            letter-spacing: 0.02em;
+            -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.3;
+        }
+
+        .btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .btn--primary {
+            background: var(--text);
+            color: #fff;
+            border-color: var(--text);
+        }
+
+        .btn--primary:hover {
+            background: #2e2b28;
+            border-color: #2e2b28;
+        }
+
+        .btn--primary:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .btn--accent {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn--accent:hover {
+            background: var(--accent-hover);
+            border-color: var(--accent-hover);
+        }
+
+        .btn--ghost {
+            background: transparent;
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+
+        .btn--ghost:hover {
+            border-color: var(--border-strong);
+            color: var(--text);
+        }
+
+        .btn--success {
+            background: var(--success);
+            color: #fff;
+            border-color: var(--success);
+        }
+
+        .btn--success:hover {
+            background: #245a43;
+            border-color: #245a43;
+        }
+
+        .btn--hidden {
+            display: none !important;
+        }
+
+        .feedback {
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 8px;
+            min-height: 22px;
+            transition: color 0.2s ease;
+        }
+
+        .feedback--success {
+            color: var(--success);
+        }
+
+        .feedback--error {
+            color: var(--error);
+        }
+
+        .summary {
+            display: none;
+            border-top: 3px double var(--border-strong);
+            padding-top: 36px;
+            margin-top: 36px;
+            animation: pairFadeIn 0.35s ease;
+        }
+
+        .summary.visible {
+            display: block;
+        }
+
+        .summary__title {
+            font-family: var(--serif);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .summary__subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+
+        .summary__list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .summary-item {
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item__header {
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .summary-item__num {
+            font-family: var(--serif);
+            font-weight: 600;
+            font-size: 16px;
+            min-width: 30px;
+            flex-shrink: 0;
+            color: var(--text);
+        }
+
+        .summary-item__answer {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .summary-item__answer .correct-tag {
+            display: inline-block;
+            background: var(--success-bg);
+            color: var(--success);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 2px 8px;
+            border-radius: 2px;
+            border: 1px solid #c5ddcf;
+            margin-left: 8px;
+        }
+
+        .summary-item__answer .both-tag {
+            display: inline-block;
+            background: var(--accent-bg);
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 2px 8px;
+            border-radius: 2px;
+            border: 1px solid #b8c9db;
+            margin-left: 8px;
+        }
+
+        .summary-item__options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 560px) {
+            .summary-item__options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary-option {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 12px 14px;
+        }
+
+        .summary-option__label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .summary-option__dialogue {
+            font-family: var(--serif);
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .summary-option__dialogue .speaker {
+            font-weight: 600;
+            font-family: var(--sans);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .summary-item__explanation {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .summary__first-try {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 20px;
+            font-style: italic;
+        }
+
+        .footnote {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 40px;
+            text-align: center;
+            letter-spacing: 0.04em;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 28px 14px 48px;
+            }
+            .page-header__title {
+                font-size: 26px;
+            }
+            .option {
+                padding: 16px 14px 12px;
+            }
+            .option__dialogue {
+                font-size: 14px;
+            }
+            .btn {
+                padding: 9px 18px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="page-header">
+            <div class="page-header__label">Grammar Practice · Future Forms</div>
+            <h1 class="page-header__title">Going to &amp; Present Continuous</h1>
+            <p class="page-header__instructions">Choose the correct option. Sometimes both are possible.</p>
+        </header>
+
+        <div class="progress" id="progressBar">
+            <span class="progress__label">Progress</span>
+            <div class="progress__track">
+                <div class="progress__fill" id="progressFill"></div>
+            </div>
+            <span class="progress__count" id="progressCount">1 / 8</span>
+        </div>
+
+        <main class="exercise" id="exerciseContainer">
+            <!-- Pairs will be rendered here by JS -->
+        </main>
+
+        <section class="summary" id="summarySection">
+            <h2 class="summary__title">Answer Key &amp; Explanations</h2>
+            <p class="summary__subtitle">Full dialogues and grammar notes.</p>
+            <ul class="summary__list" id="summaryList"></ul>
+            <p class="summary__first-try" id="firstTryMessage"></p>
+            <div style="margin-top:24px;">
+                <button class="btn btn--ghost" id="restartBtn">Start Over</button>
+            </div>
+        </section>
+
+        <div class="footnote">Exercise · Future Forms · Grammar Practice</div>
+    </div>
+
+    <script>
+        (function() {
+            const pairs = [{
+                id: 1,
+                label: 'Dialogue 1',
+                options: [{
+                    key: 'A',
+                    subtitle: 'with "I\'m going to get"',
+                    lines: [
+                        { speaker: 'A', text: 'Do you know how to get to Andrew\'s house tomorrow?' },
+                        { speaker: 'B', text: 'No. I\'m sure I\'m going to get lost.' }
+                    ]
+                }, {
+                    key: 'B',
+                    subtitle: 'with "I\'m getting"',
+                    lines: [
+                        { speaker: 'A', text: 'Do you know how to get to Andrew\'s house tomorrow?' },
+                        { speaker: 'B', text: 'No. I\'m sure I\'m getting lost.' }
+                    ]
+                }],
+                correct: ['A'],
+                explanation: 'Use "going to" for predictions based on evidence or opinion. "I\'m getting lost" would mean it\'s happening right now or already arranged.'
+            }, {
+                id: 2,
+                label: 'Dialogue 2',
+                options: [{
+                    key: 'A',
+                    subtitle: 'with "I\'m going to visit"',
+                    lines: [
+                        { speaker: 'A', text: 'Do you have any plans for next weekend?' },
+                        { speaker: 'B', text: 'Yes, I\'m going to visit my grandparents on Sunday.' }
+                    ]
+                }, {
+                    key: 'B',
+                    subtitle: 'with "I\'m visiting"',
+                    lines: [
+                        { speaker: 'A', text: 'Do you have any plans for next weekend?' },
+                        { speaker: 'B', text: 'Yes, I\'m visiting my grandparents on Sunday.' }
+                    ]
+                }],
+                correct: ['A', 'B'],
+                explanation: 'Both are correct. "Going to" expresses intention, and present continuous ("I\'m visiting") can also be used for a planned future arrangement.'
+            }, {
+                id: 3,
+                label: 'Dialogue 3',
+                options: [{
+                    key: 'A',
+                    subtitle: 'with "it\'s going to snow"',
+                    lines: [
+                        { speaker: 'A', text: 'It\'s very cold tonight.' },
+                        { speaker: 'B', text: 'Do you think it\'s going to snow?' }
+                    ]
+                }, {
+                    key: 'B',
+                    subtitle: 'with "it\'s snowing"',
+                    lines: [
+                        { speaker: 'A', text: 'It\'s very cold tonight.' },
+                        { speaker: 'B', text: 'Do you think it\'s snowing?' }
+                    ]
+                }],
+                correct: ['A'],
+                explanation: '"Going to snow" is a prediction about the future. "It\'s snowing" means it is snowing now, so it doesn\'t fit the context.'
+            }, {
+                id: 4,
+                label: 'Dialogue 4',
+                options: [{
+                    key: 'A',
+                    subtitle: 'with "he\'s going to get"',
+                    lines: [
+                        { speaker: 'A', text: 'My brother has a job interview in Chicago.' },
+                        { speaker: 'B', text: 'Oh. Do you think he\'s going to get the job?' }
+                    ]
+                }, {
+                    key: 'B',
+                    subtitle: 'with "he\'s getting"',
+                    lines: [
+                        { speaker: 'A', text: 'My brother has a job interview in Chicago.' },
+                        { speaker: 'B', text: 'Oh. Do you think he\'s getting the job?' }
+                    ]
+                }],
+                correct: ['A'],
+                explanation: 'We use "going to" to ask for a prediction. "He\'s getting the job" would imply it\'s already decided or arranged.'
+            }, {
+                id: 5,
+                label: 'Dialogue 5',
+                options: [{
+                    key: 'A',
+                    subtitle: 'with "We aren\'t going to miss"',
+                    lines: [
+                        { speaker: 'A', text: 'What time\'s the train?' },
+                        { speaker: 'B', text: 'At 7:15. Don\'t worry. We aren\'t going to miss it.' }
+                    ]
+                }, {
+                    key: 'B',
+                    subtitle: 'with "aren\'t missing"',
+                    lines: [
+                        { speaker: 'A', text: 'What time\'s the train?' },
+                        { speaker: 'B', text: 'At 7:15. Don\'t worry. We aren\'t missing it.' }
+                    ]
+                }],
+                correct: ['A'],
+                explanation: '"Going to miss" is a prediction or assurance about the future. "Aren\'t missing" would mean we are not in the process of missing it now.'
+            }, {
+                id: 6,
+                label: 'Dialogue 6',
+                options: [{
+                    key: 'A',
+                    subtitle: 'with "Where are you going to go"',
+                    lines: [
+                        { speaker: 'A', text: 'We\'re going on vacation next month.' },
+                        { speaker: 'B', text: 'Are you? Where are you going to go?' }
+                    ]
+                }, {
+                    key: 'B',
+                    subtitle: 'with "Where are you going"',
+                    lines: [
+                        { speaker: 'A', text: 'We\'re going on vacation next month.' },
+                        { speaker: 'B', text: 'Are you? Where are you going?' }
+                    ]
+                }],
+                correct: ['A', 'B'],
+                explanation: 'Both are natural. "Where are you going to go?" and "Where are you going?" are both used to ask about future plans.'
+            }, {
+                id: 7,
+                label: 'Dialogue 7',
+                options: [{
+                    key: 'A',
+                    subtitle: 'with "I\'m going to catch"',
+                    lines: [
+                        { speaker: 'A', text: 'What time are you leaving tomorrow?' },
+                        { speaker: 'B', text: 'Early. I\'m going to catch the 6:00 train.' }
+                    ]
+                }, {
+                    key: 'B',
+                    subtitle: 'with "I\'m catching"',
+                    lines: [
+                        { speaker: 'A', text: 'What time are you leaving tomorrow?' },
+                        { speaker: 'B', text: 'Early. I\'m catching the 6:00 train.' }
+                    ]
+                }],
+                correct: ['A', 'B'],
+                explanation: 'Both are correct. "Going to catch" shows intention; "I\'m catching" implies a scheduled arrangement.'
+            }, {
+                id: 8,
+                label: 'Dialogue 8',
+                options: [{
+                    key: 'A',
+                    subtitle: 'with "she\'s going to have"',
+                    lines: [
+                        { speaker: 'A', text: 'Your girlfriend drives too fast.' },
+                        { speaker: 'B', text: 'I know. I\'m sure she\'s going to have an accident one day.' }
+                    ]
+                }, {
+                    key: 'B',
+                    subtitle: 'with "she\'s having"',
+                    lines: [
+                        { speaker: 'A', text: 'Your girlfriend drives too fast.' },
+                        { speaker: 'B', text: 'I know. I\'m sure she\'s having an accident one day.' }
+                    ]
+                }],
+                correct: ['A'],
+                explanation: '"Going to have" expresses a prediction based on evidence (she drives too fast). "She\'s having" would mean it\'s happening now.'
+            }];
+
+            let currentPairIndex = 0;
+            let userSelections = {};
+            let firstTryResults = {};
+
+            const exerciseContainer = document.getElementById('exerciseContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressCount = document.getElementById('progressCount');
+            const summarySection = document.getElementById('summarySection');
+            const summaryList = document.getElementById('summaryList');
+            const firstTryMessage = document.getElementById('firstTryMessage');
+            const restartBtn = document.getElementById('restartBtn');
+
+            let audioCtx = null;
+
+            function getAudioContext() {
+                if (!audioCtx) {
+                    audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                }
+                return audioCtx;
+            }
+
+            function playBuzz() {
+                try {
+                    const ctx = getAudioContext();
+                    const oscillator = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(160, ctx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(120, ctx.currentTime + 0.15);
+                    gainNode.gain.setValueAtTime(0.12, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+                    oscillator.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+                    oscillator.start(ctx.currentTime);
+                    oscillator.stop(ctx.currentTime + 0.2);
+                } catch (e) {}
+            }
+
+            function playCorrectSound() {
+                try {
+                    const ctx = getAudioContext();
+                    const oscillator = ctx.createOscillator();
+                    const gainNode = ctx.createGain();
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(520, ctx.currentTime);
+                    oscillator.frequency.exponentialRampToValueAtTime(660, ctx.currentTime + 0.08);
+                    gainNode.gain.setValueAtTime(0.06, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+                    oscillator.connect(gainNode);
+                    gainNode.connect(ctx.destination);
+                    oscillator.start(ctx.currentTime);
+                    oscillator.stop(ctx.currentTime + 0.12);
+                } catch (e) {}
+            }
+
+            function setEquals(a, b) {
+                if (a.size !== b.size) return false;
+                for (const item of a) {
+                    if (!b.has(item)) return false;
+                }
+                return true;
+            }
+
+            function renderDialogueOption(option) {
+                const linesHtml = option.lines.map(line =>
+                    `<p><span class="speaker">${line.speaker}:</span> ${line.text}</p>`
+                ).join('');
+                return linesHtml;
+            }
+
+            function createPairElement(pair) {
+                const pairDiv = document.createElement('div');
+                pairDiv.className = 'pair';
+                pairDiv.dataset.pairId = pair.id;
+
+                const selectedSet = userSelections[pair.id] || new Set();
+
+                const optionsHtml = pair.options.map(opt => {
+                    const isSelected = selectedSet.has(opt.key);
+                    return `
+                <div class="option ${isSelected ? 'selected' : ''}" data-option-key="${opt.key}" role="button" tabindex="0" aria-label="Option ${opt.key}">
+                  <div class="option__top">
+                    <span class="option__label">${opt.key}</span>
+                    <span class="option__subtitle">${opt.subtitle}</span>
+                  </div>
+                  <div class="option__dialogue">
+                    ${renderDialogueOption(opt)}
+                  </div>
+                  <div class="option__checkbox">
+                    <span class="option__checkbox-box">
+                      <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.5 6.5L5 9L9.5 3.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </span>
+                    <span>Correct</span>
+                  </div>
+                </div>
+              `;
+                }).join('');
+
+                pairDiv.innerHTML = `
+              <div class="pair__header">
+                <span class="pair__number">${pair.id}.</span>
+                <span class="pair__title">${pair.label}</span>
+              </div>
+              <div class="pair__options">
+                ${optionsHtml}
+              </div>
+              <div class="pair__actions">
+                <button class="btn btn--primary check-btn" data-pair-id="${pair.id}">Check</button>
+                <button class="btn btn--success next-btn btn--hidden" data-pair-id="${pair.id}">
+                  ${pair.id === pairs.length ? 'See Summary' : 'Next Pair'}
+                </button>
+                <span class="feedback" data-pair-id="${pair.id}"></span>
+              </div>
+            `;
+
+                const optionEls = pairDiv.querySelectorAll('.option');
+                optionEls.forEach(el => {
+                    el.addEventListener('click', () => toggleOption(pair.id, el.dataset.optionKey));
+                    el.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleOption(pair.id, el.dataset.optionKey);
+                        }
+                    });
+                });
+
+                const checkBtn = pairDiv.querySelector('.check-btn');
+                checkBtn.addEventListener('click', () => checkPair(pair.id));
+
+                const nextBtn = pairDiv.querySelector('.next-btn');
+                nextBtn.addEventListener('click', () => goToNextPair());
+
+                return pairDiv;
+            }
+
+            function toggleOption(pairId, optionKey) {
+                const pair = pairs.find(p => p.id === pairId);
+                if (!pair) return;
+
+                if (!userSelections[pairId]) {
+                    userSelections[pairId] = new Set();
+                }
+                const selected = userSelections[pairId];
+
+                if (selected.has(optionKey)) {
+                    selected.delete(optionKey);
+                } else {
+                    selected.add(optionKey);
+                }
+
+                const pairEl = exerciseContainer.querySelector(`.pair[data-pair-id="${pairId}"]`);
+                if (!pairEl) return;
+
+                const optionEl = pairEl.querySelector(`.option[data-option-key="${optionKey}"]`);
+                if (optionEl) {
+                    optionEl.classList.toggle('selected', selected.has(optionKey));
+                }
+
+                const feedbackEl = pairEl.querySelector('.feedback');
+                if (feedbackEl) {
+                    feedbackEl.textContent = '';
+                    feedbackEl.className = 'feedback';
+                }
+
+                const optionEls = pairEl.querySelectorAll('.option');
+                optionEls.forEach(el => {
+                    el.classList.remove('correct-reveal', 'incorrect-reveal');
+                });
+
+                const checkBtn = pairEl.querySelector('.check-btn');
+                if (checkBtn) {
+                    checkBtn.disabled = false;
+                    checkBtn.classList.remove('btn--accent');
+                    checkBtn.classList.add('btn--primary');
+                }
+            }
+
+            function checkPair(pairId) {
+                const pair = pairs.find(p => p.id === pairId);
+                if (!pair) return;
+
+                const selected = userSelections[pairId] || new Set();
+                const correctSet = new Set(pair.correct);
+                const isCorrect = setEquals(selected, correctSet);
+
+                const pairEl = exerciseContainer.querySelector(`.pair[data-pair-id="${pairId}"]`);
+                if (!pairEl) return;
+
+                const optionEls = pairEl.querySelectorAll('.option');
+                const feedbackEl = pairEl.querySelector('.feedback');
+                const checkBtn = pairEl.querySelector('.check-btn');
+                const nextBtn = pairEl.querySelector('.next-btn');
+
+                if (isCorrect) {
+                    playCorrectSound();
+                    optionEls.forEach(el => {
+                        const key = el.dataset.optionKey;
+                        if (selected.has(key)) {
+                            el.classList.add('correct-reveal');
+                            el.classList.remove('selected');
+                        } else {
+                            el.style.opacity = '0.5';
+                        }
+                    });
+
+                    if (feedbackEl) {
+                        feedbackEl.textContent = 'Correct!';
+                        feedbackEl.className = 'feedback feedback--success';
+                    }
+
+                    if (checkBtn) {
+                        checkBtn.disabled = true;
+                        checkBtn.classList.add('btn--hidden');
+                    }
+
+                    if (nextBtn) {
+                        nextBtn.classList.remove('btn--hidden');
+                    }
+
+                    if (!firstTryResults[pairId]) {
+                        firstTryResults[pairId] = true;
+                    }
+                } else {
+                    playBuzz();
+                    optionEls.forEach(el => {
+                        const key = el.dataset.optionKey;
+                        if (selected.has(key)) {
+                            el.classList.add('incorrect-reveal');
+                            el.classList.remove('selected');
+                        }
+                    });
+
+                    if (feedbackEl) {
+                        if (selected.size === 0) {
+                            feedbackEl.textContent = 'Select at least one option.';
+                        } else {
+                            feedbackEl.textContent = 'Not quite right. Try again.';
+                        }
+                        feedbackEl.className = 'feedback feedback--error';
+                    }
+
+                    if (!firstTryResults[pairId]) {
+                        firstTryResults[pairId] = false;
+                    }
+
+                    setTimeout(() => {
+                        optionEls.forEach(el => {
+                            el.classList.remove('incorrect-reveal');
+                            const key = el.dataset.optionKey;
+                            if ((userSelections[pairId] || new Set()).has(key)) {
+                                el.classList.add('selected');
+                            }
+                        });
+                    }, 900);
+                }
+            }
+
+            function goToNextPair() {
+                if (currentPairIndex < pairs.length - 1) {
+                    currentPairIndex++;
+                    showPair(currentPairIndex);
+                } else {
+                    showSummary();
+                }
+            }
+
+            function showPair(index) {
+                const allPairs = exerciseContainer.querySelectorAll('.pair');
+                allPairs.forEach((el, i) => {
+                    if (i === index) {
+                        el.classList.add('active');
+                    } else {
+                        el.classList.remove('active');
+                    }
+                });
+
+                const progressPct = ((index) / pairs.length) * 100;
+                progressFill.style.width = `${progressPct}%`;
+                progressCount.textContent = `${index + 1} / ${pairs.length}`;
+
+                exerciseContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function showSummary() {
+                progressFill.style.width = '100%';
+                progressCount.textContent = `${pairs.length} / ${pairs.length}`;
+
+                exerciseContainer.style.display = 'none';
+                document.querySelector('.progress').style.display = 'none';
+
+                summarySection.classList.add('visible');
+                renderSummary();
+
+                summarySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function renderSummary() {
+                let html = '';
+                pairs.forEach(pair => {
+                    const correctSet = new Set(pair.correct);
+                    const bothCorrect = correctSet.size > 1;
+                    const correctLabel = bothCorrect ? 'Both A & B' : `Only ${[...correctSet].join(', ')}`;
+                    const tagClass = bothCorrect ? 'both-tag' : 'correct-tag';
+                    const tagText = bothCorrect ? 'both correct' : 'correct';
+
+                    const optionHtml = pair.options.map(opt => {
+                        return `
+                        <div class="summary-option">
+                            <span class="summary-option__label">${opt.key}</span>
+                            <div class="summary-option__dialogue">${renderDialogueOption(opt)}</div>
+                        </div>
+                    `;
+                    }).join('');
+
+                    html += `
+                    <li class="summary-item">
+                        <div class="summary-item__header">
+                            <span class="summary-item__num">${pair.id}.</span>
+                            <span class="summary-item__answer">
+                                ${correctLabel}
+                                <span class="${tagClass}">${tagText}</span>
+                            </span>
+                        </div>
+                        <div class="summary-item__options">
+                            ${optionHtml}
+                        </div>
+                        <p class="summary-item__explanation">${pair.explanation}</p>
+                    </li>
+                `;
+                });
+                summaryList.innerHTML = html;
+
+                let firstTryCount = 0;
+                for (const pid in firstTryResults) {
+                    if (firstTryResults[pid]) firstTryCount++;
+                }
+                const total = pairs.length;
+                firstTryMessage.textContent = `You answered ${firstTryCount} of ${total} correctly on the first attempt.`;
+            }
+
+            function init() {
+                pairs.forEach(p => {
+                    userSelections[p.id] = new Set();
+                });
+
+                pairs.forEach(pair => {
+                    const el = createPairElement(pair);
+                    exerciseContainer.appendChild(el);
+                });
+
+                showPair(0);
+            }
+
+            restartBtn.addEventListener('click', () => {
+                currentPairIndex = 0;
+                userSelections = {};
+                firstTryResults = {};
+
+                pairs.forEach(p => {
+                    userSelections[p.id] = new Set();
+                });
+
+                exerciseContainer.innerHTML = '';
+                pairs.forEach(pair => {
+                    const el = createPairElement(pair);
+                    exerciseContainer.appendChild(el);
+                });
+
+                exerciseContainer.style.display = '';
+                document.querySelector('.progress').style.display = '';
+                summarySection.classList.remove('visible');
+                summaryList.innerHTML = '';
+                firstTryMessage.textContent = '';
+
+                showPair(0);
+            });
+
+            init();
+        })();
+    </script>
+</body>
+</html>
