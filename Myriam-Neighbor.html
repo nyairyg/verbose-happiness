@@ -136,6 +136,7 @@
             padding: 0.5rem 1.5rem 1rem;
             width: 100%;
             flex: 1;
+            position: relative;
         }
 
         .story {
@@ -284,6 +285,28 @@
             80% {
                 transform: translateX(2px);
             }
+        }
+
+        /* Custom Tooltip */
+        #wordTooltip {
+            position: absolute;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            padding: 0.6rem 0.9rem;
+            font-family: var(--sans);
+            font-size: 0.8rem;
+            color: var(--text);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            max-width: 260px;
+            z-index: 1000;
+            display: none;
+            pointer-events: none;
+            line-height: 1.5;
+            letter-spacing: normal;
+            text-transform: none;
+            font-style: normal;
+            font-weight: 400;
         }
 
         .pagination {
@@ -489,48 +512,50 @@
 
             <!-- PAGE 1 -->
             <div class="page" data-page="1" id="page1">
-                <p>In the heart of Colombia's Quindío department lies the city of Armenia, a place known for its coffee-growing <span class="scrambled" data-answer="heritage" tabindex="0">HTAEGEIR</span> and warm, welcoming people. But recently, one of its residents has gained international attention for a rather unconventional profession. Meet Myriam, a 67-year-old woman who has turned neighbourhood <span class="scrambled" data-answer="gossip" tabindex="0">PISGOS</span> into a full-fledged business — and claims it has made her wealthy enough to buy two houses.</p>
+                <p>In the heart of Colombia's Quindío department lies the city of Armenia, a place known for its coffee-growing <span class="scrambled" data-answer="heritage" data-definition="the traditions, values, culture, and physical or natural items passed down to us from past generations" tabindex="0">HTAEGEIR</span> and warm, welcoming people. But recently, one of its residents has gained international attention for a rather unconventional profession. Meet Myriam, a 67-year-old woman who has turned neighbourhood <span class="scrambled" data-answer="gossip" data-definition="casual or idle talk about other people's private lives, often involving rumours or personal affairs" tabindex="0">PISGOS</span> into a full-fledged business — and claims it has made her wealthy enough to buy two houses.</p>
 
                 <h2>A Business Born from a Natural Talent</h2>
 
                 <p>Myriam's story came to light after an interview with a TikTok content creator named Lady Daniella went viral, amassing millions of views. In the interview, Myriam openly admitted: "I really like gossip, I'm a gossiper, and I turned that into a business and started charging".</p>
 
-                <p>What started as a personal interest in knowing what was happening around her neighbourhood gradually evolved into a structured <span class="scrambled" data-answer="enterprise" tabindex="0">RENPTRIESE</span>. Myriam sits outside her home each morning with a notebook, carefully observing and recording conversations, <span class="scrambled" data-answer="disputes" tabindex="0">SUDPITES</span>, and relationships in her community. She doesn't just rely on memory — she keeps detailed records, including photographs and relationship charts, to <span class="scrambled" data-answer="track" tabindex="0">KTRAC</span> family connections, friendships, and personal dramas. In her own words: "I can be here talking to you, but my little ears are wide open to hear what they say here, what they say there, and what's going on".</p>
+                <p>What started as a personal interest in knowing what was happening around her neighbourhood gradually evolved into a structured <span class="scrambled" data-answer="enterprise" data-definition="a business or company, especially a new or ambitious one" tabindex="0">RENPTRIESE</span>. Myriam sits outside her home each morning with a notebook, carefully observing and recording conversations, <span class="scrambled" data-answer="disputes" data-definition="arguments or disagreements between people" tabindex="0">SUDPITES</span>, and relationships in her community. She doesn't just rely on memory — she keeps detailed records, including photographs and relationship charts, to <span class="scrambled" data-answer="track" data-definition="to follow or monitor the progress or development of something" tabindex="0">KTRAC</span> family connections, friendships, and personal dramas. In her own words: "I can be here talking to you, but my little ears are wide open to hear what they say here, what they say there, and what's going on".</p>
             </div>
 
             <!-- PAGE 2 -->
             <div class="page" data-page="2" id="page2" style="display:none;">
                 <h2>Pricing the Gossip</h2>
 
-                <p>Like any savvy businesswoman, Myriam has developed a pricing structure. According to her, she charges between 5,000 and 10,000 Colombian pesos for what she calls "soft" gossip, with prices increasing depending on how "juicy" or sensitive the information is. The more <span class="scrambled" data-answer="controversial" tabindex="0">ROVCLATRIESON</span> or damaging the story, the higher the fee.</p>
+                <p>Like any savvy businesswoman, Myriam has developed a pricing structure. According to her, she charges between 5,000 and 10,000 Colombian pesos for what she calls "soft" gossip, with prices increasing depending on how "juicy" or sensitive the information is. The more <span class="scrambled" data-answer="controversial" data-definition="causing strong disagreement or argument, often involving public debate" tabindex="0">ROVCLATRIESON</span> or damaging the story, the higher the fee.</p>
 
-                <p>Perhaps more intriguingly, Myriam has also revealed that she sometimes receives payments to keep certain information private. In one reported case, she was paid 700,000 Colombian pesos to remain <span class="scrambled" data-answer="silent" tabindex="0">NELTIS</span> about a sensitive matter. This dual revenue stream — selling gossip to those who want to know, and accepting money from those who don't want certain stories told — has proven remarkably <span class="scrambled" data-answer="profitable" tabindex="0">FIPRLOABTE</span>.</p>
+                <p>Perhaps more intriguingly, Myriam has also revealed that she sometimes receives payments to keep certain information private. In one reported case, she was paid 700,000 Colombian pesos to remain <span class="scrambled" data-answer="silent" data-definition="not speaking or revealing information; keeping quiet" tabindex="0">NELTIS</span> about a sensitive matter. This dual revenue stream — selling gossip to those who want to know, and accepting money from those who don't want certain stories told — has proven remarkably <span class="scrambled" data-answer="profitable" data-definition="yielding financial gain or benefit; making good money" tabindex="0">FIPRLOABTE</span>.</p>
 
                 <h2>A Methodical Approach to Information</h2>
 
-                <p>Myriam's operation is far from <span class="scrambled" data-answer="casual" tabindex="0">SUACAL</span>. She maintains what she calls a "croquis" — a detailed chart or map — in her home, complete with photographs of her neighbours and evidence of the stories she collects. In her interview, she pointed to photos and explained relationships: "This is the holier-than-thou woman of the neighbourhood, and she's having an <span class="scrambled" data-answer="affair" tabindex="0">FRAIFFA</span> with this gentleman who is the husband of that lady".</p>
+                <p>Myriam's operation is far from <span class="scrambled" data-answer="casual" data-definition="not formal or organised; done without much planning or effort" tabindex="0">SUACAL</span>. She maintains what she calls a "croquis" — a detailed chart or map — in her home, complete with photographs of her neighbours and evidence of the stories she collects. In her interview, she pointed to photos and explained relationships: "This is the holier-than-thou woman of the neighbourhood, and she's having an <span class="scrambled" data-answer="affair" data-definition="a secret romantic or sexual relationship, often outside marriage" tabindex="0">FRAIFFA</span> with this gentleman who is the husband of that lady".</p>
 
-                <p>This systematic approach has earned her a reputation as a <span class="scrambled" data-answer="reliable" tabindex="0">LEBALIRE</span> source of information within her community. As she herself puts it: "a gossiper who respects herself in the neighbourhood knows everything".</p>
+                <p>This systematic approach has earned her a reputation as a <span class="scrambled" data-answer="reliable" data-definition="trustworthy and dependable; able to be counted on to provide accurate information" tabindex="0">LEBALIRE</span> source of information within her community. As she herself puts it: "a gossiper who respects herself in the neighbourhood knows everything".</p>
             </div>
 
             <!-- PAGE 3 -->
             <div class="page" data-page="3" id="page3" style="display:none;">
                 <h2>Mixed Reactions and Ethical Questions</h2>
 
-                <p>Myriam's story has sparked a lively <span class="scrambled" data-answer="debate" tabindex="0">BETADE</span> across social media and news outlets. Some have praised her as a creative entrepreneur who found an unconventional way to make money. Comments on TikTok included reactions like "My new business venture, coming soon" and "My neighbour is losing money".</p>
+                <p>Myriam's story has sparked a lively <span class="scrambled" data-answer="debate" data-definition="a formal discussion or argument about a topic, often involving opposing views" tabindex="0">BETADE</span> across social media and news outlets. Some have praised her as a creative entrepreneur who found an unconventional way to make money. Comments on TikTok included reactions like "My new business venture, coming soon" and "My neighbour is losing money".</p>
 
-                <p>However, others have expressed serious ethical <span class="scrambled" data-answer="concerns" tabindex="0">CNORCENS</span>. Critics argue that profiting from other people's private lives crosses a line. Myriam herself admits that her work has caused problems: "I've had problems, and they act all dignified". Nevertheless, she maintains that since she started charging, people have stopped confronting her directly: "since I started charging, nobody has bothered me about it anymore".</p>
+                <p>However, others have expressed serious ethical <span class="scrambled" data-answer="concerns" data-definition="worries, anxieties, or matters of interest that cause people to feel troubled or careful" tabindex="0">CNORCENS</span>. Critics argue that profiting from other people's private lives crosses a line. Myriam herself admits that her work has caused problems: "I've had problems, and they act all dignified". Nevertheless, she maintains that since she started charging, people have stopped confronting her directly: "since I started charging, nobody has bothered me about it anymore".</p>
 
-                <p>Some online commentators have also raised the question of whether <span class="scrambled" data-answer="accepting" tabindex="0">CACEPTNIG</span> money to keep secrets could be considered a form of extortion. While Myriam's financial claims have been widely reported, they have not been independently verified.</p>
+                <p>Some online commentators have also raised the question of whether <span class="scrambled" data-answer="accepting" data-definition="agreeing to receive or take something offered, such as money or an offer" tabindex="0">CACEPTNIG</span> money to keep secrets could be considered a form of extortion. While Myriam's financial claims have been widely reported, they have not been independently verified.</p>
 
                 <h2>A Story That Transcends Borders</h2>
 
-                <p>Regardless of where one stands on the ethical debate, Myriam's story has resonated far beyond her neighbourhood in Armenia, Colombia. It has been picked up by media outlets across Latin America and even internationally. Her story raises interesting questions about <span class="scrambled" data-answer="privacy" tabindex="0">RYVIPAC</span>, <span class="scrambled" data-answer="reputation" tabindex="0">RENOTPUITA</span>, and the <span class="scrambled" data-answer="value" tabindex="0">LUAVE</span> of information in today's world.</p>
+                <p>Regardless of where one stands on the ethical debate, Myriam's story has resonated far beyond her neighbourhood in Armenia, Colombia. It has been picked up by media outlets across Latin America and even internationally. Her story raises interesting questions about <span class="scrambled" data-answer="privacy" data-definition="the state of being free from public attention; keeping one's personal life and information secret from others" tabindex="0">RYVIPAC</span>, <span class="scrambled" data-answer="reputation" data-definition="the general opinion or belief that people have about someone or something, based on what they have done or how they behave" tabindex="0">RENOTPUITA</span>, and the <span class="scrambled" data-answer="value" data-definition="the importance, worth, or usefulness of something, especially in terms of money, importance, or meaning" tabindex="0">LUAVE</span> of information in today's world.</p>
 
                 <p>For now, Myriam continues her unusual trade from her home in Armenia, a self-proclaimed "professional gossiper" who has proven that sometimes, even the most unexpected talents can become profitable businesses.</p>
             </div>
 
         </div>
+
+        <div id="wordTooltip" role="tooltip"></div>
 
         <nav class="pagination" aria-label="Page navigation">
             <button class="pagination-btn prev-btn" id="prevBtn" disabled aria-label="Previous page">← Previous</button>
@@ -558,6 +583,7 @@
             const nextBtn = document.getElementById('nextBtn');
             const pageIndicator = document.getElementById('pageIndicator');
             const pageHint = document.getElementById('pageHint');
+            const tooltipEl = document.getElementById('wordTooltip');
 
             const allScrambledSpans = Array.from(document.querySelectorAll('.scrambled'));
             const totalInstances = allScrambledSpans.length;
@@ -633,10 +659,45 @@
                 });
                 currentPage = pageNum;
                 updatePaginationUI();
+                hideTooltip();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
 
+            // Tooltip functions
+            function showTooltip(span) {
+                if (span.classList.contains('solved')) return;
+                const definition = span.dataset.definition;
+                if (!definition) return;
+                tooltipEl.textContent = definition;
+                tooltipEl.style.display = 'block';
+
+                const rect = span.getBoundingClientRect();
+                const tooltipWidth = tooltipEl.offsetWidth;
+                const tooltipHeight = tooltipEl.offsetHeight;
+                const scrollY = window.scrollY || window.pageYOffset;
+                const scrollX = window.scrollX || window.pageXOffset;
+
+                let top = rect.top + scrollY - tooltipHeight - 8;
+                if (top < scrollY + 10) {
+                    top = rect.bottom + scrollY + 8;
+                }
+
+                let left = rect.left + scrollX + (rect.width / 2) - (tooltipWidth / 2);
+                const maxLeft = scrollX + document.documentElement.clientWidth - tooltipWidth - 10;
+                const minLeft = scrollX + 10;
+                if (left > maxLeft) left = maxLeft;
+                if (left < minLeft) left = minLeft;
+
+                tooltipEl.style.top = top + 'px';
+                tooltipEl.style.left = left + 'px';
+            }
+
+            function hideTooltip() {
+                tooltipEl.style.display = 'none';
+            }
+
             function handleScrambledClick(span) {
+                hideTooltip(); // hide tooltip when converting to input
                 if (span.classList.contains('solved') || !span.isConnected) return;
 
                 const answer = span.dataset.answer;
@@ -692,6 +753,7 @@
                         const revertSpan = document.createElement('span');
                         revertSpan.className = 'scrambled';
                         revertSpan.dataset.answer = answer;
+                        revertSpan.dataset.definition = span.dataset.definition;
                         revertSpan.textContent = scrambled;
                         revertSpan.setAttribute('tabindex', '0');
                         revertSpan.setAttribute('aria-label', 'Scrambled word: ' + scrambled);
@@ -716,6 +778,7 @@
                         const revertSpan = document.createElement('span');
                         revertSpan.className = 'scrambled';
                         revertSpan.dataset.answer = answer;
+                        revertSpan.dataset.definition = span.dataset.definition;
                         revertSpan.textContent = scrambled;
                         revertSpan.setAttribute('tabindex', '0');
                         revertSpan.setAttribute('aria-label', 'Scrambled word: ' + scrambled);
@@ -726,9 +789,27 @@
             }
 
             function attachSpanEvents(span) {
+                // Tooltip events
+                span.addEventListener('mouseenter', function(e) {
+                    if (!span.classList.contains('solved')) {
+                        showTooltip(span);
+                    }
+                });
+                span.addEventListener('mouseleave', function(e) {
+                    if (!span.classList.contains('solved') && document.activeElement !== span) {
+                        hideTooltip();
+                    }
+                });
                 span.addEventListener('focus', function(e) {
-                    if (span.classList.contains('solved')) return;
-                    handleScrambledClick(span);
+                    if (!span.classList.contains('solved')) {
+                        showTooltip(span);
+                        handleScrambledClick(span);
+                    }
+                });
+                span.addEventListener('blur', function(e) {
+                    if (!span.classList.contains('solved') && !span.matches(':hover')) {
+                        hideTooltip();
+                    }
                 });
 
                 span.addEventListener('click', function(e) {
@@ -768,6 +849,10 @@
                     e.stopPropagation();
                 }
             });
+
+            // Hide tooltip on scroll/resize
+            window.addEventListener('scroll', hideTooltip);
+            window.addEventListener('resize', hideTooltip);
 
             init();
         })();
