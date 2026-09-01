@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Tenses — Tasks 1–7</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F6F4EF;
+            --text-primary: #1A1917;
+            --text-secondary: #7A756E;
+            --accent: #C03A2B;
+            --success: #3D7A4E;
+            --border: #DEDBD4;
+            --border-hover: #1A1917;
+            --radius-btn: 2px;
+            --max-width: 660px;
+            --font-body: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            line-height: 1.4;
+        }
+
+        main {
+            width: 100%;
+            max-width: var(--max-width);
+        }
+
+        .start-screen,
+        .instruction-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        .start-divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 0.5rem;
+        }
+
+        .start-label {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .start-instructions {
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .task-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .task-btn,
+        .ready-btn,
+        .back-btn,
+        .retry-btn,
+        .check-btn,
+        .next-btn,
+        .restart-btn {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            text-align: left;
+            align-self: flex-start;
+            min-width: auto;
+        }
+
+        .task-btn {
+            padding: 14px 24px;
+            min-width: 240px;
+        }
+
+        .task-btn:hover,
+        .ready-btn:hover,
+        .back-btn:hover,
+        .retry-btn:hover,
+        .check-btn:hover,
+        .next-btn:hover,
+        .restart-btn:hover {
+            border-color: var(--border-hover);
+        }
+
+        .task-btn:focus-visible,
+        .ready-btn:focus-visible,
+        .back-btn:focus-visible,
+        .retry-btn:focus-visible,
+        .check-btn:focus-visible,
+        .next-btn:focus-visible,
+        .restart-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .instruction-title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .instruction-text {
+            font-size: 18px;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .progress-area {
+            margin-bottom: 4rem;
+            display: none;
+        }
+
+        .progress-label {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 2px;
+            background: var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.35s ease;
+        }
+
+        .question-area {
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .label-container {
+            display: flex;
+            align-items: baseline;
+            gap: 0.65rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .label-line {
+            width: 20px;
+            height: 2px;
+            background: var(--accent);
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .label-text {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .sentence {
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            letter-spacing: -0.01em;
+        }
+
+        .blank {
+            display: inline-block;
+            border-bottom: 1px solid var(--text-primary);
+            min-width: 60px;
+            text-align: center;
+            font-weight: 400;
+            transition: color 0.25s ease, border-color 0.25s ease;
+            padding-bottom: 2px;
+            line-height: 1.4;
+        }
+
+        .blank.filled {
+            color: var(--success);
+            border-bottom-color: var(--success);
+        }
+
+        .blank.filled.wrong-answer {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .options-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            font-family: var(--font-body);
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+            letter-spacing: 0.01em;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            flex: 0 0 auto;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--border-hover);
+        }
+
+        .option-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+            opacity: 0.55;
+        }
+
+        .option-btn.selected {
+            border-color: var(--text-primary);
+            background: rgba(0,0,0,0.03);
+        }
+
+        .option-btn.correct-selected {
+            border-color: var(--success);
+            color: var(--success);
+            opacity: 1;
+        }
+
+        .option-btn.wrong-selected {
+            border-color: var(--accent);
+            color: var(--accent);
+            opacity: 1;
+        }
+
+        .error-message {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 1rem;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            visibility: hidden;
+            transition: visibility 0.2s ease;
+        }
+
+        .error-message.visible {
+            visibility: visible;
+        }
+
+        .error-message .error-line {
+            width: 12px;
+            height: 2px;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .next-btn,
+        .check-btn,
+        .retry-btn,
+        .back-btn {
+            display: none;
+        }
+
+        .next-btn:disabled,
+        .check-btn:disabled,
+        .retry-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .next-btn:not(:disabled):hover,
+        .check-btn:not(:disabled):hover,
+        .retry-btn:not(:disabled):hover {
+            border-color: var(--border-hover);
+        }
+
+        .next-btn:focus-visible,
+        .check-btn:focus-visible,
+        .retry-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .ordering-area {
+            display: none;
+        }
+
+        .slots-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .slot-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-primary);
+            min-height: 40px;
+            border-bottom: 1px solid var(--border);
+            padding: 0.25rem 0;
+        }
+
+        .slot-number {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            min-width: 40px;
+            flex-shrink: 0;
+        }
+
+        .slot-name {
+            font-size: 16px;
+            color: var(--text-primary);
+            flex-grow: 1;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .slot-name.filled {
+            color: var(--text-primary);
+        }
+
+        .slot-name.empty {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .slot-name.filled:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .slot-name.correct-position {
+            color: var(--success);
+        }
+
+        .slot-name.wrong-position {
+            color: var(--accent);
+        }
+
+        .names-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .name-btn {
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, opacity 0.2s ease;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            flex: 0 0 auto;
+        }
+
+        .name-btn:hover {
+            border-color: var(--border-hover);
+        }
+
+        .name-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .name-btn.placed {
+            opacity: 0.35;
+            cursor: default;
+            border-color: var(--border);
+        }
+
+        .same-diff-area {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .same-diff-pair {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .same-diff-pair:last-child {
+            border-bottom: none;
+        }
+
+        .same-diff-verbs {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--text-primary);
+            flex-grow: 1;
+        }
+
+        .same-diff-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .same-diff-btn {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: none; /* changed from uppercase */
+            padding: 6px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            background: transparent;
+            cursor: pointer;
+            transition: border-color 0.2s ease, color 0.2s ease;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .same-diff-btn:hover:not(:disabled) {
+            border-color: var(--border-hover);
+        }
+
+        .same-diff-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .same-diff-btn.selected {
+            border-color: var(--text-primary);
+        }
+
+        .same-diff-btn.correct-selected {
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .same-diff-btn.wrong-selected {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .completion-area {
+            display: none;
+            animation: completion-fade 0.4s ease;
+        }
+
+        .completion-area.visible {
+            display: block;
+        }
+
+        @keyframes completion-fade {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .completion-text {
+            font-size: 32px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        .completion-rule {
+            width: 40px;
+            height: 2px;
+            background: var(--accent);
+            margin-bottom: 2.5rem;
+        }
+
+        .review-list {
+            list-style: none;
+            margin-bottom: 3rem;
+        }
+
+        .review-item {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 0.4rem 0;
+            letter-spacing: -0.005em;
+        }
+
+        .review-correct {
+            color: var(--success);
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .review-wrong {
+            color: var(--accent);
+            white-space: nowrap;
+            font-weight: 500;
+            text-decoration: line-through;
+        }
+
+        .back-btn {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        #retryBtn {
+            margin-bottom: 2rem; /* more gap before next button */
+        }
+
+        .note {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 540px) {
+            body { padding: 2rem 1rem; }
+            .sentence { font-size: 21px; margin-bottom: 1.5rem; }
+            .options-container { flex-direction: column; gap: 0.5rem; }
+            .option-btn { width: 100%; text-align: center; padding: 12px 16px; }
+            .progress-area { margin-bottom: 2.5rem; }
+            .review-item { font-size: 16px; }
+            .completion-text { font-size: 26px; }
+            .start-instructions { font-size: 20px; }
+            .task-btn, .ready-btn { min-width: 180px; padding: 12px 18px; }
+            .slot-row { font-size: 14px; min-height: 36px; }
+            .slot-number { min-width: 35px; font-size: 11px; }
+            .name-btn { font-size: 13px; padding: 8px 12px; }
+            .same-diff-pair { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .same-diff-verbs { font-size: 16px; }
+            .same-diff-options { width: 100%; }
+            .back-btn { margin-top: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <!-- Start Screen -->
+        <section class="start-screen" id="startScreen">
+            <div class="start-divider"></div>
+            <div class="start-label">Select Task</div>
+            <div class="task-buttons" id="taskButtonsContainer">
+                <button class="task-btn" data-task="task1">Task 1</button>
+                <button class="task-btn" data-task="task2">Task 2</button>
+                <button class="task-btn" data-task="task3">Task 3</button>
+                <button class="task-btn" data-task="task4">Task 4</button>
+                <button class="task-btn" data-task="task5">Task 5</button>
+                <button class="task-btn" data-task="task6">Task 6</button>
+                <button class="task-btn" data-task="task7">Task 7</button>
+            </div>
+        </section>
+
+        <!-- Instruction Screen -->
+        <section class="instruction-screen" id="instructionScreen" style="display: none;">
+            <div class="start-divider"></div>
+            <div class="start-label" id="instructionTaskLabel">Task</div>
+            <h2 class="instruction-title" id="instructionTitle"></h2>
+            <p class="instruction-text" id="instructionText"></p>
+            <div class="instruction-ready">Ready?</div>
+            <button class="ready-btn" id="readyBtn">Yes</button>
+            <button class="back-btn" id="backBtnFromInstruction">Back to Tasks</button>
+        </section>
+
+        <!-- Progress Area -->
+        <section class="progress-area" id="progressArea">
+            <div class="progress-label" id="progressLabel">01 / 10</div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <button class="back-btn" id="backBtnFromTask" style="display:inline-block; margin-top:1rem;">Back to Tasks</button>
+        </section>
+
+        <!-- Question Area -->
+        <section class="question-area" id="questionArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text" id="questionLabel">Your Choice</span>
+            </div>
+            <div class="sentence" id="sentenceDisplay">
+                <span id="sentenceBefore"></span><span class="blank" id="blankDisplay">______</span><span id="sentenceAfter"></span>
+            </div>
+            <div class="options-container" id="optionsContainer">
+                <button class="option-btn" id="option0" type="button"></button>
+                <button class="option-btn" id="option1" type="button"></button>
+                <button class="option-btn" id="option2" type="button" style="display:none;"></button>
+                <button class="option-btn" id="option3" type="button" style="display:none;"></button>
+            </div>
+            <div class="error-message" id="errorMessageMC">
+                <span class="error-line"></span><span>Try Again</span>
+            </div>
+        </section>
+
+        <!-- Ordering Area -->
+        <section class="ordering-area" id="orderingArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text">Your Order</span>
+            </div>
+            <div class="slots-container" id="slotsContainer"></div>
+            <div class="names-container" id="namesContainer"></div>
+            <div class="error-message" id="errorMessageOrder">
+                <span class="error-line"></span><span>Try Again</span>
+            </div>
+            <button class="retry-btn" id="retryBtn" style="display: none;">Try Again</button>
+        </section>
+
+        <!-- Same/Different Area -->
+        <section class="same-diff-area" id="sameDiffArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text">Same or Different</span>
+            </div>
+            <p class="sentence" style="font-size: 20px; margin-bottom: 0.5rem;">Do these irregular verbs have the same vowel sound?</p>
+            <p class="note">Only 2 pairs have the same sound.</p>
+            <div id="pairsContainer"></div>
+            <div class="error-message" id="errorMessageCheck">
+                <span class="error-line"></span><span>Try Again</span>
+            </div>
+        </section>
+
+        <!-- Check Button (task 6) -->
+        <button class="check-btn" id="checkBtn" type="button" disabled>Check</button>
+
+        <!-- Next Button -->
+        <button class="next-btn" id="nextBtn" type="button" disabled>Next</button>
+
+        <!-- Completion Area -->
+        <section class="completion-area" id="completionArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text">Complete</span>
+            </div>
+            <div class="completion-text">All tasks cleared.</div>
+            <div class="completion-rule"></div>
+            <ul class="review-list" id="reviewList"></ul>
+            <button class="restart-btn" id="restartBtn">Back to Start</button>
+        </section>
+    </main>
+
+    <script>
+        (function() {
+            // ─── Task Data ───
+            const tasks = {
+                task1: {
+                    title: 'Task 1 — Grammar',
+                    instructions: 'Choose the correct past time expression for each sentence.',
+                    type: 'multiple-choice',
+                    questions: [
+                        { before: "I chatted with my friends ", after: ".", options: ["for an hour", "yesterday night"], correct: 0 },
+                        { before: "My girlfriend finished college ", after: ".", options: ["ago two years", "two years ago"], correct: 1 },
+                        { before: "They traveled abroad ", after: ".", options: ["last month", "the last month"], correct: 0 },
+                        { before: "Did you call me ", after: "?", options: ["last morning", "yesterday morning"], correct: 1 },
+                        { before: "It stopped raining ", after: ".", options: ["two hours ago", "two ago hours"], correct: 0 },
+                        { before: "My brother worked in the city ", after: ".", options: ["last July", "the last July"], correct: 0 },
+                        { before: "We watched that movie ", after: ".", options: ["before two weeks", "two weeks ago"], correct: 1 },
+                        { before: "David booked the tickets ", after: ".", options: ["yesterday afternoon", "last afternoon"], correct: 0 },
+                        { before: "Steve was born ", after: ".", options: ["in 1990", "on 1990"], correct: 0 },
+                        { before: "I played golf ", after: ".", options: ["the day yesterday before", "the day before yesterday"], correct: 1 }
+                    ]
+                },
+                task2: {
+                    title: 'Task 2 — Listening',
+                    instructions: 'Listen to the audio and choose the correct answer.',
+                    type: 'multiple-choice',
+                    questions: [
+                        { before: "Raul thinks reggae is ", after: ".", options: ["loud", "slow", "great"], correct: 1 },
+                        { before: "The people who sing on the woman's favorite CD are ", after: ".", options: ["a classical choir", "a rock band", "actors"], correct: 2 },
+                        { before: "Wendy usually listens to music ", after: ".", options: ["online", "on CDs", "on the radio"], correct: 0 },
+                        { before: "The man really likes ", after: ".", options: ["Rihanna", "Beyonce", "Justin Bieber"], correct: 1 },
+                        { before: "John ", after: " the song.", options: ["likes", "doesn't mind", "hates"], correct: 1 }
+                    ]
+                },
+                task3: {
+                    title: 'Task 3 — Top 5 Americans',
+                    instructions: 'Order the top 5 greatest Americans from 5th to 1st place.',
+                    type: 'ordering',
+                    correctOrder: [
+                        "Ben Franklin",
+                        "George Washington",
+                        "Martin Luther King, Jr.",
+                        "Abraham Lincoln",
+                        "Ronald Reagan"
+                    ]
+                },
+                task4: {
+                    title: 'Task 4 — True or False',
+                    instructions: 'Decide if each statement is true or false.',
+                    type: 'true-false',
+                    questions: [
+                        { statement: "Ben Franklin was a young newspaper owner.", answer: true },
+                        { statement: "George Washington was born on February 12, 1732.", answer: false },
+                        { statement: "He was 76 when he died.", answer: false },
+                        { statement: "Martin Luther King, Jr. was born on January 15th, 1929.", answer: true },
+                        { statement: "He was young when he died.", answer: true },
+                        { statement: "Abraham Lincoln was a painter.", answer: false },
+                        { statement: "He was 56 when he died.", answer: true },
+                        { statement: "The greatest American of all time was a singer.", answer: false }
+                    ]
+                },
+                task5: {
+                    title: 'Task 5 — Multiple Correct',
+                    instructions: 'Select ALL correct options for each verb.',
+                    type: 'multi-select',
+                    questions: [
+                        { before: "GO ", after: "", options: ["to the beach", "out", "to a restaurant", "a bus"], correct: [0,1,2] },
+                        { before: "HAVE ", after: "", options: ["lunch", "a sandwich", "for a walk", "a sister"], correct: [0,1,3] },
+                        { before: "GET ", after: "", options: ["dressed", "a good time", "up", "an email"], correct: [0,2,3] },
+                        { before: "GO ", after: "", options: ["to bed", "a car", "away", "on vacation"], correct: [0,2,3] },
+                        { before: "HAVE ", after: "", options: ["breakfast", "a bike", "short hair", "18 years"], correct: [0,1,2] },
+                        { before: "GET ", after: "", options: ["shopping", "home", "a newspaper", "a taxi"], correct: [1,2,3] }
+                    ]
+                },
+                task6: {
+                    title: 'Task 6 — Same Sound',
+                    instructions: 'Do these irregular verbs have the same vowel sound? Only 2 pairs have the same sound.',
+                    type: 'same-different',
+                    pairs: [
+                        { verb1: 'came', verb2: 'had', same: false },
+                        { verb1: 'did', verb2: 'feel', same: false },
+                        { verb1: 'taught', verb2: 'wore', same: false },
+                        { verb1: 'lost', verb2: 'spoke', same: false },
+                        { verb1: 'met', verb2: 'went', same: true },
+                        { verb1: 'knew', verb2: 'saw', same: false },
+                        { verb1: 'heard', verb2: 'left', same: false },
+                        { verb1: 'took', verb2: 'could', same: true }
+                    ]
+                },
+                task7: {
+                    title: 'Task 7 — It\'s / There\'s',
+                    instructions: 'Choose the correct word or phrase.',
+                    type: 'multiple-choice',
+                    questions: [
+                        { before: "", after: " a nice apartment and...", options: ["It's", "There's"], correct: 1 },
+                        { before: "", after: " very expensive.", options: ["it isn't", "there isn't"], correct: 0 },
+                        { before: "", after: " two rooms, but ...", options: ["There are", "They are"], correct: 0 },
+                        { before: "", after: " very big.", options: ["there aren't", "they aren't"], correct: 1 },
+                        { before: "", after: " a small kitchen and a bathroom.", options: ["There's", "It is"], correct: 0 },
+                        { before: "", after: " a bathtub in the bathroom, but ...", options: ["There isn't", "It isn't"], correct: 0 },
+                        { before: "", after: " a new shower.", options: ["it's", "there's"], correct: 1 },
+                        { before: "The apartment is on the 10th floor, so ", after: " a great view of the city.", options: ["there's", "it is"], correct: 0 },
+                        { before: "And ", after: " a very large balcony with a lot of flowers.", options: ["there's", "it's"], correct: 0 },
+                        { before: "", after: " beautiful in the summer!", options: ["They are", "There are"], correct: 0 }
+                    ]
+                }
+            };
+
+            let currentTask = null;
+            let currentIndex = 0;
+            let totalQuestions = 0;
+            let answeredCorrectly = false;
+            let isTransitioning = false;
+            let orderSlots = [];
+            let orderNamesPool = [];
+            let orderCorrectOrder = [];
+            let orderChecked = false;
+            let sameDiffSelections = [];
+            let multiSelectSelected = [];
+
+            // DOM Elements
+            const startScreen = document.getElementById('startScreen');
+            const instructionScreen = document.getElementById('instructionScreen');
+            const instructionTaskLabel = document.getElementById('instructionTaskLabel');
+            const instructionTitle = document.getElementById('instructionTitle');
+            const instructionText = document.getElementById('instructionText');
+            const readyBtn = document.getElementById('readyBtn');
+            const backBtnFromInstruction = document.getElementById('backBtnFromInstruction');
+            const backBtnFromTask = document.getElementById('backBtnFromTask');
+            const taskButtonsContainer = document.getElementById('taskButtonsContainer');
+            const progressArea = document.getElementById('progressArea');
+            const progressLabel = document.getElementById('progressLabel');
+            const progressFill = document.getElementById('progressFill');
+            const questionArea = document.getElementById('questionArea');
+            const questionLabel = document.getElementById('questionLabel');
+            const sentenceBefore = document.getElementById('sentenceBefore');
+            const sentenceAfter = document.getElementById('sentenceAfter');
+            const blankDisplay = document.getElementById('blankDisplay');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const option0 = document.getElementById('option0');
+            const option1 = document.getElementById('option1');
+            const option2 = document.getElementById('option2');
+            const option3 = document.getElementById('option3');
+            const errorMessageMC = document.getElementById('errorMessageMC');
+            const orderingArea = document.getElementById('orderingArea');
+            const slotsContainer = document.getElementById('slotsContainer');
+            const namesContainer = document.getElementById('namesContainer');
+            const errorMessageOrder = document.getElementById('errorMessageOrder');
+            const retryBtn = document.getElementById('retryBtn');
+            const sameDiffArea = document.getElementById('sameDiffArea');
+            const pairsContainer = document.getElementById('pairsContainer');
+            const checkBtn = document.getElementById('checkBtn');
+            const errorMessageCheck = document.getElementById('errorMessageCheck');
+            const nextBtn = document.getElementById('nextBtn');
+            const completionArea = document.getElementById('completionArea');
+            const reviewList = document.getElementById('reviewList');
+            const restartBtn = document.getElementById('restartBtn');
+
+            const optionButtons = [option0, option1, option2, option3];
+
+            function padNumber(num) { return String(num).padStart(2, '0'); }
+
+            function updateProgress() {
+                progressLabel.textContent = padNumber(currentIndex + 1) + ' / ' + padNumber(totalQuestions);
+                const pct = (currentIndex / totalQuestions) * 100;
+                progressFill.style.width = pct + '%';
+            }
+
+            function resetBlank() { blankDisplay.textContent = '______'; blankDisplay.classList.remove('filled', 'wrong-answer'); }
+            function fillBlank(text, isWrong = false) { blankDisplay.textContent = text; blankDisplay.classList.add('filled'); if (isWrong) blankDisplay.classList.add('wrong-answer'); }
+
+            function resetOptions() {
+                optionButtons.forEach(btn => { btn.disabled = false; btn.classList.remove('correct-selected', 'wrong-selected', 'selected'); });
+            }
+
+            function hideErrorMC() { errorMessageMC.classList.remove('visible'); }
+            function showErrorMC() { errorMessageMC.classList.add('visible'); }
+            function hideErrorOrder() { errorMessageOrder.classList.remove('visible'); }
+            function showErrorOrder() { errorMessageOrder.classList.add('visible'); }
+            function hideErrorCheck() { errorMessageCheck.classList.remove('visible'); }
+            function showErrorCheck() { errorMessageCheck.classList.add('visible'); }
+
+            function disableOptions() { optionButtons.forEach(btn => { if (btn.style.display !== 'none') btn.disabled = true; }); }
+            function enableNext() { nextBtn.disabled = false; }
+            function disableNext() { nextBtn.disabled = true; }
+            function enableCheck() { checkBtn.disabled = false; }
+            function disableCheck() { checkBtn.disabled = true; }
+
+            function showStartScreen() {
+                startScreen.style.display = 'flex';
+                instructionScreen.style.display = 'none';
+                progressArea.style.display = 'none';
+                questionArea.style.display = 'none';
+                orderingArea.style.display = 'none';
+                sameDiffArea.style.display = 'none';
+                nextBtn.style.display = 'none';
+                checkBtn.style.display = 'none';
+                retryBtn.style.display = 'none';
+                backBtnFromInstruction.style.display = 'none';
+                backBtnFromTask.style.display = 'none';
+                completionArea.style.display = 'none';
+                completionArea.classList.remove('visible');
+            }
+
+            function showInstructionScreen(taskId) {
+                const task = tasks[taskId];
+                startScreen.style.display = 'none';
+                instructionScreen.style.display = 'flex';
+                instructionTaskLabel.textContent = task.title;
+                instructionTitle.textContent = task.title;
+                instructionText.textContent = task.instructions || '';
+                readyBtn.dataset.taskId = taskId;
+                backBtnFromInstruction.style.display = 'inline-block';
+                backBtnFromTask.style.display = 'none';
+            }
+
+            function showTaskArea() {
+                instructionScreen.style.display = 'none';
+                progressArea.style.display = 'block';
+                nextBtn.style.display = 'inline-block';
+                checkBtn.style.display = 'none';
+                retryBtn.style.display = 'none';
+                backBtnFromInstruction.style.display = 'none';
+                backBtnFromTask.style.display = 'inline-block';
+                completionArea.style.display = 'none';
+            }
+
+            function showQuestionArea() {
+                questionArea.style.display = 'block';
+                orderingArea.style.display = 'none';
+                sameDiffArea.style.display = 'none';
+                questionLabel.textContent = currentTask.type === 'multi-select' ? 'Select all correct' : (currentTask.type === 'true-false' ? 'True or False' : 'Your Choice');
+            }
+
+            function showOrderingArea() {
+                questionArea.style.display = 'none';
+                orderingArea.style.display = 'block';
+                sameDiffArea.style.display = 'none';
+                retryBtn.style.display = 'none';
+            }
+
+            function showSameDiffArea() {
+                questionArea.style.display = 'none';
+                orderingArea.style.display = 'none';
+                sameDiffArea.style.display = 'block';
+                checkBtn.style.display = 'inline-block';
+                disableCheck();
+            }
+
+            function showCompletion() {
+                progressArea.style.display = 'none';
+                questionArea.style.display = 'none';
+                orderingArea.style.display = 'none';
+                sameDiffArea.style.display = 'none';
+                checkBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+                retryBtn.style.display = 'none';
+                backBtnFromTask.style.display = 'none';
+                completionArea.style.display = 'block';
+                completionArea.classList.add('visible');
+            }
+
+            function setOptionVisibility(numOptions) {
+                option0.style.display = 'inline-block';
+                option1.style.display = 'inline-block';
+                option2.style.display = numOptions >= 3 ? 'inline-block' : 'none';
+                option3.style.display = numOptions >= 4 ? 'inline-block' : 'none';
+            }
+
+            function shuffleArray(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+            // ─── Render MC / True-False / Multi-Select Question ───
+            function renderMCQuestion(index) {
+                const q = currentTask.questions[index];
+                if (currentTask.type === 'true-false') {
+                    sentenceBefore.textContent = q.statement;
+                    sentenceAfter.textContent = '';
+                    blankDisplay.style.display = 'none';
+                    option0.textContent = 'True';
+                    option1.textContent = 'False';
+                    setOptionVisibility(2);
+                    option2.style.display = 'none';
+                    option3.style.display = 'none';
+                } else {
+                    sentenceBefore.textContent = q.before;
+                    sentenceAfter.textContent = q.after;
+                    blankDisplay.style.display = 'inline-block';
+                    const numOptions = q.options.length;
+                    setOptionVisibility(numOptions);
+                    for (let i = 0; i < optionButtons.length; i++) {
+                        if (i < numOptions) optionButtons[i].textContent = q.options[i];
+                    }
+                }
+                if (currentTask.type === 'multi-select') {
+                    multiSelectSelected = new Array(q.options.length).fill(false);
+                    updateMultiSelectButtons();
+                }
+                resetBlank();
+                resetOptions();
+                hideErrorMC();
+                disableNext();
+                answeredCorrectly = false;
+                updateProgress();
+            }
+
+            function updateMultiSelectButtons() {
+                const q = currentTask.questions[currentIndex];
+                for (let i = 0; i < optionButtons.length; i++) {
+                    if (i >= q.options.length) break;
+                    if (multiSelectSelected[i]) {
+                        optionButtons[i].classList.add('selected');
+                    } else {
+                        optionButtons[i].classList.remove('selected');
+                    }
+                }
+            }
+
+            function handleMultiSelectClick(optionIndex) {
+                if (answeredCorrectly || isTransitioning) return;
+                const q = currentTask.questions[currentIndex];
+                multiSelectSelected[optionIndex] = !multiSelectSelected[optionIndex];
+                updateMultiSelectButtons();
+                const correctSet = new Set(q.correct);
+                const selectedSet = new Set(multiSelectSelected.map((val, idx) => val ? idx : -1).filter(idx => idx !== -1));
+                if (selectedSet.size === correctSet.size && [...selectedSet].every(idx => correctSet.has(idx))) {
+                    answeredCorrectly = true;
+                    hideErrorMC();
+                    const selectedOptions = q.correct.map(i => q.options[i]);
+                    fillBlank(selectedOptions.join(', '));
+                    disableOptions();
+                    optionButtons.forEach((btn, i) => { if (i < q.options.length && q.correct.includes(i)) btn.classList.add('correct-selected'); });
+                    enableNext();
+                }
+            }
+
+            function handleOptionClick(optionIndex) {
+                if (answeredCorrectly || isTransitioning) return;
+                if (currentTask.type === 'multi-select') {
+                    handleMultiSelectClick(optionIndex);
+                    return;
+                }
+                let correctIndex;
+                if (currentTask.type === 'true-false') correctIndex = currentTask.questions[currentIndex].answer ? 0 : 1;
+                else correctIndex = currentTask.questions[currentIndex].correct;
+                if (optionIndex === correctIndex) {
+                    answeredCorrectly = true;
+                    hideErrorMC();
+                    if (currentTask.type === 'true-false') {
+                        blankDisplay.textContent = currentTask.questions[currentIndex].answer ? 'True' : 'False';
+                        blankDisplay.classList.add('filled');
+                        blankDisplay.style.display = 'inline-block';
+                    } else {
+                        fillBlank(currentTask.questions[currentIndex].options[correctIndex], currentTask.isWrongChoice);
+                    }
+                    disableOptions();
+                    optionButtons[optionIndex].classList.add('correct-selected');
+                    enableNext();
+                } else {
+                    const btn = optionButtons[optionIndex];
+                    btn.classList.remove('wrong-selected');
+                    void btn.offsetWidth;
+                    btn.classList.add('wrong-selected');
+                    showErrorMC();
+                }
+            }
+
+            // ─── Render Ordering ───
+            function renderOrdering() {
+                orderSlots = [null, null, null, null, null];
+                orderNamesPool = shuffleArray(orderCorrectOrder);
+                orderChecked = false;
+                renderSlots();
+                renderNames();
+                hideErrorOrder();
+                retryBtn.style.display = 'none';
+                disableNext();
+                answeredCorrectly = false;
+                updateProgress();
+            }
+
+            function renderSlots() {
+                slotsContainer.innerHTML = '';
+                const ordinals = ['5th', '4th', '3rd', '2nd', '1st'];
+                ordinals.forEach((ord, i) => {
+                    const row = document.createElement('div');
+                    row.className = 'slot-row';
+                    const numSpan = document.createElement('span');
+                    numSpan.className = 'slot-number';
+                    numSpan.textContent = ord;
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'slot-name' + (orderSlots[i] ? ' filled' : ' empty');
+                    nameSpan.textContent = orderSlots[i] || '—';
+                    nameSpan.addEventListener('click', () => removeFromSlot(i));
+                    row.appendChild(numSpan);
+                    row.appendChild(nameSpan);
+                    slotsContainer.appendChild(row);
+                });
+            }
+
+            function renderNames() {
+                namesContainer.innerHTML = '';
+                orderNamesPool.forEach((name, i) => {
+                    if (name === null) return;
+                    const btn = document.createElement('button');
+                    btn.className = 'name-btn';
+                    btn.textContent = name;
+                    btn.addEventListener('click', () => placeName(i));
+                    namesContainer.appendChild(btn);
+                });
+            }
+
+            function placeName(poolIndex) {
+                if (orderChecked || isTransitioning) return;
+                const name = orderNamesPool[poolIndex];
+                if (!name) return;
+                const emptySlot = orderSlots.indexOf(null);
+                if (emptySlot === -1) return;
+                orderSlots[emptySlot] = name;
+                orderNamesPool[poolIndex] = null;
+                hideErrorOrder();
+                renderSlots();
+                renderNames();
+                if (orderSlots.every(s => s !== null)) checkOrder();
+            }
+
+            function removeFromSlot(slotIndex) {
+                if (orderChecked || isTransitioning) return;
+                const name = orderSlots[slotIndex];
+                if (!name) return;
+                orderSlots[slotIndex] = null;
+                const nullIndex = orderNamesPool.indexOf(null);
+                if (nullIndex !== -1) orderNamesPool[nullIndex] = name;
+                else orderNamesPool.push(name);
+                hideErrorOrder();
+                renderSlots();
+                renderNames();
+                disableNext();
+                answeredCorrectly = false;
+                retryBtn.style.display = 'none';
+            }
+
+            function checkOrder() {
+                const isCorrect = orderSlots.every((name, i) => name === orderCorrectOrder[i]);
+                orderChecked = true;
+                if (isCorrect) {
+                    answeredCorrectly = true;
+                    hideErrorOrder();
+                    slotsContainer.querySelectorAll('.slot-name').forEach(el => el.classList.add('correct-position'));
+                    retryBtn.style.display = 'none';
+                    enableNext();
+                } else {
+                    slotsContainer.querySelectorAll('.slot-name').forEach((el, i) => {
+                        if (orderSlots[i] === orderCorrectOrder[i]) el.classList.add('correct-position');
+                        else el.classList.add('wrong-position');
+                    });
+                    showErrorOrder();
+                    retryBtn.style.display = 'inline-block';
+                }
+            }
+
+            function resetOrdering() {
+                renderOrdering();
+            }
+
+            // ─── Same/Different ───
+            function renderSameDiff() {
+                pairsContainer.innerHTML = '';
+                sameDiffSelections = new Array(currentTask.pairs.length).fill(null);
+                currentTask.pairs.forEach((pair, index) => {
+                    const row = document.createElement('div');
+                    row.className = 'same-diff-pair';
+                    const verbsSpan = document.createElement('span');
+                    verbsSpan.className = 'same-diff-verbs';
+                    verbsSpan.textContent = `${pair.verb1} — ${pair.verb2}`;
+                    row.appendChild(verbsSpan);
+                    const optionsDiv = document.createElement('div');
+                    optionsDiv.className = 'same-diff-options';
+                    const sameBtn = document.createElement('button');
+                    sameBtn.className = 'same-diff-btn same-btn';
+                    sameBtn.textContent = 'Same';
+                    sameBtn.addEventListener('click', () => handleSameDiffSelection(index, true));
+                    optionsDiv.appendChild(sameBtn);
+                    const diffBtn = document.createElement('button');
+                    diffBtn.className = 'same-diff-btn diff-btn';
+                    diffBtn.textContent = 'Different';
+                    diffBtn.addEventListener('click', () => handleSameDiffSelection(index, false));
+                    optionsDiv.appendChild(diffBtn);
+                    row.appendChild(optionsDiv);
+                    pairsContainer.appendChild(row);
+                });
+                hideErrorCheck();
+                disableCheck();
+            }
+
+            function handleSameDiffSelection(pairIndex, sameValue) {
+                if (answeredCorrectly || isTransitioning) return;
+                sameDiffSelections[pairIndex] = sameValue;
+                const row = pairsContainer.querySelectorAll('.same-diff-pair')[pairIndex];
+                const sameBtn = row.querySelector('.same-btn');
+                const diffBtn = row.querySelector('.diff-btn');
+                sameBtn.classList.remove('selected', 'correct-selected', 'wrong-selected');
+                diffBtn.classList.remove('selected', 'correct-selected', 'wrong-selected');
+                if (sameValue) sameBtn.classList.add('selected');
+                else diffBtn.classList.add('selected');
+                const allAnswered = sameDiffSelections.every(sel => sel !== null);
+                if (allAnswered) enableCheck(); else disableCheck();
+                hideErrorCheck();
+                answeredCorrectly = false;
+                disableNext();
+                pairsContainer.querySelectorAll('.same-diff-btn').forEach(btn => btn.classList.remove('correct-selected', 'wrong-selected'));
+            }
+
+            function checkSameDiff() {
+                if (answeredCorrectly || isTransitioning) return;
+                const results = currentTask.pairs.map((pair, index) => sameDiffSelections[index] === pair.same);
+                const allCorrect = results.every(r => r);
+                currentTask.pairs.forEach((pair, index) => {
+                    const row = pairsContainer.querySelectorAll('.same-diff-pair')[index];
+                    const sameBtn = row.querySelector('.same-btn');
+                    const diffBtn = row.querySelector('.diff-btn');
+                    sameBtn.classList.remove('selected', 'correct-selected', 'wrong-selected');
+                    diffBtn.classList.remove('selected', 'correct-selected', 'wrong-selected');
+                    if (pair.same) {
+                        if (sameDiffSelections[index] === true) sameBtn.classList.add('correct-selected');
+                        else sameBtn.classList.add('wrong-selected');
+                    } else {
+                        if (sameDiffSelections[index] === false) diffBtn.classList.add('correct-selected');
+                        else diffBtn.classList.add('wrong-selected');
+                    }
+                });
+                if (allCorrect) {
+                    answeredCorrectly = true;
+                    hideErrorCheck();
+                    enableNext();
+                    disableCheck();
+                } else {
+                    showErrorCheck();
+                }
+            }
+
+            // ─── Next Handler ───
+            function handleNext() {
+                if (!answeredCorrectly || isTransitioning) return;
+                if (currentTask.type === 'ordering' || currentTask.type === 'same-different') {
+                    isTransitioning = true;
+                    const area = currentTask.type === 'ordering' ? orderingArea : sameDiffArea;
+                    area.classList.add('fade-out');
+                    setTimeout(() => {
+                        buildReview();
+                        showCompletion();
+                        area.classList.remove('fade-out');
+                        isTransitioning = false;
+                    }, 200);
+                    return;
+                }
+                if (currentIndex + 1 >= totalQuestions) {
+                    isTransitioning = true;
+                    questionArea.classList.add('fade-out');
+                    setTimeout(() => {
+                        buildReview();
+                        showCompletion();
+                        questionArea.classList.remove('fade-out');
+                        isTransitioning = false;
+                    }, 200);
+                } else {
+                    isTransitioning = true;
+                    questionArea.classList.add('fade-out');
+                    setTimeout(() => {
+                        currentIndex++;
+                        renderMCQuestion(currentIndex);
+                        questionArea.classList.remove('fade-out');
+                        questionArea.classList.add('fade-in');
+                        setTimeout(() => { questionArea.classList.remove('fade-in'); isTransitioning = false; }, 250);
+                    }, 200);
+                }
+            }
+
+            function buildReview() {
+                reviewList.innerHTML = '';
+                if (currentTask.type === 'ordering') {
+                    const li = document.createElement('li');
+                    li.className = 'review-item';
+                    li.innerHTML = '<strong>Correct order (5th to 1st):</strong>';
+                    reviewList.appendChild(li);
+                    orderCorrectOrder.forEach((name, i) => {
+                        const item = document.createElement('li');
+                        item.className = 'review-item';
+                        const num = document.createElement('span');
+                        num.textContent = (i+1) + '. ';
+                        const correctSpan = document.createElement('span');
+                        correctSpan.className = 'review-correct';
+                        correctSpan.textContent = name;
+                        item.appendChild(num);
+                        item.appendChild(correctSpan);
+                        reviewList.appendChild(item);
+                    });
+                } else if (currentTask.type === 'true-false') {
+                    currentTask.questions.forEach(q => {
+                        const li = document.createElement('li');
+                        li.className = 'review-item';
+                        li.appendChild(document.createTextNode(q.statement + ' '));
+                        const span = document.createElement('span');
+                        span.className = 'review-correct';
+                        span.textContent = q.answer ? 'True' : 'False';
+                        li.appendChild(span);
+                        reviewList.appendChild(li);
+                    });
+                } else if (currentTask.type === 'same-different') {
+                    currentTask.pairs.forEach(pair => {
+                        const li = document.createElement('li');
+                        li.className = 'review-item';
+                        li.appendChild(document.createTextNode(`${pair.verb1} — ${pair.verb2} `));
+                        const span = document.createElement('span');
+                        span.className = 'review-correct';
+                        span.textContent = pair.same ? 'Same' : 'Different';
+                        li.appendChild(span);
+                        reviewList.appendChild(li);
+                    });
+                } else if (currentTask.type === 'multi-select') {
+                    currentTask.questions.forEach(q => {
+                        const li = document.createElement('li');
+                        li.className = 'review-item';
+                        li.appendChild(document.createTextNode(q.before));
+                        const span = document.createElement('span');
+                        span.className = 'review-correct';
+                        span.textContent = q.correct.map(i => q.options[i]).join(', ');
+                        li.appendChild(span);
+                        li.appendChild(document.createTextNode(q.after));
+                        reviewList.appendChild(li);
+                    });
+                } else {
+                    currentTask.questions.forEach(q => {
+                        const li = document.createElement('li');
+                        li.className = 'review-item';
+                        li.appendChild(document.createTextNode(q.before));
+                        const span = document.createElement('span');
+                        span.className = 'review-correct';
+                        span.textContent = q.options[q.correct];
+                        li.appendChild(span);
+                        li.appendChild(document.createTextNode(q.after));
+                        reviewList.appendChild(li);
+                    });
+                }
+            }
+
+            function startTask(taskId) {
+                currentTask = tasks[taskId];
+                totalQuestions = currentTask.type === 'ordering' || currentTask.type === 'same-different' ? 1 : currentTask.questions.length;
+                currentIndex = 0;
+                answeredCorrectly = false;
+                isTransitioning = false;
+                orderCorrectOrder = currentTask.type === 'ordering' ? [...currentTask.correctOrder] : [];
+                showTaskArea();
+                if (currentTask.type === 'ordering') {
+                    showOrderingArea();
+                    renderOrdering();
+                } else if (currentTask.type === 'same-different') {
+                    showSameDiffArea();
+                    renderSameDiff();
+                } else {
+                    showQuestionArea();
+                    renderMCQuestion(0);
+                }
+            }
+
+            function handleRestart() {
+                showStartScreen();
+            }
+
+            // ─── Event Listeners ───
+            taskButtonsContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.task-btn');
+                if (btn) {
+                    const taskId = btn.dataset.task;
+                    showInstructionScreen(taskId);
+                }
+            });
+
+            readyBtn.addEventListener('click', () => {
+                const taskId = readyBtn.dataset.taskId;
+                startTask(taskId);
+            });
+
+            backBtnFromInstruction.addEventListener('click', showStartScreen);
+            backBtnFromTask.addEventListener('click', showStartScreen);
+
+            option0.addEventListener('click', () => handleOptionClick(0));
+            option1.addEventListener('click', () => handleOptionClick(1));
+            option2.addEventListener('click', () => handleOptionClick(2));
+            option3.addEventListener('click', () => handleOptionClick(3));
+            checkBtn.addEventListener('click', checkSameDiff);
+            retryBtn.addEventListener('click', resetOrdering);
+            nextBtn.addEventListener('click', handleNext);
+            restartBtn.addEventListener('click', handleRestart);
+
+            document.addEventListener('keydown', (e) => {
+                const startVisible = startScreen.style.display !== 'none';
+                const instructionVisible = instructionScreen.style.display !== 'none';
+                const questionVisible = questionArea.style.display !== 'none';
+                const orderingVisible = orderingArea.style.display !== 'none';
+                const sameDiffVisible = sameDiffArea.style.display !== 'none';
+                const completionVisible = completionArea.style.display !== 'none';
+
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const active = document.activeElement;
+                    if (instructionVisible && active === readyBtn) { e.preventDefault(); startTask(readyBtn.dataset.taskId); }
+                    if (questionVisible && active === nextBtn && !nextBtn.disabled) { e.preventDefault(); handleNext(); }
+                    if (orderingVisible && active === retryBtn) { e.preventDefault(); resetOrdering(); }
+                    if (sameDiffVisible && active === checkBtn && !checkBtn.disabled) { e.preventDefault(); checkSameDiff(); }
+                    if (completionVisible && active === restartBtn) { e.preventDefault(); handleRestart(); }
+                }
+                if (questionVisible && !answeredCorrectly && !isTransitioning) {
+                    const numOptions = currentTask.type === 'true-false' ? 2 : currentTask.questions[currentIndex].options.length;
+                    if (e.key === '1') { e.preventDefault(); handleOptionClick(0); }
+                    else if (e.key === '2') { e.preventDefault(); handleOptionClick(1); }
+                    else if (e.key === '3' && numOptions >= 3) { e.preventDefault(); handleOptionClick(2); }
+                    else if (e.key === '4' && numOptions >= 4) { e.preventDefault(); handleOptionClick(3); }
+                }
+            });
+
+            // Init
+            showStartScreen();
+        })();
+    </script>
+</body>
+</html>
