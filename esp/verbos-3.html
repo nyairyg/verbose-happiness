@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verbos — práctica</title>
+    <style>
+        :root {
+            --bg: #f4f3f0;
+            --surface: #ffffff;
+            --ink: #1a1a1a;
+            --muted: #77736c;
+            --line: #dcd9d2;
+            --error: #a33a2b;
+            --ok: #2d6a4f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 560px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            padding: 28px 28px 24px;
+        }
+
+        .verb-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 14px;
+            margin-bottom: 22px;
+        }
+
+        .inf {
+            font-size: 22px;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .tr {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .example {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+        }
+
+        .example .label {
+            display: inline-block;
+            width: 60px;
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+        }
+
+        .example .text {
+            font-style: italic;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .form-row .label {
+            width: 60px;
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+        }
+
+        .form-row input {
+            flex: 1;
+            min-width: 180px;
+            border: none;
+            border-bottom: 1px solid var(--line);
+            background: transparent;
+            font-size: 15px;
+            padding: 2px 0 3px;
+            outline: none;
+            font-family: inherit;
+            font-style: italic;
+            transition: border-color 0.15s;
+            border-radius: 0;
+        }
+
+        .form-row input:focus {
+            border-bottom-color: var(--ink);
+        }
+
+        .form-row.ok input {
+            border-bottom-color: var(--ok);
+        }
+
+        .form-row.bad input {
+            border-bottom-color: var(--error);
+        }
+
+        .stem-note {
+            font-size: 12px;
+            color: var(--muted);
+            margin: 2px 0 10px 68px;
+            border-left: 2px solid var(--line);
+            padding-left: 10px;
+        }
+
+        .msg {
+            font-size: 13px;
+            min-height: 18px;
+            margin-bottom: 18px;
+            color: var(--muted);
+        }
+
+        .msg.error {
+            color: var(--error);
+        }
+
+        .msg.success {
+            color: var(--ok);
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        button {
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            padding: 9px 20px;
+            font-size: 13px;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+
+        button:disabled {
+            background: #c9c5bd;
+            cursor: not-allowed;
+        }
+
+        button:not(:disabled):hover {
+            background: #000;
+        }
+
+        .counter {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 18px;
+            text-align: right;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .done {
+            font-size: 15px;
+            color: var(--muted);
+            text-align: center;
+            padding: 30px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap" id="app">
+        <div class="counter" id="counter"></div>
+        <div id="practice">
+            <div class="verb-head">
+                <span class="inf" id="inf"></span>
+                <span class="tr" id="tr"></span>
+            </div>
+            <div class="example">
+                <span class="label" id="exampleLabel"></span>
+                <span class="text" id="exampleForm"></span>
+            </div>
+            <div class="form-row" id="row1">
+                <span class="label" id="label1"></span>
+                <input type="text" id="input1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            </div>
+            <div class="form-row" id="row2">
+                <span class="label" id="label2"></span>
+                <input type="text" id="input2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            </div>
+            <div class="stem-note hidden" id="stemNote">В формах nosotros / nosotras гласная в корне не меняется.</div>
+            <div class="msg" id="msg"></div>
+            <div class="actions">
+                <button id="checkBtn">comprobar</button>
+                <button id="nextBtn" class="hidden">siguiente →</button>
+            </div>
+        </div>
+        <div id="done" class="done hidden">fin de la práctica</div>
+    </div>
+
+    <script>
+        const verbs = [
+            { inf: "imaginar", tr: "воображать", examplePron: "yo", exampleForm: "imagino", pron1: "él", form1: "imagina", pron2: "ellas", form2: "imaginan", stemNote: false },
+            { inf: "llover", tr: "идти (о дожде)", examplePron: "él", exampleForm: "llueve", pron1: "ellos", form1: "llueven", pron2: "ustedes", form2: "llueven", stemNote: false },
+            { inf: "poder", tr: "мочь", examplePron: "yo", exampleForm: "puedo", pron1: "tú", form1: "puedes", pron2: "nosotros", form2: "podemos", stemNote: true },
+            { inf: "ver", tr: "видеть", examplePron: "yo", exampleForm: "veo", pron1: "él", form1: "ve", pron2: "ellos", form2: "ven", stemNote: false },
+            { inf: "ser", tr: "быть", examplePron: "yo", exampleForm: "soy", pron1: "tú", form1: "eres", pron2: "él", form2: "es", stemNote: false },
+            { inf: "estar", tr: "быть, находиться", examplePron: "yo", exampleForm: "estoy", pron1: "él", form1: "está", pron2: "nosotros", form2: "estamos", stemNote: false },
+            { inf: "llamarse", tr: "зваться", examplePron: "yo", exampleForm: "me llamo", pron1: "él", form1: "se llama", pron2: "ellos", form2: "se llaman", stemNote: false },
+            { inf: "manejar", tr: "водить (машину)", examplePron: "yo", exampleForm: "manejo", pron1: "tú", form1: "manejas", pron2: "él", form2: "maneja", stemNote: false },
+            { inf: "invitar", tr: "приглашать", examplePron: "yo", exampleForm: "invito", pron1: "nosotros", form1: "invitamos", pron2: "ellos", form2: "invitan", stemNote: false },
+            { inf: "subir", tr: "подниматься", examplePron: "yo", exampleForm: "subo", pron1: "él", form1: "sube", pron2: "nosotros", form2: "subimos", stemNote: false },
+            { inf: "vivir", tr: "жить", examplePron: "yo", exampleForm: "vivo", pron1: "tú", form1: "vives", pron2: "él", form2: "vive", stemNote: false },
+            { inf: "tener", tr: "иметь", examplePron: "yo", exampleForm: "tengo", pron1: "él", form1: "tiene", pron2: "nosotros", form2: "tenemos", stemNote: true },
+            { inf: "sonreír", tr: "улыбаться", examplePron: "yo", exampleForm: "sonrío", pron1: "tú", form1: "sonríes", pron2: "nosotros", form2: "sonreímos", stemNote: true },
+            { inf: "sentir", tr: "чувствовать", examplePron: "yo", exampleForm: "siento", pron1: "ellos", form1: "sienten", pron2: "nosotros", form2: "sentimos", stemNote: true },
+            { inf: "mostrar", tr: "показывать", examplePron: "yo", exampleForm: "muestro", pron1: "nosotros", form1: "mostramos", pron2: "ellos", form2: "muestran", stemNote: true },
+            { inf: "caer", tr: "падать", examplePron: "yo", exampleForm: "caigo", pron1: "él", form1: "cae", pron2: "ellos", form2: "caen", stemNote: false },
+            { inf: "abrirse", tr: "открываться", examplePron: "yo", exampleForm: "me abro", pron1: "él", form1: "se abre", pron2: "ellos", form2: "se abren", stemNote: false },
+            { inf: "descubrir", tr: "открывать, обнаруживать", examplePron: "yo", exampleForm: "descubro", pron1: "tú", form1: "descubres", pron2: "nosotros", form2: "descubrimos", stemNote: false },
+            { inf: "viajar", tr: "путешествовать", examplePron: "yo", exampleForm: "viajo", pron1: "él", form1: "viaja", pron2: "nosotros", form2: "viajamos", stemNote: false },
+            { inf: "contar", tr: "рассказывать", examplePron: "yo", exampleForm: "cuento", pron1: "tú", form1: "cuentas", pron2: "nosotros", form2: "contamos", stemNote: true },
+            { inf: "sobrevivir", tr: "выживать", examplePron: "yo", exampleForm: "sobrevivo", pron1: "él", form1: "sobrevive", pron2: "ellos", form2: "sobreviven", stemNote: false },
+            { inf: "parar", tr: "останавливаться", examplePron: "yo", exampleForm: "paro", pron1: "tú", form1: "paras", pron2: "nosotros", form2: "paramos", stemNote: false },
+            { inf: "comer", tr: "есть, кушать", examplePron: "yo", exampleForm: "como", pron1: "tú", form1: "comes", pron2: "él", form2: "come", stemNote: false },
+            { inf: "usar", tr: "использовать", examplePron: "yo", exampleForm: "uso", pron1: "él", form1: "usa", pron2: "nosotros", form2: "usamos", stemNote: false },
+            { inf: "compartir", tr: "делиться", examplePron: "yo", exampleForm: "comparto", pron1: "tú", form1: "compartes", pron2: "él", form2: "comparte", stemNote: false },
+            { inf: "pasar", tr: "проводить (время)", examplePron: "yo", exampleForm: "paso", pron1: "nosotros", form1: "pasamos", pron2: "ellos", form2: "pasan", stemNote: false },
+            { inf: "morir", tr: "умирать", examplePron: "yo", exampleForm: "muero", pron1: "él", form1: "muere", pron2: "nosotros", form2: "morimos", stemNote: true },
+            { inf: "calentar", tr: "нагревать", examplePron: "yo", exampleForm: "caliento", pron1: "tú", form1: "calientas", pron2: "nosotros", form2: "calentamos", stemNote: true },
+            { inf: "enseñar", tr: "учить, преподавать", examplePron: "yo", exampleForm: "enseño", pron1: "él", form1: "enseña", pron2: "ellos", form2: "enseñan", stemNote: false }
+        ];
+
+        let current = 0;
+        let checked = false;
+
+        const infEl = document.getElementById('inf');
+        const trEl = document.getElementById('tr');
+        const exampleLabel = document.getElementById('exampleLabel');
+        const exampleForm = document.getElementById('exampleForm');
+        const label1 = document.getElementById('label1');
+        const label2 = document.getElementById('label2');
+        const input1 = document.getElementById('input1');
+        const input2 = document.getElementById('input2');
+        const stemNote = document.getElementById('stemNote');
+        const msg = document.getElementById('msg');
+        const checkBtn = document.getElementById('checkBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const counter = document.getElementById('counter');
+        const practice = document.getElementById('practice');
+        const done = document.getElementById('done');
+        const row1 = document.getElementById('row1');
+        const row2 = document.getElementById('row2');
+
+        function normalize(str) {
+            return str
+                .trim()
+                .toLowerCase()
+                .replace(/\s+/g, ' ')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '');
+        }
+
+        function loadVerb(index) {
+            const v = verbs[index];
+            infEl.textContent = v.inf;
+            trEl.textContent = v.tr;
+            exampleLabel.textContent = v.examplePron;
+            exampleForm.textContent = v.exampleForm;
+            label1.textContent = v.pron1;
+            label2.textContent = v.pron2;
+            input1.value = '';
+            input2.value = '';
+            msg.textContent = '';
+            msg.className = 'msg';
+            row1.classList.remove('ok', 'bad');
+            row2.classList.remove('ok', 'bad');
+            input1.disabled = false;
+            input2.disabled = false;
+            checkBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            stemNote.classList.toggle('hidden', !v.stemNote);
+            checked = false;
+            counter.textContent = `${index + 1} / ${verbs.length}`;
+            input1.focus();
+        }
+
+        function checkAnswers() {
+            const v = verbs[current];
+            const a1 = normalize(input1.value);
+            const a2 = normalize(input2.value);
+            const e1 = normalize(v.form1);
+            const e2 = normalize(v.form2);
+            let correct = true;
+
+            if (a1 === e1) {
+                row1.classList.add('ok');
+                row1.classList.remove('bad');
+            } else {
+                row1.classList.add('bad');
+                row1.classList.remove('ok');
+                correct = false;
+            }
+
+            if (a2 === e2) {
+                row2.classList.add('ok');
+                row2.classList.remove('bad');
+            } else {
+                row2.classList.add('bad');
+                row2.classList.remove('ok');
+                correct = false;
+            }
+
+            if (correct) {
+                msg.textContent = 'correcto';
+                msg.className = 'msg success';
+                checkBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+                input1.disabled = true;
+                input2.disabled = true;
+                checked = true;
+                nextBtn.focus();
+            } else {
+                msg.textContent = 'algo no coincide';
+                msg.className = 'msg error';
+            }
+        }
+
+        function next() {
+            if (!checked) return;
+            current++;
+            if (current >= verbs.length) {
+                practice.classList.add('hidden');
+                done.classList.remove('hidden');
+                counter.textContent = '';
+            } else {
+                loadVerb(current);
+            }
+        }
+
+        checkBtn.addEventListener('click', checkAnswers);
+        nextBtn.addEventListener('click', next);
+
+        input1.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (!checked) checkAnswers();
+            }
+        });
+
+        input2.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (!checked) checkAnswers();
+            }
+        });
+
+        loadVerb(0);
+    </script>
+</body>
+</html>
