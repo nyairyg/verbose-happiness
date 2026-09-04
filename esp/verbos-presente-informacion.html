@@ -49,7 +49,6 @@
             width: 100%;
         }
 
-        /* ── THREE COLUMN GRID ──────────────────── */
         .grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -63,7 +62,6 @@
             padding: 0;
         }
 
-        /* ── COLUMN HEADER ──────────────────────── */
         .col-header {
             padding: 20px 24px;
             border-bottom: 2px solid var(--line);
@@ -104,7 +102,6 @@
             color: var(--accent-ir);
         }
 
-        /* ── CONJUGATION ROWS ──────────────────── */
         .rows {
             display: flex;
             flex-direction: column;
@@ -113,7 +110,6 @@
         .row {
             display: flex;
             align-items: center;
-            justify-content: space-between;
             padding: 16px 24px;
             border-bottom: 1px solid var(--line-light);
             transition: background 0.15s;
@@ -134,7 +130,8 @@
             letter-spacing: 0.02em;
             color: var(--ink-light);
             text-transform: lowercase;
-            min-width: 70px;
+            flex: 1;
+            text-align: left;
         }
 
         .row .ending {
@@ -142,7 +139,18 @@
             font-size: 16px;
             font-weight: 600;
             letter-spacing: 0.01em;
+            width: 70px;
             text-align: right;
+        }
+
+        .row .example {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--muted);
+            width: 90px;
+            text-align: right;
+            letter-spacing: 0.01em;
         }
 
         .ar .row .ending {
@@ -155,17 +163,6 @@
             color: var(--accent-ir);
         }
 
-        .row .example {
-            font-family: var(--mono);
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--muted);
-            text-align: right;
-            min-width: 110px;
-            letter-spacing: 0.01em;
-        }
-
-        /* ── RESPONSIVE ─────────────────────────── */
         @media (max-width: 820px) {
             body {
                 padding: 24px 16px;
@@ -180,6 +177,12 @@
             .col-header {
                 padding: 16px 18px;
             }
+            .row .ending {
+                width: 60px;
+            }
+            .row .example {
+                width: 80px;
+            }
         }
     </style>
 </head>
@@ -187,10 +190,9 @@
 
     <div class="container">
 
-        <!-- MAIN GRID -->
         <div class="grid">
 
-            <!-- ── -AR COLUMN ── -->
+            <!-- -AR -->
             <div class="col ar">
                 <div class="col-header">
                     <span class="verb-type">-AR</span>
@@ -226,7 +228,7 @@
                 </div>
             </div>
 
-            <!-- ── -ER COLUMN ── -->
+            <!-- -ER -->
             <div class="col er">
                 <div class="col-header">
                     <span class="verb-type">-ER</span>
@@ -262,7 +264,7 @@
                 </div>
             </div>
 
-            <!-- ── -IR COLUMN ── -->
+            <!-- -IR -->
             <div class="col ir">
                 <div class="col-header">
                     <span class="verb-type">-IR</span>
