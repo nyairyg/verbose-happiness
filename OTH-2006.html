@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE OTH DAILY - Fan Blog & Reviews</title>
+    <style>
+        /* ===== 2006 AUTHENTIC STYLING ===== */
+        body {
+            background-color: #e8e4e4;
+            background-image: url('data:image/svg+xml,%3Csvg width="60" height="60" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath d="M30 0L60 30L30 60L0 30Z" fill="none" stroke="%23d4d0d0" stroke-width="0.5"/%3E%3C/svg%3E');
+            font-family: Verdana, Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            color: #333333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+
+        /* main container */
+        #container {
+            width: 960px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border: 2px solid #7a5c8e;
+            border-top: none;
+            box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* header area */
+        #header {
+            background: linear-gradient(to bottom, #4a2d5c 0%, #6b3f7a 40%, #8b5a9e 100%);
+            border-bottom: 3px solid #e8b4e0;
+            padding: 15px 20px 10px 20px;
+            text-align: center;
+            position: relative;
+        }
+        #header h1 {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 36px;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px #2a1a33;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+        #header h1 .accent {
+            color: #ffd700;
+            font-style: italic;
+        }
+        #header .tagline {
+            font-size: 11px;
+            color: #e8d4f0;
+            font-style: italic;
+            margin-top: 3px;
+            letter-spacing: 1px;
+        }
+        #header .header-date {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #d4b8e0;
+            font-size: 10px;
+            background: #3a1f4a;
+            padding: 3px 8px;
+            border: 1px solid #e8b4e0;
+            border-radius: 10px;
+        }
+
+        /* navigation bar */
+        #navbar {
+            background: linear-gradient(to bottom, #5d3a6e 0%, #4a2d5c 100%);
+            border-bottom: 2px solid #e8b4e0;
+            padding: 5px 10px;
+            text-align: center;
+        }
+        #navbar a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 5px 12px;
+            margin: 0 2px;
+            background: #6b3f7a;
+            border: 1px solid #9a6bad;
+            border-radius: 8px;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+        #navbar a:hover {
+            background: #8b5a9e;
+            border-color: #ffd700;
+            color: #ffd700;
+        }
+
+        /* main content wrapper */
+        #main-wrapper {
+            width: 100%;
+            display: table;
+            border-collapse: collapse;
+        }
+        #content {
+            display: table-cell;
+            width: 640px;
+            vertical-align: top;
+            padding: 15px;
+            background-color: #ffffff;
+        }
+        #sidebar {
+            display: table-cell;
+            width: 290px;
+            vertical-align: top;
+            padding: 15px 10px 15px 10px;
+            background-color: #f5f0f7;
+            border-left: 2px dotted #b89bc4;
+        }
+
+        /* post styling */
+        .post {
+            margin-bottom: 30px;
+            border-bottom: 2px dashed #b89bc4;
+            padding-bottom: 20px;
+        }
+        .post-header {
+            background: linear-gradient(to bottom, #f0e8f4 0%, #e0d4e8 100%);
+            border: 1px solid #b89bc4;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+        }
+        .post-title {
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 20px;
+            color: #4a2d5c;
+            margin: 0 0 5px 0;
+            font-weight: bold;
+        }
+        .post-meta {
+            font-size: 10px;
+            color: #6b4a7a;
+            font-style: italic;
+        }
+        .post-meta .author {
+            color: #d45a5a;
+            font-weight: bold;
+            font-style: normal;
+        }
+        .post-body {
+            padding: 5px 5px;
+            font-size: 11.5px;
+        }
+        .post-body p {
+            margin: 8px 0;
+        }
+        .post-body h3 {
+            font-family: Georgia, serif;
+            color: #4a2d5c;
+            font-size: 14px;
+            margin: 12px 0 5px 0;
+            border-bottom: 1px dotted #b89bc4;
+            padding-bottom: 3px;
+        }
+
+        /* star rating */
+        .rating {
+            display: inline-block;
+            background: #fffde0;
+            border: 1px solid #d4b84a;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #c8a000;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* avatar */
+        .avatar {
+            float: left;
+            margin-right: 10px;
+            border: 2px solid #b89bc4;
+            border-radius: 4px;
+            background: #e0d4e8;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #4a2d5c;
+        }
+
+        /* sidebar widgets */
+        .widget {
+            background: #ffffff;
+            border: 1px solid #b89bc4;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .widget-header {
+            background: linear-gradient(to bottom, #6b3f7a 0%, #4a2d5c 100%);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 6px 10px;
+            text-align: center;
+        }
+        .widget-body {
+            padding: 8px 10px;
+            font-size: 10px;
+        }
+        .widget-body ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .widget-body li {
+            padding: 3px 0;
+            border-bottom: 1px dotted #d4c4dc;
+        }
+        .widget-body li a {
+            color: #6b3f7a;
+            text-decoration: none;
+            font-size: 10px;
+        }
+        .widget-body li a:hover {
+            color: #d45a5a;
+            text-decoration: underline;
+        }
+
+        /* hit counter */
+        .hit-counter {
+            font-family: "Courier New", monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+            background: #000000;
+            padding: 5px 8px;
+            letter-spacing: 3px;
+            border: 2px inset #888888;
+            display: inline-block;
+            text-align: center;
+        }
+
+        /* comment section */
+        .comment {
+            background: #faf8fc;
+            border: 1px solid #d4c4dc;
+            border-radius: 5px;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+        }
+        .comment .comment-header {
+            font-size: 9px;
+            color: #6b4a7a;
+            border-bottom: 1px dotted #d4c4dc;
+            padding-bottom: 3px;
+            margin-bottom: 5px;
+        }
+        .comment .comment-header .c-author {
+            font-weight: bold;
+            color: #4a2d5c;
+            font-size: 10px;
+        }
+        .comment .comment-text {
+            font-size: 10.5px;
+        }
+
+        /* marquee */
+        #ticker {
+            background: #ffe8e8;
+            border: 1px solid #d45a5a;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            color: #a03030;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        /* webring/footer badges */
+        .badge-row {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 8px;
+            color: #888888;
+        }
+        .badge-row img {
+            margin: 0 3px;
+            border: none;
+            vertical-align: middle;
+        }
+
+        /* footer */
+        #footer {
+            background: linear-gradient(to bottom, #4a2d5c 0%, #3a1f4a 100%);
+            color: #c4a8d0;
+            text-align: center;
+            padding: 10px;
+            font-size: 9px;
+            border-top: 3px solid #e8b4e0;
+            letter-spacing: 0.5px;
+        }
+        #footer a {
+            color: #e8d4f0;
+            text-decoration: none;
+        }
+        #footer a:hover {
+            text-decoration: underline;
+            color: #ffd700;
+        }
+
+        /* old-school table borders */
+        .retro-table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 5px 0;
+        }
+        .retro-table td,
+        .retro-table th {
+            border: 1px solid #b89bc4;
+            padding: 4px 6px;
+            font-size: 9.5px;
+            background: #faf8fc;
+        }
+        .retro-table th {
+            background: #e0d4e8;
+            color: #4a2d5c;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+
+        /* blink tag fallback */
+        blink {
+            color: #d45a5a;
+            font-weight: bold;
+        }
+
+        /* button style */
+        .btn-retro {
+            background: linear-gradient(to bottom, #f8f0fc 0%, #d4c4dc 100%);
+            border: 1px solid #9a7aaa;
+            border-radius: 4px;
+            padding: 4px 12px;
+            font-size: 10px;
+            font-family: Verdana, Arial, sans-serif;
+            cursor: pointer;
+            color: #4a2d5c;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .btn-retro:hover {
+            background: linear-gradient(to bottom, #e8d4f0 0%, #b89bc4 100%);
+            border-color: #6b3f7a;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            border: 1px solid #b89bc4;
+            background: #fdfcfe;
+            padding: 3px 5px;
+            font-size: 10px;
+            font-family: Verdana, Arial, sans-serif;
+            border-radius: 3px;
+            width: 95%;
+        }
+        textarea {
+            resize: vertical;
+        }
+
+        /* affiliate / web buttons area */
+        .affiliate-box {
+            text-align: center;
+            padding: 5px;
+            font-size: 8px;
+            color: #888;
+            border-top: 1px dotted #ccc;
+            margin-top: 8px;
+        }
+        .affiliate-box .aff-btn {
+            display: inline-block;
+            background: #e0d4e8;
+            border: 1px solid #b89bc4;
+            border-radius: 3px;
+            padding: 3px 8px;
+            margin: 2px;
+            font-size: 8px;
+            color: #4a2d5c;
+            font-weight: bold;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+
+        <!-- ===== HEADER ===== -->
+        <div id="header">
+            <span class="header-date">October 18, 2006 &bull; 11:47 PM EST</span>
+            <h1>THE <span class="accent">OTH</span> DAILY</h1>
+            <div class="tagline">~ Your #1 Fan Source for One Tree Hill News, Reviews, &amp; Gossip Since 2003 ~</div>
+        </div>
+
+        <!-- ===== NAVIGATION ===== -->
+        <div id="navbar">
+            <a href="#">Home</a>
+            <a href="#">Episode Guide</a>
+            <a href="#">Reviews</a>
+            <a href="#">Fan Fiction</a>
+            <a href="#">Photo Gallery</a>
+            <a href="#">Forum</a>
+            <a href="#">Chat Room</a>
+            <a href="#">Links</a>
+        </div>
+
+        <!-- ===== MAIN CONTENT WRAPPER ===== -->
+        <div id="main-wrapper">
+
+            <!-- ===== LEFT COLUMN: CONTENT ===== -->
+            <div id="content">
+
+                <!-- Ticker / marquee -->
+                <div id="ticker">
+                    <marquee behavior="scroll" direction="left" scrollamount="4" onmouseover="this.stop()" onmouseout="this.start()">
+                        &#9733; &nbsp; BREAKING: Chad Michael Murray spotted filming in Wilmington! &nbsp; &#9733; &nbsp; Season 4 Episode 5 airs next Wednesday at 9/8c on The CW! &nbsp; &#9733; &nbsp; New "Punk &amp; Disorderly" track "The Mixed Tape" by Jack's Mannequin now streaming on Peyton's site! &nbsp; &#9733; &nbsp; OTH Season 3 DVD set releases December 12th &mdash; pre-order now! &nbsp; &#9733;
+                    </marquee>
+                </div>
+
+                <!-- ===== BLOG POST ===== -->
+                <div class="post">
+
+                    <!-- Post header -->
+                    <div class="post-header">
+                        <div style="display:flex; align-items:center;">
+                            <div class="avatar">&#128253;</div>
+                            <div>
+                                <div class="post-title">Retro Review: Season 4, Episode 4 &ndash; "Can't Stop This Thing We've Started"</div>
+                                <div class="post-meta">
+                                    Posted by: <span class="author">TVFanatic_04</span> &bull;
+                                    October 18, 2006 &bull;
+                                    <a href="#" style="color:#6b3f7a;">Comments (47)</a> &bull;
+                                    <a href="#" style="color:#6b3f7a;">Permalink</a> &bull;
+                                    <a href="#" style="color:#6b3f7a;">Print</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post body -->
+                    <div class="post-body">
+
+                        <p>Oh my god, you guys. <strong>One Tree Hill</strong> just took a massive detour into straight-up <em>horror movie</em> territory, and I am still shaking.</p>
+
+                        <p>After weeks of Peyton talking to her alleged half-brother <strong>"Derek"</strong> online, we finally got the big face-to-face introduction tonight. And let&rsquo;s just say, the vibe check is <strong>completely off</strong>. But to really understand why tonight&rsquo;s ending is so deeply disturbing, we have to look back at the history of Peyton&rsquo;s bedroom webcam&mdash;and the terrifyingly naive way this show has treated it up until now.</p>
+
+                        <h3>The Myth of "Punk &amp; Disorderly"</h3>
+
+                        <p>For three seasons, Peyton&rsquo;s 24/7 webcam has been framed as the ultimate symbol of indie-cool authenticity. It was her <em>digital diary</em>. We watched her paint angsty murals on her walls, broadcast underground rock music, and vent to her audio journals. To us&mdash;and to her&mdash;the webcam was a beautiful, edgy sanctuary for lonely misfits.</p>
+
+                        <p>Even when the webcam caused drama, it was treated like a joke. Remember in Season 1 when Brooke accidentally saw Peyton and Lucas fooling around on the live feed? The outrage was <em>entirely</em> about the boyfriend-stealing, not the fact that <strong>anyone on earth with an internet connection</strong> could have witnessed that exact same intimate moment. For years, Peyton completely dissolved the walls of her bedroom, trading her physical privacy for digital validation. Her dad didn't care, her friends didn't care, and we didn't care.</p>
+
+                        <p>Tonight, that naivety caught up with us.</p>
+
+                        <h3>The Good Brother... Or the Ultimate Lurker?</h3>
+
+                        <p>When <strong>"Derek"</strong> (played by Matt Barr) first shows up, he seems like a dream. He&rsquo;s a charming Marine who steps right into the protective big-brother role Peyton has desperately needed since Ellie, her birth mom, died. When some creeps corner Peyton at a club, Derek steps in and beats them to a pulp.</p>
+
+                        <p>At first, I was cheering. But did anyone else notice how... <em>intense</em> that fight was? It wasn't just a protective brother thing; it felt completely <strong>unhinged</strong>.</p>
+
+                        <h3>The Ending Twist That Exposed the Danger of Streaming</h3>
+
+                        <p>If you weren't sure whether to trust him, the final two minutes of the episode absolutely confirmed our worst fears.</p>
+
+                        <p>The camera cuts to Derek&rsquo;s apartment, and my jaw literally hit the floor. The walls are <strong>completely covered</strong> in printouts, photos, and screenshots of Peyton taken directly from her <em>Punk &amp; Disorderly</em> stream. He&rsquo;s got her schedule, her art, everything. He isn't her brother at all. He&rsquo;s <strong>"WATCHMEWATCHU"</strong>&mdash;the anonymous user from her chat room.</p>
+
+                        <p>The absolute chills I got watching him stare at her live feed while standing in a physical shrine dedicated to her room... It turns out Peyton&rsquo;s curated vulnerability wasn't just art; it was a literal <strong>blueprint for a stalker</strong>.</p>
+
+                        <h3>Why This Episode Changes Everything</h3>
+
+                        <p>This is a massive wake-up call for early internet culture. We've spent years romanticizing Peyton's webcam as this deep, creative outlet, entirely blind to the dark side of live-streaming. Peyton thought she was building a community, but she was actually feeding a <strong>parasite</strong>. She thinks she just let family into her life, but she just opened the door to a monster.</p>
+
+                        <p style="text-align:center; margin:15px 0;">
+                            <span class="rating">&#9733;&#9733;&#9733;&#9733;&#9734; &nbsp; 4.5/5 Stars</span>
+                        </p>
+
+                        <p style="font-style:italic; color:#6b4a7a; text-align:center;">Creepy, fast-paced, and a terrifying reality check on digital safety. Lock your doors, Peyton!</p>
+
+                        <!-- Social bookmarking -->
+                        <div style="text-align:center; margin-top:12px; padding-top:10px; border-top:1px dotted #ccc;">
+                            <span style="font-size:9px; color:#888;">Share this review:</span>
+                            <a href="#" style="text-decoration:none; margin:0 4px;" title="Digg this!">&#128279; Digg</a> |
+                            <a href="#" style="text-decoration:none; margin:0 4px;" title="Save to del.icio.us">&#128279; del.icio.us</a> |
+                            <a href="#" style="text-decoration:none; margin:0 4px;" title="StumbleUpon">&#128279; StumbleUpon</a> |
+                            <a href="#" style="text-decoration:none; margin:0 4px;" title="MySpace">&#128279; MySpace</a>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ===== COMMENTS SECTION ===== -->
+                <div style="margin-bottom:20px;">
+                    <div style="background:linear-gradient(to bottom,#6b3f7a,#4a2d5c); color:#fff; padding:6px 12px; font-size:11px; font-weight:bold; letter-spacing:1px; text-transform:uppercase; border-radius:5px 5px 0 0; border:1px solid #4a2d5c;">
+                        &#128172; 47 Comments So Far
+                    </div>
+                    <div style="border:1px solid #b89bc4; border-top:none; padding:10px; background:#fdfcfe; border-radius:0 0 5px 5px;">
+
+                        <!-- Comment 1 -->
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span class="c-author">peytonsawyerluvr</span> &bull; October 18, 2006, 11:52 PM &bull; <a href="#" style="color:#6b3f7a;">Reply</a>
+                            </div>
+                            <div class="comment-text">OMG I literally screamed at my TV!!! That final shot of Derek&rsquo;s apartment was the creepiest thing I have EVER seen on a teen drama. I had to turn on all the lights in my house after watching. The show is really stepping up its game this season!!! &#128561;</div>
+                        </div>
+
+                        <!-- Comment 2 -->
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span class="c-author">TreeHillFan_92</span> &bull; October 18, 2006, 11:58 PM &bull; <a href="#" style="color:#6b3f7a;">Reply</a>
+                            </div>
+                            <div class="comment-text">Wait wait wait... so &ldquo;Derek&rdquo; was WATCHMEWATCHU the whole time??? I knew something was off when he showed up at that club. Who just happens to be there? And that fight was SO over the top. The writers are geniuses for this twist. POOR PEYTON. She finally thinks she has family and it&rsquo;s a stalker. I can&rsquo;t.</div>
+                        </div>
+
+                        <!-- Comment 3 -->
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span class="c-author">brooke_davis_4eva</span> &bull; October 19, 2006, 12:04 AM &bull; <a href="#" style="color:#6b3f7a;">Reply</a>
+                            </div>
+                            <div class="comment-text">Okay but can we talk about how this retroactively makes EVERY webcam scene so much more terrifying? Rewatching Season 1 knowing that some random guy was probably screenshotting every moment... I feel sick. The show really predicted how dangerous livestreaming could be. Ahead of its time!</div>
+                        </div>
+
+                        <!-- Comment 4 -->
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span class="c-author">lucas_peyton_shipper</span> &bull; October 19, 2006, 12:11 AM &bull; <a href="#" style="color:#6b3f7a;">Reply</a>
+                            </div>
+                            <div class="comment-text">Great review TVFanatic_04! Completely agree about the fight scene. I thought I was the only one who noticed how Derek just kept punching that guy even after he was down. The look in his eyes was NOT right. And that apartment... all those photos... I&rsquo;m never going to look at a webcam the same way again.</div>
+                        </div>
+
+                        <!-- Comment 5 -->
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span class="c-author">wilmington_insider</span> &bull; October 19, 2006, 12:15 AM &bull; <a href="#" style="color:#6b3f7a;">Reply</a>
+                            </div>
+                            <div class="comment-text">Fun fact: Matt Barr (Derek) was only supposed to be in 2 episodes but the network extended his arc because the stalker storyline tested so well with focus groups. Expect this to get even darker before it gets better. Also Hilarie Burton did an interview with TV Guide about how she couldn&rsquo;t sleep after reading the script for episode 5!</div>
+                        </div>
+
+                        <!-- Comment 6 -->
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span class="c-author">oth_addict_2004</span> &bull; October 19, 2006, 12:22 AM &bull; <a href="#" style="color:#6b3f7a;">Reply</a>
+                            </div>
+                            <div class="comment-text">I remember when people used to joke about Peyton&rsquo;s webcam being &ldquo;her whole personality&rdquo; and now look what happened. It&rsquo;s actually a really smart commentary on internet privacy and how we overshare without thinking about who&rsquo;s on the other side of the screen. The show is saying something important here and I&rsquo;m here for it.</div>
+                        </div>
+
+                        <!-- Comment 7 -->
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span class="c-author">naley_is_endgame</span> &bull; October 19, 2006, 12:30 AM &bull; <a href="#" style="color:#6b3f7a;">Reply</a>
+                            </div>
+                            <div class="comment-text">This is why I&rsquo;ve always said Peyton needed better friends. HOW did nobody think to tell her to turn off the webcam?? Like, hello, it&rsquo;s broadcasting to the ENTIRE internet. Lucas is too busy moping, Brooke is too busy with her clothing line, and Haley is too busy being pregnant. Someone help this girl!!</div>
+                        </div>
+
+                        <!-- Comment 8 -->
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span class="c-author">punk_and_disorderly_fan</span> &bull; October 19, 2006, 12:36 AM &bull; <a href="#" style="color:#6b3f7a;">Reply</a>
+                            </div>
+                            <div class="comment-text">Not gonna lie, I&rsquo;ve been visiting Peyton&rsquo;s fake webcam site (the show made a real one for promo purposes) and now I feel really weird about it. Like... it&rsquo;s a fun interactive thing but after this episode it hits different. The line between fan and stalker is thinner than we think. This show is DEEP.</div>
+                        </div>
+
+                        <!-- Comment form -->
+                        <div style="margin-top:15px; padding-top:10px; border-top:2px solid #b89bc4;">
+                            <div style="font-size:11px; font-weight:bold; color:#4a2d5c; margin-bottom:6px;">&#9997;&#65039; Leave a Comment:</div>
+                            <form>
+                                <table class="retro-table" style="width:100%;">
+                                    <tr>
+                                        <td style="width:80px; background:#e0d4e8; font-weight:bold; font-size:9px;">Name:</td>
+                                        <td><input type="text" name="name" placeholder="Your name..." style="width:95%;"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:80px; background:#e0d4e8; font-weight:bold; font-size:9px;">Email:</td>
+                                        <td><input type="text" name="email" placeholder="you@email.com" style="width:95%;"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:80px; background:#e0d4e8; font-weight:bold; font-size:9px;">Website:</td>
+                                        <td><input type="text" name="website" placeholder="http://" style="width:95%;"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:80px; background:#e0d4e8; font-weight:bold; font-size:9px;" valign="top">Comment:</td>
+                                        <td><textarea name="comment" rows="4" style="width:95%;"></textarea></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="text-align:center; background:#f5f0f7;">
+                                            <button type="submit" class="btn-retro">&#10003; Post Comment</button>
+                                            &nbsp;
+                                            <button type="reset" class="btn-retro">&#10005; Clear</button>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <div style="font-size:8px; color:#999; margin-top:5px;">Comments are moderated. Please keep it respectful!</div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== RIGHT COLUMN: SIDEBAR ===== -->
+            <div id="sidebar">
+
+                <!-- About widget -->
+                <div class="widget">
+                    <div class="widget-header">&#128100; About The Blog</div>
+                    <div class="widget-body">
+                        <p style="margin:3px 0; font-size:10px;"><strong>Welcome to THE OTH DAILY!</strong> Your daily source for all things One Tree Hill since 2003. Episode reviews, fan theories, cast news, and more. Updated every day after a new episode airs!</p>
+                        <p style="margin:3px 0; font-size:9px; color:#666;">&#128274; <a href="#" style="color:#6b3f7a;">Sign my guestbook!</a></p>
+                        <p style="margin:3px 0; font-size:9px; color:#666;">&#128231; <a href="#" style="color:#6b3f7a;">Contact the webmaster</a></p>
+                    </div>
+                </div>
+
+                <!-- Currently watching widget -->
+                <div class="widget">
+                    <div class="widget-header">&#127916; Currently Watching</div>
+                    <div class="widget-body" style="text-align:center;">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='60'%3E%3Crect width='80' height='60' fill='%234a2d5c'/%3E%3Ctext x='40' y='35' font-size='10' fill='white' text-anchor='middle' font-family='Verdana'%3EOTH S4E4%3C/text%3E%3C/svg%3E"
+                        alt="One Tree Hill S4E4" style="border:2px solid #b89bc4; border-radius:3px;">
+                        <div style="font-size:9px; color:#6b4a7a; margin-top:4px;"><strong>Season 4, Episode 4</strong><br>"Can't Stop This Thing We've Started"</div>
+                        <div style="font-size:8px; color:#999;">Airs Wednesdays @ 9/8c on The CW</div>
+                    </div>
+                </div>
+
+                <!-- Episode Guide widget -->
+                <div class="widget">
+                    <div class="widget-header">&#128218; Season 4 Episode Guide</div>
+                    <div class="widget-body">
+                        <ul>
+                            <li><a href="#">4.01 - "The Same Deep Water as You"</a> &nbsp;<span style="color:#999; font-size:8px;">&#10003; Reviewed</span></li>
+                            <li><a href="#">4.02 - "Things I Forgot at Birth"</a> &nbsp;<span style="color:#999; font-size:8px;">&#10003; Reviewed</span></li>
+                            <li><a href="#">4.03 - "Good News for People Who Love Bad News"</a> &nbsp;<span style="color:#999; font-size:8px;">&#10003; Reviewed</span></li>
+                            <li><a href="#" style="font-weight:bold; color:#d45a5a;">4.04 - "Can't Stop This Thing We've Started"</a> &nbsp;<span style="color:#d45a5a; font-size:8px;">&#9733; NEW</span></li>
+                            <li><a href="#" style="color:#bbb;">4.05 - "I Love You But I've Chosen Darkness"</a> <span style="font-size:8px; color:#aaa;">(Nov 1)</span></li>
+                            <li><a href="#" style="color:#bbb;">4.06 - "Where Did You Sleep Last Night?"</a> <span style="font-size:8px; color:#aaa;">(Nov 8)</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Hit counter widget -->
+                <div class="widget">
+                    <div class="widget-header">&#128202; Site Statistics</div>
+                    <div class="widget-body" style="text-align:center;">
+                        <div style="font-size:9px; color:#666; margin-bottom:4px;">You are visitor number:</div>
+                        <div class="hit-counter">0 4 8 2 9 3 7</div>
+                        <div style="font-size:8px; color:#999; margin-top:4px;">Since August 15, 2003</div>
+                        <div style="border-top:1px dotted #ccc; margin-top:6px; padding-top:4px; font-size:9px; color:#666;">
+                            Currently online: <strong style="color:#4a2d5c;">37</strong> fans<br>
+                            Most ever: <strong style="color:#4a2d5c;">1,247</strong> (S3 finale)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Poll widget -->
+                <div class="widget">
+                    <div class="widget-header">&#128499; Weekly Poll</div>
+                    <div class="widget-body">
+                        <div style="font-size:9.5px; font-weight:bold; color:#4a2d5c; margin-bottom:4px;">Is "Derek" really Peyton's brother?</div>
+                        <form>
+                            <label style="font-size:10px;"><input type="radio" name="poll" checked> No way, he's a stalker! &#128561;</label><br>
+                            <label style="font-size:10px;"><input type="radio" name="poll"> Yes, the twist is a red herring</label><br>
+                            <label style="font-size:10px;"><input type="radio" name="poll"> I don't know but I'm scared</label><br>
+                            <label style="font-size:10px;"><input type="radio" name="poll"> He's both somehow??</label><br>
+                            <div style="text-align:center; margin-top:5px;">
+                                <button type="submit" class="btn-retro" style="font-size:9px;">Vote!</button>
+                            </div>
+                        </form>
+                        <div style="font-size:8px; color:#999; margin-top:4px;">Total votes: 1,893 &bull; Poll closes Oct 25</div>
+                    </div>
+                </div>
+
+                <!-- Blogroll -->
+                <div class="widget">
+                    <div class="widget-header">&#128279; OTH Blogroll</div>
+                    <div class="widget-body">
+                        <ul>
+                            <li><a href="#">&#10148; Tree Hill Tribune</a></li>
+                            <li><a href="#">&#10148; Peyton's Podcast Picks</a></li>
+                            <li><a href="#">&#10148; The Brooke Davis Closet</a></li>
+                            <li><a href="#">&#10148; Lucas &amp; Peyton Forever</a></li>
+                            <li><a href="#">&#10148; Naley Fanfiction Archive</a></li>
+                            <li><a href="#">&#10148; The Raven's Nest Forum</a></li>
+                            <li><a href="#">&#10148; Mouth's Sports Blog</a></li>
+                            <li><a href="#">&#10148; Skills' Beat Lab</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Recent Comments -->
+                <div class="widget">
+                    <div class="widget-header">&#128172; Recent Comments</div>
+                    <div class="widget-body">
+                        <ul>
+                            <li><a href="#">naley_is_endgame</a> on <a href="#">"Can't Stop This Thing..."</a></li>
+                            <li><a href="#">TreeHillTara</a> on <a href="#">Episode 3 Review</a></li>
+                            <li><a href="#">ravens_fan_2005</a> on <a href="#">S4 Premiere Recap</a></li>
+                            <li><a href="#">peytons_art</a> on <a href="#">Punk &amp; Disorderly Playlist</a></li>
+                            <li><a href="#">brooke_davis_4eva</a> on <a href="#">S4E4 Review</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Archives widget -->
+                <div class="widget">
+                    <div class="widget-header">&#128197; Archives</div>
+                    <div class="widget-body">
+                        <ul>
+                            <li><a href="#">October 2006</a> (8 posts)</li>
+                            <li><a href="#">September 2006</a> (12 posts)</li>
+                            <li><a href="#">August 2006</a> (5 posts)</li>
+                            <li><a href="#">July 2006</a> (7 posts)</li>
+                            <li><a href="#">June 2006</a> (9 posts)</li>
+                            <li><a href="#">May 2006</a> (11 posts)</li>
+                            <li><a href="#">Season 3 Archive</a></li>
+                            <li><a href="#">Season 2 Archive</a></li>
+                            <li><a href="#">Season 1 Archive</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Affiliate buttons -->
+                <div class="widget">
+                    <div class="widget-header">&#127760; Affiliates &amp; Web Rings</div>
+                    <div class="widget-body affiliate-box">
+                        <a href="#" class="aff-btn">OTH Fanlisting</a>
+                        <a href="#" class="aff-btn">The CW</a>
+                        <a href="#" class="aff-btn">WB Archive</a>
+                        <a href="#" class="aff-btn">Teen Drama Ring</a>
+                        <a href="#" class="aff-btn">Hilarie Online</a>
+                        <a href="#" class="aff-btn">CMM Source</a>
+                        <a href="#" class="aff-btn">Sophia Bush Fan</a>
+                        <a href="#" class="aff-btn">James Lafferty Net</a>
+                        <div style="font-size:8px; color:#999; margin-top:5px;">Want to affiliate? <a href="#" style="color:#6b3f7a;">Email us!</a></div>
+                    </div>
+                </div>
+
+                <!-- Mini ad box -->
+                <div style="text-align:center; font-size:9px; color:#aaa; margin-top:10px;">
+                    <div style="border:1px dashed #ccc; padding:8px; background:#faf8fc;">
+                        <span style="font-size:8px; letter-spacing:2px;">ADVERTISEMENT</span><br>
+                        <div style="font-size:11px; font-weight:bold; color:#4a2d5c; margin:4px 0;">&#127925; Download the NEW<br>OTH Soundtrack on iTunes!</div>
+                        <span style="font-size:8px;">Featuring tracks from Jack's Mannequin,<br>Dashboard Confessional, and more!</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ===== FOOTER ===== -->
+        <div id="footer">
+            <div style="font-size:10px; margin-bottom:5px;">
+                <a href="#">Home</a> &nbsp;|&nbsp;
+                <a href="#">About</a> &nbsp;|&nbsp;
+                <a href="#">Contact</a> &nbsp;|&nbsp;
+                <a href="#">Privacy Policy</a> &nbsp;|&nbsp;
+                <a href="#">Terms of Use</a> &nbsp;|&nbsp;
+                <a href="#">Site Map</a> &nbsp;|&nbsp;
+                <a href="#">RSS Feed</a>
+            </div>
+            <div style="margin-bottom:5px;">
+                &copy; 2003-2006 THE OTH DAILY &bull; All Rights Reserved &bull; Not affiliated with The CW or One Tree Hill
+            </div>
+            <div style="font-size:8px; color:#a888b5;">
+                Best viewed in Internet Explorer 6.0+ or Netscape Navigator at 1024x768 resolution &bull;
+                &#128187; &nbsp; Powered by <a href="#">Blogger</a> &amp; <a href="#">GeoCities-style HTML</a>
+            </div>
+            <div style="margin-top:6px; font-size:8px; color:#887; letter-spacing:1px;">
+                &#10087; &nbsp; SITE UPDATED DAILY &nbsp; &#10087; &nbsp; WEBMASTER: <a href="#">TVFanatic_04</a> &nbsp; &#10087;
+            </div>
+            <div style="margin-top:4px;">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='15'%3E%3Crect width='80' height='15' fill='%23f0e8f4' stroke='%23b89bc4'/%3E%3Ctext x='40' y='11' font-size='7' fill='%234a2d5c' text-anchor='middle' font-family='Verdana'%3EOTH DAILY%3C/text%3E%3C/svg%3E"
+                alt="OTH Daily button" style="border:none; vertical-align:middle;">
+                &nbsp;
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='15'%3E%3Crect width='80' height='15' fill='%23fffde0' stroke='%23d4b84a'/%3E%3Ctext x='40' y='11' font-size='7' fill='%23c8a000' text-anchor='middle' font-family='Verdana'%3EFAN SITE%3C/text%3E%3C/svg%3E"
+                alt="Fan Site badge" style="border:none; vertical-align:middle;">
+                &nbsp;
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='15'%3E%3Crect width='80' height='15' fill='%23ffe8e8' stroke='%23d45a5a'/%3E%3Ctext x='40' y='11' font-size='7' fill='%23a03030' text-anchor='middle' font-family='Verdana'%3E2006 EST.%3C/text%3E%3C/svg%3E"
+                alt="2006 badge" style="border:none; vertical-align:middle;">
+            </div>
+            <div style="margin-top:4px; font-size:7px; color:#887;">
+                <blink>&#9670;</blink> Thanks for visiting! Come back tomorrow for the S4E5 preview! <blink>&#9670;</blink>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tiny script to emulate old-school blink effect (since modern browsers don't support <blink>) -->
+    <script>
+        (function() {
+            var blinks = document.querySelectorAll('blink');
+            var visible = true;
+            setInterval(function() {
+                visible = !visible;
+                blinks.forEach(function(el) {
+                    el.style.visibility = visible ? 'visible' : 'hidden';
+                });
+            }, 600);
+        })();
+    </script>
+
+</body>
+</html>
