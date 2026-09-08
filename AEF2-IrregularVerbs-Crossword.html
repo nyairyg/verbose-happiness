@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irregular Verbs Crossword – Self‑hosted</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #faf9f7;
+            --surface: #ffffff;
+            --text: #1a1a1a;
+            --border: #d0d0d0;
+            --black-cell: #1a1a1a;
+            --correct: #e8f5e9;
+            --wrong: #ffebee;
+            --focus: #90caf9;
+        }
+        body {
+            font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .puzzle-area {
+            flex: 1 1 auto;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem 1rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+        .crossword-wrapper { display: inline-block; line-height: 0; }
+        .crossword-grid {
+            display: grid;
+            grid-template-columns: repeat(25, 30px);
+            grid-template-rows: repeat(29, 30px);
+            gap: 0;
+            background: var(--black-cell);
+            border: 1px solid var(--black-cell);
+            user-select: none;
+        }
+        .cell {
+            width: 30px; height: 30px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            font-size: 20px; font-weight: 500;
+            text-transform: uppercase; color: var(--text);
+        }
+        .cell.black { background: var(--black-cell); border: 1px solid var(--black-cell); }
+        .cell.empty { background: #e0e0e0; border: 1px solid #ccc; }
+        .cell .number {
+            position: absolute; top: 1px; left: 3px;
+            font-size: 9px; font-weight: 400; color: #555;
+            pointer-events: none; line-height: 1;
+        }
+        .cell input {
+            width: 100%; height: 100%;
+            border: none; background: transparent;
+            text-align: center; font-size: 20px; font-weight: 500;
+            text-transform: uppercase; outline: none; padding: 0;
+            font-family: inherit;
+        }
+        .cell input:focus { background: var(--focus); box-shadow: inset 0 0 0 1px #1976d2; }
+        .cell.correct input { background: var(--correct); }
+        .cell.wrong input { background: var(--wrong); }
+        .buttons {
+            text-align: center; padding: 12px 10px;
+            background: var(--surface); border-bottom: 1px solid var(--border);
+            flex: 0 0 auto;
+        }
+        .buttons button {
+            padding: 8px 20px; margin: 0 6px;
+            font-size: 14px; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            cursor: pointer; background: var(--surface); color: var(--text);
+            border: 1px solid var(--border); border-radius: 2px;
+            font-family: inherit; transition: background 0.2s;
+        }
+        .buttons button:hover { background: #f0f0f0; }
+        .clues-area {
+            flex: 0 0 35%; min-height: 180px;
+            background: var(--bg); display: flex; overflow: hidden;
+        }
+        .clues-column {
+            flex: 1; overflow-y: auto;
+            padding: 20px 24px; border-right: 1px solid var(--border);
+        }
+        .clues-column:last-child { border-right: none; }
+        .clues-column h3 {
+            margin-bottom: 16px; font-size: 14px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1.5px; color: #333;
+        }
+        .clues-column ol { list-style: none; padding-left: 0; }
+        .clues-column li {
+            margin-bottom: 10px; font-size: 16px; cursor: pointer;
+            line-height: 1.4; transition: background 0.1s;
+        }
+        .clues-column li:hover { background: #e0e0e0; }
+        .clues-column li strong { display: inline-block; min-width: 24px; font-weight: 500; color: #555; }
+        .clues-column li.active { background: #d0e8ff; }
+        .clues-column li.correct { color: #2e7d32; }
+        .clues-column li.wrong { color: #c62828; }
+        @media (max-width: 800px) {
+            .crossword-grid { grid-template-columns: repeat(25, 24px); grid-template-rows: repeat(29, 24px); }
+            .cell { width: 24px; height: 24px; font-size: 16px; }
+            .cell .number { font-size: 8px; top: 0; left: 2px; }
+            .cell input { font-size: 16px; }
+            .buttons button { padding: 6px 12px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="puzzle-area">
+        <div class="crossword-wrapper">
+            <div class="crossword-grid" id="crosswordGrid"></div>
+        </div>
+    </div>
+    <div class="buttons">
+        <button id="checkBtn">Check</button>
+        <button id="clearBtn">Clear</button>
+    </div>
+    <div class="clues-area">
+        <div class="clues-column">
+            <h3>Across</h3>
+            <ol id="acrossList"></ol>
+        </div>
+        <div class="clues-column">
+            <h3>Down</h3>
+            <ol id="downList"></ol>
+        </div>
+    </div>
+
+    <script>
+        // ================== PUZZLE DATA ==================
+        var grid = [[null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {"down": {"index": 24, "is_start_of_word": true}, "char": "f", "across": null}, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {"down": {"index": 24, "is_start_of_word": false}, "char": "o", "across": null}, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {"down": {"index": 24, "is_start_of_word": false}, "char": "r", "across": {"index": 9, "is_start_of_word": true, "rtl": 0}}, {"across": {"index": 9, "is_start_of_word": false, "rtl": 0}, "char": "e", "down": null}, {"across": {"index": 9, "is_start_of_word": false, "rtl": 0}, "char": "a", "down": null}, {"across": {"index": 9, "is_start_of_word": false, "rtl": 0}, "char": "d", "down": {"index": 4, "is_start_of_word": true}}, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {"down": {"index": 24, "is_start_of_word": false}, "char": "g", "across": null}, null, null, {"down": {"index": 4, "is_start_of_word": false}, "char": "r", "across": null}, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {"down": {"index": 24, "is_start_of_word": false}, "char": "o", "across": null}, null, null, {"down": {"index": 4, "is_start_of_word": false}, "char": "i", "across": null}, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {"across": {"index": 19, "is_start_of_word": true, "rtl": 0}, "char": "m", "down": null}, {"across": {"index": 19, "is_start_of_word": false, "rtl": 0}, "char": "e", "down": null}, {"down": {"index": 24, "is_start_of_word": false}, "char": "t", "across": {"index": 19, "is_start_of_word": false, "rtl": 0}}, null, null, {"down": {"index": 4, "is_start_of_word": false}, "char": "v", "across": null}, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {"down": {"index": 24, "is_start_of_word": false}, "char": "t", "across": null}, null, {"across": {"index": 13, "is_start_of_word": true, "rtl": 0}, "char": "s", "down": null}, {"down": {"index": 4, "is_start_of_word": false}, "char": "e", "across": {"index": 13, "is_start_of_word": false, "rtl": 0}}, {"across": {"index": 13, "is_start_of_word": false, "rtl": 0}, "char": "e", "down": null}, {"across": {"index": 13, "is_start_of_word": false, "rtl": 0}, "char": "n", "down": null}], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {"down": {"index": 23, "is_start_of_word": true}, "char": "c", "across": {"index": 11, "is_start_of_word": true, "rtl": 0}}, {"across": {"index": 11, "is_start_of_word": false, "rtl": 0}, "char": "a", "down": null}, {"across": {"index": 11, "is_start_of_word": false, "rtl": 0}, "char": "m", "down": null}, {"down": {"index": 24, "is_start_of_word": false}, "char": "e", "across": {"index": 11, "is_start_of_word": false, "rtl": 0}}, null, null, {"down": {"index": 4, "is_start_of_word": false}, "char": "n", "across": null}, null, null], [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, {"down": {"index": 23, "is_start_of_word": false}, "char": "h", "across": null}, null, null, {"down": {"index": 24, "is_start_of_word": false}, "char": "n", "across": null}, null, {"down": {"index": 14, "is_start_of_word": true}, "char": "d", "across": null}, null, null, null], [null, null, null, null, null, null, null, null, null, null, {"down": {"index": 12, "is_start_of_word": true}, "char": "g", "across": null}, null, null, {"down": {"index": 1, "is_start_of_word": true}, "char": "b", "across": null}, null, null, {"down": {"index": 23, "is_start_of_word": false}, "char": "o", "across": null}, null, {"down": {"index": 3, "is_start_of_word": true}, "char": "t", "across": null}, null, null, {"down": {"index": 14, "is_start_of_word": false}, "char": "o", "across": null}, null, null, null], [null, null, null, null, null, null, null, null, null, {"across": {"index": 25, "is_start_of_word": true, "rtl": 0}, "char": "h", "down": null}, {"down": {"index": 12, "is_start_of_word": false}, "char": "i", "across": {"index": 25, "is_start_of_word": false, "rtl": 0}}, {"across": {"index": 25, "is_start_of_word": false, "rtl": 0}, "char": "d", "down": null}, {"across": {"index": 25, "is_start_of_word": false, "rtl": 0}, "char": "d", "down": null}, {"down": {"index": 1, "is_start_of_word": false}, "char": "e", "across": {"index": 25, "is_start_of_word": false, "rtl": 0}}, {"across": {"index": 25, "is_start_of_word": false, "rtl": 0}, "char": "n", "down": null}, null, {"down": {"index": 23, "is_start_of_word": false}, "char": "s", "across": {"index": 7, "is_start_of_word": true, "rtl": 0}}, {"across": {"index": 7, "is_start_of_word": false, "rtl": 0}, "char": "p", "down": null}, {"down": {"index": 3, "is_start_of_word": false}, "char": "o", "across": {"index": 7, "is_start_of_word": false, "rtl": 0}}, {"across": {"index": 7, "is_start_of_word": false, "rtl": 0}, "char": "k", "down": null}, {"across": {"index": 7, "is_start_of_word": false, "rtl": 0}, "char": "e", "down": null}, {"down": {"index": 14, "is_start_of_word": false}, "char": "n", "across": {"index": 7, "is_start_of_word": false, "rtl": 0}}, null, null, null], [null, null, null, null, null, null, null, null, null, null, {"down": {"index": 12, "is_start_of_word": false}, "char": "v", "across": null}, null, null, {"down": {"index": 1, "is_start_of_word": false}, "char": "e", "across": null}, null, null, {"down": {"index": 23, "is_start_of_word": false}, "char": "e", "across": null}, null, {"down": {"index": 3, "is_start_of_word": false}, "char": "o", "across": null}, null, null, {"down": {"index": 14, "is_start_of_word": false}, "char": "e", "across": null}, null, null, null], [null, null, null, null, null, null, null, null, null, null, {"down": {"index": 12, "is_start_of_word": false}, "char": "e", "across": null}, null, {"across": {"index": 6, "is_start_of_word": true, "rtl": 0}, "char": "k", "down": null}, {"down": {"index": 1, "is_start_of_word": false}, "char": "n", "across": {"index": 6, "is_start_of_word": false, "rtl": 0}}, {"across": {"index": 6, "is_start_of_word": false, "rtl": 0}, "char": "o", "down": null}, {"across": {"index": 6, "is_start_of_word": false, "rtl": 0}, "char": "w", "down": null}, {"down": {"index": 23, "is_start_of_word": false}, "char": "n", "across": {"index": 6, "is_start_of_word": false, "rtl": 0}}, null, {"down": {"index": 3, "is_start_of_word": false}, "char": "k", "across": null}, null, null, null, null, null, null], [null, null, null, null, null, null, {"across": {"index": 20, "is_start_of_word": true, "rtl": 0}, "char": "f", "down": null}, {"across": {"index": 20, "is_start_of_word": false, "rtl": 0}, "char": "l", "down": {"index": 17, "is_start_of_word": true}}, {"across": {"index": 20, "is_start_of_word": false, "rtl": 0}, "char": "o", "down": null}, {"across": {"index": 20, "is_start_of_word": false, "rtl": 0}, "char": "w", "down": {"index": 0, "is_start_of_word": true}}, {"down": {"index": 12, "is_start_of_word": false}, "char": "n", "across": {"index": 20, "is_start_of_word": false, "rtl": 0}}, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, {"down": {"index": 17, "is_start_of_word": false}, "char": "o", "across": null}, null, {"down": {"index": 0, "is_start_of_word": false}, "char": "e", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, {"down": {"index": 17, "is_start_of_word": false}, "char": "s", "across": {"index": 2, "is_start_of_word": true, "rtl": 0}}, {"across": {"index": 2, "is_start_of_word": false, "rtl": 0}, "char": "u", "down": null}, {"down": {"index": 0, "is_start_of_word": false}, "char": "n", "across": {"index": 2, "is_start_of_word": false, "rtl": 0}}, {"across": {"index": 2, "is_start_of_word": false, "rtl": 0}, "char": "g", "down": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, {"across": {"index": 16, "is_start_of_word": true, "rtl": 0}, "char": "b", "down": {"index": 26, "is_start_of_word": true}}, {"across": {"index": 16, "is_start_of_word": false, "rtl": 0}, "char": "u", "down": null}, {"across": {"index": 16, "is_start_of_word": false, "rtl": 0}, "char": "i", "down": null}, {"across": {"index": 16, "is_start_of_word": false, "rtl": 0}, "char": "l", "down": {"index": 18, "is_start_of_word": true}}, {"down": {"index": 17, "is_start_of_word": false}, "char": "t", "across": {"index": 16, "is_start_of_word": false, "rtl": 0}}, null, {"down": {"index": 0, "is_start_of_word": false}, "char": "t", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [{"down": {"index": 29, "is_start_of_word": true}, "char": "s", "across": null}, null, null, {"down": {"index": 26, "is_start_of_word": false}, "char": "i", "across": null}, null, null, {"down": {"index": 18, "is_start_of_word": false}, "char": "e", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [{"down": {"index": 29, "is_start_of_word": false}, "char": "w", "across": null}, null, null, {"down": {"index": 26, "is_start_of_word": false}, "char": "t", "across": null}, null, null, {"down": {"index": 18, "is_start_of_word": false}, "char": "f", "across": {"index": 27, "is_start_of_word": true, "rtl": 0}}, {"across": {"index": 27, "is_start_of_word": false, "rtl": 0}, "char": "a", "down": null}, {"across": {"index": 27, "is_start_of_word": false, "rtl": 0}, "char": "l", "down": null}, {"across": {"index": 27, "is_start_of_word": false, "rtl": 0}, "char": "l", "down": null}, {"across": {"index": 27, "is_start_of_word": false, "rtl": 0}, "char": "e", "down": {"index": 28, "is_start_of_word": true}}, {"across": {"index": 27, "is_start_of_word": false, "rtl": 0}, "char": "n", "down": null}, null, null, null, null, null, null, null, null, null, null, null, null, null], [{"down": {"index": 29, "is_start_of_word": false}, "char": "u", "across": null}, null, null, {"down": {"index": 26, "is_start_of_word": false}, "char": "t", "across": null}, null, null, {"down": {"index": 18, "is_start_of_word": false}, "char": "t", "across": null}, null, null, null, {"down": {"index": 28, "is_start_of_word": false}, "char": "a", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [{"down": {"index": 29, "is_start_of_word": false}, "char": "m", "across": {"index": 15, "is_start_of_word": true, "rtl": 0}}, {"across": {"index": 15, "is_start_of_word": false, "rtl": 0}, "char": "a", "down": null}, {"across": {"index": 15, "is_start_of_word": false, "rtl": 0}, "char": "d", "down": null}, {"down": {"index": 26, "is_start_of_word": false}, "char": "e", "across": {"index": 15, "is_start_of_word": false, "rtl": 0}}, null, null, null, null, null, null, {"down": {"index": 28, "is_start_of_word": false}, "char": "t", "across": {"index": 22, "is_start_of_word": true, "rtl": 0}}, {"across": {"index": 22, "is_start_of_word": false, "rtl": 0}, "char": "h", "down": null}, {"across": {"index": 22, "is_start_of_word": false, "rtl": 0}, "char": "r", "down": {"index": 10, "is_start_of_word": true}}, {"across": {"index": 22, "is_start_of_word": false, "rtl": 0}, "char": "o", "down": null}, {"across": {"index": 22, "is_start_of_word": false, "rtl": 0}, "char": "w", "down": null}, {"across": {"index": 22, "is_start_of_word": false, "rtl": 0}, "char": "n", "down": null}, null, null, null, null, null, null, null, null, null], [null, null, null, {"down": {"index": 26, "is_start_of_word": false}, "char": "n", "across": null}, null, null, null, null, null, null, {"down": {"index": 28, "is_start_of_word": false}, "char": "e", "across": null}, null, {"down": {"index": 10, "is_start_of_word": false}, "char": "a", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, {"across": {"index": 21, "is_start_of_word": true, "rtl": 0}, "char": "g", "down": null}, {"across": {"index": 21, "is_start_of_word": false, "rtl": 0}, "char": "r", "down": null}, {"across": {"index": 21, "is_start_of_word": false, "rtl": 0}, "char": "o", "down": null}, {"across": {"index": 21, "is_start_of_word": false, "rtl": 0}, "char": "w", "down": {"index": 8, "is_start_of_word": true}}, {"down": {"index": 28, "is_start_of_word": false}, "char": "n", "across": {"index": 21, "is_start_of_word": false, "rtl": 0}}, null, {"down": {"index": 10, "is_start_of_word": false}, "char": "n", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, {"down": {"index": 8, "is_start_of_word": false}, "char": "r", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, {"down": {"index": 8, "is_start_of_word": false}, "char": "i", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, {"down": {"index": 8, "is_start_of_word": false}, "char": "t", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, {"down": {"index": 8, "is_start_of_word": false}, "char": "t", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, {"down": {"index": 8, "is_start_of_word": false}, "char": "e", "across": null}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, {"across": {"index": 5, "is_start_of_word": true, "rtl": 0}, "char": "b", "down": null}, {"across": {"index": 5, "is_start_of_word": false, "rtl": 0}, "char": "r", "down": null}, {"across": {"index": 5, "is_start_of_word": false, "rtl": 0}, "char": "o", "down": null}, {"across": {"index": 5, "is_start_of_word": false, "rtl": 0}, "char": "k", "down": null}, {"across": {"index": 5, "is_start_of_word": false, "rtl": 0}, "char": "e", "down": null}, {"down": {"index": 8, "is_start_of_word": false}, "char": "n", "across": {"index": 5, "is_start_of_word": false, "rtl": 0}}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]];
+
+        var acrossClues = [
+            { num: 2, clue: "read-???-read" },
+            { num: 4, clue: "meet-???-met" },
+            { num: 5, clue: "see-saw-???" },
+            { num: 6, clue: "come-???-come" },
+            { num: 11, clue: "hide-hid-???" },
+            { num: 12, clue: "speak-spoke-???" },
+            { num: 13, clue: "know-???-known" },
+            { num: 14, clue: "fly-flew-???" },
+            { num: 17, clue: "sing-sang-???" },
+            { num: 18, clue: "build-???-built" },
+            { num: 21, clue: "fall-fell-???" },
+            { num: 23, clue: "make-???-made" },
+            { num: 24, clue: "throw-threw-???" },
+            { num: 26, clue: "grow-grew-???" },
+            { num: 28, clue: "break-???-broken" }
+        ];
+
+        var downClues = [
+            { num: 1, clue: "forget-forgot-???" },
+            { num: 3, clue: "drive-drove-???" },
+            { num: 6, clue: "choose-chose-???" },
+            { num: 7, clue: "do-did-???" },
+            { num: 8, clue: "give-gave-???" },
+            { num: 9, clue: "be-was/were-???" },
+            { num: 10, clue: "take-???-taken" },
+            { num: 15, clue: "lose-???-lost" },
+            { num: 16, clue: "go-??-gone" },
+            { num: 18, clue: "bite-bit-???" },
+            { num: 19, clue: "leave-???-left" },
+            { num: 20, clue: "swim-swam-???" },
+            { num: 22, clue: "eat-ate-???" },
+            { num: 25, clue: "run-???-run" },
+            { num: 27, clue: "write-wrote-???" }
+        ];
+
+        // ================== STATE ==================
+        var currentDirection = null;   // 'across' или 'down'
+        var currentWordIndex = null;   // индекс текущего слова
+
+        // ================== RENDER ==================
+        const gridEl = document.getElementById('crosswordGrid');
+        const acrossListEl = document.getElementById('acrossList');
+        const downListEl = document.getElementById('downList');
+
+        // Вспомогательные карты номер->индекс и индекс->номер
+        const acrossNumToIndex = {2:9, 4:19, 5:13, 6:11, 11:25, 12:7, 13:6, 14:20, 17:2, 18:16, 21:27, 23:15, 24:22, 26:21, 28:5};
+        const downNumToIndex = {1:24, 3:4, 6:23, 7:14, 8:12, 9:1, 10:3, 15:17, 16:0, 18:26, 19:18, 20:29, 22:28, 25:10, 27:8};
+        const acrossIndexToNum = Object.fromEntries(Object.entries(acrossNumToIndex).map(([k,v])=>[v,k]));
+        const downIndexToNum = Object.fromEntries(Object.entries(downNumToIndex).map(([k,v])=>[v,k]));
+
+        function getAcrossNumber(index) { return acrossIndexToNum[index] || ''; }
+        function getDownNumber(index) { return downIndexToNum[index] || ''; }
+        function getAcrossIndex(num) { return acrossNumToIndex[num]; }
+        function getDownIndex(num) { return downNumToIndex[num]; }
+
+        // Построение сетки
+        for (let r = 0; r < grid.length; r++) {
+            for (let c = 0; c < grid[r].length; c++) {
+                const cellData = grid[r][c];
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.dataset.row = r;
+                cell.dataset.col = c;
+
+                if (cellData === null) {
+                    cell.classList.add('empty');
+                } else if (cellData.char === '*') {
+                    cell.classList.add('black');
+                } else {
+                    const input = document.createElement('input');
+                    input.maxLength = 1;
+                    input.autocomplete = 'off';
+                    input.dataset.row = r;
+                    input.dataset.col = c;
+                    if (cellData.across) input.dataset.acrossIndex = cellData.across.index;
+                    if (cellData.down) input.dataset.downIndex = cellData.down.index;
+                    cell.appendChild(input);
+
+                    if (cellData.across && cellData.across.is_start_of_word) {
+                        const num = document.createElement('span');
+                        num.className = 'number';
+                        num.textContent = getAcrossNumber(cellData.across.index);
+                        cell.appendChild(num);
+                    }
+                    if (cellData.down && cellData.down.is_start_of_word) {
+                        const num = document.createElement('span');
+                        num.className = 'number';
+                        num.textContent = getDownNumber(cellData.down.index);
+                        cell.appendChild(num);
+                    }
+                }
+                gridEl.appendChild(cell);
+            }
+        }
+
+        // Заполнение списков подсказок
+        acrossClues.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${item.num}.</strong> ${item.clue}`;
+            li.dataset.clueNum = item.num;
+            li.dataset.direction = 'across';
+            acrossListEl.appendChild(li);
+        });
+        downClues.forEach(item => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${item.num}.</strong> ${item.clue}`;
+            li.dataset.clueNum = item.num;
+            li.dataset.direction = 'down';
+            downListEl.appendChild(li);
+        });
+
+        // ================== DIRECTION & FOCUS ==================
+        function setDirectionFromCell(input) {
+    const row = parseInt(input.dataset.row);
+    const col = parseInt(input.dataset.col);
+    const cellData = grid[row][col];
+    if (!cellData) return;
+
+    // Если текущее направление уже соответствует слову, к которому принадлежит клетка – не меняем
+    if (currentDirection && currentWordIndex !== null) {
+        const idx = input.dataset[currentDirection === 'across' ? 'acrossIndex' : 'downIndex'];
+        if (idx !== undefined && parseInt(idx) === currentWordIndex) {
+            return;
+        }
+    }
+
+    // Сначала проверяем, является ли клетка НАЧАЛОМ слова
+    if (cellData.across && cellData.across.is_start_of_word) {
+        currentDirection = 'across';
+        currentWordIndex = cellData.across.index;
+    } else if (cellData.down && cellData.down.is_start_of_word) {
+        currentDirection = 'down';
+        currentWordIndex = cellData.down.index;
+    } 
+    // Если не начало – берём то направление, которое есть (середина слова)
+    else if (cellData.across) {
+        currentDirection = 'across';
+        currentWordIndex = cellData.across.index;
+    } else if (cellData.down) {
+        currentDirection = 'down';
+        currentWordIndex = cellData.down.index;
+    } else {
+        currentDirection = null;
+        currentWordIndex = null;
+    }
+}
+
+        function highlightActiveClue() {
+            document.querySelectorAll('.clues-column li').forEach(li => {
+                li.classList.remove('active');
+                if (li.dataset.direction === currentDirection && parseInt(li.dataset.clueNum) === 
+                    (currentDirection === 'across' ? getAcrossNumber(currentWordIndex) : getDownNumber(currentWordIndex))) {
+                    li.classList.add('active');
+                }
+            });
+        }
+
+        function focusWord(direction, num) {
+            let targetIndex = direction === 'across' ? getAcrossIndex(num) : getDownIndex(num);
+            if (targetIndex === undefined) return;
+
+            for (let r = 0; r < grid.length; r++) {
+                for (let c = 0; c < grid[r].length; c++) {
+                    const cellData = grid[r][c];
+                    if (!cellData) continue;
+                    if (direction === 'across' && cellData.across && cellData.across.index === targetIndex && cellData.across.is_start_of_word) {
+                        const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                        if (input) {
+                            currentDirection = 'across';
+                            currentWordIndex = targetIndex;
+                            input.focus();
+                            highlightActiveClue();
+                        }
+                        return;
+                    }
+                    if (direction === 'down' && cellData.down && cellData.down.index === targetIndex && cellData.down.is_start_of_word) {
+                        const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                        if (input) {
+                            currentDirection = 'down';
+                            currentWordIndex = targetIndex;
+                            input.focus();
+                            highlightActiveClue();
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
+        // ================== MOVEMENT ==================
+        function getNextInput(input) {
+            const row = parseInt(input.dataset.row);
+            const col = parseInt(input.dataset.col);
+            const dir = currentDirection;
+            const wordIndex = currentWordIndex;
+
+            if (dir === 'across') {
+                let nextCol = col + 1;
+                while (nextCol < grid[row].length) {
+                    const nextCell = grid[row][nextCol];
+                    if (nextCell && nextCell.across && nextCell.across.index === wordIndex) {
+                        return document.querySelector(`input[data-row="${row}"][data-col="${nextCol}"]`);
+                    }
+                    break;
+                }
+            } else if (dir === 'down') {
+                let nextRow = row + 1;
+                while (nextRow < grid.length) {
+                    const nextCell = grid[nextRow][col];
+                    if (nextCell && nextCell.down && nextCell.down.index === wordIndex) {
+                        return document.querySelector(`input[data-row="${nextRow}"][data-col="${col}"]`);
+                    }
+                    break;
+                }
+            }
+            return null;
+        }
+
+        function getPrevInput(input) {
+            const row = parseInt(input.dataset.row);
+            const col = parseInt(input.dataset.col);
+            const dir = currentDirection;
+            const wordIndex = currentWordIndex;
+
+            if (dir === 'across') {
+                let prevCol = col - 1;
+                while (prevCol >= 0) {
+                    const prevCell = grid[row][prevCol];
+                    if (prevCell && prevCell.across && prevCell.across.index === wordIndex) {
+                        return document.querySelector(`input[data-row="${row}"][data-col="${prevCol}"]`);
+                    }
+                    break;
+                }
+            } else if (dir === 'down') {
+                let prevRow = row - 1;
+                while (prevRow >= 0) {
+                    const prevCell = grid[prevRow][col];
+                    if (prevCell && prevCell.down && prevCell.down.index === wordIndex) {
+                        return document.querySelector(`input[data-row="${prevRow}"][data-col="${col}"]`);
+                    }
+                    break;
+                }
+            }
+            return null;
+        }
+
+        // ================== EVENTS ==================
+        document.addEventListener('focusin', function(e) {
+    if (e.target.tagName === 'INPUT' && e.target.closest('.cell')) {
+        e.target.select();          // <-- ВЫДЕЛИТЬ СОДЕРЖИМОЕ
+        setDirectionFromCell(e.target);
+        highlightActiveClue();
+    }
+});
+
+        document.addEventListener('input', function(e) {
+            if (e.target.tagName === 'INPUT' && e.target.closest('.cell')) {
+                const input = e.target;
+                if (input.value.length === 1) {
+                    const next = getNextInput(input);
+                    if (next) next.focus();
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Backspace' && e.target.tagName === 'INPUT' && e.target.closest('.cell')) {
+                const input = e.target;
+                if (input.value === '') {
+                    const prev = getPrevInput(input);
+                    if (prev) {
+                        prev.focus();
+                        prev.value = '';
+                    }
+                }
+            }
+        });
+
+        // Клик по подсказке
+        document.querySelectorAll('.clues-column li').forEach(li => {
+            li.addEventListener('click', function() {
+                const num = parseInt(li.dataset.clueNum);
+                const direction = li.dataset.direction;
+                focusWord(direction, num);
+            });
+        });
+
+        // Кнопки Check и Clear
+        document.getElementById('checkBtn').addEventListener('click', function() {
+            document.querySelectorAll('.cell input').forEach(inp => {
+                inp.parentElement.classList.remove('correct', 'wrong');
+            });
+            for (let r = 0; r < grid.length; r++) {
+                for (let c = 0; c < grid[r].length; c++) {
+                    const cellData = grid[r][c];
+                    if (cellData && cellData.char && cellData.char !== '*') {
+                        const input = document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+                        if (input) {
+                            const userValue = input.value.toLowerCase();
+                            const correctValue = cellData.char.toLowerCase();
+                            if (userValue === correctValue) {
+                                input.parentElement.classList.add('correct');
+                            } else if (userValue !== '') {
+                                input.parentElement.classList.add('wrong');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            document.querySelectorAll('.cell input').forEach(inp => {
+                inp.value = '';
+                inp.parentElement.classList.remove('correct', 'wrong');
+            });
+            currentDirection = null;
+            currentWordIndex = null;
+            document.querySelector('.cell input')?.focus();
+        });
+    </script>
+</body>
+</html>
