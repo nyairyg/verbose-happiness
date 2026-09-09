@@ -201,7 +201,7 @@
             margin-bottom: 32px;
             line-height: 1.6;
         }
-        .btn-restart {
+        .btn-restart, .btn-start {
             display: inline-block;
             padding: 14px 32px;
             font-size: 14px;
@@ -217,7 +217,7 @@
             outline: none;
             user-select: none;
         }
-        .btn-restart:hover { background:#F3F1ED; border-color:#C8C3BA; }
+        .btn-restart:hover, .btn-start:hover { background:#F3F1ED; border-color:#C8C3BA; }
         .fade-out { opacity:0; transition: opacity 0.22s ease; }
         .fade-in { opacity:1; transition: opacity 0.22s ease; }
         .fill-input {
@@ -260,24 +260,7 @@
     </style>
 </head>
 <body>
-    <div class="container" id="container">
-        <div class="header">
-            <span class="header-title">Part 1: Choose the Tense</span>
-            <div class="header-right">
-                <span class="header-progress" id="progressLabel">1 / 48</span>
-                <span class="header-score" id="scoreLabel">Score: 0</span>
-            </div>
-        </div>
-        <div class="sentence-area" id="sentenceArea">
-            <span class="sentence-text" id="sentenceText"></span>
-        </div>
-        <div class="judgment-group" id="judgmentGroup">
-            <button class="btn-judgment" data-tense="past" id="btnPast">Past Simple</button>
-            <button class="btn-judgment" data-tense="present" id="btnPresent">Present Perfect</button>
-        </div>
-        <button class="btn-check" id="btnCheck">Check</button>
-        <div class="feedback-msg" id="feedbackMsg"></div>
-    </div>
+    <div class="container" id="container"></div>
 
     <script>
         (function() {
@@ -345,7 +328,7 @@
             }
 
             let sentences = shuffle(sentencesData);
-            let currentMode = 'tense'; // 'tense' | 'fill'
+            let currentMode = 'intro'; // 'intro', 'tense', 'intro2', 'fill', 'summary'
             let currentIndex = 0;
             let scorePart1 = 0;
             let scorePart2 = 0;
@@ -354,35 +337,39 @@
             let firstAttempt = true;
 
             let container = document.getElementById('container');
-            let sentenceText = document.getElementById('sentenceText');
-            let sentenceArea = document.getElementById('sentenceArea');
-            let progressLabel = document.getElementById('progressLabel');
-            let scoreLabel = document.getElementById('scoreLabel');
-            let btnPast = document.getElementById('btnPast');
-            let btnPresent = document.getElementById('btnPresent');
-            let judgmentGroup = document.getElementById('judgmentGroup');
-            let btnCheck = document.getElementById('btnCheck');
-            let feedbackMsg = document.getElementById('feedbackMsg');
-
-            // Для второй части
+            let sentenceText = null;
+            let sentenceArea = null;
+            let progressLabel = null;
+            let scoreLabel = null;
+            let btnPast = null;
+            let btnPresent = null;
+            let judgmentGroup = null;
+            let btnCheck = null;
+            let feedbackMsg = null;
             let fillInput = null;
 
             function getCurrentSentence() { return sentences[currentIndex]; }
 
             function clearSelection() {
                 selectedTense = null;
-                btnPast.classList.remove('selected');
-                btnPresent.classList.remove('selected');
+                if (btnPast && btnPresent) {
+                    btnPast.classList.remove('selected');
+                    btnPresent.classList.remove('selected');
+                }
             }
 
             function resetForCurrentSentence() {
                 clearSelection();
-                feedbackMsg.textContent = '';
-                feedbackMsg.className = 'feedback-msg';
-                btnCheck.classList.remove('success-flash','error-flash');
-                btnCheck.textContent = 'Check';
-                sentenceArea.classList.remove('shake');
-                judgmentGroup.classList.remove('shake');
+                if (feedbackMsg) {
+                    feedbackMsg.textContent = '';
+                    feedbackMsg.className = 'feedback-msg';
+                }
+                if (btnCheck) {
+                    btnCheck.classList.remove('success-flash','error-flash');
+                    btnCheck.textContent = 'Check';
+                }
+                if (sentenceArea) sentenceArea.classList.remove('shake');
+                if (judgmentGroup) judgmentGroup.classList.remove('shake');
                 container.classList.remove('shake');
                 isTransitioning = false;
                 firstAttempt = true;
@@ -393,21 +380,26 @@
             }
 
             function updateProgressUI() {
-                progressLabel.textContent = (currentIndex + 1) + ' / ' + sentences.length;
-                scoreLabel.textContent = currentMode === 'tense' ? 'Score: ' + scorePart1 : 'Score: ' + scorePart2;
+                if (progressLabel && scoreLabel) {
+                    progressLabel.textContent = (currentIndex + 1) + ' / ' + sentences.length;
+                    scoreLabel.textContent = (currentMode === 'tense') ? 'Score: ' + scorePart1 : 'Score: ' + scorePart2;
+                }
             }
 
             function renderTenseSentence() {
-                sentenceText.textContent = getCurrentSentence().text;
-                updateProgressUI();
+                if (sentenceText) {
+                    sentenceText.textContent = getCurrentSentence().text;
+                    updateProgressUI();
+                }
             }
 
             function renderFillSentence() {
-                const s = getCurrentSentence();
-                // Отображаем исходное предложение с глаголом в скобках и указанием времени
-                const displayText = s.text + ' (' + (s.correctTense === 'past' ? 'Past Simple' : 'Present Perfect') + ')';
-                sentenceText.textContent = displayText;
-                updateProgressUI();
+                if (sentenceText) {
+                    const s = getCurrentSentence();
+                    const displayText = s.text + ' (' + (s.correctTense === 'past' ? 'Past Simple' : 'Present Perfect') + ')';
+                    sentenceText.textContent = displayText;
+                    updateProgressUI();
+                }
             }
 
             function getPastSimpleExplanation(sentenceText) {
@@ -548,6 +540,63 @@
                 }
             }
 
+            function showIntro1() {
+                currentMode = 'intro';
+                container.innerHTML = `
+                    <div class="header">
+                        <span class="header-title">Part 1: Choose the Tense</span>
+                    </div>
+                    <div class="summary">
+                        <div class="summary-well-done">Instructions</div>
+                        <div class="summary-detail">You will see sentences with a verb in brackets.<br>Choose the correct tense: Past Simple or Present Perfect.<br><br>Click the buttons or use keys <strong>1</strong> and <strong>2</strong> to select, <strong>Enter</strong> to check.</div>
+                        <button class="btn-start" id="btnStart">Start</button>
+                    </div>
+                `;
+                document.getElementById('btnStart').addEventListener('click', startTenseMode);
+            }
+
+            function startTenseMode() {
+                currentMode = 'tense';
+                currentIndex = 0;
+                scorePart1 = 0;
+                isTransitioning = false;
+                firstAttempt = true;
+                container.innerHTML = `
+                    <div class="header">
+                        <span class="header-title">Part 1: Choose the Tense</span>
+                        <div class="header-right">
+                            <span class="header-progress" id="progressLabel">1 / ${sentences.length}</span>
+                            <span class="header-score" id="scoreLabel">Score: 0</span>
+                        </div>
+                    </div>
+                    <div class="sentence-area" id="sentenceArea">
+                        <span class="sentence-text" id="sentenceText"></span>
+                    </div>
+                    <div class="judgment-group" id="judgmentGroup">
+                        <button class="btn-judgment" data-tense="past" id="btnPast">Past Simple</button>
+                        <button class="btn-judgment" data-tense="present" id="btnPresent">Present Perfect</button>
+                    </div>
+                    <button class="btn-check" id="btnCheck">Check</button>
+                    <div class="feedback-msg" id="feedbackMsg"></div>
+                `;
+                sentenceText = document.getElementById('sentenceText');
+                sentenceArea = document.getElementById('sentenceArea');
+                progressLabel = document.getElementById('progressLabel');
+                scoreLabel = document.getElementById('scoreLabel');
+                btnPast = document.getElementById('btnPast');
+                btnPresent = document.getElementById('btnPresent');
+                judgmentGroup = document.getElementById('judgmentGroup');
+                btnCheck = document.getElementById('btnCheck');
+                feedbackMsg = document.getElementById('feedbackMsg');
+                fillInput = null;
+                judgmentGroup.addEventListener('click', onJudgmentClick);
+                btnCheck.addEventListener('click', onCheckClick);
+                renderTenseSentence();
+                container.classList.remove('fade-out');
+                container.classList.add('fade-in');
+                setTimeout(() => container.classList.remove('fade-in'), 250);
+            }
+
             function showPart1Complete() {
                 isTransitioning = true;
                 container.classList.add('fade-out');
@@ -562,12 +611,13 @@
                             <div class="summary-score">${scorePart1} / ${sentences.length}</div>
                             <div class="summary-label">Now Part 2: Fill in the blanks</div>
                             <div class="summary-detail">You will see the same sentences but with a gap.<br>Type ONLY the correct verb form.</div>
+                            <button class="btn-start" id="btnContinue">Continue to Part 2</button>
                         </div>
                     `;
-                    // Убираем fade-out и добавляем fade-in, чтобы экран стал видимым
+                    document.getElementById('btnContinue').addEventListener('click', startFillMode);
                     container.classList.remove('fade-out');
                     container.classList.add('fade-in');
-                    setTimeout(() => startFillMode(), 2000);
+                    isTransitioning = false;
                 }, 250);
             }
 
@@ -646,52 +696,13 @@
                     document.getElementById('btnRestart').addEventListener('click', restartAll);
                     container.classList.remove('fade-out');
                     container.classList.add('fade-in');
+                    isTransitioning = false;
                 }, 250);
             }
 
             function restartAll() {
                 sentences = shuffle(sentencesData);
-                currentMode = 'tense';
-                currentIndex = 0;
-                scorePart1 = 0;
-                scorePart2 = 0;
-                selectedTense = null;
-                isTransitioning = false;
-                firstAttempt = true;
-                container.innerHTML = `
-                    <div class="header">
-                        <span class="header-title">Part 1: Choose the Tense</span>
-                        <div class="header-right">
-                            <span class="header-progress" id="progressLabel">1 / ${sentences.length}</span>
-                            <span class="header-score" id="scoreLabel">Score: 0</span>
-                        </div>
-                    </div>
-                    <div class="sentence-area" id="sentenceArea">
-                        <span class="sentence-text" id="sentenceText"></span>
-                    </div>
-                    <div class="judgment-group" id="judgmentGroup">
-                        <button class="btn-judgment" data-tense="past" id="btnPast">Past Simple</button>
-                        <button class="btn-judgment" data-tense="present" id="btnPresent">Present Perfect</button>
-                    </div>
-                    <button class="btn-check" id="btnCheck">Check</button>
-                    <div class="feedback-msg" id="feedbackMsg"></div>
-                `;
-                sentenceText = document.getElementById('sentenceText');
-                sentenceArea = document.getElementById('sentenceArea');
-                progressLabel = document.getElementById('progressLabel');
-                scoreLabel = document.getElementById('scoreLabel');
-                btnPast = document.getElementById('btnPast');
-                btnPresent = document.getElementById('btnPresent');
-                judgmentGroup = document.getElementById('judgmentGroup');
-                btnCheck = document.getElementById('btnCheck');
-                feedbackMsg = document.getElementById('feedbackMsg');
-                fillInput = null;
-                judgmentGroup.addEventListener('click', onJudgmentClick);
-                btnCheck.addEventListener('click', onCheckClick);
-                renderTenseSentence();
-                container.classList.remove('fade-out');
-                container.classList.add('fade-in');
-                setTimeout(() => container.classList.remove('fade-in'), 250);
+                showIntro1();
             }
 
             function onJudgmentClick(e) {
@@ -718,15 +729,13 @@
                     else if (btnPresent.classList.contains('selected')) selectedTense = 'present';
                     else selectedTense = null;
                     handleTenseCheck();
-                } else {
+                } else if (currentMode === 'fill') {
                     handleFillCheck();
                 }
             }
 
             // Инициализация
-            judgmentGroup.addEventListener('click', onJudgmentClick);
-            btnCheck.addEventListener('click', onCheckClick);
-            renderTenseSentence();
+            showIntro1();
 
             // Глобальная обработка клавиш: 1, 2, Enter
             document.addEventListener('keydown', function(e) {
