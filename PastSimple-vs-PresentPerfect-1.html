@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two-Part Tense Practice</title>
+    <style>
+        :root {
+            --bg: #F4F1EC;
+            --card-bg: #FFFFFF;
+            --text: #1C1C1C;
+            --text-secondary: #6B6560;
+            --border: #D6D0C8;
+            --border-light: #E8E3DC;
+            --correct: #3D6B35;
+            --error: #C84630;
+            --accent: #3A3A3A;
+            --btn-hover: #F9F7F4;
+            --btn-active: #F0EDE8;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+            --radius: 2px;
+            --font-stack: 'Inter', 'Helvetica Neue', 'Segoe UI', 'Arial', sans-serif;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background-color: var(--bg);
+            font-family: var(--font-stack);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.015) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+        }
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 640px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-md);
+            padding: 48px 44px 40px;
+            transition: opacity 0.3s ease;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 36px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .header-title {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .header-right { display: flex; gap: 20px; }
+        .header-progress, .header-score {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.03em;
+            font-variant-numeric: tabular-nums;
+            font-family: 'SF Mono','Consolas','Menlo',monospace;
+        }
+        .sentence-area { margin-bottom: 32px; min-height: 60px; display: flex; align-items: center; }
+        .sentence-text {
+            font-size: 20px;
+            font-weight: 450;
+            line-height: 1.5;
+            color: var(--text);
+            letter-spacing: 0.01em;
+            transition: color 0.25s ease;
+        }
+        .judgment-group { display: flex; gap: 12px; margin-bottom: 20px; }
+        .btn-judgment {
+            flex:1;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            background: #FAFAF8;
+            border: 1px solid var(--border);
+            color: var(--text);
+            transition: all 0.18s ease;
+            font-family: var(--font-stack);
+            border-radius: var(--radius);
+            outline: none;
+            user-select: none;
+            position: relative;
+        }
+        .btn-judgment:hover { background:#F3F1ED; border-color:#C8C3BA; }
+        .btn-judgment:active { background:#EDEAE5; transform:scale(0.985); }
+        .btn-judgment.selected {
+            background:#EDEAE5;
+            border-color:#A09A90;
+            font-weight:550;
+            box-shadow:inset 0 0 0 1px rgba(0,0,0,0.06);
+        }
+        .btn-judgment.selected::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: var(--accent);
+        }
+        .btn-check {
+            display:block;
+            width:100%;
+            padding: 15px 24px;
+            font-size:15px;
+            font-weight:550;
+            letter-spacing: 0.04em;
+            cursor:pointer;
+            background:var(--accent);
+            border:none;
+            color:#FFFFFF;
+            transition: all 0.18s ease;
+            font-family:var(--font-stack);
+            border-radius: var(--radius);
+            outline:none;
+            user-select:none;
+        }
+        .btn-check:hover { background:#2E2E2E; }
+        .btn-check:active { transform:scale(0.985); background:#252525; }
+        .btn-check.success-flash { background:var(--correct); }
+        .btn-check.error-flash { background:var(--error); }
+        .feedback-msg {
+            text-align:center;
+            font-size:13px;
+            font-weight:500;
+            letter-spacing:0.03em;
+            margin-top:14px;
+            min-height:20px;
+            transition: color 0.2s ease;
+        }
+        .feedback-msg.success { color:var(--correct); }
+        .feedback-msg.error { color:var(--error); }
+        @keyframes shakeHorizontal {
+            0%,100%{ transform:translateX(0); }
+            10%{ transform:translateX(-6px); }
+            20%{ transform:translateX(6px); }
+            30%{ transform:translateX(-5px); }
+            40%{ transform:translateX(5px); }
+            50%{ transform:translateX(-3px); }
+            60%{ transform:translateX(3px); }
+            70%{ transform:translateX(-2px); }
+            80%{ transform:translateX(2px); }
+            90%{ transform:translateX(-1px); }
+        }
+        .shake { animation: shakeHorizontal 0.55s ease; }
+        .summary { text-align: center; padding: 20px 0; }
+        .summary-well-done {
+            font-size: 24px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .summary-score {
+            font-size: 56px;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
+            font-family: 'SF Mono','Consolas','Menlo',monospace;
+        }
+        .summary-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+        .summary-detail {
+            font-size: 15px;
+            color: var(--text-secondary);
+            letter-spacing: 0.02em;
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+        .btn-restart {
+            display: inline-block;
+            padding: 14px 32px;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+            transition: all 0.18s ease;
+            font-family: var(--font-stack);
+            border-radius: var(--radius);
+            outline: none;
+            user-select: none;
+        }
+        .btn-restart:hover { background:#F3F1ED; border-color:#C8C3BA; }
+        .fade-out { opacity:0; transition: opacity 0.22s ease; }
+        .fade-in { opacity:1; transition: opacity 0.22s ease; }
+        .fill-input {
+            width:100%;
+            padding: 14px 16px;
+            font-size: 16px;
+            font-family: var(--font-stack);
+            border:1px solid var(--border);
+            background:#FDFCFB;
+            color:var(--text);
+            resize:none;
+            outline:none;
+            border-radius: var(--radius);
+            transition: border-color 0.18s ease, box-shadow 0.18s ease;
+            line-height:1.5;
+            margin-bottom: 20px;
+        }
+        .fill-input:focus { border-color:#A09A90; box-shadow:0 0 0 3px rgba(0,0,0,0.04); background:#FFFFFF; }
+        .fill-input.error-highlight { border-color:var(--error); box-shadow:0 0 0 3px rgba(200,70,48,0.08); background:#FFFBFB; }
+        .copy-area {
+            background:#F9F8F6;
+            border:1px solid var(--border-light);
+            padding: 16px;
+            font-size: 14px;
+            line-height:1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 400px;
+            overflow-y:auto;
+            text-align: left;
+        }
+        @media (max-width: 640px) {
+            .container { padding: 28px 20px 24px; }
+            .sentence-text { font-size:17px; }
+            .btn-judgment { padding:12px 14px; font-size:14px; }
+            .btn-check { padding:13px 20px; font-size:14px; }
+            .judgment-group { gap:8px; }
+            .header { margin-bottom:24px; padding-bottom:12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="header">
+            <span class="header-title">Part 1: Choose the Tense</span>
+            <div class="header-right">
+                <span class="header-progress" id="progressLabel">1 / 48</span>
+                <span class="header-score" id="scoreLabel">Score: 0</span>
+            </div>
+        </div>
+        <div class="sentence-area" id="sentenceArea">
+            <span class="sentence-text" id="sentenceText"></span>
+        </div>
+        <div class="judgment-group" id="judgmentGroup">
+            <button class="btn-judgment" data-tense="past" id="btnPast">Past Simple</button>
+            <button class="btn-judgment" data-tense="present" id="btnPresent">Present Perfect</button>
+        </div>
+        <button class="btn-check" id="btnCheck">Check</button>
+        <div class="feedback-msg" id="feedbackMsg"></div>
+    </div>
+
+    <script>
+        (function() {
+            const sentencesData = [
+                // Past Simple
+                { id: 1, text: 'I (watch) a funny cartoon yesterday.', correctTense: 'past', correctForm: 'watched', fullSentence: 'I watched a funny cartoon yesterday.' },
+                { id: 2, text: 'She (visit) her grandmother two days ago.', correctTense: 'past', correctForm: 'visited', fullSentence: 'She visited her grandmother two days ago.' },
+                { id: 3, text: 'We (play) football last Saturday.', correctTense: 'past', correctForm: 'played', fullSentence: 'We played football last Saturday.' },
+                { id: 4, text: 'He (cook) pasta for dinner last night.', correctTense: 'past', correctForm: 'cooked', fullSentence: 'He cooked pasta for dinner last night.' },
+                { id: 5, text: 'They (move) to London in 2015.', correctTense: 'past', correctForm: 'moved', fullSentence: 'They moved to London in 2015.' },
+                { id: 6, text: 'I (finish) reading that book a week ago.', correctTense: 'past', correctForm: 'finished', fullSentence: 'I finished reading that book a week ago.' },
+                { id: 7, text: 'My mom (buy) a new dress yesterday.', correctTense: 'past', correctForm: 'bought', fullSentence: 'My mom bought a new dress yesterday.' },
+                { id: 8, text: 'Tom (pass) his driving test last month.', correctTense: 'past', correctForm: 'passed', fullSentence: 'Tom passed his driving test last month.' },
+                { id: 9, text: 'We (go) to the beach last summer.', correctTense: 'past', correctForm: 'went', fullSentence: 'We went to the beach last summer.' },
+                { id: 10, text: 'She (start) her new job on Monday.', correctTense: 'past', correctForm: 'started', fullSentence: 'She started her new job on Monday.' },
+                { id: 11, text: 'I (not go) to school yesterday because I was sick.', correctTense: 'past', correctForm: "didn't go", fullSentence: "I didn't go to school yesterday because I was sick." },
+                { id: 13, text: 'They (not come) to my party last week.', correctTense: 'past', correctForm: "didn't come", fullSentence: "They didn't come to my party last week." },
+                { id: 14, text: 'She (not like) the film we saw yesterday.', correctTense: 'past', correctForm: "didn't like", fullSentence: "She didn't like the film we saw yesterday." },
+                { id: 15, text: 'We (not have) a car when we lived in Rome.', correctTense: 'past', correctForm: "didn't have", fullSentence: "We didn't have a car when we lived in Rome." },
+                { id: 16, text: 'I (not see) you at the meeting two days ago.', correctTense: 'past', correctForm: "didn't see", fullSentence: "I didn't see you at the meeting two days ago." },
+                { id: 17, text: 'He (not do) his homework last night.', correctTense: 'past', correctForm: "didn't do", fullSentence: "He didn't do his homework last night." },
+                { id: 18, text: 'My parents (not travel) abroad in 2020.', correctTense: 'past', correctForm: "didn't travel", fullSentence: "My parents didn't travel abroad in 2020." },
+                { id: 19, text: '(you / call) me yesterday?', correctTense: 'past', correctForm: 'did you call', fullSentence: 'Did you call me yesterday?' },
+                { id: 20, text: '(she / finish) the project last Friday?', correctTense: 'past', correctForm: 'did she finish', fullSentence: 'Did she finish the project last Friday?' },
+                { id: 21, text: 'Where (you / go) last weekend?', correctTense: 'past', correctForm: 'did you go', fullSentence: 'Where did you go last weekend?' },
+                { id: 22, text: 'What time (they / arrive) yesterday?', correctTense: 'past', correctForm: 'did they arrive', fullSentence: 'What time did they arrive yesterday?' },
+                { id: 23, text: '(he / watch) the news last night?', correctTense: 'past', correctForm: 'did he watch', fullSentence: 'Did he watch the news last night?' },
+                { id: 24, text: 'When (you / buy) this phone?', correctTense: 'past', correctForm: 'did you buy', fullSentence: 'When did you buy this phone?' },
+                { id: 25, text: '(you / meet) your friends two days ago?', correctTense: 'past', correctForm: 'did you meet', fullSentence: 'Did you meet your friends two days ago?' },
+
+                // Present Perfect
+                { id: 26, text: 'I (lose) my keys.', correctTense: 'present', correctForm: 'have lost', fullSentence: 'I have lost my keys.' },
+                { id: 27, text: 'She (cut) her finger.', correctTense: 'present', correctForm: 'has cut', fullSentence: 'She has cut her finger.' },
+                { id: 28, text: 'They (finish) their work.', correctTense: 'present', correctForm: 'have finished', fullSentence: 'They have finished their work.' },
+                { id: 29, text: 'He (break) his leg.', correctTense: 'present', correctForm: 'has broken', fullSentence: 'He has broken his leg.' },
+                { id: 30, text: 'I (already / see) this movie.', correctTense: 'present', correctForm: 'have already seen', fullSentence: 'I have already seen this movie.' },
+                { id: 31, text: 'We (just / arrive) home.', correctTense: 'present', correctForm: 'have just arrived', fullSentence: 'We have just arrived home.' },
+                { id: 32, text: 'I (not finish) my homework yet.', correctTense: 'present', correctForm: "haven't finished", fullSentence: "I haven't finished my homework yet." },
+                { id: 33, text: 'She (not call) me yet.', correctTense: 'present', correctForm: "hasn't called", fullSentence: "She hasn't called me yet." },
+                { id: 34, text: 'They (not eat) lunch yet.', correctTense: 'present', correctForm: "haven't eaten", fullSentence: "They haven't eaten lunch yet." },
+                { id: 35, text: 'He (never / try) sushi.', correctTense: 'present', correctForm: 'has never tried', fullSentence: 'He has never tried sushi.' },
+                { id: 36, text: 'I (never / be) to France.', correctTense: 'present', correctForm: 'have never been', fullSentence: 'I have never been to France.' },
+                { id: 37, text: 'We (not see) him this week.', correctTense: 'present', correctForm: "haven't seen", fullSentence: "We haven't seen him this week." },
+                { id: 38, text: '(you / ever / eat) Thai food?', correctTense: 'present', correctForm: 'have you ever eaten', fullSentence: 'Have you ever eaten Thai food?' },
+                { id: 39, text: '(he / finish) the report yet?', correctTense: 'present', correctForm: 'has he finished', fullSentence: 'Has he finished the report yet?' },
+                { id: 40, text: '(you / do) your homework yet?', correctTense: 'present', correctForm: 'have you done', fullSentence: 'Have you done your homework yet?' },
+                { id: 41, text: '(they / arrive) yet?', correctTense: 'present', correctForm: 'have they arrived', fullSentence: 'Have they arrived yet?' },
+                { id: 42, text: '(she / ever / meet) a celebrity?', correctTense: 'present', correctForm: 'has she ever met', fullSentence: 'Has she ever met a celebrity?' },
+                { id: 43, text: 'What (you / do) to your hair?', correctTense: 'present', correctForm: 'have you done', fullSentence: 'What have you done to your hair?' },
+                { id: 45, text: 'She (visit) her parents this month.', correctTense: 'present', correctForm: 'has visited', fullSentence: 'She has visited her parents this month.' },
+                { id: 46, text: 'We (be) to the gym twice this week.', correctTense: 'present', correctForm: 'have been', fullSentence: 'We have been to the gym twice this week.' },
+                { id: 47, text: 'He (write) three emails today.', correctTense: 'present', correctForm: 'has written', fullSentence: 'He has written three emails today.' },
+                { id: 48, text: 'I (not see) him lately.', correctTense: 'present', correctForm: "haven't seen", fullSentence: "I haven't seen him lately." },
+                { id: 49, text: '(you / read) any good books this year?', correctTense: 'present', correctForm: 'have you read', fullSentence: 'Have you read any good books this year?' },
+                { id: 50, text: 'They (already / pack) their bags.', correctTense: 'present', correctForm: 'have already packed', fullSentence: 'They have already packed their bags.' }
+            ];
+
+            function shuffle(arr) {
+                const a = arr.slice();
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            let sentences = shuffle(sentencesData);
+            let currentMode = 'tense'; // 'tense' | 'fill'
+            let currentIndex = 0;
+            let scorePart1 = 0;
+            let scorePart2 = 0;
+            let selectedTense = null;
+            let isTransitioning = false;
+            let firstAttempt = true;
+
+            let container = document.getElementById('container');
+            let sentenceText = document.getElementById('sentenceText');
+            let sentenceArea = document.getElementById('sentenceArea');
+            let progressLabel = document.getElementById('progressLabel');
+            let scoreLabel = document.getElementById('scoreLabel');
+            let btnPast = document.getElementById('btnPast');
+            let btnPresent = document.getElementById('btnPresent');
+            let judgmentGroup = document.getElementById('judgmentGroup');
+            let btnCheck = document.getElementById('btnCheck');
+            let feedbackMsg = document.getElementById('feedbackMsg');
+
+            // Для второй части
+            let fillInput = null;
+
+            function getCurrentSentence() { return sentences[currentIndex]; }
+
+            function clearSelection() {
+                selectedTense = null;
+                btnPast.classList.remove('selected');
+                btnPresent.classList.remove('selected');
+            }
+
+            function resetForCurrentSentence() {
+                clearSelection();
+                feedbackMsg.textContent = '';
+                feedbackMsg.className = 'feedback-msg';
+                btnCheck.classList.remove('success-flash','error-flash');
+                btnCheck.textContent = 'Check';
+                sentenceArea.classList.remove('shake');
+                judgmentGroup.classList.remove('shake');
+                container.classList.remove('shake');
+                isTransitioning = false;
+                firstAttempt = true;
+                if (fillInput) {
+                    fillInput.value = '';
+                    fillInput.classList.remove('error-highlight');
+                }
+            }
+
+            function updateProgressUI() {
+                progressLabel.textContent = (currentIndex + 1) + ' / ' + sentences.length;
+                scoreLabel.textContent = currentMode === 'tense' ? 'Score: ' + scorePart1 : 'Score: ' + scorePart2;
+            }
+
+            function renderTenseSentence() {
+                sentenceText.textContent = getCurrentSentence().text;
+                updateProgressUI();
+            }
+
+            function renderFillSentence() {
+                const s = getCurrentSentence();
+                // Отображаем исходное предложение с глаголом в скобках и указанием времени
+                const displayText = s.text + ' (' + (s.correctTense === 'past' ? 'Past Simple' : 'Present Perfect') + ')';
+                sentenceText.textContent = displayText;
+                updateProgressUI();
+            }
+
+            function getPastSimpleExplanation(sentenceText) {
+                const lower = sentenceText.toLowerCase();
+                if (lower.includes('yesterday')) return 'Есть конкретное указание времени в прошлом – yesterday.';
+                if (lower.includes('ago')) return 'Есть конкретное указание времени в прошлом – ... ago.';
+                if (lower.includes('last')) return 'Есть конкретное указание времени в прошлом – last ...';
+                if (lower.includes('in 2015') || lower.includes('in 2020')) return 'Есть конкретное указание времени в прошлом – in [год].';
+                if (lower.includes('when')) return 'Есть указание на момент в прошлом – when ...';
+                if (lower.includes('on monday')) return 'Есть конкретное указание времени в прошлом – on Monday.';
+                return 'Есть указание на завершённый период в прошлом.';
+            }
+
+            function getExplanation(sentence, wrongTense) {
+                const text = sentence.text.toLowerCase();
+                if (wrongTense === 'past') {
+                    if (text.includes('just') || text.includes('already')) return '"Just" или "already" указывают, что действие уже совершено к настоящему моменту, точное время не указано.';
+                    if (text.includes('yet')) return '"Yet" используется в отрицаниях и вопросах о действиях, которые ещё не произошли к настоящему моменту.';
+                    if (text.includes('never') || text.includes('ever')) return '"Never"/"ever" используются для разговора о жизненном опыте, без привязки к конкретному времени.';
+                    if (text.includes('this week') || text.includes('this month') || text.includes('this year') || text.includes('today')) return 'Период времени ещё не закончен (this week/month/year/today), действие связано с настоящим.';
+                    if (text.includes('lately') || text.includes('recently')) return '"Lately"/"recently" указывают на недавнее прошлое без точного указания времени.';
+                    return 'Нет указания времени, важен результат действия сейчас.';
+                } else {
+                    return getPastSimpleExplanation(sentence.text);
+                }
+            }
+
+            function getTenseStructureHint(tense) {
+                if (tense === 'past') {
+                    return 'Past Simple: Subject + V2 (для правильных глаголов +ed, неправильные – вторая форма). Для отрицаний: didn\'t + V1. Для вопросов: Did + subject + V1?';
+                } else {
+                    return 'Present Perfect: Subject + have/has + V3 (past participle). Для отрицаний: haven\'t/hasn\'t + V3. Для вопросов: Have/Has + subject + V3?';
+                }
+            }
+
+            function normalizeAnswer(str) {
+                let s = str.trim().toLowerCase();
+                s = s.replace(/\bdid not\b/g, "didn't");
+                s = s.replace(/\bhave not\b/g, "haven't");
+                s = s.replace(/\bhas not\b/g, "hasn't");
+                s = s.replace(/\s+/g, ' ');
+                return s;
+            }
+
+            function handleTenseCheck() {
+                if (isTransitioning) return;
+                const sentence = getCurrentSentence();
+                if (selectedTense === null) {
+                    judgmentGroup.classList.add('shake');
+                    setTimeout(() => judgmentGroup.classList.remove('shake'), 550);
+                    feedbackMsg.textContent = 'Choose Past Simple or Present Perfect.';
+                    feedbackMsg.className = 'feedback-msg error';
+                    return;
+                }
+                if (selectedTense === sentence.correctTense) {
+                    if (firstAttempt) {
+                        scorePart1++;
+                        updateProgressUI();
+                    }
+                    isTransitioning = true;
+                    feedbackMsg.textContent = 'Correct!';
+                    feedbackMsg.className = 'feedback-msg success';
+                    btnCheck.classList.add('success-flash');
+                    btnCheck.textContent = '✓';
+                    setTimeout(() => {
+                        if (currentIndex < sentences.length - 1) {
+                            container.classList.add('fade-out');
+                            setTimeout(() => {
+                                currentIndex++;
+                                resetForCurrentSentence();
+                                renderTenseSentence();
+                                container.classList.remove('fade-out');
+                                container.classList.add('fade-in');
+                                setTimeout(() => container.classList.remove('fade-in'), 250);
+                            }, 220);
+                        } else {
+                            showPart1Complete();
+                        }
+                    }, 900);
+                } else {
+                    firstAttempt = false;
+                    judgmentGroup.classList.add('shake');
+                    setTimeout(() => judgmentGroup.classList.remove('shake'), 550);
+                    feedbackMsg.textContent = getExplanation(sentence, selectedTense);
+                    feedbackMsg.className = 'feedback-msg error';
+                    btnCheck.classList.add('error-flash');
+                    setTimeout(() => btnCheck.classList.remove('error-flash'), 400);
+                    clearSelection();
+                }
+            }
+
+            function handleFillCheck() {
+                if (isTransitioning) return;
+                const sentence = getCurrentSentence();
+                const userAnswer = fillInput.value.trim();
+                if (!userAnswer) {
+                    fillInput.classList.add('error-highlight');
+                    fillInput.focus();
+                    feedbackMsg.textContent = 'Type ONLY the correct verb form.';
+                    feedbackMsg.className = 'feedback-msg error';
+                    return;
+                }
+                const normalizedUser = normalizeAnswer(userAnswer);
+                const normalizedCorrect = normalizeAnswer(sentence.correctForm);
+                if (normalizedUser === normalizedCorrect) {
+                    if (firstAttempt) {
+                        scorePart2++;
+                        updateProgressUI();
+                    }
+                    isTransitioning = true;
+                    feedbackMsg.textContent = 'Correct!';
+                    feedbackMsg.className = 'feedback-msg success';
+                    btnCheck.classList.add('success-flash');
+                    btnCheck.textContent = '✓';
+                    setTimeout(() => {
+                        if (currentIndex < sentences.length - 1) {
+                            container.classList.add('fade-out');
+                            setTimeout(() => {
+                                currentIndex++;
+                                resetForCurrentSentence();
+                                renderFillSentence();
+                                container.classList.remove('fade-out');
+                                container.classList.add('fade-in');
+                                setTimeout(() => container.classList.remove('fade-in'), 250);
+                            }, 220);
+                        } else {
+                            showFinalSummary();
+                        }
+                    }, 900);
+                } else {
+                    firstAttempt = false;
+                    fillInput.classList.add('error-highlight');
+                    fillInput.focus();
+                    feedbackMsg.textContent = getTenseStructureHint(sentence.correctTense);
+                    feedbackMsg.className = 'feedback-msg error';
+                    btnCheck.classList.add('error-flash');
+                    setTimeout(() => btnCheck.classList.remove('error-flash'), 400);
+                }
+            }
+
+            function showPart1Complete() {
+                isTransitioning = true;
+                container.classList.add('fade-out');
+                setTimeout(() => {
+                    container.innerHTML = `
+                        <div class="header">
+                            <span class="header-title">Part 1 Complete</span>
+                            <span class="header-progress">Score: ${scorePart1} / ${sentences.length}</span>
+                        </div>
+                        <div class="summary">
+                            <div class="summary-well-done">Part 1 done!</div>
+                            <div class="summary-score">${scorePart1} / ${sentences.length}</div>
+                            <div class="summary-label">Now Part 2: Fill in the blanks</div>
+                            <div class="summary-detail">You will see the same sentences but with a gap.<br>Type ONLY the correct verb form.</div>
+                        </div>
+                    `;
+                    // Убираем fade-out и добавляем fade-in, чтобы экран стал видимым
+                    container.classList.remove('fade-out');
+                    container.classList.add('fade-in');
+                    setTimeout(() => startFillMode(), 2000);
+                }, 250);
+            }
+
+            function startFillMode() {
+                currentMode = 'fill';
+                currentIndex = 0;
+                scorePart2 = 0;
+                isTransitioning = false;
+                firstAttempt = true;
+                container.innerHTML = `
+                    <div class="header">
+                        <span class="header-title">Part 2: Fill in the blanks</span>
+                        <div class="header-right">
+                            <span class="header-progress" id="progressLabel">1 / ${sentences.length}</span>
+                            <span class="header-score" id="scoreLabel">Score: 0</span>
+                        </div>
+                    </div>
+                    <div class="sentence-area" id="sentenceArea">
+                        <span class="sentence-text" id="sentenceText"></span>
+                    </div>
+                    <input type="text" class="fill-input" id="fillInput" placeholder="Type ONLY the correct verb form (e.g. did not go, have you seen ...)" autocomplete="off">
+                    <button class="btn-check" id="btnCheck">Check</button>
+                    <div class="feedback-msg" id="feedbackMsg"></div>
+                `;
+                sentenceText = document.getElementById('sentenceText');
+                sentenceArea = document.getElementById('sentenceArea');
+                progressLabel = document.getElementById('progressLabel');
+                scoreLabel = document.getElementById('scoreLabel');
+                fillInput = document.getElementById('fillInput');
+                btnCheck = document.getElementById('btnCheck');
+                feedbackMsg = document.getElementById('feedbackMsg');
+                fillInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (!isTransitioning) handleFillCheck();
+                    }
+                });
+                btnCheck.addEventListener('click', function() {
+                    if (!isTransitioning) handleFillCheck();
+                });
+                renderFillSentence();
+                container.classList.remove('fade-out');
+                container.classList.add('fade-in');
+                setTimeout(() => container.classList.remove('fade-in'), 250);
+            }
+
+            function showFinalSummary() {
+                isTransitioning = true;
+                container.classList.add('fade-out');
+                setTimeout(() => {
+                    const totalScore = scorePart1 + scorePart2;
+                    const pct = Math.round((totalScore / (sentences.length * 2)) * 100);
+                    let remark = '';
+                    if (pct >= 90) remark = 'Excellent work!';
+                    else if (pct >= 70) remark = 'Good effort. Keep practicing.';
+                    else if (pct >= 50) remark = 'Solid progress. Review the tricky ones.';
+                    else remark = 'Keep at it. Practice makes progress.';
+                    const allCorrect = sentences.map(s => s.fullSentence).join('\n');
+                    container.innerHTML = `
+                        <div class="header">
+                            <span class="header-title">Practice Complete</span>
+                            <span class="header-progress">Final Score</span>
+                        </div>
+                        <div class="summary">
+                            <div class="summary-well-done">Well done!</div>
+                            <div class="summary-score">${totalScore} / ${sentences.length * 2}</div>
+                            <div class="summary-label">${remark}</div>
+                            <div class="summary-detail">Part 1: ${scorePart1} / ${sentences.length}<br>Part 2: ${scorePart2} / ${sentences.length}</div>
+                            <button class="btn-restart" id="btnRestart">Start Again</button>
+                        </div>
+                        <div style="margin-top: 30px; text-align: left;">
+                            <p style="font-weight:600; margin-bottom:8px;">All correct sentences:</p>
+                            <div class="copy-area">${allCorrect}</div>
+                        </div>
+                    `;
+                    document.getElementById('btnRestart').addEventListener('click', restartAll);
+                    container.classList.remove('fade-out');
+                    container.classList.add('fade-in');
+                }, 250);
+            }
+
+            function restartAll() {
+                sentences = shuffle(sentencesData);
+                currentMode = 'tense';
+                currentIndex = 0;
+                scorePart1 = 0;
+                scorePart2 = 0;
+                selectedTense = null;
+                isTransitioning = false;
+                firstAttempt = true;
+                container.innerHTML = `
+                    <div class="header">
+                        <span class="header-title">Part 1: Choose the Tense</span>
+                        <div class="header-right">
+                            <span class="header-progress" id="progressLabel">1 / ${sentences.length}</span>
+                            <span class="header-score" id="scoreLabel">Score: 0</span>
+                        </div>
+                    </div>
+                    <div class="sentence-area" id="sentenceArea">
+                        <span class="sentence-text" id="sentenceText"></span>
+                    </div>
+                    <div class="judgment-group" id="judgmentGroup">
+                        <button class="btn-judgment" data-tense="past" id="btnPast">Past Simple</button>
+                        <button class="btn-judgment" data-tense="present" id="btnPresent">Present Perfect</button>
+                    </div>
+                    <button class="btn-check" id="btnCheck">Check</button>
+                    <div class="feedback-msg" id="feedbackMsg"></div>
+                `;
+                sentenceText = document.getElementById('sentenceText');
+                sentenceArea = document.getElementById('sentenceArea');
+                progressLabel = document.getElementById('progressLabel');
+                scoreLabel = document.getElementById('scoreLabel');
+                btnPast = document.getElementById('btnPast');
+                btnPresent = document.getElementById('btnPresent');
+                judgmentGroup = document.getElementById('judgmentGroup');
+                btnCheck = document.getElementById('btnCheck');
+                feedbackMsg = document.getElementById('feedbackMsg');
+                fillInput = null;
+                judgmentGroup.addEventListener('click', onJudgmentClick);
+                btnCheck.addEventListener('click', onCheckClick);
+                renderTenseSentence();
+                container.classList.remove('fade-out');
+                container.classList.add('fade-in');
+                setTimeout(() => container.classList.remove('fade-in'), 250);
+            }
+
+            function onJudgmentClick(e) {
+                if (isTransitioning || currentMode !== 'tense') return;
+                const btn = e.target.closest('.btn-judgment');
+                if (!btn) return;
+                const tense = btn.dataset.tense;
+                feedbackMsg.textContent = '';
+                feedbackMsg.className = 'feedback-msg';
+                btnCheck.classList.remove('success-flash','error-flash');
+                btnCheck.textContent = 'Check';
+                container.classList.remove('shake');
+                judgmentGroup.classList.remove('shake');
+                clearSelection();
+                selectedTense = tense;
+                if (tense === 'past') btnPast.classList.add('selected');
+                else btnPresent.classList.add('selected');
+            }
+
+            function onCheckClick() {
+                if (isTransitioning) return;
+                if (currentMode === 'tense') {
+                    if (btnPast.classList.contains('selected')) selectedTense = 'past';
+                    else if (btnPresent.classList.contains('selected')) selectedTense = 'present';
+                    else selectedTense = null;
+                    handleTenseCheck();
+                } else {
+                    handleFillCheck();
+                }
+            }
+
+            // Инициализация
+            judgmentGroup.addEventListener('click', onJudgmentClick);
+            btnCheck.addEventListener('click', onCheckClick);
+            renderTenseSentence();
+
+            // Глобальная обработка клавиш: 1, 2, Enter
+            document.addEventListener('keydown', function(e) {
+                if (currentMode === 'tense' && !isTransitioning) {
+                    if (e.key === '1') {
+                        btnPast.click();
+                    } else if (e.key === '2') {
+                        btnPresent.click();
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        onCheckClick();
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+</html>
