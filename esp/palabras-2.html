@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terminology — Español A1</title>
+<style>
+  :root {
+    --bg:          #f9f6ef;
+    --paper:       #fdfbf6;
+    --ink:         #2f2b24;
+    --ink-soft:    #5e574b;
+    --muted:       #a9a294;
+    --line:        #ece7db;
+    --line-strong: #2f2b24;
+    --accent:      #c9553a;
+    --ok:          #527a5c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    display: grid;
+    place-items: center;
+    padding: 32px 20px;
+    min-height: 100vh;
+  }
+
+  .quiz {
+    width: 100%;
+    max-width: 700px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: 32px 44px 24px;
+    position: relative;
+  }
+  .quiz::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 10px; height: 10px;
+    background: var(--accent);
+  }
+
+  /* ================= barra superior ================= */
+  .bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  .bar__right { color: var(--muted); }
+
+  .bar__line {
+    margin-top: 10px;
+    height: 1px;
+    background: var(--line);
+    position: relative;
+  }
+  .bar__line::after {
+    content: "";
+    position: absolute;
+    top: -1px; left: 0;
+    height: 3px;
+    width: var(--p, 0%);
+    background: var(--ink);
+    transition: width .4s ease;
+  }
+
+  /* ================= rejilla de secciones ================= */
+  .grid {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 20px;
+  }
+  .label {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 14px;
+    border-top: 1px solid var(--line-strong);
+  }
+  .label em {
+    font-style: normal;
+    color: var(--ink-soft);
+  }
+
+  /* ================= titular ================= */
+  .prompt { margin-top: 56px; }
+  .prompt .label { padding-top: 10px; }
+  .prompt__text {
+    font-family: "Iowan Old Style", "Charter", "Palatino Linotype", Georgia, serif;
+    font-size: 28px;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+    animation: fade .25s ease;
+  }
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .prompt__text small {
+    display: block;
+    margin-top: 14px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-style: normal;
+  }
+
+  /* ================= listas ================= */
+  .list { margin-top: 44px; }
+  .list__body {
+    border-top: 1px solid var(--line-strong);
+    animation: fade .3s ease;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 16px 2px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    background: transparent;
+    font-family: inherit;
+    font-size: 17px;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    transition: color .15s ease, padding-left .2s ease;
+  }
+  .row__n {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    color: var(--muted);
+    transition: color .15s ease;
+  }
+
+  .row:not(:disabled):hover {
+    padding-left: 12px;
+    color: var(--accent);
+  }
+  .row:not(:disabled):hover .row__n { color: var(--accent); }
+  .row:disabled { cursor: default; }
+
+  .row.is-rejected { animation: reject .35s ease; }
+  @keyframes reject {
+    0%   { transform: translateX(0); }
+    25%  { transform: translateX(-5px); }
+    50%  { transform: translateX(4px); }
+    75%  { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+  }
+
+  .row.is-correct {
+    color: var(--ok);
+    padding-left: 12px;
+  }
+  .row.is-correct .row__n { color: var(--ok); }
+
+  /* ================= instrucciones ================= */
+  .rules {
+    border-top: 1px solid var(--line-strong);
+    padding-top: 4px;
+  }
+  .rule {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 20px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .rule__k {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-top: 4px;
+  }
+  .rule__v { font-size: 16px; color: var(--ink); }
+  .rule__v kbd {
+    display: inline-block;
+    min-width: 20px;
+    padding: 2px 6px;
+    margin: 0 2px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    line-height: 1;
+    text-align: center;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 2px;
+  }
+
+  /* ================= pie ================= */
+  .footer { margin-top: 36px; min-height: 40px; }
+  .footer .label { padding-top: 16px; }
+  .footer__right {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 16px;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .next {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+  }
+  .next::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -3px;
+    height: 1px;
+    background: var(--ink);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform .25s ease;
+  }
+  .next:hover::after { transform: scaleX(1); }
+  .next[hidden] { display: none; }
+
+  /* ================= final ================= */
+  .end { padding: 40px 0 24px; }
+  .end__score {
+    font-family: "Iowan Old Style", "Charter", Georgia, serif;
+    font-size: 96px;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+  .end__score small {
+    display: block;
+    margin-top: 10px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .end__text {
+    margin-top: 24px;
+    font-family: "Iowan Old Style", "Charter", Georgia, serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-soft);
+  }
+  .end__actions {
+    margin-top: 36px;
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+
+  /* ================= adaptable ================= */
+  @media (max-width: 640px) {
+    .quiz { padding: 24px 24px 20px; }
+    .grid, .rule { grid-template-columns: 1fr; gap: 8px; }
+    .label, .rule__k { border-top: 0; padding-top: 0; }
+    .prompt { margin-top: 32px; }
+    .prompt__text { font-size: 22px; }
+    .list { margin-top: 28px; }
+    .end__score { font-size: 64px; }
+  }
+</style>
+</head>
+<body>
+
+<main class="quiz" id="quiz"></main>
+
+<script>
+/* =========================================================
+   Datos
+   ========================================================= */
+const THEMES = [
+  {
+    name: "La comida",
+    items: [
+      { term: "el pan",       definition: "Alimento básico hecho con harina y agua. Horneado, no hervido." },
+      { term: "la manzana",   definition: "Fruta redonda, roja o verde, y dulce." },
+      { term: "el agua",      definition: "Bebida transparente y sin color, muy necesaria." },
+      { term: "la carne",     definition: "Alimento que viene de animales como la vaca o el cerdo." },
+      { term: "el pescado",   definition: "Alimento que vive en el mar o en el río." },
+      { term: "el arroz",     definition: "Alimento blanco que se come mucho en Asia." },
+      { term: "la leche",     definition: "Bebida blanca que viene de la vaca." },
+      { term: "el queso",     definition: "Producto que se hace con leche y puede ser amarillo o blanco. Se pone a una pizza." },
+      { term: "la sopa",      definition: "Comida líquida y caliente que se come con cuchara." },
+      { term: "el helado",    definition: "Postre frío y dulce, típico en verano." },
+    ],
+    words: [
+      "el pan", "la manzana", "el agua", "la carne", "el pescado",
+      "el arroz", "la leche", "el queso", "la sopa", "el helado",
+      "el té", "la naranja", "el café", "la cebolla", "la ensalada",
+      "el zumo", "la mantequilla", "el plátano", "la pasta", "el chocolate",
+    ],
+  },
+  {
+    name: "La casa",
+    items: [
+      { term: "la cocina",     definition: "Lugar donde cocinas y preparas la comida." },
+      { term: "el dormitorio", definition: "Habitación donde duermes." },
+      { term: "el baño",       definition: "Habitación donde te duchas y lavas las manos." },
+      { term: "la sala",       definition: "Habitación donde ves la tele o hablas con la familia." },
+      { term: "la ventana",    definition: "Parte de la pared que se abre para ver la calle." },
+      { term: "la puerta",     definition: "Parte de la casa por donde entras y sales." },
+      { term: "la cama",       definition: "Mueble cómodo para dormir o descansar." },
+      { term: "la mesa",       definition: "Mueble con cuatro patas donde comes o escribes." },
+      { term: "la silla",      definition: "Mueble para sentarse." },
+      { term: "el armario",    definition: "Mueble donde guardas la ropa." },
+    ],
+    words: [
+      "la cocina", "el dormitorio", "el baño", "la sala", "la ventana",
+      "la puerta", "la cama", "la mesa", "la silla", "el armario",
+      "la lámpara", "el espejo", "la nevera", "el jardín", "la pared",
+      "el techo", "la escalera", "el garaje", "la alfombra", "la cortina",
+    ],
+  },
+  {
+    name: "La ciudad",
+    items: [
+      { term: "la calle",        definition: "Camino en la ciudad por donde pasan coches y personas." },
+      { term: "la plaza",        definition: "Lugar abierto y amplio en la ciudad. No casas o edificios en este lugar, pero no es el parque." },
+      { term: "el parque",       definition: "Lugar con árboles y flores donde puedes pasear o jugar." },
+      { term: "la tienda",       definition: "Lugar pequeño o grande donde venden ropa, libros, etc." },
+      { term: "el supermercado", definition: "Lugar grande donde compras comida y productos para la casa. Usualmente es una cadena." },
+      { term: "el hospital",     definition: "Lugar donde los médicos y enfermeros cuidan a los enfermos." },
+      { term: "la escuela",      definition: "Lugar donde los niños estudian y aprenden." },
+      { term: "el banco",        definition: "Lugar donde guardas dinero." },
+      { term: "la farmacia",     definition: "Lugar donde compras medicinas." },
+      { term: "el restaurante",  definition: "Lugar donde comes y pagas por la comida." },
+    ],
+    words: [
+      "la calle", "la plaza", "el parque", "la tienda", "el supermercado",
+      "el hospital", "la escuela", "el banco", "la farmacia", "el restaurante",
+      "la biblioteca", "el museo", "la iglesia", "el cine", "la playa",
+      "el aeropuerto", "la estación", "la oficina", "el hotel", "el teatro",
+    ],
+  },
+  {
+    name: "La familia y las personas",
+    items: [
+      { term: "la madre",   definition: "La mujer. Eres su hija." },
+      { term: "el padre",   definition: "El hombre. Eres su hija." },
+      { term: "el hermano", definition: "El hijo de tus padres, tu compañero." },
+      { term: "la hermana", definition: "La hija de tus padres, tu compañera." },
+      { term: "el abuelo",  definition: "El padre de tu padre o de tu madre." },
+      { term: "la abuela",  definition: "La madre de tu padre o de tu madre." },
+      { term: "el tío",     definition: "El hermano de tu padre o de tu madre." },
+      { term: "la tía",     definition: "La hermana de tu padre o de tu madre." },
+      { term: "el primo",   definition: "El hijo de tus tíos." },
+      { term: "el amigo",   definition: "Persona que no es de tu familia, pero te quiere y juega contigo." },
+    ],
+    words: [
+      "la madre", "el padre", "el hermano", "la hermana", "el abuelo",
+      "la abuela", "el tío", "la tía", "el primo", "el amigo",
+      "el sobrino", "la sobrina", "el nieto", "la nieta", "el suegro",
+      "la suegra", "el cuñado", "la cuñada", "el vecino", "la vecina",
+    ],
+  },
+  {
+    name: "Los pasatiempos y deportes",
+    items: [
+      { term: "leer",            definition: "Pasar el tiempo con un libro o una revista." },
+      { term: "escribir",        definition: "Poner palabras en un papel o en un ordenador." },
+      { term: "bailar",          definition: "Mover el cuerpo al ritmo de la música." },
+      { term: "cantar",          definition: "Usar la voz para hacer música." },
+      { term: "nadar",           definition: "Hacer deporte en el agua." },
+      { term: "correr",          definition: "Mover las piernas rápido para hacer ejercicio." },
+      { term: "jugar al fútbol", definition: "Practicar un deporte con un balón y dos equipos." },
+      { term: "escuchar música", definition: "Oír canciones o grupos de música." },
+      { term: "ver la tele",     definition: "Mirar programas o películas, pero no en YouTube o Netflix." },
+      { term: "dibujar",         definition: "Ser creativo con lápiz o bolígrafo." },
+    ],
+    words: [
+      "leer", "escribir", "bailar", "cantar", "nadar",
+      "correr", "jugar al fútbol", "escuchar música", "ver la tele", "dibujar",
+      "cocinar", "viajar", "dormir", "trabajar", "estudiar",
+      "limpiar", "comprar", "pasear", "tocar la guitarra", "ir de compras",
+    ],
+  },
+];
+
+/* =========================================================
+   Utilidades
+   ========================================================= */
+const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+const pad = n => String(n).padStart(2, "0");
+const $ = id => document.getElementById(id);
+const root = $("quiz");
+const TOTAL_ITEMS = THEMES.reduce((n, t) => n + t.items.length, 0);
+
+let state = null;
+
+/* =========================================================
+   Estado global
+   ========================================================= */
+function startSession() {
+  state = {
+    phase: "intro",        // intro | theme-intro | question | end
+    themeIdx: 0,
+    pool: [],
+    idx: 0,
+    score: 0,
+    themeScore: 0,
+    revealed: false,       // ¿ya se mostraron las opciones?
+    solved: false,
+  };
+  render();
+}
+
+/* =========================================================
+   Render principal — enrutador por fases
+   ========================================================= */
+function render() {
+  switch (state.phase) {
+    case "intro":       return renderIntro();
+    case "theme-intro": return renderThemeIntro();
+    case "question":    return renderQuestion();
+    case "end":         return renderEnd();
+  }
+}
+
+/* =========================================================
+   Estructura / barra
+   ========================================================= */
+function shell({ progress = 0, right = "", body }) {
+  root.innerHTML = `
+    <div class="bar">
+      <span>Terminology</span>
+      <span class="bar__right">${right}</span>
+    </div>
+    <div class="bar__line" style="--p: ${progress}%"></div>
+    ${body}
+  `;
+}
+
+/* =========================================================
+   Pantalla 1 — instrucciones
+   ========================================================= */
+function renderIntro() {
+  shell({
+    progress: 0,
+    right: "Instrucciones",
+    body: `
+      <section class="prompt">
+        <div class="grid">
+          <div class="label">Cómo funciona</div>
+          <div class="prompt__text">
+            Primero lee la definición. Después aparecen cuatro palabras: elige la correcta.
+          </div>
+        </div>
+      </section>
+
+      <section class="list">
+        <div class="grid">
+          <div class="label">Reglas</div>
+          <div class="rules">
+            <div class="rule">
+              <div class="rule__k">Leer</div>
+              <div class="rule__v">
+                Al empezar la pregunta solo verás la definición.
+                Pulsa <kbd>Enter</kbd> cuando estés listo para ver las opciones.
+              </div>
+            </div>
+            <div class="rule">
+              <div class="rule__k">Respuesta</div>
+              <div class="rule__v">
+                Pulsa <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd>
+                o haz clic en la fila para elegir una opción.
+              </div>
+            </div>
+            <div class="rule">
+              <div class="rule__k">Error</div>
+              <div class="rule__v">
+                Si la respuesta es incorrecta, la opción se aparta en silencio;
+                puedes intentarlo de nuevo. No hay pistas.
+              </div>
+            </div>
+            <div class="rule">
+              <div class="rule__k">Acierto</div>
+              <div class="rule__v">
+                La respuesta correcta se ilumina una sola vez; las demás quedan bloqueadas.
+              </div>
+            </div>
+            <div class="rule">
+              <div class="rule__k">Continuar</div>
+              <div class="rule__v">
+                <kbd>Enter</kbd> o <kbd>→</kbd> para pasar a la siguiente pantalla.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="grid">
+          <div class="label">Empezar <em>· ↵</em></div>
+          <div class="footer__right">
+            <button class="next" id="nextBtn" type="button">Empezar →</button>
+          </div>
+        </div>
+      </footer>
+    `,
+  });
+  $("nextBtn").addEventListener("click", goToThemeIntro);
+}
+
+/* =========================================================
+   Pantalla 2 — portada del tema
+   ========================================================= */
+function goToThemeIntro() {
+  state.phase = "theme-intro";
+  state.themeScore = 0;
+  render();
+}
+
+function renderThemeIntro() {
+  const theme = THEMES[state.themeIdx];
+  const progress = (state.themeIdx / THEMES.length) * 100;
+
+  shell({
+    progress,
+    right: `Tema ${pad(state.themeIdx + 1)} / ${pad(THEMES.length)}`,
+    body: `
+      <section class="prompt">
+        <div class="grid">
+          <div class="label">Tema</div>
+          <div class="prompt__text">
+            ${theme.name}
+            <small>${theme.items.length} palabras</small>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="grid">
+          <div class="label">Siguiente <em>· ↵</em></div>
+          <div class="footer__right">
+            <button class="next" id="nextBtn" type="button">Empezar tema →</button>
+          </div>
+        </div>
+      </footer>
+    `,
+  });
+
+  $("nextBtn").addEventListener("click", beginThemeQuestions);
+}
+
+/* =========================================================
+   Preguntas del tema
+   ========================================================= */
+function beginThemeQuestions() {
+  const theme = THEMES[state.themeIdx];
+  state.pool = shuffle(theme.items).map(it => ({ ...it, words: theme.words }));
+  state.idx = 0;
+  state.revealed = false;
+  state.phase = "question";
+  render();
+}
+
+function buildOptions(correct, words) {
+  const others = shuffle(words.filter(w => w !== correct)).slice(0, 3);
+  return shuffle([correct, ...others]);
+}
+
+function renderQuestion() {
+  state.solved = false;
+
+  const item = state.pool[state.idx];
+  const theme = THEMES[state.themeIdx];
+  const localTotal = state.pool.length;
+  const themeProgress = (state.themeIdx + state.idx / localTotal) / THEMES.length * 100;
+
+  const optionsBlock = state.revealed
+    ? `
+      <section class="list">
+        <div class="grid">
+          <div class="label">Opciones <em>· 1–4</em></div>
+          <div class="list__body" id="options"></div>
+        </div>
+      </section>
+    `
+    : "";
+
+  const footerBlock = state.revealed
+    ? `
+      <div class="label">Siguiente <em>· ↵</em></div>
+      <div class="footer__right">
+        <button class="next" id="nextBtn" type="button" hidden>
+          ${state.idx === localTotal - 1 ? "Al tema →" : "Siguiente →"}
+        </button>
+      </div>
+    `
+    : `
+      <div class="label">Opciones <em>· ↵</em></div>
+      <div class="footer__right">
+        <button class="next" id="revealBtn" type="button">Ver opciones →</button>
+      </div>
+    `;
+
+  shell({
+    progress: themeProgress,
+    right: `${theme.name} · ${pad(state.idx + 1)} / ${pad(localTotal)}`,
+    body: `
+      <section class="prompt">
+        <div class="grid">
+          <div class="label">Definición</div>
+          <div class="prompt__text" id="question">${item.definition}</div>
+        </div>
+      </section>
+
+      ${optionsBlock}
+
+      <footer class="footer">
+        <div class="grid">${footerBlock}</div>
+      </footer>
+    `,
+  });
+
+  if (!state.revealed) {
+    $("revealBtn").addEventListener("click", revealOptions);
+    return;
+  }
+
+  const list = $("options");
+  buildOptions(item.term, item.words).forEach((word, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "row";
+    btn.dataset.index = i;
+    btn.innerHTML = `
+      <span class="row__n">${pad(i + 1)}</span>
+      <span class="row__t">${word}</span>
+    `;
+    btn.addEventListener("click", () => pick(btn, word, item.term));
+    list.appendChild(btn);
+  });
+
+  $("nextBtn").addEventListener("click", nextQuestion);
+}
+
+/* =========================================================
+   Mostrar opciones (paso 1 → paso 2)
+   ========================================================= */
+function revealOptions() {
+  state.revealed = true;
+  renderQuestion();
+}
+
+/* =========================================================
+   Respuesta
+   ========================================================= */
+function pick(btn, chosen, correct) {
+  if (state.solved) return;
+
+  if (chosen === correct) {
+    state.solved = true;
+    state.score++;
+    state.themeScore++;
+    btn.classList.add("is-correct");
+    $("options").querySelectorAll(".row").forEach(o => (o.disabled = true));
+
+    const localTotal = state.pool.length;
+    const themeProgress =
+      (state.themeIdx + (state.idx + 1) / localTotal) / THEMES.length * 100;
+    document.querySelector(".bar__line").style.setProperty("--p", `${themeProgress}%`);
+
+    $("nextBtn").hidden = false;
+    return;
+  }
+
+  btn.classList.remove("is-rejected");
+  void btn.offsetWidth;
+  btn.classList.add("is-rejected");
+}
+
+/* =========================================================
+   Navegación
+   ========================================================= */
+function nextQuestion() {
+  state.idx++;
+  state.revealed = false;
+  if (state.idx >= state.pool.length) return goToNextTheme();
+  renderQuestion();
+}
+
+function goToNextTheme() {
+  state.themeIdx++;
+  if (state.themeIdx >= THEMES.length) {
+    state.phase = "end";
+    return render();
+  }
+  state.phase = "theme-intro";
+  state.themeScore = 0;
+  render();
+}
+
+/* =========================================================
+   Pantalla final
+   ========================================================= */
+function renderEnd() {
+  const total = TOTAL_ITEMS;
+  const ratio = state.score / total;
+  const note =
+    ratio >= 0.7  ? "Buen resultado." :
+    ratio >= 0.4  ? "Hay margen de mejora." :
+                    "Conviene repasar el material.";
+
+  shell({
+    progress: 100,
+    right: "Completado",
+    body: `
+      <section class="end">
+        <div class="grid">
+          <div class="label">Resultado</div>
+          <div>
+            <div class="end__score">
+              ${state.score}
+              <small>de ${total} correctas</small>
+            </div>
+            <p class="end__text">${note}</p>
+            <div class="end__actions">
+              <button class="next" id="again" type="button">Repetir →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    `,
+  });
+
+  $("again").addEventListener("click", startSession);
+}
+
+/* =========================================================
+   Teclado
+   ========================================================= */
+document.addEventListener("keydown", e => {
+  if (!state) return;
+
+  const phase = state.phase;
+
+  // intro / theme-intro / end — Enter/Space/→ avanzan
+  if (phase === "intro" || phase === "theme-intro" || phase === "end") {
+    if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") {
+      e.preventDefault();
+      const btn = $("nextBtn") || $("again");
+      if (btn) btn.click();
+    }
+    return;
+  }
+
+  if (phase === "question") {
+    // paso 1 — solo definición: Enter abre las opciones
+    if (!state.revealed) {
+      if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") {
+        e.preventDefault();
+        revealOptions();
+      }
+      return;
+    }
+
+    // paso 2 — resuelto: Enter va al siguiente
+    if (state.solved) {
+      if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") {
+        e.preventDefault();
+        nextQuestion();
+      }
+      return;
+    }
+
+    // paso 2 — sin resolver: 1–4 eligen
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 4) {
+      const btn = $("options").querySelector(`.row[data-index="${n - 1}"]`);
+      if (btn && !btn.disabled) btn.click();
+    }
+  }
+});
+
+/* =========================================================
+   Inicio
+   ========================================================= */
+startSession();
+</script>
+
+</body>
+</html>
