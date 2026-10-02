@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar &amp; Vocabulary — Tasks 1–5</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F6F4EF;
+            --text-primary: #1A1917;
+            --text-secondary: #7A756E;
+            --accent: #C03A2B;
+            --success: #3D7A4E;
+            --border: #DEDBD4;
+            --border-hover: #1A1917;
+            --radius-btn: 2px;
+            --max-width: 660px;
+            --font-body: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            line-height: 1.4;
+        }
+
+        main {
+            width: 100%;
+            max-width: var(--max-width);
+        }
+
+        .start-screen,
+        .instruction-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        .start-divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 0.5rem;
+        }
+
+        .start-label {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .start-instructions {
+            font-size: 24px;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .task-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .task-btn,
+        .ready-btn,
+        .back-btn,
+        .next-btn,
+        .restart-btn,
+        .check-btn,
+        .retry-btn {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            text-align: left;
+            align-self: flex-start;
+            min-width: auto;
+        }
+
+        .task-btn {
+            padding: 14px 24px;
+            min-width: 240px;
+        }
+
+        .task-btn:hover,
+        .ready-btn:hover,
+        .back-btn:hover,
+        .next-btn:hover,
+        .restart-btn:hover,
+        .check-btn:hover,
+        .retry-btn:hover {
+            border-color: var(--border-hover);
+        }
+
+        .task-btn:focus-visible,
+        .ready-btn:focus-visible,
+        .back-btn:focus-visible,
+        .next-btn:focus-visible,
+        .restart-btn:focus-visible,
+        .check-btn:focus-visible,
+        .retry-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .instruction-title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .instruction-text {
+            font-size: 18px;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .progress-area {
+            margin-bottom: 4rem;
+            display: none;
+        }
+
+        .progress-label {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 2px;
+            background: var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.35s ease;
+        }
+
+        .question-area {
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .label-container {
+            display: flex;
+            align-items: baseline;
+            gap: 0.65rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .label-line {
+            width: 20px;
+            height: 2px;
+            background: var(--accent);
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .label-text {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .sentence {
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            letter-spacing: -0.01em;
+        }
+
+        .sentence.text-mode {
+            font-size: 20px;
+            line-height: 1.7;
+        }
+
+        .blank {
+            display: inline-block;
+            border-bottom: 1px solid var(--text-primary);
+            min-width: 60px;
+            text-align: center;
+            font-weight: 400;
+            transition: color 0.25s ease, border-color 0.25s ease;
+            padding-bottom: 2px;
+            line-height: 1.4;
+        }
+
+        .blank.filled {
+            color: var(--success);
+            border-bottom-color: var(--success);
+        }
+
+        .blank.filled.wrong-answer {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .text-blank {
+            display: inline-block;
+            border-bottom: 1px solid var(--text-primary);
+            min-width: 70px;
+            text-align: center;
+            font-weight: 400;
+            padding-bottom: 2px;
+            line-height: 1.4;
+            cursor: pointer;
+            transition: color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .text-blank.filled {
+            color: var(--success);
+            border-bottom-color: var(--success);
+            cursor: default;
+        }
+
+        .text-blank.active {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .options-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            font-family: var(--font-body);
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+            letter-spacing: 0.01em;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            flex: 0 0 auto;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--border-hover);
+        }
+
+        .option-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+            opacity: 0.55;
+        }
+
+        .option-btn.selected {
+            border-color: var(--text-primary);
+            background: rgba(0,0,0,0.03);
+        }
+
+        .option-btn.correct-selected {
+            border-color: var(--success);
+            color: var(--success);
+            opacity: 1;
+        }
+
+        .option-btn.wrong-selected {
+            border-color: var(--accent);
+            color: var(--accent);
+            opacity: 1;
+        }
+
+        .error-message {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 1rem;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            visibility: hidden;
+            transition: visibility 0.2s ease;
+        }
+
+        .error-message.visible {
+            visibility: visible;
+        }
+
+        .error-message .error-line {
+            width: 12px;
+            height: 2px;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .next-btn {
+            display: none;
+        }
+
+        .next-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .next-btn:not(:disabled):hover {
+            border-color: var(--border-hover);
+        }
+
+        .next-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .completion-area {
+            display: none;
+            animation: completion-fade 0.4s ease;
+        }
+
+        .completion-area.visible {
+            display: block;
+        }
+
+        @keyframes completion-fade {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .completion-text {
+            font-size: 32px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        .completion-rule {
+            width: 40px;
+            height: 2px;
+            background: var(--accent);
+            margin-bottom: 2.5rem;
+        }
+
+        .review-list {
+            list-style: none;
+            margin-bottom: 3rem;
+        }
+
+        .review-item {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 0.4rem 0;
+            letter-spacing: -0.005em;
+        }
+
+        .review-correct {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        .review-wrong {
+            color: var(--accent);
+            white-space: nowrap;
+            font-weight: 500;
+            text-decoration: line-through;
+        }
+
+        .back-btn {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .note {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        /* Matching styles */
+        .matching-area {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .matching-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 18px;
+            flex-wrap: wrap;
+        }
+
+        .matching-sentence {
+            flex: 1 1 200px;
+        }
+
+        .matching-select {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            background: transparent;
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+            min-width: 70px;
+        }
+
+        .matching-select:focus {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .matching-select.wrong {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            font-size: 16px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        .option-item {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .option-letter {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            color: var(--accent);
+            min-width: 20px;
+        }
+
+        /* Ordering styles */
+        .ordering-area {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .slots-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .slot-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-primary);
+            min-height: 40px;
+            border-bottom: 1px solid var(--border);
+            padding: 0.25rem 0;
+        }
+
+        .slot-number {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            min-width: 40px;
+            flex-shrink: 0;
+        }
+
+        .slot-name {
+            font-size: 16px;
+            color: var(--text-primary);
+            flex-grow: 1;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .slot-name.filled {
+            color: var(--text-primary);
+        }
+
+        .slot-name.empty {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .slot-name.filled:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .slot-name.correct-position {
+            color: var(--success);
+        }
+
+        .slot-name.wrong-position {
+            color: var(--accent);
+        }
+
+        .names-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .name-btn {
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, opacity 0.2s ease;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            flex: 0 0 auto;
+            text-align: left;
+        }
+
+        .name-btn:hover {
+            border-color: var(--border-hover);
+        }
+
+        .name-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .name-btn.placed {
+            opacity: 0.35;
+            cursor: default;
+            border-color: var(--border);
+        }
+
+        .retry-btn {
+            display: none;
+        }
+
+        /* Fill remaining styles */
+        .fill-area {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            background: rgba(0,0,0,0.02);
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .word-bank span {
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+        }
+
+        .fill-text {
+            font-size: 20px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            white-space: pre-wrap;
+        }
+
+        .fill-input {
+            font-family: var(--font-body);
+            font-size: 18px;
+            border: none;
+            border-bottom: 1px solid var(--text-primary);
+            background: transparent;
+            color: var(--text-primary);
+            outline: none;
+            width: 100px;
+            padding: 2px 4px;
+            margin: 0 2px;
+            text-align: center;
+        }
+
+        .fill-input.wide {
+            width: 200px;
+        }
+
+        .fill-input:focus {
+            border-bottom-color: var(--accent);
+        }
+
+        .fill-input.correct {
+            color: var(--success);
+            border-bottom-color: var(--success);
+        }
+
+        .fill-input.wrong {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        @media (max-width: 540px) {
+            body { padding: 2rem 1rem; }
+            .sentence { font-size: 21px; margin-bottom: 1.5rem; }
+            .sentence.text-mode { font-size: 17px; }
+            .options-container { flex-direction: column; gap: 0.5rem; }
+            .option-btn { width: 100%; text-align: center; padding: 12px 16px; }
+            .progress-area { margin-bottom: 2.5rem; }
+            .review-item { font-size: 16px; }
+            .completion-text { font-size: 26px; }
+            .start-instructions { font-size: 20px; }
+            .task-btn, .ready-btn { min-width: 180px; padding: 12px 18px; }
+            .back-btn { margin-top: 1rem; }
+            .text-blank { min-width: 55px; }
+            .matching-row { font-size: 16px; }
+            .matching-select { font-size: 13px; padding: 6px 10px; }
+            .fill-text { font-size: 17px; line-height: 1.7; }
+            .fill-input { font-size: 16px; width: 80px; }
+            .fill-input.wide { width: 150px; }
+            .slot-row { font-size: 14px; min-height: 36px; }
+            .slot-number { min-width: 35px; font-size: 11px; }
+            .name-btn { font-size: 13px; padding: 8px 12px; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <!-- Start Screen -->
+        <section class="start-screen" id="startScreen">
+            <div class="start-divider"></div>
+            <div class="start-label">Select Task</div>
+            <div class="task-buttons" id="taskButtonsContainer">
+                <button class="task-btn" data-task="task1">Task 1</button>
+                <button class="task-btn" data-task="task2">Task 2</button>
+                <button class="task-btn" data-task="task3">Task 3</button>
+                <button class="task-btn" data-task="task4">Task 4</button>
+                <button class="task-btn" data-task="task5">Task 5</button>
+            </div>
+        </section>
+
+        <!-- Instruction Screen -->
+        <section class="instruction-screen" id="instructionScreen" style="display: none;">
+            <div class="start-divider"></div>
+            <div class="start-label" id="instructionTaskLabel">Task</div>
+            <h2 class="instruction-title" id="instructionTitle"></h2>
+            <p class="instruction-text" id="instructionText"></p>
+            <div class="instruction-ready">Ready?</div>
+            <button class="ready-btn" id="readyBtn">Yes</button>
+            <button class="back-btn" id="backBtnFromInstruction">Back to Tasks</button>
+        </section>
+
+        <!-- Progress Area -->
+        <section class="progress-area" id="progressArea">
+            <div class="progress-label" id="progressLabel">01 / 10</div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+            <button class="back-btn" id="backBtnFromTask" style="display:inline-block; margin-top:1rem;">Back to Tasks</button>
+        </section>
+
+        <!-- Question Area -->
+        <section class="question-area" id="questionArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text" id="questionLabel">Your Choice</span>
+            </div>
+            <div class="sentence" id="sentenceDisplay">
+                <span id="sentenceBefore"></span><span class="blank" id="blankDisplay">______</span><span id="sentenceAfter"></span>
+            </div>
+            <div class="options-container" id="optionsContainer">
+                <button class="option-btn" id="option0" type="button"></button>
+                <button class="option-btn" id="option1" type="button"></button>
+                <button class="option-btn" id="option2" type="button" style="display:none;"></button>
+                <button class="option-btn" id="option3" type="button" style="display:none;"></button>
+            </div>
+            <div class="error-message" id="errorMessageMC">
+                <span class="error-line"></span><span>Try Again</span>
+            </div>
+        </section>
+
+        <!-- Matching Area -->
+        <section class="matching-area" id="matchingArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text">Match</span>
+            </div>
+            <div id="matchingContainer"></div>
+            <div class="options-list" id="optionsList"></div>
+            <div class="error-message" id="errorMessageMatching">
+                <span class="error-line"></span><span>Try Again</span>
+            </div>
+            <button class="check-btn" id="checkMatchingBtn" type="button" disabled>Check</button>
+        </section>
+
+        <!-- Ordering Area -->
+        <section class="ordering-area" id="orderingArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text">Your Order</span>
+            </div>
+            <div class="slots-container" id="slotsContainer"></div>
+            <div class="names-container" id="namesContainer"></div>
+            <div class="error-message" id="errorMessageOrder">
+                <span class="error-line"></span><span>Try Again</span>
+            </div>
+            <button class="retry-btn" id="retryBtn" style="display: none;">Try Again</button>
+        </section>
+
+        <!-- Fill Remaining Area -->
+        <section class="fill-area" id="fillArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text" id="fillLabel">Complete the phrases</span>
+            </div>
+            <div class="word-bank" id="wordBankDisplay"></div>
+            <div class="fill-text" id="fillText"></div>
+            <div class="error-message" id="errorMessageFill">
+                <span class="error-line"></span><span>Try Again</span>
+            </div>
+            <button class="check-btn" id="checkFillBtn" type="button">Check</button>
+        </section>
+
+        <!-- Next Button -->
+        <button class="next-btn" id="nextBtn" type="button" disabled>Next</button>
+
+        <!-- Completion Area -->
+        <section class="completion-area" id="completionArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text">Complete</span>
+            </div>
+            <div class="completion-text">All tasks cleared.</div>
+            <div class="completion-rule"></div>
+            <ul class="review-list" id="reviewList"></ul>
+            <button class="restart-btn" id="restartBtn">Back to Start</button>
+        </section>
+    </main>
+
+    <script>
+        (function() {
+            // ─── Task Data ───
+            const tasks = {
+                task1: {
+                    title: 'Task 1',
+                    instructions: 'Choose the correct option to complete each sentence.',
+                    type: 'multiple-choice',
+                    questions: [
+                        { before: "My brother dresses ", after: ".", options: ["casual", "casually"], correct: 1 },
+                        { before: "Shoji cooks ", after: " well.", options: ["real", "really"], correct: 1 },
+                        { before: "It's ", after: " to ride a bike.", options: ["easy", "easily"], correct: 0 },
+                        { before: "They walked ", after: " to the train station.", options: ["quick", "quickly"], correct: 1 },
+                        { before: "He's very ", after: ". He never says anything!", options: ["quiet", "quietly"], correct: 0 },
+                        { before: "Elena's pizzas are ", after: ".", options: ["incredible", "incredibly"], correct: 0 },
+                        { before: "My French is very ", after: ".", options: ["bad", "badly"], correct: 0 },
+                        { before: "Can you speak more ", after: "?", options: ["slow", "slowly"], correct: 1 },
+                        { before: "Mark speaks English ", after: ".", options: ["good", "well"], correct: 1 },
+                        { before: "She eats ", after: ".", options: ["unhealthily", "unhealthy"], correct: 0 },
+                        { before: "They have ", after: " stressful jobs.", options: ["real", "really"], correct: 1 }
+                    ]
+                },
+                task2: {
+                    title: 'Task 2',
+                    instructions: 'Complete the phrases with verbs from the box. Write the correct verb in each blank.',
+                    type: 'fill-remaining',
+                    wordBank: ['be', 'become', 'fall', 'get', 'get', 'get', 'have', 'meet', 'move', 'travel'],
+                    text: "1. {1} lucky\n2. {2} somebody new\n3. {3} to a different country\n4. {4} married\n5. {5} a lot of money\n6. {6} in love\n7. {7} famous\n8. {8} a new job\n9. {9} a surprise\n10. {10} to a new house",
+                    blanks: [
+                        { parts: [{ prefix: '', answer: 'be' }] },
+                        { parts: [{ prefix: '', answer: 'meet' }] },
+                        { parts: [{ prefix: '', answer: 'travel' }] },
+                        { parts: [{ prefix: '', answer: 'get' }] },
+                        { parts: [{ prefix: '', answer: 'have' }] },
+                        { parts: [{ prefix: '', answer: 'fall' }] },
+                        { parts: [{ prefix: '', answer: 'become' }] },
+                        { parts: [{ prefix: '', answer: 'get' }] },
+                        { parts: [{ prefix: '', answer: 'get' }] },
+                        { parts: [{ prefix: '', answer: 'move' }] }
+                    ]
+                },
+                task3: {
+                    title: 'Task 3',
+                    instructions: 'Complete the sentences. Write the correct form of to be going to.',
+                    type: 'fill-remaining',
+                    inputWidth: '200px',
+                    text: "1 {1} by train? (they / leave)\n2 We {2} our friends the city. (show)\n3 They {3} nice meals in expensive restaurants. (have)\n4 {4} with a friend? (you / stay)\n5 They {5} the museum. (not visit)\n6 {6} the sights? (they / see)\n7 He {7} a lot of people. (meet)\n8 She {8} on vacation this year. (not go)",
+                    blanks: [
+                        { parts: [{ prefix: '', answer: 'Are they going to leave' }] },
+                        { parts: [{ prefix: '', answer: 'are going to show' }] },
+                        { parts: [{ prefix: '', answer: 'are going to have' }] },
+                        { parts: [{ prefix: '', answer: 'Are you going to stay' }] },
+                        { parts: [{ prefix: '', answer: "aren't going to visit" }] },
+                        { parts: [{ prefix: '', answer: 'Are they going to see' }] },
+                        { parts: [{ prefix: '', answer: 'is going to meet' }] },
+                        { parts: [{ prefix: '', answer: "isn't going to go" }] }
+                    ]
+                },
+                task4: {
+                    title: 'Task 4',
+                    instructions: 'Match the words to make compound nouns.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "art", correct: "a" },
+                        { text: "department", correct: "b" },
+                        { text: "parking", correct: "c" },
+                        { text: "police", correct: "d" },
+                        { text: "post", correct: "e" },
+                        { text: "shopping", correct: "f" },
+                        { text: "town", correct: "g" },
+                        { text: "train", correct: "h" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'gallery' },
+                        { letter: 'b', text: 'store' },
+                        { letter: 'c', text: 'lot' },
+                        { letter: 'd', text: 'station' },
+                        { letter: 'e', text: 'office' },
+                        { letter: 'f', text: 'mall' },
+                        { letter: 'g', text: 'hall' },
+                        { letter: 'h', text: 'station' }
+                    ]
+                },
+                task5: {
+                    title: 'Task 5',
+                    instructions: 'Fill in the gaps with the compound nouns from Task 4.',
+                    type: 'fill-remaining',
+                    wordBank: ['art gallery', 'department store', 'parking lot', 'police station', 'post office', 'shopping mall', 'town hall', 'train station'],
+                    text: "1 Where can you visit different stores?\nAt a {1}\n2 Where can you see paintings?\nIn an {2}\n3 Where can you get a train from?\nFrom a {3}\n4 Where can you buy a stamp?\nAt a {4}\n5 Where can you talk to a police officer?\nAt a {5}\n6 Where can you buy clothes for all the family?\nAt a {6}\n7 Where can you leave your car?\nAt a {7}\n8 Where can you speak to a local politician?\nIn the {8}",
+                    blanks: [
+                        { parts: [{ prefix: '', answer: 'shopping mall' }] },
+                        { parts: [{ prefix: '', answer: 'art gallery' }] },
+                        { parts: [{ prefix: '', answer: 'train station' }] },
+                        { parts: [{ prefix: '', answer: 'post office' }] },
+                        { parts: [{ prefix: '', answer: 'police station' }] },
+                        { parts: [{ prefix: '', answer: 'department store' }] },
+                        { parts: [{ prefix: '', answer: 'parking lot' }] },
+                        { parts: [{ prefix: '', answer: 'town hall' }] }
+                    ]
+                }
+            };
+
+            let currentTask = null;
+            let currentIndex = 0;
+            let totalQuestions = 0;
+            let answeredCorrectly = false;
+            let isTransitioning = false;
+            let blankStatus = [];
+            let activeBlankIndex = 0;
+            let orderSlots = [];
+            let orderNamesPool = [];
+            let orderCorrectOrder = [];
+            let orderChecked = false;
+
+            // ─── DOM Elements ───
+            const startScreen = document.getElementById('startScreen');
+            const instructionScreen = document.getElementById('instructionScreen');
+            const instructionTaskLabel = document.getElementById('instructionTaskLabel');
+            const instructionTitle = document.getElementById('instructionTitle');
+            const instructionText = document.getElementById('instructionText');
+            const readyBtn = document.getElementById('readyBtn');
+            const backBtnFromInstruction = document.getElementById('backBtnFromInstruction');
+            const backBtnFromTask = document.getElementById('backBtnFromTask');
+            const taskButtonsContainer = document.getElementById('taskButtonsContainer');
+            const progressArea = document.getElementById('progressArea');
+            const progressLabel = document.getElementById('progressLabel');
+            const progressFill = document.getElementById('progressFill');
+            const questionArea = document.getElementById('questionArea');
+            const questionLabel = document.getElementById('questionLabel');
+            const sentenceDisplay = document.getElementById('sentenceDisplay');
+            const option0 = document.getElementById('option0');
+            const option1 = document.getElementById('option1');
+            const option2 = document.getElementById('option2');
+            const option3 = document.getElementById('option3');
+            const errorMessageMC = document.getElementById('errorMessageMC');
+            const matchingArea = document.getElementById('matchingArea');
+            const matchingContainer = document.getElementById('matchingContainer');
+            const optionsList = document.getElementById('optionsList');
+            const errorMessageMatching = document.getElementById('errorMessageMatching');
+            const checkMatchingBtn = document.getElementById('checkMatchingBtn');
+            const orderingArea = document.getElementById('orderingArea');
+            const slotsContainer = document.getElementById('slotsContainer');
+            const namesContainer = document.getElementById('namesContainer');
+            const errorMessageOrder = document.getElementById('errorMessageOrder');
+            const retryBtn = document.getElementById('retryBtn');
+            const fillArea = document.getElementById('fillArea');
+            const fillLabel = document.getElementById('fillLabel');
+            const wordBankDisplay = document.getElementById('wordBankDisplay');
+            const fillText = document.getElementById('fillText');
+            const errorMessageFill = document.getElementById('errorMessageFill');
+            const checkFillBtn = document.getElementById('checkFillBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const completionArea = document.getElementById('completionArea');
+            const reviewList = document.getElementById('reviewList');
+            const restartBtn = document.getElementById('restartBtn');
+
+            const optionButtons = [option0, option1, option2, option3];
+
+            function padNumber(num) { return String(num).padStart(2, '0'); }
+
+            function updateProgress() {
+                if (currentTask.type === 'text-with-blanks') {
+                    const filled = blankStatus.filter(Boolean).length;
+                    progressLabel.textContent = 'Filled: ' + padNumber(filled) + ' / ' + padNumber(totalQuestions);
+                    const pct = (filled / totalQuestions) * 100;
+                    progressFill.style.width = pct + '%';
+                } else if (currentTask.type === 'matching') {
+                    progressLabel.textContent = '01 / 01';
+                    progressFill.style.width = '0%';
+                } else if (currentTask.type === 'ordering') {
+                    const filled = orderSlots.filter(Boolean).length;
+                    progressLabel.textContent = 'Placed: ' + padNumber(filled) + ' / ' + padNumber(totalQuestions);
+                    const pct = (filled / totalQuestions) * 100;
+                    progressFill.style.width = pct + '%';
+                } else if (currentTask.type === 'fill-remaining') {
+                    const inputs = fillText.querySelectorAll('.fill-input');
+                    const filled = Array.from(inputs).filter(inp => inp.value.trim() !== '').length;
+                    progressLabel.textContent = 'Filled: ' + padNumber(filled) + ' / ' + padNumber(totalQuestions);
+                    const pct = (filled / totalQuestions) * 100;
+                    progressFill.style.width = pct + '%';
+                } else {
+                    progressLabel.textContent = padNumber(currentIndex + 1) + ' / ' + padNumber(totalQuestions);
+                    const pct = (currentIndex / totalQuestions) * 100;
+                    progressFill.style.width = pct + '%';
+                }
+            }
+
+            function resetBlank() {
+                const blankDisplay = document.getElementById('blankDisplay');
+                if (blankDisplay) {
+                    blankDisplay.textContent = '______';
+                    blankDisplay.classList.remove('filled', 'wrong-answer');
+                }
+            }
+
+            function fillBlank(text) {
+                const blankDisplay = document.getElementById('blankDisplay');
+                if (blankDisplay) {
+                    blankDisplay.textContent = text;
+                    blankDisplay.classList.add('filled');
+                }
+            }
+
+            function resetOptions() {
+                optionButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.classList.remove('correct-selected', 'wrong-selected', 'selected');
+                });
+            }
+
+            function hideErrorMC() { errorMessageMC.classList.remove('visible'); }
+            function showErrorMC() { errorMessageMC.classList.add('visible'); }
+            function hideErrorMatching() { errorMessageMatching.classList.remove('visible'); }
+            function showErrorMatching() { errorMessageMatching.classList.add('visible'); }
+            function hideErrorOrder() { errorMessageOrder.classList.remove('visible'); }
+            function showErrorOrder() { errorMessageOrder.classList.add('visible'); }
+            function hideErrorFill() { errorMessageFill.classList.remove('visible'); }
+            function showErrorFill() { errorMessageFill.classList.add('visible'); }
+
+            function disableOptions() {
+                optionButtons.forEach(btn => {
+                    if (btn.style.display !== 'none') btn.disabled = true;
+                });
+            }
+
+            function enableNext() { nextBtn.disabled = false; }
+            function disableNext() { nextBtn.disabled = true; }
+
+            function showStartScreen() {
+                startScreen.style.display = 'flex';
+                instructionScreen.style.display = 'none';
+                progressArea.style.display = 'none';
+                questionArea.style.display = 'none';
+                matchingArea.style.display = 'none';
+                orderingArea.style.display = 'none';
+                fillArea.style.display = 'none';
+                nextBtn.style.display = 'none';
+                backBtnFromInstruction.style.display = 'none';
+                backBtnFromTask.style.display = 'none';
+                completionArea.style.display = 'none';
+                completionArea.classList.remove('visible');
+            }
+
+            function showInstructionScreen(taskId) {
+                const task = tasks[taskId];
+                startScreen.style.display = 'none';
+                instructionScreen.style.display = 'flex';
+                instructionTaskLabel.textContent = task.title;
+                instructionTitle.textContent = task.title;
+                instructionText.textContent = task.instructions || '';
+                readyBtn.dataset.taskId = taskId;
+                backBtnFromInstruction.style.display = 'inline-block';
+                backBtnFromTask.style.display = 'none';
+            }
+
+            function showTaskArea() {
+                instructionScreen.style.display = 'none';
+                progressArea.style.display = 'block';
+                nextBtn.style.display = 'inline-block';
+                backBtnFromInstruction.style.display = 'none';
+                backBtnFromTask.style.display = 'inline-block';
+                completionArea.style.display = 'none';
+            }
+
+            function showCompletion() {
+                progressArea.style.display = 'none';
+                questionArea.style.display = 'none';
+                matchingArea.style.display = 'none';
+                orderingArea.style.display = 'none';
+                fillArea.style.display = 'none';
+                nextBtn.style.display = 'none';
+                backBtnFromTask.style.display = 'none';
+                completionArea.style.display = 'block';
+                completionArea.classList.add('visible');
+            }
+
+            function setOptionVisibility(numOptions) {
+                option0.style.display = 'inline-block';
+                option1.style.display = 'inline-block';
+                option2.style.display = numOptions >= 3 ? 'inline-block' : 'none';
+                option3.style.display = numOptions >= 4 ? 'inline-block' : 'none';
+            }
+
+            // ─── Render Text With Blanks ───
+            function renderTextWithBlanks() {
+                if (blankStatus[activeBlankIndex]) {
+                    const unfilled = blankStatus.findIndex(val => !val);
+                    if (unfilled !== -1) activeBlankIndex = unfilled;
+                }
+
+                let textHtml = currentTask.text;
+                textHtml = textHtml.replace(/\{(\d+)\}/g, (match, num) => {
+                    const idx = parseInt(num) - 1;
+                    const filled = blankStatus[idx];
+                    const displayText = filled ? currentTask.blanks[idx].options[currentTask.blanks[idx].correct] : '______';
+                    const filledClass = filled ? ' filled' : '';
+                    const activeClass = (idx === activeBlankIndex && !filled) ? ' active' : '';
+                    return `<span class="text-blank${filledClass}${activeClass}" data-index="${idx}">${displayText}</span>`;
+                });
+
+                sentenceDisplay.innerHTML = textHtml;
+                sentenceDisplay.classList.add('text-mode');
+
+                sentenceDisplay.querySelectorAll('.text-blank').forEach(span => {
+                    span.addEventListener('click', () => {
+                        const idx = parseInt(span.dataset.index);
+                        if (blankStatus[idx]) return;
+                        activeBlankIndex = idx;
+                        renderTextWithBlanks();
+                        updateOptionsForActiveBlank();
+                    });
+                });
+
+                updateOptionsForActiveBlank();
+                hideErrorMC();
+
+                if (blankStatus.every(Boolean)) {
+                    enableNext();
+                } else {
+                    disableNext();
+                }
+                updateProgress();
+            }
+
+            function updateOptionsForActiveBlank() {
+                const blank = currentTask.blanks[activeBlankIndex];
+                const numOptions = blank.options.length;
+                setOptionVisibility(numOptions);
+                for (let i = 0; i < optionButtons.length; i++) {
+                    if (i < numOptions) optionButtons[i].textContent = blank.options[i];
+                }
+                resetOptions();
+            }
+
+            function handleTextBlankOptionClick(optionIndex) {
+                const blank = currentTask.blanks[activeBlankIndex];
+                if (optionIndex === blank.correct) {
+                    blankStatus[activeBlankIndex] = true;
+                    hideErrorMC();
+                    renderTextWithBlanks();
+                    if (blankStatus.every(Boolean)) {
+                        enableNext();
+                    } else {
+                        const nextUnfilled = blankStatus.findIndex(val => !val);
+                        if (nextUnfilled !== -1) {
+                            activeBlankIndex = nextUnfilled;
+                            renderTextWithBlanks();
+                        }
+                    }
+                } else {
+                    const btn = optionButtons[optionIndex];
+                    btn.classList.remove('wrong-selected');
+                    void btn.offsetWidth;
+                    btn.classList.add('wrong-selected');
+                    showErrorMC();
+                }
+            }
+
+            // ─── Render Matching ───
+            function renderMatching() {
+                matchingContainer.innerHTML = '';
+                optionsList.innerHTML = '';
+
+                currentTask.options.forEach(opt => {
+                    const div = document.createElement('div');
+                    div.className = 'option-item';
+                    const letterSpan = document.createElement('span');
+                    letterSpan.className = 'option-letter';
+                    letterSpan.textContent = opt.letter + '.';
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = opt.text;
+                    div.appendChild(letterSpan);
+                    div.appendChild(textSpan);
+                    optionsList.appendChild(div);
+                });
+
+                currentTask.sentences.forEach((sent, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'matching-row';
+                    const sentSpan = document.createElement('span');
+                    sentSpan.className = 'matching-sentence';
+                    sentSpan.textContent = (idx + 1) + '. ' + sent.text;
+                    const select = document.createElement('select');
+                    select.className = 'matching-select';
+                    select.dataset.index = idx;
+                    const blankOpt = document.createElement('option');
+                    blankOpt.value = '';
+                    blankOpt.textContent = '—';
+                    select.appendChild(blankOpt);
+                    currentTask.options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.letter;
+                        option.textContent = opt.letter;
+                        select.appendChild(option);
+                    });
+                    select.addEventListener('change', () => {
+                        hideErrorMatching();
+                        disableNext();
+                        const allFilled = Array.from(matchingContainer.querySelectorAll('.matching-select')).every(s => s.value !== '');
+                        checkMatchingBtn.disabled = !allFilled;
+                        matchingContainer.querySelectorAll('.matching-select').forEach(s => s.classList.remove('wrong'));
+                    });
+                    row.appendChild(sentSpan);
+                    row.appendChild(select);
+                    matchingContainer.appendChild(row);
+                });
+
+                checkMatchingBtn.disabled = true;
+                checkMatchingBtn.style.display = 'inline-block';
+                hideErrorMatching();
+                disableNext();
+                answeredCorrectly = false;
+                updateProgress();
+            }
+
+            function checkMatching() {
+                const selects = matchingContainer.querySelectorAll('.matching-select');
+                let allCorrect = true;
+                selects.forEach((select, idx) => {
+                    const correct = currentTask.sentences[idx].correct;
+                    if (select.value !== correct) {
+                        allCorrect = false;
+                        select.classList.add('wrong');
+                    } else {
+                        select.classList.remove('wrong');
+                    }
+                });
+
+                if (allCorrect) {
+                    answeredCorrectly = true;
+                    hideErrorMatching();
+                    checkMatchingBtn.disabled = true;
+                    selects.forEach(s => s.disabled = true);
+                    enableNext();
+                } else {
+                    showErrorMatching();
+                }
+            }
+
+            // ─── Render Ordering ───
+            function renderOrdering() {
+                const total = orderCorrectOrder.length;
+                orderSlots = new Array(total).fill(null);
+                orderNamesPool = shuffleArray(orderCorrectOrder);
+                orderChecked = false;
+                renderSlots();
+                renderNames();
+                hideErrorOrder();
+                retryBtn.style.display = 'none';
+                disableNext();
+                answeredCorrectly = false;
+                updateProgress();
+            }
+
+            function getOrdinalSuffix(n) {
+                const s = ["th", "st", "nd", "rd"];
+                const v = n % 100;
+                return s[(v - 20) % 10] || s[v] || s[0];
+            }
+
+            function renderSlots() {
+                slotsContainer.innerHTML = '';
+                const ordinals = [];
+                for (let i = 1; i <= orderSlots.length; i++) {
+                    ordinals.push(i + getOrdinalSuffix(i));
+                }
+                ordinals.forEach((ord, i) => {
+                    const row = document.createElement('div');
+                    row.className = 'slot-row';
+                    const numSpan = document.createElement('span');
+                    numSpan.className = 'slot-number';
+                    numSpan.textContent = ord;
+                    const nameSpan = document.createElement('span');
+                    nameSpan.className = 'slot-name' + (orderSlots[i] ? ' filled' : ' empty');
+                    nameSpan.textContent = orderSlots[i] || '—';
+                    nameSpan.addEventListener('click', () => removeFromSlot(i));
+                    row.appendChild(numSpan);
+                    row.appendChild(nameSpan);
+                    slotsContainer.appendChild(row);
+                });
+            }
+
+            function renderNames() {
+                namesContainer.innerHTML = '';
+                orderNamesPool.forEach((name, i) => {
+                    if (name === null) return;
+                    const btn = document.createElement('button');
+                    btn.className = 'name-btn';
+                    btn.textContent = name;
+                    btn.addEventListener('click', () => placeName(i));
+                    namesContainer.appendChild(btn);
+                });
+            }
+
+            function placeName(poolIndex) {
+                if (orderChecked || isTransitioning) return;
+                const name = orderNamesPool[poolIndex];
+                if (!name) return;
+                const emptySlot = orderSlots.indexOf(null);
+                if (emptySlot === -1) return;
+                orderSlots[emptySlot] = name;
+                orderNamesPool[poolIndex] = null;
+                hideErrorOrder();
+                renderSlots();
+                renderNames();
+                updateProgress();
+                if (orderSlots.every(s => s !== null)) checkOrder();
+            }
+
+            function removeFromSlot(slotIndex) {
+                if (orderChecked || isTransitioning) return;
+                const name = orderSlots[slotIndex];
+                if (!name) return;
+                orderSlots[slotIndex] = null;
+                const nullIndex = orderNamesPool.indexOf(null);
+                if (nullIndex !== -1) orderNamesPool[nullIndex] = name;
+                else orderNamesPool.push(name);
+                hideErrorOrder();
+                renderSlots();
+                renderNames();
+                updateProgress();
+                disableNext();
+                answeredCorrectly = false;
+                retryBtn.style.display = 'none';
+            }
+
+            function checkOrder() {
+                const isCorrect = orderSlots.every((name, i) => name === orderCorrectOrder[i]);
+                orderChecked = true;
+                if (isCorrect) {
+                    answeredCorrectly = true;
+                    hideErrorOrder();
+                    slotsContainer.querySelectorAll('.slot-name').forEach(el => el.classList.add('correct-position'));
+                    retryBtn.style.display = 'none';
+                    enableNext();
+                } else {
+                    slotsContainer.querySelectorAll('.slot-name').forEach((el, i) => {
+                        if (orderSlots[i] === orderCorrectOrder[i]) el.classList.add('correct-position');
+                        else el.classList.add('wrong-position');
+                    });
+                    showErrorOrder();
+                    retryBtn.style.display = 'inline-block';
+                }
+            }
+
+            function resetOrdering() {
+                renderOrdering();
+            }
+
+            // ─── Render Fill Remaining ───
+            function renderFillRemaining() {
+                fillLabel.textContent = currentTask.title === 'Task 3' ? 'Write the correct form' : 'Complete the phrases';
+
+                if (currentTask.wordBank && currentTask.wordBank.length) {
+                    wordBankDisplay.innerHTML = currentTask.wordBank.map(w => `<span>${w}</span>`).join('');
+                    wordBankDisplay.style.display = 'flex';
+                } else {
+                    wordBankDisplay.style.display = 'none';
+                }
+
+                const inputClass = currentTask.inputWidth ? 'fill-input wide' : 'fill-input';
+
+                let html = currentTask.text;
+                html = html.replace(/\{(\d+)\}/g, (match, num) => {
+                    const idx = parseInt(num) - 1;
+                    const parts = currentTask.blanks[idx].parts;
+                    let partHtml = '';
+                    parts.forEach((part, pIdx) => {
+                        if (pIdx > 0) partHtml += ' ';
+                        partHtml += part.prefix + '<input class="' + inputClass + '" data-blank="' + idx + '" data-part="' + pIdx + '" type="text" autocomplete="off" spellcheck="false">';
+                    });
+                    return partHtml;
+                });
+                fillText.innerHTML = html;
+
+                fillText.querySelectorAll('.fill-input').forEach(input => {
+                    input.addEventListener('input', () => {
+                        hideErrorFill();
+                        const allFilled = Array.from(fillText.querySelectorAll('.fill-input')).every(inp => inp.value.trim() !== '');
+                        checkFillBtn.disabled = !allFilled;
+                        updateProgress();
+                    });
+                });
+
+                checkFillBtn.disabled = true;
+                hideErrorFill();
+                disableNext();
+                answeredCorrectly = false;
+                updateProgress();
+            }
+
+            function checkFillRemaining() {
+                const inputs = fillText.querySelectorAll('.fill-input');
+                let allCorrect = true;
+                inputs.forEach(input => {
+                    const blankIdx = parseInt(input.dataset.blank);
+                    const partIdx = parseInt(input.dataset.part);
+                    const part = currentTask.blanks[blankIdx].parts[partIdx];
+                    const userAnswer = input.value.trim().toLowerCase();
+                    const correctAnswer = part.answer.toLowerCase();
+                    if (userAnswer === correctAnswer) {
+                        input.classList.add('correct');
+                        input.classList.remove('wrong');
+                        input.disabled = true;
+                    } else {
+                        input.classList.add('wrong');
+                        input.classList.remove('correct');
+                        allCorrect = false;
+                    }
+                });
+
+                if (allCorrect) {
+                    answeredCorrectly = true;
+                    hideErrorFill();
+                    checkFillBtn.disabled = true;
+                    enableNext();
+                } else {
+                    showErrorFill();
+                }
+            }
+
+            // ─── Render Question ───
+            function renderQuestion(index) {
+                if (currentTask.type === 'text-with-blanks') {
+                    questionLabel.textContent = 'Fill in the blanks';
+                    renderTextWithBlanks();
+                    return;
+                }
+
+                if (currentTask.type === 'matching') {
+                    questionLabel.textContent = 'Match';
+                    renderMatching();
+                    return;
+                }
+
+                if (currentTask.type === 'ordering') {
+                    questionLabel.textContent = 'Put in order';
+                    renderOrdering();
+                    return;
+                }
+
+                if (currentTask.type === 'fill-remaining') {
+                    renderFillRemaining();
+                    return;
+                }
+
+                sentenceDisplay.innerHTML = `<span id="sentenceBefore"></span><span class="blank" id="blankDisplay">______</span><span id="sentenceAfter"></span>`;
+                sentenceDisplay.classList.remove('text-mode');
+
+                const q = currentTask.questions[index];
+                const sentenceBefore = document.getElementById('sentenceBefore');
+                const sentenceAfter = document.getElementById('sentenceAfter');
+                const blankDisplay = document.getElementById('blankDisplay');
+
+                if (currentTask.type === 'odd-one-out') {
+                    questionLabel.textContent = 'Odd One Out';
+                    sentenceDisplay.style.display = 'none';
+                } else {
+                    questionLabel.textContent = 'Your Choice';
+                    sentenceDisplay.style.display = 'block';
+                    sentenceBefore.textContent = q.before || '';
+                    sentenceAfter.textContent = q.after || '';
+                    blankDisplay.style.display = 'inline-block';
+                }
+
+                const numOptions = q.options.length;
+                setOptionVisibility(numOptions);
+                for (let i = 0; i < optionButtons.length; i++) {
+                    if (i < numOptions) optionButtons[i].textContent = q.options[i];
+                }
+
+                resetBlank();
+                resetOptions();
+                hideErrorMC();
+                disableNext();
+                answeredCorrectly = false;
+                updateProgress();
+            }
+
+            function handleOptionClick(optionIndex) {
+                if (answeredCorrectly || isTransitioning) return;
+                if (currentTask.type === 'text-with-blanks') {
+                    handleTextBlankOptionClick(optionIndex);
+                    return;
+                }
+                if (currentTask.type === 'matching' || currentTask.type === 'ordering' || currentTask.type === 'fill-remaining') return;
+
+                const q = currentTask.questions[currentIndex];
+                const correctIndex = q.correct;
+
+                if (optionIndex === correctIndex) {
+                    answeredCorrectly = true;
+                    hideErrorMC();
+
+                    if (currentTask.type !== 'odd-one-out') {
+                        fillBlank(q.options[correctIndex]);
+                    } else {
+                        sentenceDisplay.style.display = 'block';
+                        const sentenceBefore = document.getElementById('sentenceBefore');
+                        const blankDisplay = document.getElementById('blankDisplay');
+                        sentenceBefore.textContent = q.options
+                            .filter((_, i) => i !== correctIndex)
+                            .join(' · ') + ' · ';
+                        blankDisplay.style.display = 'inline-block';
+                        fillBlank(q.options[correctIndex]);
+                    }
+
+                    disableOptions();
+                    optionButtons[optionIndex].classList.add('correct-selected');
+                    enableNext();
+                } else {
+                    const btn = optionButtons[optionIndex];
+                    btn.classList.remove('wrong-selected');
+                    void btn.offsetWidth;
+                    btn.classList.add('wrong-selected');
+                    showErrorMC();
+                }
+            }
+
+            // ─── Next Handler ───
+            function handleNext() {
+                if (currentTask.type === 'fill-remaining' && !answeredCorrectly) return;
+                if (currentTask.type === 'matching' && !answeredCorrectly) return;
+                if (currentTask.type === 'ordering' && !answeredCorrectly) return;
+                if (currentTask.type === 'text-with-blanks' && !blankStatus.every(Boolean)) return;
+                if (currentTask.type !== 'fill-remaining' && currentTask.type !== 'matching' && currentTask.type !== 'ordering' && currentTask.type !== 'text-with-blanks' && !answeredCorrectly) return;
+                if (isTransitioning) return;
+
+                if (currentTask.type === 'text-with-blanks' || currentTask.type === 'matching' || currentTask.type === 'ordering' || currentTask.type === 'fill-remaining' || currentIndex + 1 >= totalQuestions) {
+                    isTransitioning = true;
+                    questionArea.classList.add('fade-out');
+                    matchingArea.classList.add('fade-out');
+                    orderingArea.classList.add('fade-out');
+                    fillArea.classList.add('fade-out');
+                    setTimeout(() => {
+                        buildReview();
+                        showCompletion();
+                        questionArea.classList.remove('fade-out');
+                        matchingArea.classList.remove('fade-out');
+                        orderingArea.classList.remove('fade-out');
+                        fillArea.classList.remove('fade-out');
+                        isTransitioning = false;
+                    }, 200);
+                } else {
+                    isTransitioning = true;
+                    questionArea.classList.add('fade-out');
+                    setTimeout(() => {
+                        currentIndex++;
+                        renderQuestion(currentIndex);
+                        questionArea.classList.remove('fade-out');
+                        questionArea.classList.add('fade-in');
+                        setTimeout(() => {
+                            questionArea.classList.remove('fade-in');
+                            isTransitioning = false;
+                        }, 250);
+                    }, 200);
+                }
+            }
+
+            function buildReview() {
+                reviewList.innerHTML = '';
+
+                if (currentTask.type === 'odd-one-out') {
+                    currentTask.questions.forEach(q => {
+                        const li = document.createElement('li');
+                        li.className = 'review-item';
+                        q.options.forEach((opt, i) => {
+                            const span = document.createElement('span');
+                            if (i === q.correct) span.className = 'review-correct';
+                            span.textContent = opt;
+                            li.appendChild(span);
+                            if (i < q.options.length - 1) {
+                                li.appendChild(document.createTextNode(' · '));
+                            }
+                        });
+                        reviewList.appendChild(li);
+                    });
+                } else if (currentTask.type === 'text-with-blanks') {
+                    let reviewText = currentTask.text;
+                    reviewText = reviewText.replace(/\{(\d+)\}/g, (match, num) => {
+                        const idx = parseInt(num) - 1;
+                        const correctWord = currentTask.blanks[idx].options[currentTask.blanks[idx].correct];
+                        return `<span class="review-correct">${correctWord}</span>`;
+                    });
+                    const li = document.createElement('li');
+                    li.className = 'review-item';
+                    li.innerHTML = reviewText;
+                    reviewList.appendChild(li);
+                } else if (currentTask.type === 'matching') {
+                    currentTask.sentences.forEach((sent, idx) => {
+                        const li = document.createElement('li');
+                        li.className = 'review-item';
+                        const correctLetter = sent.correct;
+                        const correctOpt = currentTask.options.find(o => o.letter === correctLetter);
+                        li.innerHTML = (idx + 1) + '. ' + sent.text + ' <span class="review-correct">' + correctLetter + '. ' + correctOpt.text + '</span>';
+                        reviewList.appendChild(li);
+                    });
+                } else if (currentTask.type === 'ordering') {
+                    const li = document.createElement('li');
+                    li.className = 'review-item';
+                    li.innerHTML = '<strong>Correct order:</strong>';
+                    reviewList.appendChild(li);
+                    orderCorrectOrder.forEach((name, i) => {
+                        const item = document.createElement('li');
+                        item.className = 'review-item';
+                        const num = document.createElement('span');
+                        num.textContent = (i + 1) + '. ';
+                        const correctSpan = document.createElement('span');
+                        correctSpan.className = 'review-correct';
+                        correctSpan.textContent = name;
+                        item.appendChild(num);
+                        item.appendChild(correctSpan);
+                        reviewList.appendChild(item);
+                    });
+                } else if (currentTask.type === 'fill-remaining') {
+                    let reviewText = currentTask.text;
+                    reviewText = reviewText.replace(/\{(\d+)\}/g, (match, num) => {
+                        const idx = parseInt(num) - 1;
+                        const parts = currentTask.blanks[idx].parts;
+                        return parts.map(p => p.prefix + p.answer).join(' ');
+                    });
+                    const li = document.createElement('li');
+                    li.className = 'review-item';
+                    li.innerHTML = reviewText;
+                    reviewList.appendChild(li);
+                } else {
+                    currentTask.questions.forEach(q => {
+                        const li = document.createElement('li');
+                        li.className = 'review-item';
+                        li.appendChild(document.createTextNode(q.before));
+                        const span = document.createElement('span');
+                        span.className = 'review-correct';
+                        span.textContent = q.options[q.correct];
+                        li.appendChild(span);
+                        li.appendChild(document.createTextNode(q.after));
+                        reviewList.appendChild(li);
+                    });
+                }
+            }
+
+            function startTask(taskId) {
+                currentTask = tasks[taskId];
+                answeredCorrectly = false;
+                isTransitioning = false;
+                if (currentTask.type === 'text-with-blanks') {
+                    totalQuestions = currentTask.blanks.length;
+                    blankStatus = new Array(totalQuestions).fill(false);
+                    activeBlankIndex = 0;
+                    currentIndex = 0;
+                } else if (currentTask.type === 'matching') {
+                    totalQuestions = 1;
+                    currentIndex = 0;
+                } else if (currentTask.type === 'ordering') {
+                    totalQuestions = currentTask.correctOrder.length;
+                    orderCorrectOrder = [...currentTask.correctOrder];
+                    currentIndex = 0;
+                } else if (currentTask.type === 'fill-remaining') {
+                    totalQuestions = currentTask.blanks.length;
+                    currentIndex = 0;
+                } else {
+                    totalQuestions = currentTask.questions.length;
+                    currentIndex = 0;
+                }
+                showTaskArea();
+                questionArea.style.display = 'none';
+                matchingArea.style.display = 'none';
+                orderingArea.style.display = 'none';
+                fillArea.style.display = 'none';
+                if (currentTask.type === 'matching') {
+                    matchingArea.style.display = 'block';
+                } else if (currentTask.type === 'ordering') {
+                    orderingArea.style.display = 'block';
+                } else if (currentTask.type === 'fill-remaining') {
+                    fillArea.style.display = 'block';
+                } else {
+                    questionArea.style.display = 'block';
+                }
+                renderQuestion(0);
+            }
+
+            function handleRestart() {
+                showStartScreen();
+            }
+
+            // ─── Event Listeners ───
+            taskButtonsContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.task-btn');
+                if (btn) showInstructionScreen(btn.dataset.task);
+            });
+
+            readyBtn.addEventListener('click', () => {
+                startTask(readyBtn.dataset.taskId);
+            });
+
+            backBtnFromInstruction.addEventListener('click', showStartScreen);
+            backBtnFromTask.addEventListener('click', showStartScreen);
+
+            option0.addEventListener('click', () => handleOptionClick(0));
+            option1.addEventListener('click', () => handleOptionClick(1));
+            option2.addEventListener('click', () => handleOptionClick(2));
+            option3.addEventListener('click', () => handleOptionClick(3));
+
+            checkMatchingBtn.addEventListener('click', checkMatching);
+            checkFillBtn.addEventListener('click', checkFillRemaining);
+            retryBtn.addEventListener('click', resetOrdering);
+
+            nextBtn.addEventListener('click', handleNext);
+            restartBtn.addEventListener('click', handleRestart);
+
+            document.addEventListener('keydown', (e) => {
+                const instructionVisible = instructionScreen.style.display !== 'none';
+                const questionVisible = questionArea.style.display !== 'none';
+                const matchingVisible = matchingArea.style.display !== 'none';
+                const orderingVisible = orderingArea.style.display !== 'none';
+                const fillVisible = fillArea.style.display !== 'none';
+                const completionVisible = completionArea.style.display !== 'none';
+
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const active = document.activeElement;
+                    if (instructionVisible && active === readyBtn) {
+                        e.preventDefault();
+                        startTask(readyBtn.dataset.taskId);
+                    }
+                    if ((questionVisible || matchingVisible || orderingVisible || fillVisible) && active === nextBtn && !nextBtn.disabled) {
+                        e.preventDefault();
+                        handleNext();
+                    }
+                    if (completionVisible && active === restartBtn) {
+                        e.preventDefault();
+                        handleRestart();
+                    }
+                }
+
+                if (questionVisible && !answeredCorrectly && !isTransitioning && currentTask.type !== 'matching' && currentTask.type !== 'ordering' && currentTask.type !== 'fill-remaining') {
+                    if (currentTask.type === 'text-with-blanks') {
+                        const numOptions = currentTask.blanks[activeBlankIndex].options.length;
+                        if (e.key === '1') { e.preventDefault(); handleOptionClick(0); }
+                        else if (e.key === '2') { e.preventDefault(); handleOptionClick(1); }
+                        else if (e.key === '3' && numOptions >= 3) { e.preventDefault(); handleOptionClick(2); }
+                        else if (e.key === '4' && numOptions >= 4) { e.preventDefault(); handleOptionClick(3); }
+                    } else {
+                        const numOptions = currentTask.questions[currentIndex].options.length;
+                        if (e.key === '1') { e.preventDefault(); handleOptionClick(0); }
+                        else if (e.key === '2') { e.preventDefault(); handleOptionClick(1); }
+                        else if (e.key === '3' && numOptions >= 3) { e.preventDefault(); handleOptionClick(2); }
+                        else if (e.key === '4' && numOptions >= 4) { e.preventDefault(); handleOptionClick(3); }
+                    }
+                }
+            });
+
+            // Init
+            showStartScreen();
+        })();
+    </script>
+</body>
+</html>
