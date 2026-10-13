@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tareas 1–9 — Traducción</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F6F4EF;
+            --text-primary: #1A1917;
+            --text-secondary: #7A756E;
+            --accent: #C03A2B;
+            --success: #3D7A4E;
+            --border: #DEDBD4;
+            --border-hover: #1A1917;
+            --radius-btn: 2px;
+            --max-width: 660px;
+            --font-body: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            line-height: 1.4;
+        }
+
+        main {
+            width: 100%;
+            max-width: var(--max-width);
+        }
+
+        .instruction-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+
+        .start-divider {
+            width: 100%;
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 0.5rem;
+        }
+
+        .start-label {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .ready-btn,
+        .next-btn,
+        .restart-btn,
+        .check-btn {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: border-color 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            text-align: left;
+            align-self: flex-start;
+            min-width: auto;
+        }
+
+        .ready-btn:hover,
+        .next-btn:hover,
+        .restart-btn:hover,
+        .check-btn:hover {
+            border-color: var(--border-hover);
+        }
+
+        .ready-btn:focus-visible,
+        .next-btn:focus-visible,
+        .restart-btn:focus-visible,
+        .check-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .instruction-title {
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .instruction-text {
+            font-size: 18px;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .progress-area {
+            margin-bottom: 4rem;
+            display: none;
+        }
+
+        .progress-label {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 2px;
+            background: var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.35s ease;
+        }
+
+        .label-container {
+            display: flex;
+            align-items: baseline;
+            gap: 0.65rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .label-line {
+            width: 20px;
+            height: 2px;
+            background: var(--accent);
+            flex-shrink: 0;
+            align-self: center;
+        }
+
+        .label-text {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
+
+        .error-message {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-top: 1rem;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            visibility: hidden;
+            transition: visibility 0.2s ease;
+        }
+
+        .error-message.visible {
+            visibility: visible;
+        }
+
+        .error-message .error-line {
+            width: 12px;
+            height: 2px;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .next-btn {
+            display: none;
+        }
+
+        .next-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .next-btn:not(:disabled):hover {
+            border-color: var(--border-hover);
+        }
+
+        .next-btn:focus-visible {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .completion-area {
+            display: none;
+            animation: completion-fade 0.4s ease;
+        }
+
+        .completion-area.visible {
+            display: block;
+        }
+
+        @keyframes completion-fade {
+            0% { opacity: 0; transform: translateY(8px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .completion-text {
+            font-size: 32px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        .completion-rule {
+            width: 40px;
+            height: 2px;
+            background: var(--accent);
+            margin-bottom: 2.5rem;
+        }
+
+        .review-list {
+            list-style: none;
+            margin-bottom: 3rem;
+        }
+
+        .review-item {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 0.4rem 0;
+            letter-spacing: -0.005em;
+        }
+
+        .review-correct {
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* Matching styles */
+        .matching-area {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .matching-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 18px;
+            flex-wrap: wrap;
+        }
+
+        .matching-sentence {
+            flex: 1 1 200px;
+        }
+
+        .matching-select {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-btn);
+            background: transparent;
+            color: var(--text-primary);
+            outline: none;
+            cursor: pointer;
+            min-width: 70px;
+        }
+
+        .matching-select:focus {
+            border-color: var(--text-primary);
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+
+        .matching-select.wrong {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            font-size: 16px;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        .option-item {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .option-letter {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            color: var(--accent);
+            min-width: 20px;
+        }
+
+        @media (max-width: 540px) {
+            body { padding: 2rem 1rem; }
+            .progress-area { margin-bottom: 2.5rem; }
+            .review-item { font-size: 16px; }
+            .completion-text { font-size: 26px; }
+            .ready-btn { min-width: 180px; padding: 12px 18px; }
+            .matching-row { font-size: 16px; }
+            .matching-select { font-size: 13px; padding: 6px 10px; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <!-- Instruction Screen -->
+        <section class="instruction-screen" id="instructionScreen">
+            <div class="start-divider"></div>
+            <div class="start-label" id="instructionTaskLabel">Tarea 1</div>
+            <h2 class="instruction-title" id="instructionTitle">Tarea 1</h2>
+            <p class="instruction-text" id="instructionText">Relaciona cada línea del texto en español con su traducción al ruso.</p>
+            <div class="instruction-ready">¿Listo?</div>
+            <button class="ready-btn" id="readyBtn">Sí</button>
+        </section>
+
+        <!-- Progress Area -->
+        <section class="progress-area" id="progressArea">
+            <div class="progress-label" id="progressLabel">01 / 09</div>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </section>
+
+        <!-- Matching Area -->
+        <section class="matching-area" id="matchingArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text">Relaciona</span>
+            </div>
+            <div id="matchingContainer"></div>
+            <div class="options-list" id="optionsList"></div>
+            <div class="error-message" id="errorMessageMatching">
+                <span class="error-line"></span><span>Inténtalo de nuevo</span>
+            </div>
+            <button class="check-btn" id="checkMatchingBtn" type="button" disabled>Comprobar</button>
+        </section>
+
+        <!-- Next Button -->
+        <button class="next-btn" id="nextBtn" type="button" disabled>Siguiente</button>
+
+        <!-- Completion Area -->
+        <section class="completion-area" id="completionArea">
+            <div class="label-container">
+                <span class="label-line"></span>
+                <span class="label-text">Completado</span>
+            </div>
+            <div class="completion-text">Tareas completadas.</div>
+            <div class="completion-rule"></div>
+            <ul class="review-list" id="reviewList"></ul>
+            <button class="restart-btn" id="restartBtn">Reiniciar</button>
+        </section>
+    </main>
+
+    <script>
+        (function() {
+            // ─── Datos de las Tareas 1–9 ───
+            const tasksList = [
+                // Tarea 1
+                {
+                    title: 'Tarea 1',
+                    instructions: 'Relaciona cada línea del texto en español con su traducción al ruso.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "A la base de operaciones,", correct: "b" },
+                        { text: "este pequeño perro realiza", correct: "d" },
+                        { text: "labores de proximidad social,", correct: "e" },
+                        { text: "vistiendo un chaleco y un equipo táctico,", correct: "a" },
+                        { text: "confeccionados especialmente a su medida.", correct: "c" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'нося жилет и тактическое снаряжение,' },
+                        { letter: 'b', text: 'На базе операций' },
+                        { letter: 'c', text: 'изготовленные специально по его мерке.' },
+                        { letter: 'd', text: 'эта маленькая собака выполняет' },
+                        { letter: 'e', text: 'задачи по социальному сближению,' }
+                    ]
+                },
+                // Tarea 2
+                {
+                    title: 'Tarea 2',
+                    instructions: 'Relaciona cada línea del texto en español con su traducción al ruso.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "En las filas de la Guardia Nacional", correct: "c" },
+                        { text: "hay un elemento que", correct: "a" },
+                        { text: "no necesita armas de fuego ni operativos", correct: "d" },
+                        { text: "para conquistar a quienes lo conocen.", correct: "b" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'есть элемент, который' },
+                        { letter: 'b', text: 'чтобы покорять тех, кто его знает.' },
+                        { letter: 'c', text: 'В рядах Национальной гвардии' },
+                        { letter: 'd', text: 'не нуждается в огнестрельном оружии и операциях,' }
+                    ]
+                },
+                // Tarea 3
+                {
+                    title: 'Tarea 3',
+                    instructions: 'Relaciona cada línea del texto en español con su traducción al ruso.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "Su misión es diferente", correct: "c" },
+                        { text: "y su tamaño también.", correct: "a" },
+                        { text: "Se trata de Comando Chihuahua,", correct: "d" },
+                        { text: "un pequeño integrante de la coordinación estatal", correct: "e" },
+                        { text: "de la Guardia Nacional en Chihuahua.", correct: "b" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'и его размер тоже.' },
+                        { letter: 'b', text: 'Национальной гвардии в Чиуауа.' },
+                        { letter: 'c', text: 'Его миссия — другая,' },
+                        { letter: 'd', text: 'Речь о «Командо Чиуауа»,' },
+                        { letter: 'e', text: 'маленьком члене координации штата' }
+                    ]
+                },
+                // Tarea 4
+                {
+                    title: 'Tarea 4',
+                    instructions: 'Relaciona cada línea del texto en español con su traducción al ruso.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "Su historia con la Guardia Nacional comenzó", correct: "c" },
+                        { text: "cuando fue entregado en donación", correct: "d" },
+                        { text: "en la base de operaciones.", correct: "f" },
+                        { text: "Con el paso del tiempo,", correct: "a" },
+                        { text: "los elementos se encariñaron con él", correct: "g" },
+                        { text: "y el comandante decidió que Comando Chihuahua", correct: "e" },
+                        { text: "también tendría su propio uniforme.", correct: "b" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'Со временем' },
+                        { letter: 'b', text: 'тоже будет своя собственная форма.' },
+                        { letter: 'c', text: 'Его история с Национальной гвардией началась,' },
+                        { letter: 'd', text: 'когда его передали в дар' },
+                        { letter: 'e', text: 'и командир решил, что у «Командо Чиуауа»' },
+                        { letter: 'f', text: 'на базе операций.' },
+                        { letter: 'g', text: 'сотрудники привязались к нему,' }
+                    ]
+                },
+                // Tarea 5
+                {
+                    title: 'Tarea 5',
+                    instructions: 'Relaciona cada línea del texto en español con su traducción al ruso.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "Primero la playera oficial de la Guardia Nacional,", correct: "c" },
+                        { text: "después su chaleco táctico", correct: "i" },
+                        { text: "elaborado especialmente a su medida.", correct: "f" },
+                        { text: "Todo el equipo fue diseñado", correct: "a" },
+                        { text: "para que este pequeño elemento lleve", correct: "g" },
+                        { text: "una versión en miniatura del uniforme", correct: "d" },
+                        { text: "que utiliza el personal de esa institución.", correct: "h" },
+                        { text: "Una pequeña arma de juguete y una granada", correct: "b" },
+                        { text: "complementan su peculiar equipamiento.", correct: "e" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'Всё снаряжение было разработано' },
+                        { letter: 'b', text: 'Маленькое игрушечное оружие и граната' },
+                        { letter: 'c', text: 'Сначала официальная футболка Национальной гвардии,' },
+                        { letter: 'd', text: 'миниатюрную версию формы' },
+                        { letter: 'e', text: 'дополняют его своеобразное снаряжение.' },
+                        { letter: 'f', text: 'изготовленный специально по его мерке.' },
+                        { letter: 'g', text: 'для того, чтобы этот маленький элемент носил' },
+                        { letter: 'h', text: 'которую использует персонал этого учреждения.' },
+                        { letter: 'i', text: 'потом его тактический жилет' }
+                    ]
+                },
+                // Tarea 6
+                {
+                    title: 'Tarea 6',
+                    instructions: 'Relaciona cada línea del texto en español con su traducción al ruso.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "Bueno, todo el uniforme fue hecho justo a su medida", correct: "a" },
+                        { text: "y pues refiere al uniforme que usa", correct: "b" },
+                        { text: "pues el personal militar de la Guardia Nacional", correct: "c" },
+                        { text: "y pues tiene su Palestina, su casquito táctico,", correct: "d" },
+                        { text: "su chaleco y su guerrera.", correct: "e" },
+                        { text: "Sí, bien armado.", correct: "f" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'Ну, вся форма была сделана точно по его мерке' },
+                        { letter: 'b', text: 'и, значит, соответствует форме, которую использует' },
+                        { letter: 'c', text: 'военный персонал Национальной гвардии,' },
+                        { letter: 'd', text: 'и, значит, у него есть его «палестинка», его тактический шлем,' },
+                        { letter: 'e', text: 'его жилет и его куртка.' },
+                        { letter: 'f', text: 'Да, хорошо вооружён.' }
+                    ]
+                },
+                // Tarea 7
+                {
+                    title: 'Tarea 7',
+                    instructions: 'Relaciona cada línea del texto en español con su traducción al ruso.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "Pero la verdadera misión de Comando Chihuahua", correct: "a" },
+                        { text: "no está en el combate.", correct: "b" },
+                        { text: "Su labor es acercarse a las personas,", correct: "c" },
+                        { text: "especialmente a los niños.", correct: "d" },
+                        { text: "Y esa es su misión, convivir con la población", correct: "e" },
+                        { text: "que se acerca a conocerlo", correct: "f" },
+                        { text: "a los elementos de la Guardia Nacional.", correct: "g" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'Но настоящая миссия «Командо Чиуауа»' },
+                        { letter: 'b', text: 'не в бою.' },
+                        { letter: 'c', text: 'Его задача — быть ближе к людям,' },
+                        { letter: 'd', text: 'особенно к детям.' },
+                        { letter: 'e', text: 'И это его миссия — общаться с населением,' },
+                        { letter: 'f', text: 'которое подходит, чтобы познакомиться с ним,' },
+                        { letter: 'g', text: 'к сотрудникам Национальной гвардии.' }
+                    ]
+                },
+                // Tarea 8
+                {
+                    title: 'Tarea 8',
+                    instructions: 'Relaciona cada línea del texto en español con su traducción al ruso.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "Y aunque su tamaño es pequeño,", correct: "a" },
+                        { text: "Comando Chihuahua ya tiene una gran responsabilidad,", correct: "b" },
+                        { text: "representar a su manera el rostro más cercano y amable", correct: "c" },
+                        { text: "de la Guardia Nacional.", correct: "d" },
+                        { text: "Sí, Comando Chihuahua, este, pues es un perrito", correct: "e" },
+                        { text: "que pertenece a la coordinación estatal de Chihuahua", correct: "f" },
+                        { text: "y él realiza labores de proximidad social.", correct: "g" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'И хотя его размер маленький,' },
+                        { letter: 'b', text: 'у «Командо Чиуауа» уже есть большая ответственность —' },
+                        { letter: 'c', text: 'представлять по-своему самое близкое и дружелюбное лицо' },
+                        { letter: 'd', text: 'Национальной гвардии.' },
+                        { letter: 'e', text: 'Да, «Командо Чиуауа», это, значит, собачка,' },
+                        { letter: 'f', text: 'которая принадлежит координации штата Чиуауа' },
+                        { letter: 'g', text: 'и выполняет задачи по социальному сближению.' }
+                    ]
+                },
+                // Tarea 9
+                {
+                    title: 'Tarea 9',
+                    instructions: 'Relaciona cada línea del texto en español con su traducción al ruso.',
+                    type: 'matching',
+                    sentences: [
+                        { text: "Él asiste a plazas comerciales, a escuelas, está con niños.", correct: "a" },
+                        { text: "Comando Chihuahua, pequeño de tamaño,", correct: "b" },
+                        { text: "pero grande en su misión de acercar", correct: "c" },
+                        { text: "a la Guardia Nacional con la sociedad.", correct: "d" }
+                    ],
+                    options: [
+                        { letter: 'a', text: 'Он посещает торговые центры, школы, находится с детьми.' },
+                        { letter: 'b', text: ' «Командо Чиуауа», маленький по размеру,' },
+                        { letter: 'c', text: 'но большой в своей миссии — сближать' },
+                        { letter: 'd', text: 'Национальную гвардию с обществом.' }
+                    ]
+                }
+            ];
+
+            const totalTasks = tasksList.length;
+            let currentTaskIndex = 0;
+            let currentTask = null;
+            let answeredCorrectly = false;
+            let isTransitioning = false;
+
+            // ─── Elementos del DOM ───
+            const instructionScreen = document.getElementById('instructionScreen');
+            const instructionTaskLabel = document.getElementById('instructionTaskLabel');
+            const instructionTitle = document.getElementById('instructionTitle');
+            const instructionText = document.getElementById('instructionText');
+            const readyBtn = document.getElementById('readyBtn');
+            const progressArea = document.getElementById('progressArea');
+            const progressLabel = document.getElementById('progressLabel');
+            const progressFill = document.getElementById('progressFill');
+            const matchingArea = document.getElementById('matchingArea');
+            const matchingContainer = document.getElementById('matchingContainer');
+            const optionsList = document.getElementById('optionsList');
+            const errorMessageMatching = document.getElementById('errorMessageMatching');
+            const checkMatchingBtn = document.getElementById('checkMatchingBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const completionArea = document.getElementById('completionArea');
+            const reviewList = document.getElementById('reviewList');
+            const restartBtn = document.getElementById('restartBtn');
+
+            function updateProgress() {
+                const currentNum = String(currentTaskIndex + 1).padStart(2, '0');
+                const totalNum = String(totalTasks).padStart(2, '0');
+                progressLabel.textContent = `${currentNum} / ${totalNum}`;
+                // Progress fill: proportion of tasks completed (currentTaskIndex + 1) / total
+                progressFill.style.width = ((currentTaskIndex) / totalTasks * 100) + '%';
+            }
+
+            function hideErrorMatching() { errorMessageMatching.classList.remove('visible'); }
+            function showErrorMatching() { errorMessageMatching.classList.add('visible'); }
+
+            function enableNext() { nextBtn.disabled = false; }
+            function disableNext() { nextBtn.disabled = true; }
+
+            function showInstructionScreen() {
+                currentTaskIndex = 0;
+                instructionScreen.style.display = 'flex';
+                progressArea.style.display = 'none';
+                matchingArea.style.display = 'none';
+                nextBtn.style.display = 'none';
+                completionArea.style.display = 'none';
+                completionArea.classList.remove('visible');
+                // Rellenar datos de la primera tarea
+                const task = tasksList[0];
+                instructionTaskLabel.textContent = task.title;
+                instructionTitle.textContent = task.title;
+                instructionText.textContent = task.instructions;
+            }
+
+            function showTaskArea() {
+                instructionScreen.style.display = 'none';
+                progressArea.style.display = 'block';
+                nextBtn.style.display = 'inline-block';
+                completionArea.style.display = 'none';
+            }
+
+            function showCompletion() {
+                progressArea.style.display = 'none';
+                matchingArea.style.display = 'none';
+                nextBtn.style.display = 'none';
+                completionArea.style.display = 'block';
+                completionArea.classList.add('visible');
+            }
+
+            // ─── Render Matching ───
+            function renderMatching() {
+                matchingContainer.innerHTML = '';
+                optionsList.innerHTML = '';
+
+                currentTask.options.forEach(opt => {
+                    const div = document.createElement('div');
+                    div.className = 'option-item';
+                    const letterSpan = document.createElement('span');
+                    letterSpan.className = 'option-letter';
+                    letterSpan.textContent = opt.letter + '.';
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = opt.text;
+                    div.appendChild(letterSpan);
+                    div.appendChild(textSpan);
+                    optionsList.appendChild(div);
+                });
+
+                currentTask.sentences.forEach((sent, idx) => {
+                    const row = document.createElement('div');
+                    row.className = 'matching-row';
+                    const sentSpan = document.createElement('span');
+                    sentSpan.className = 'matching-sentence';
+                    sentSpan.textContent = (idx + 1) + '. ' + sent.text;
+                    const select = document.createElement('select');
+                    select.className = 'matching-select';
+                    select.dataset.index = idx;
+                    const blankOpt = document.createElement('option');
+                    blankOpt.value = '';
+                    blankOpt.textContent = '—';
+                    select.appendChild(blankOpt);
+                    currentTask.options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.letter;
+                        option.textContent = opt.letter;
+                        select.appendChild(option);
+                    });
+                    select.addEventListener('change', () => {
+                        hideErrorMatching();
+                        disableNext();
+                        const allFilled = Array.from(matchingContainer.querySelectorAll('.matching-select')).every(s => s.value !== '');
+                        checkMatchingBtn.disabled = !allFilled;
+                        matchingContainer.querySelectorAll('.matching-select').forEach(s => s.classList.remove('wrong'));
+                    });
+                    row.appendChild(sentSpan);
+                    row.appendChild(select);
+                    matchingContainer.appendChild(row);
+                });
+
+                checkMatchingBtn.disabled = true;
+                checkMatchingBtn.style.display = 'inline-block';
+                hideErrorMatching();
+                disableNext();
+                answeredCorrectly = false;
+                updateProgress();
+            }
+
+            function checkMatching() {
+                const selects = matchingContainer.querySelectorAll('.matching-select');
+                let allCorrect = true;
+                selects.forEach((select, idx) => {
+                    const correct = currentTask.sentences[idx].correct;
+                    if (select.value !== correct) {
+                        allCorrect = false;
+                        select.classList.add('wrong');
+                    } else {
+                        select.classList.remove('wrong');
+                    }
+                });
+
+                if (allCorrect) {
+                    answeredCorrectly = true;
+                    hideErrorMatching();
+                    checkMatchingBtn.disabled = true;
+                    selects.forEach(s => s.disabled = true);
+                    enableNext();
+                } else {
+                    showErrorMatching();
+                }
+            }
+
+            function buildReviewAll() {
+                reviewList.innerHTML = '';
+                tasksList.forEach((task, taskIdx) => {
+                    // Título de la tarea
+                    const headingLi = document.createElement('li');
+                    headingLi.className = 'review-item';
+                    headingLi.style.fontWeight = '600';
+                    headingLi.style.marginTop = taskIdx > 0 ? '2rem' : '0';
+                    headingLi.textContent = task.title;
+                    reviewList.appendChild(headingLi);
+
+                    // Texto completo en español
+                    const spanishFull = task.sentences.map(s => s.text).join(' ');
+                    const spanishLi = document.createElement('li');
+                    spanishLi.className = 'review-item';
+                    spanishLi.style.marginBottom = '0.5rem';
+                    spanishLi.textContent = spanishFull;
+                    reviewList.appendChild(spanishLi);
+
+                    // Texto completo en ruso (construido a partir de las respuestas correctas)
+                    const russianFull = task.sentences.map(s => {
+                        const opt = task.options.find(o => o.letter === s.correct);
+                        return opt ? opt.text : '';
+                    }).join(' ');
+                    const russianLi = document.createElement('li');
+                    russianLi.className = 'review-item';
+                    russianLi.style.marginBottom = '1.5rem';
+                    russianLi.textContent = russianFull;
+                    reviewList.appendChild(russianLi);
+                });
+            }
+
+            function startTask() {
+                currentTask = tasksList[currentTaskIndex];
+                answeredCorrectly = false;
+                isTransitioning = false;
+
+                showTaskArea();
+                matchingArea.style.display = 'block';
+                renderMatching();
+
+                // Update next button text
+                if (currentTaskIndex === totalTasks - 1) {
+                    nextBtn.textContent = 'Finalizar';
+                } else {
+                    nextBtn.textContent = 'Siguiente';
+                }
+            }
+
+            function handleNext() {
+                if (!answeredCorrectly || isTransitioning) return;
+                isTransitioning = true;
+
+                if (currentTaskIndex < totalTasks - 1) {
+                    // Move to next task
+                    currentTaskIndex++;
+                    startTask();
+                    isTransitioning = false;
+                } else {
+                    // All tasks done
+                    buildReviewAll();
+                    showCompletion();
+                    isTransitioning = false;
+                }
+            }
+
+            function handleRestart() {
+                showInstructionScreen();
+            }
+
+            // ─── Event Listeners ───
+            readyBtn.addEventListener('click', startTask);
+            checkMatchingBtn.addEventListener('click', checkMatching);
+            nextBtn.addEventListener('click', handleNext);
+            restartBtn.addEventListener('click', handleRestart);
+
+            document.addEventListener('keydown', (e) => {
+                const instructionVisible = instructionScreen.style.display !== 'none';
+                const matchingVisible = matchingArea.style.display !== 'none';
+                const completionVisible = completionArea.style.display !== 'none';
+
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const active = document.activeElement;
+                    if (instructionVisible && active === readyBtn) {
+                        e.preventDefault();
+                        startTask();
+                    }
+                    if (matchingVisible && active === nextBtn && !nextBtn.disabled) {
+                        e.preventDefault();
+                        handleNext();
+                    }
+                    if (completionVisible && active === restartBtn) {
+                        e.preventDefault();
+                        handleRestart();
+                    }
+                }
+            });
+
+            // Init: mostrar pantalla de instrucciones
+            showInstructionScreen();
+        })();
+    </script>
+</body>
+</html>
