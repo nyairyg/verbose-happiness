@@ -194,25 +194,32 @@
   "use strict";
 
   /* ---------- Данные ---------- */
+  /* Для каждого задания — массив допустимых ответов.
+     Где естественно звучит и Present Simple, и Present Continuous —
+     принимаются оба. Апострофы любого вида и конечная пунктуация
+     игнорируются при проверке (см. norm()).                       */
 
   const TASKS = [
     { wrong: "Him drive a bus every day.",
       answers: ["He drives a bus every day."] },
 
     { wrong: "Him go to school.",
-      answers: ["He goes to school.", "He is going to school."] },
+      answers: ["He goes to school.",
+                "He is going to school."] },
 
     { wrong: "I goes there every day.",
       answers: ["I go there every day."] },
 
     { wrong: "Her go to work by car.",
-      answers: ["She goes to work by car.", "She is going to work by car."] },
+      answers: ["She goes to work by car.",
+                "She is going to work by car."] },
 
     { wrong: "She go to school every day.",
       answers: ["She goes to school every day."] },
 
     { wrong: "She is drive a car.",
-      answers: ["She is driving a car."] },
+      answers: ["She is driving a car.",
+                "She drives a car."] },
 
     { wrong: "It have a long tail.",
       answers: ["It has a long tail."] },
@@ -227,16 +234,20 @@
       answers: ["She watches TV in the evening."] },
 
     { wrong: "He study English at school.",
-      answers: ["He studies English at school."] },
+      answers: ["He studies English at school.",
+                "He is studying English at school."] },
 
     { wrong: "We are go home.",
-      answers: ["We are going home.", "We go home."] },
+      answers: ["We are going home.",
+                "We go home."] },
 
     { wrong: "She have two brothers.",
       answers: ["She has two brothers."] },
 
     { wrong: "I am look outside.",
-      answers: ["I am looking outside.", "I’m looking outside."] },
+      answers: ["I am looking outside.",
+                "I’m looking outside.",
+                "I look outside."] },
 
     { wrong: "He play football on Saturdays.",
       answers: ["He plays football on Saturdays."] },
@@ -260,7 +271,8 @@
       answers: ["They are students."] },
 
     { wrong: "Me is a student.",
-      answers: ["I am a student.", "I’m a student."] },
+      answers: ["I am a student.",
+                "I’m a student."] },
 
     { wrong: "Him not go to school on Sundays.",
       answers: ["He does not go to school on Sundays.",
@@ -268,13 +280,16 @@
 
     { wrong: "He don’t drive a car.",
       answers: ["He does not drive a car.",
-                "He doesn’t drive a car."] },
+                "He doesn’t drive a car.",
+                "He is not driving a car.",
+                "He isn’t driving a car."] },
 
     { wrong: "I see he and she every day.",
       answers: ["I see him and her every day."] },
 
     { wrong: "Him is my friend.",
-      answers: ["He is my friend.", "He’s my friend."] },
+      answers: ["He is my friend.",
+                "He’s my friend."] },
 
     { wrong: "Can you help we?",
       answers: ["Can you help us?"] }
@@ -285,10 +300,10 @@
 
   /* ---------- Нормализация ответа ---------- */
   /* - игнорируем регистр
-     - все виды апострофов (’ ‘ ` ´ ') считаем одинаковыми и вообще убираем,
-       поэтому "doesn't" == "doesnt" == "does not"? нет — только "doesnt".
-       Полная форма "does not" перечислена отдельно в answers.
-     - игнорируем финальную точку / вопросительный знак
+     - все виды апострофов (‘ ’ ` ´ ') приводим к одному и убираем,
+       поэтому "doesn't" == "doesnt"; полная форма "does not"
+       перечислена в answers отдельно
+     - игнорируем финальную точку / вопросительный знак / многоточие
      - сжимаем пробелы                                       */
 
   function norm(s) {
