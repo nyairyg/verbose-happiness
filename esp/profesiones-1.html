@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quiz · Profesiones</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root{
+    --bg:      #f4f4f1;
+    --panel:   #ffffff;
+    --ink:     #101010;
+    --line:    #e2e2dd;
+    --muted:   #b6b6af;
+    --green:   #12a150;
+    --green-soft: #e6f7ec;
+    --green-ink:  #0b6b36;
+  }
+
+  html, body { min-height: 100%; }
+
+  body{
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    padding: 24px;
+  }
+
+  .app{
+    margin: auto;
+    width: 100%;
+    max-width: 780px;
+  }
+
+  /* ---------- top bar ---------- */
+  .bar{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .bar b{ font-weight: 600; color: var(--ink); }
+
+  .progress{
+    height: 2px;
+    background: var(--line);
+    margin-bottom: 22px;
+  }
+  .progress > i{
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--ink);
+    transition: width .35s ease;
+  }
+
+  /* ---------- card ---------- */
+  .card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 34px 34px 30px;
+    border-radius: 0;
+    transition: background .25s ease, border-color .25s ease;
+  }
+
+  .eyebrow{
+    margin: 0 0 14px;
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .question{
+    margin: 0;
+    font-size: clamp(19px, 2.6vw, 26px);
+    line-height: 1.38;
+    font-weight: 500;
+    letter-spacing: -.01em;
+    min-height: 2.9em;
+  }
+
+  /* ---------- options ---------- */
+  /* нумерация по столбцам:  1 4 / 2 5 / 3 6 */
+  .options{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, minmax(0, auto));
+    grid-auto-flow: column;
+    gap: 8px;
+    margin-top: 30px;
+  }
+
+  .opt{
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.3;
+    text-align: left;
+    padding: 14px 16px;
+    background: transparent;
+    border: 1px solid var(--line);
+    border-radius: 0;
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease,
+                color .15s ease, opacity .25s ease;
+  }
+  .opt .key{
+    font-size: 11px;
+    letter-spacing: .08em;
+    color: var(--muted);
+    flex: none;
+    transition: color .15s ease, opacity .15s ease;
+  }
+  .opt:hover:not(:disabled){
+    border-color: var(--ink);
+    background: #fafaf7;
+  }
+  .opt:hover:not(:disabled) .key{ color: var(--ink); }
+  .opt:disabled{ cursor: default; }
+
+  /* ---- wrong click ---- */
+  .opt.wrong{
+    background: #eeeeea;
+    border-color: #e4e4de;
+    color: var(--muted);
+  }
+  .opt.wrong .key{ color: var(--muted); }
+
+  @keyframes shake{
+    0%, 100% { transform: translateX(0); }
+    15%      { transform: translateX(-7px); }
+    30%      { transform: translateX(6px); }
+    45%      { transform: translateX(-4px); }
+    60%      { transform: translateX(3px); }
+    80%      { transform: translateX(-2px); }
+  }
+  .opt.shake{
+    animation: shake .45s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  /* ---- resolved: только верный зелёный, остальные muted ---- */
+  .options.resolved .opt{
+    background: transparent;
+    border-color: var(--line);
+    color: var(--muted);
+    opacity: .55;
+  }
+  .options.resolved .opt .key{ color: var(--muted); }
+
+  .options.resolved .opt.wrong{
+    background: #eeeeea;
+    border-color: #e4e4de;
+    color: var(--muted);
+    opacity: 1;
+  }
+
+  .options.resolved .opt.exact{
+    background: var(--green-soft);
+    border-color: var(--green);
+    color: var(--green-ink);
+    opacity: 1;
+  }
+  .options.resolved .opt.exact .key{ color: var(--green); opacity: 1; }
+
+  /* ---------- siguente ---------- */
+  .foot{
+    margin-top: 22px;
+    display: flex;
+    justify-content: flex-end;
+    min-height: 46px;
+  }
+
+  .next{
+    font: inherit;
+    font-size: 13px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 14px 30px;
+    background: var(--ink);
+    color: #fff;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: background .15s ease, color .15s ease, opacity .2s ease;
+  }
+  .next.show{
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .next:hover{ background: transparent; color: var(--ink); }
+
+  /* ---------- result ---------- */
+  .result .big{
+    margin: 0 0 8px;
+    font-size: clamp(40px, 9vw, 72px);
+    font-weight: 600;
+    letter-spacing: -.03em;
+    line-height: 1;
+  }
+  .result .big span{ color: var(--muted); }
+
+  .result .cheer{
+    margin: 0 0 30px;
+    font-size: clamp(18px, 2.4vw, 24px);
+    line-height: 1.35;
+    font-weight: 500;
+  }
+
+  .restart{
+    font: inherit;
+    font-size: 13px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 14px 26px;
+    background: var(--ink);
+    color: #fff;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .restart:hover{ background: transparent; color: var(--ink); }
+
+  @media (max-width: 620px){
+    body{ padding: 16px; }
+    .card{ padding: 26px 20px 26px; }
+    .options{
+      grid-template-columns: 1fr;
+      grid-template-rows: none;
+      grid-auto-flow: row;
+      gap: 7px;
+      margin-top: 24px;
+    }
+    .question{ min-height: 0; }
+    .foot{ justify-content: stretch; }
+    .next{ width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<main class="app">
+
+  <div class="bar">
+    <span id="counter">01 / 63</span>
+    <span><b id="score">0</b> aciertos</span>
+  </div>
+  <div class="progress"><i id="bar"></i></div>
+
+  <section class="card" id="card">
+    <p class="eyebrow">¿Qué profesión es?</p>
+    <h1 class="question" id="question"></h1>
+    <div class="options" id="options"></div>
+    <div class="foot">
+      <button class="next" id="next" type="button">Siguiente</button>
+    </div>
+  </section>
+
+  <section class="card result" id="result" hidden>
+    <p class="eyebrow">Resultado</p>
+    <p class="big"><span id="finalScore">0</span> / <span id="finalTotal">63</span></p>
+    <p class="cheer">¡Todo súper, eres un crack! 🎉</p>
+    <button class="restart" id="restart" type="button">Reiniciar</button>
+  </section>
+
+</main>
+
+<script>
+/* ============================================================
+   BANCO: definición → respuesta
+   g: género de la pregunta ("f" / "m")  ·  n: palabra neutra
+   no: respuestas excluidas como distractores (sinónimos)
+   ============================================================ */
+const DATA = [
+  { q: "La mujer que defiende, representa o acusa a una persona en un juicio.", a: "abogada", g: "f" },
+  { q: "El hombre que actúa en obras de teatro, series o películas.", a: "actor", g: "m" },
+  { q: "La mujer que vende y organiza viajes, vacaciones y vuelos.", a: "agente de viaje", g: "f", n: true },
+  { q: "El hombre que diseña edificios y casas; los diseños los representa en planos.", a: "arquitecto", g: "m" },
+  { q: "El hombre que, como científico, observa el cielo y el universo, normalmente con telescopios.", a: "astrónomo", g: "m" },
+  { q: "La mujer que escribe libros, novelas o libretos.", a: "autora", g: "f" },
+  { q: "La mujer que limpia los lugares públicos (calles, plazas, etc.).", a: "barrendera", g: "f" },
+  { q: "El hombre que trabaja en una biblioteca manteniendo el orden de los libros, videos, discos, etc.", a: "bibliotecario", g: "m" },
+  { q: "La mujer que apaga el fuego en un incendio; también carga combustible en una estación de servicios. (Chile)", a: "bombera", g: "f" },
+  { q: "El hombre que trabaja en el cuerpo de carabineros y previene el crimen. (Policía)", a: "carabinero", g: "m" },
+  { q: "El hombre que lleva las cartas hasta tu casa.", a: "cartero", g: "m" },
+  { q: "La mujer que trabaja con carne: la corta y la vende.", a: "carnicera", g: "f" },
+  { q: "El hombre que trabaja con madera haciendo casas o creando muebles.", a: "carpintero", g: "m" },
+  { q: "La mujer que trabaja en investigaciones científicas haciendo muchos experimentos.", a: "científica", g: "f" },
+  { q: "La mujer que profesa la cirugía.", a: "cirujana", g: "f" },
+  { q: "El hombre que conduce o maneja buses.", a: "conductor de bus", g: "m" },
+  { q: "El hombre que trabaja con el dinero y con las cuentas de una compañía.", a: "contador", g: "m" },
+  { q: "La mujer que vende o arrienda casas a otros.", a: "corredora de propiedades", g: "f" },
+  { q: "La mujer que prepara comida para otros, comúnmente en un restaurante.", a: "cocinera", g: "f" },
+  { q: "El hombre que soluciona los problemas de los dientes.", a: "dentista", g: "m", n: true },
+  { q: "La mujer que diseña creativamente diferentes cosas: ropa, muebles, papelería, etc.", a: "diseñadora", g: "f" },
+  { q: "El hombre al que vas cuando tienes problemas de salud.", a: "doctor", g: "m" },
+  { q: "El hombre que trabaja haciendo instalaciones eléctricas.", a: "electricista", g: "m", n: true },
+  { q: "La mujer que cuida a enfermos o a personas en proceso de recuperación siguiendo las órdenes del doctor.", a: "enfermera", g: "f" },
+  { q: "El hombre que corta el pelo y hace peinados; generalmente trabaja en un salón de belleza o peluquería.", a: "peluquero", g: "m" },
+  { q: "La mujer calificada que trabaja en una farmacia, chequea las prescripciones médicas o aconseja a los enfermos.", a: "farmacéutica", g: "f" },
+  { q: "La mujer que repara las tuberías de agua o gas y realiza instalaciones de agua potable. (Sinónimo: Plomero)", a: "fontanera", g: "f", no: ["plomera"] },
+  { q: "El hombre que trabaja en la producción de flores y diseña arreglos florales.", a: "florista", g: "m", n: true },
+  { q: "La mujer que toma fotos de distintas cosas: paisajes, personas, detalles, etc.", a: "fotógrafa", g: "f" },
+  { q: "El hombre que repara las tuberías de agua o gas. (Chile)", a: "gásfiter", g: "m", no: ["gasfitero"] },
+  { q: "El hombre que repara las tuberías de agua o gas. (Perú)", a: "gasfitero", g: "m", no: ["gásfiter"] },
+  { q: "La mujer que trabaja en una granja o parcela, en la mantención de un campo con árboles frutales o ganado.", a: "granjera", g: "f" },
+  { q: "La mujer que trabaja en la mantención de un jardín: cuida las flores, corta el pasto, etc.", a: "jardinera", g: "f" },
+  { q: "El hombre que decide en un juicio si el acusado o demandado es culpable o inocente.", a: "juez", g: "m" },
+  { q: "El hombre que realiza diferentes trámites, generalmente trabaja para una oficina; a veces también limpia el lugar de trabajo.", a: "júnior", g: "m" },
+  { q: "La mujer que lee noticias, por lo general en la televisión.", a: "lectora de noticias", g: "f" },
+  { q: "La mujer que limpia los vidrios de un edificio muy alto.", a: "limpiadora de vidrios", g: "f" },
+  { q: "El hombre que construye casas o edificios y realiza diversas reparaciones.", a: "maestro de construcción", g: "m" },
+  { q: "La mujer que repara máquinas, autos, camiones, motores, etc.", a: "mecánica", g: "f" },
+  { q: "El hombre que trabaja en un restaurante, atiende y sirve la comida a los clientes.", a: "mesero", g: "m" },
+  { q: "La mujer (por lo general atractiva) que muestra ropa o accesorios en un desfile de modas o revistas.", a: "modelo", g: "f", n: true },
+  { q: "El hombre que revisa tu visión y trata de corregir problemas visuales.", a: "oftalmólogo", g: "m" },
+  { q: "El hombre que hace pan, queques y trabaja generalmente en una panadería.", a: "panadero", g: "m" },
+  { q: "La mujer que tiene por oficio peinar o cortar el pelo.", a: "peluquera", g: "f" },
+  { q: "El hombre que investiga e informa sobre las noticias, ya sea en diario, revista, radio o televisión.", a: "periodista", g: "m", n: true },
+  { q: "La mujer que pesca peces en el mar.", a: "pescadora", g: "f" },
+  { q: "La mujer que pinta cuadros u obras de arte; también pinta casas por dentro o por fuera.", a: "pintora", g: "f" },
+  { q: "El hombre que pilotea aviones o aeroplanos.", a: "piloto", g: "m", n: true },
+  { q: "La mujer que repara las tuberías de agua o gas y realiza instalaciones de agua potable. (Sinónimo: Fontanero)", a: "plomera", g: "f", no: ["fontanera"] },
+  { q: "El hombre encargado de velar por el mantenimiento del orden público; también investiga el crimen. (Chile)", a: "policía", g: "m", n: true },
+  { q: "El hombre que trabaja en la política.", a: "político", g: "m" },
+  { q: "La mujer que enseña en una escuela, instituto o universidad y potencia las destrezas de un estudiante.", a: "profesora", g: "f" },
+  { q: "El hombre especialista que evalúa, diagnostica, trata o rehabilita a personas con trastornos mentales.", a: "psiquiatra", g: "m", n: true },
+  { q: "La mujer que trabaja en la recepción de una compañía y entrega información.", a: "recepcionista", g: "f", n: true },
+  { q: "La mujer que salva las vidas de los bañistas en una piscina, en el mar o en un lago.", a: "salvavidas", g: "f", n: true },
+  { q: "El hombre que hace ropas para otros; generalmente crea diseños únicos y exclusivos.", a: "sastre", g: "m" },
+  { q: "El hombre que trabaja en una compañía escribiendo cartas, atendiendo el teléfono y organizando el horario de su jefe.", a: "secretario", g: "m" },
+  { q: "La mujer que está en un batallón de guerra.", a: "soldada", g: "f" },
+  { q: "La mujer que conduce un auto y cobra una cantidad de dinero por el recorrido.", a: "taxista", g: "f", n: true },
+  { q: "El hombre que trabaja en una fábrica.", a: "trabajador de fábrica", g: "m" },
+  { q: "La mujer que traduce un texto o conversaciones de un lenguaje a otro sin perder la idea original.", a: "traductora", g: "f" },
+  { q: "El hombre que trabaja en un lugar vendiendo productos o servicios.", a: "vendedor", g: "m" },
+  { q: "La mujer que atiende a los animales cuando están enfermos y les receta algún medicamento.", a: "veterinaria", g: "f" }
+];
+
+/* ============================ utils ============================ */
+const shuffle = arr => {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
+
+const pad = n => String(n).padStart(2, "0");
+
+/* ============================ state ============================ */
+const els = {
+  counter:     document.getElementById("counter"),
+  score:       document.getElementById("score"),
+  bar:         document.getElementById("bar"),
+  card:        document.getElementById("card"),
+  question:    document.getElementById("question"),
+  options:     document.getElementById("options"),
+  next:        document.getElementById("next"),
+  result:      document.getElementById("result"),
+  finalScore:  document.getElementById("finalScore"),
+  finalTotal:  document.getElementById("finalTotal"),
+  restart:     document.getElementById("restart")
+};
+
+let deck = [];
+let idx = 0;
+let score = 0;
+let locked = false;
+let missed = false;
+
+/* ====================== construir opciones ====================== */
+function optionsFor(item) {
+  const banned = new Set([item.a, ...(item.no || [])]);
+  const pool = DATA.filter(d => !banned.has(d.a) && d.g === item.g);
+  const distractors = shuffle(pool).slice(0, 5).map(d => d.a);
+  return shuffle([item.a, ...distractors]);
+}
+
+/* =========================== render =========================== */
+function render() {
+  const item = deck[idx];
+  locked = false;
+  missed = false;
+
+  els.counter.textContent = pad(idx + 1) + " / " + pad(deck.length);
+  els.bar.style.width = (idx / deck.length) * 100 + "%";
+  els.question.textContent = item.q;
+
+  els.options.classList.remove("resolved");
+  els.options.innerHTML = "";
+  els.next.classList.remove("show");
+
+  optionsFor(item).forEach((text, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "opt";
+    b.dataset.value = text;
+    b.innerHTML = '<span class="key">' + (i + 1) + '</span><span class="txt"></span>';
+    b.querySelector(".txt").textContent = text;
+    b.addEventListener("click", () => pick(b, text, item));
+    els.options.appendChild(b);
+  });
+}
+
+/* ============================ pick ============================ */
+function pick(btn, text, item) {
+  if (locked || btn.disabled) return;
+
+  /* ---- correcto: solo el correcto verde, el resto muted ---- */
+  if (text === item.a) {
+    locked = true;
+
+    if (!missed) {
+      score++;
+      els.score.textContent = score;
+    }
+
+    els.options.classList.add("resolved");
+
+    Array.from(els.options.children).forEach(b => {
+      b.disabled = true;
+      if (b.dataset.value === item.a) b.classList.add("exact");
+    });
+
+    els.bar.style.width = ((idx + 1) / deck.length) * 100 + "%";
+    els.next.classList.add("show");
+    els.next.focus();
+    return;
+  }
+
+  /* ---- incorrecto: tiembla y se apaga ---- */
+  missed = true;
+  btn.disabled = true;
+  btn.classList.add("wrong", "shake");
+  btn.addEventListener("animationend", () => btn.classList.remove("shake"), { once: true });
+}
+
+/* =========================== next =========================== */
+function goNext() {
+  if (!locked) return;
+  idx++;
+  if (idx < deck.length) render();
+  else finish();
+}
+
+/* =========================== finish =========================== */
+function finish() {
+  els.card.hidden = true;
+  els.result.hidden = false;
+  els.finalScore.textContent = score;
+  els.bar.style.width = "100%";
+}
+
+/* ============================ start ============================ */
+function start() {
+  deck = shuffle(DATA);
+  idx = 0;
+  score = 0;
+
+  els.score.textContent = "0";
+  els.finalTotal.textContent = deck.length;
+  els.result.hidden = true;
+  els.card.hidden = false;
+  els.next.classList.remove("show");
+
+  render();
+}
+
+/* ========================= keyboard ========================= */
+document.addEventListener("keydown", e => {
+  if (els.card.hidden) return;
+
+  if (e.key === "Enter" && locked) {
+    e.preventDefault();
+    goNext();
+    return;
+  }
+
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= 6) {
+    const b = els.options.children[n - 1];
+    if (b && !b.disabled) b.click();
+  }
+});
+
+els.next.addEventListener("click", goNext);
+els.restart.addEventListener("click", start);
+start();
+</script>
+</body>
+</html>
