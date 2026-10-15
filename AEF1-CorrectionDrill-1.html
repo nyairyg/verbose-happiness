@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тренажёр · Error correction</title>
+<style>
+  :root{
+    --bg:#f6f4ef;
+    --card:#fffdfa;
+    --ink:#22201d;
+    --muted:#8f887c;
+    --line:#e7e2d8;
+    --ok:#3d7a4f;
+    --err:#b04a3f;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font:16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+    padding:44px 20px 64px;
+  }
+  .wrap{width:100%;max-width:600px;}
+
+  .bar{
+    height:3px;
+    background:var(--line);
+    border-radius:99px;
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .bar-fill{
+    height:100%;
+    width:0;
+    background:var(--ink);
+    border-radius:99px;
+    transition:width .35s ease;
+  }
+
+  .head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:26px;
+  }
+  .counter{
+    font-size:13px;
+    color:var(--muted);
+    letter-spacing:.02em;
+  }
+  .ghost{
+    background:none;
+    border:0;
+    padding:0;
+    color:var(--muted);
+    font:inherit;
+    font-size:13px;
+    cursor:pointer;
+    border-bottom:1px solid transparent;
+  }
+  .ghost:hover{color:var(--ink);border-bottom-color:var(--line);}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:34px 32px 30px;
+  }
+
+  .label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.09em;
+    color:var(--muted);
+    margin-bottom:16px;
+  }
+
+  .task{
+    font-size:26px;
+    line-height:1.35;
+    letter-spacing:-.01em;
+    margin-bottom:28px;
+  }
+
+  input[type="text"]{
+    width:100%;
+    padding:14px 16px;
+    font:inherit;
+    font-size:17px;
+    color:var(--ink);
+    background:#fdfbf7;
+    border:1px solid var(--line);
+    border-radius:10px;
+    outline:none;
+    transition:border-color .15s, background .15s;
+  }
+  input[type="text"]::placeholder{color:#b8b1a5;}
+  input[type="text"]:focus{border-color:var(--ink);background:#fff;}
+  input[type="text"].done{
+    border-color:#cfdccf;
+    background:#f4f8f3;
+    color:var(--ok);
+  }
+  input[type="text"].shake{
+    animation:shake .32s ease;
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-5px);}
+    75%{transform:translateX(5px);}
+  }
+
+  .feedback{
+    min-height:22px;
+    margin-top:12px;
+    font-size:14px;
+    line-height:1.5;
+    color:var(--muted);
+  }
+  .feedback.ok{color:var(--ok);}
+  .feedback.err{color:var(--err);}
+
+  .primary{
+    width:100%;
+    margin-top:22px;
+    padding:14px 18px;
+    font:inherit;
+    font-size:15px;
+    font-weight:500;
+    letter-spacing:.01em;
+    color:#fdfbf7;
+    background:var(--ink);
+    border:0;
+    border-radius:10px;
+    cursor:pointer;
+    transition:opacity .15s, transform .06s;
+  }
+  .primary:hover{opacity:.88;}
+  .primary:active{transform:translateY(1px);}
+
+  .foot{
+    margin-top:20px;
+    text-align:center;
+    font-size:12.5px;
+    color:var(--muted);
+  }
+
+  @media (max-width:520px){
+    body{padding:26px 14px 44px;}
+    .card{padding:26px 20px 22px;border-radius:14px;}
+    .task{font-size:22px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="bar"><div class="bar-fill" id="barFill"></div></div>
+
+  <div class="head">
+    <span class="counter" id="counter">1 / 27</span>
+    <button class="ghost" id="resetBtn">Сбросить прогресс</button>
+  </div>
+
+  <div class="card">
+    <div id="quizView">
+      <div class="label">Исправь ошибку</div>
+      <div class="task" id="task">—</div>
+      <input id="answer" type="text" autocomplete="off" autocapitalize="off"
+             autocorrect="off" spellcheck="false" enterkeyhint="done"
+             placeholder="Напиши правильное предложение…">
+      <div class="feedback" id="feedback"></div>
+      <button class="primary" id="actionBtn">Проверить</button>
+    </div>
+
+    <div id="doneView" hidden>
+      <div class="label">Готово</div>
+      <div class="task" id="doneText">Все задания пройдены.</div>
+      <button class="primary" id="againBtn">Начать заново</button>
+    </div>
+  </div>
+
+  <div class="foot">Enter — проверить · Enter — дальше</div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Данные ---------- */
+
+  const TASKS = [
+    { wrong: "Him drive a bus every day.",
+      answers: ["He drives a bus every day."] },
+
+    { wrong: "Him go to school.",
+      answers: ["He goes to school.", "He is going to school."] },
+
+    { wrong: "I goes there every day.",
+      answers: ["I go there every day."] },
+
+    { wrong: "Her go to work by car.",
+      answers: ["She goes to work by car.", "She is going to work by car."] },
+
+    { wrong: "She go to school every day.",
+      answers: ["She goes to school every day."] },
+
+    { wrong: "She is drive a car.",
+      answers: ["She is driving a car."] },
+
+    { wrong: "It have a long tail.",
+      answers: ["It has a long tail."] },
+
+    { wrong: "Do she like apples?",
+      answers: ["Does she like apples?"] },
+
+    { wrong: "Me go to school every day.",
+      answers: ["I go to school every day."] },
+
+    { wrong: "She watch TV in the evening.",
+      answers: ["She watches TV in the evening."] },
+
+    { wrong: "He study English at school.",
+      answers: ["He studies English at school."] },
+
+    { wrong: "We are go home.",
+      answers: ["We are going home.", "We go home."] },
+
+    { wrong: "She have two brothers.",
+      answers: ["She has two brothers."] },
+
+    { wrong: "I am look outside.",
+      answers: ["I am looking outside.", "I’m looking outside."] },
+
+    { wrong: "He play football on Saturdays.",
+      answers: ["He plays football on Saturdays."] },
+
+    { wrong: "I see he every day.",
+      answers: ["I see him every day."] },
+
+    { wrong: "We know she very well.",
+      answers: ["We know her very well."] },
+
+    { wrong: "Give the book to he.",
+      answers: ["Give the book to him."] },
+
+    { wrong: "This present is for she.",
+      answers: ["This present is for her."] },
+
+    { wrong: "He like they.",
+      answers: ["He likes them."] },
+
+    { wrong: "Them are students.",
+      answers: ["They are students."] },
+
+    { wrong: "Me is a student.",
+      answers: ["I am a student.", "I’m a student."] },
+
+    { wrong: "Him not go to school on Sundays.",
+      answers: ["He does not go to school on Sundays.",
+                "He doesn’t go to school on Sundays."] },
+
+    { wrong: "He don’t drive a car.",
+      answers: ["He does not drive a car.",
+                "He doesn’t drive a car."] },
+
+    { wrong: "I see he and she every day.",
+      answers: ["I see him and her every day."] },
+
+    { wrong: "Him is my friend.",
+      answers: ["He is my friend.", "He’s my friend."] },
+
+    { wrong: "Can you help we?",
+      answers: ["Can you help us?"] }
+  ];
+
+  const TOTAL = TASKS.length;
+  const KEY = "error-correction-trainer-v1";
+
+  /* ---------- Нормализация ответа ---------- */
+  /* - игнорируем регистр
+     - все виды апострофов (’ ‘ ` ´ ') считаем одинаковыми и вообще убираем,
+       поэтому "doesn't" == "doesnt" == "does not"? нет — только "doesnt".
+       Полная форма "does not" перечислена отдельно в answers.
+     - игнорируем финальную точку / вопросительный знак
+     - сжимаем пробелы                                       */
+
+  function norm(s) {
+    return String(s)
+      .toLowerCase()
+      .replace(/[\u2018\u2019\u02BC\u0060\u00B4]/g, "'")
+      .replace(/'/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .replace(/[.!?\u2026]+$/g, "")
+      .trim();
+  }
+
+  function isCorrect(input, task) {
+    const n = norm(input);
+    if (!n) return false;
+    return task.answers.some(a => norm(a) === n);
+  }
+
+  /* ---------- Состояние ---------- */
+
+  let state = { idx: 0, solved: false, input: "", attempts: 0 };
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      if (s && typeof s.idx === "number" && s.idx >= 0 && s.idx <= TOTAL) {
+        state = {
+          idx: s.idx,
+          solved: !!s.solved,
+          input: typeof s.input === "string" ? s.input : "",
+          attempts: typeof s.attempts === "number" ? s.attempts : 0
+        };
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  function saveState() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  /* ---------- DOM ---------- */
+
+  const $ = id => document.getElementById(id);
+  const elBar     = $("barFill");
+  const elCounter = $("counter");
+  const elTask    = $("task");
+  const elInput   = $("answer");
+  const elFb      = $("feedback");
+  const elBtn     = $("actionBtn");
+  const quizView  = $("quizView");
+  const doneView  = $("doneView");
+  const doneText  = $("doneText");
+
+  /* ---------- Отрисовка ---------- */
+
+  function render(focusInput) {
+    elBar.style.width = (Math.min(state.idx, TOTAL) / TOTAL * 100) + "%";
+
+    if (state.idx >= TOTAL) {
+      quizView.hidden = true;
+      doneView.hidden = false;
+      doneText.textContent = "Все " + TOTAL + " заданий пройдены.";
+      elCounter.textContent = TOTAL + " / " + TOTAL;
+      elBar.style.width = "100%";
+      return;
+    }
+
+    quizView.hidden = false;
+    doneView.hidden = true;
+
+    const task = TASKS[state.idx];
+    elCounter.textContent = (state.idx + 1) + " / " + TOTAL;
+    elTask.textContent = task.wrong;
+
+    elInput.value = state.input || "";
+    elFb.textContent = "";
+    elFb.className = "feedback";
+
+    if (state.solved) {
+      elInput.readOnly = true;
+      elInput.classList.add("done");
+      elFb.textContent = "Верно.";
+      elFb.className = "feedback ok";
+      elBtn.textContent = (state.idx === TOTAL - 1) ? "Завершить" : "Дальше →";
+      elBtn.focus();
+    } else {
+      elInput.readOnly = false;
+      elInput.classList.remove("done");
+      elBtn.textContent = "Проверить";
+      if (state.attempts > 0) showHintOrError(task, false);
+      if (focusInput !== false) elInput.focus();
+    }
+  }
+
+  /* ---------- Ошибка / подсказка ---------- */
+
+  function showHintOrError(task, shake) {
+    if (state.attempts >= 3) {
+      elFb.className = "feedback err";
+      elFb.textContent = "Подсказка: " + task.answers.join("   /   ");
+    } else {
+      elFb.className = "feedback err";
+      elFb.textContent = "Пока не верно. Попробуй ещё раз.";
+    }
+    if (shake) {
+      elInput.classList.remove("shake");
+      void elInput.offsetWidth;
+      elInput.classList.add("shake");
+    }
+  }
+
+  /* ---------- Действия ---------- */
+
+  function submit() {
+    if (state.idx >= TOTAL) return;
+
+    if (state.solved) { nextTask(); return; }
+
+    const value = elInput.value;
+    state.input = value;
+    const task = TASKS[state.idx];
+
+    if (isCorrect(value, task)) {
+      state.solved = true;
+      saveState();
+      render(false);
+    } else {
+      state.attempts += 1;
+      saveState();
+      showHintOrError(task, true);
+      elInput.focus();
+      elInput.select();
+    }
+  }
+
+  function nextTask() {
+    state.idx += 1;
+    state.solved = false;
+    state.input = "";
+    state.attempts = 0;
+    saveState();
+    render(true);
+  }
+
+  function resetAll() {
+    if (!confirm("Сбросить весь прогресс и начать заново?")) return;
+    state = { idx: 0, solved: false, input: "", attempts: 0 };
+    saveState();
+    render(true);
+  }
+
+  /* ---------- События ---------- */
+
+  elBtn.addEventListener("click", submit);
+
+  elInput.addEventListener("input", function () {
+    state.input = elInput.value;
+    saveState();
+    if (!state.solved) {
+      elFb.textContent = "";
+      elFb.className = "feedback";
+    }
+  });
+
+  elInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      submit();
+    }
+  });
+
+  $("resetBtn").addEventListener("click", resetAll);
+  $("againBtn").addEventListener("click", function () {
+    state = { idx: 0, solved: false, input: "", attempts: 0 };
+    saveState();
+    render(true);
+  });
+
+  /* ---------- Старт ---------- */
+
+  loadState();
+  render(true);
+
+})();
+</script>
+</body>
+</html>
