@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Favorite Times — ESL A2</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #8a8a8a;
+    --line: #d8d8d8;
+    --ok: #1e8e4e;
+    --bad: #c93a3a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 48px 20px 96px;
+    background: #fbfbf9;
+    color: var(--ink);
+    font: 17px/1.7 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 680px; margin: 0 auto; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -.02em;
+    margin: 0 0 28px;
+  }
+  h2 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+    margin: 48px 0 16px;
+  }
+  h2:first-child { margin-top: 0; }
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+
+  .text p { margin: 0 0 18px; }
+  .text ol { margin: 28px 0 0; padding-left: 22px; }
+  .text ol li { margin-bottom: 8px; }
+
+  ol.gaps { list-style: none; counter-reset: n; margin: 0; padding: 0; }
+  ol.gaps li {
+    counter-increment: n;
+    position: relative;
+    padding-left: 34px;
+    margin-bottom: 18px;
+  }
+  ol.gaps li::before {
+    content: counter(n);
+    position: absolute;
+    left: 0;
+    top: 3px;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+
+  select {
+    font: inherit;
+    color: inherit;
+    max-width: 280px;
+    padding: 2px 22px 2px 6px;
+    margin: 0 2px;
+    border: none;
+    border-bottom: 1.5px dashed #b9b9b9;
+    border-radius: 0;
+    background: transparent
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%238a8a8a'/></svg>")
+      no-repeat right 4px center;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    transition: border-color .15s, color .15s;
+  }
+  select:focus { outline: none; border-bottom-color: var(--ink); }
+  select.ok  { color: var(--ok);  border-bottom: 1.5px solid var(--ok); }
+  select.bad { color: var(--bad); border-bottom: 1.5px solid var(--bad); }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px 20px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  button {
+    font: inherit;
+    font-weight: 600;
+    letter-spacing: .02em;
+    padding: 10px 26px;
+    border: 1px solid var(--ink);
+    border-radius: 999px;
+    background: var(--ink);
+    color: #fff;
+    cursor: pointer;
+    transition: opacity .15s, transform .1s;
+  }
+  button:hover { opacity: .85; }
+  button:active { transform: scale(.98); }
+
+  .nav {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    gap: 14px;
+  }
+
+  #score {
+    font-size: 15px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  #score.done { color: var(--ok); font-weight: 600; }
+
+  /* ---- listening screen ---- */
+  .audio-wrap {
+    margin: 0 0 32px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+  }
+  .audio-wrap audio { width: 100%; display: block; }
+
+  .listen-step {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .listen-step[hidden] { display: none; }
+
+  .listen-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .listen-table th,
+  .listen-table td {
+    text-align: left;
+    vertical-align: top;
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .listen-table th {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1.5px solid var(--line);
+  }
+  .listen-table col.col-q { width: 46%; }
+  .listen-table .row-label {
+    font-size: 14px;
+    color: var(--muted);
+    padding-top: 6px;
+  }
+  .listen-table input[type="text"] {
+    width: 100%;
+    font: inherit;
+    color: inherit;
+    padding: 4px 2px;
+    border: none;
+    border-bottom: 1.5px dashed #b9b9b9;
+    background: transparent;
+    transition: border-color .15s, color .15s;
+  }
+  .listen-table input[type="text"]:focus {
+    outline: none;
+    border-bottom-color: var(--ink);
+  }
+  .listen-table input[type="text"].ok  { color: var(--ok);  border-bottom: 1.5px solid var(--ok); }
+  .listen-table input[type="text"].bad { color: var(--bad); border-bottom: 1.5px solid var(--bad); }
+
+  @media (max-width: 480px) {
+    body { padding: 32px 16px 72px; }
+    .listen-table th, .listen-table td { padding: 10px 6px; }
+    select { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- ============ SCREEN 1: TEXT ============ -->
+  <section id="screen-text" class="screen active">
+    <h1>Favorite Times</h1>
+    <div class="text">
+      <p>The third Monday in January is the most depressing day of the year, says psychologist Dr. Cliff Arnall, who calls it Blue Monday. Why? Because it's winter, the weather is usually gray and cold, the days are dark, and Monday is the first day of the working week. People are also often short of money after the holidays, and some people feel bad after breaking their New Year resolutions. And the happiest day of the year? "The third Friday in June," says Dr. Arnall. And it's easy to see why – it's summer, it's warm outside, the evenings are light, and the weekend starts now!</p>
+      <p>We asked our readers about the days and times during the year that make them feel good.</p>
+      <ol>
+        <li>What's your favorite time of day? Why?</li>
+        <li>What's your favorite day of the week? Why?</li>
+        <li>What's your favorite month? Why?</li>
+        <li>What's your favorite season? Why?</li>
+        <li>What's your favorite holiday? Why?</li>
+      </ol>
+    </div>
+    <div class="nav">
+      <button data-goto="screen-exercise">Move forward</button>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 2: DROPDOWN EXERCISE ============ -->
+  <section id="screen-exercise" class="screen">
+    <h2>Joe, 24</h2>
+    <ol class="gaps">
+      <li>Ten thirty at night. Because it's the time of day when I can really relax.</li>
+      <li>Saturday. Because <select class="gap" data-answer="c"></select> during the week, and Saturday is the first day when I can stay in bed until 12 if I want!</li>
+      <li>August. Because my birthday is in August and I'm usually on vacation.</li>
+      <li>The summer. Because the weather's good, <select class="gap" data-answer="e"></select>, and people are in a good mood.</li>
+      <li>January 1st. Because it's the start of a new year, and <select class="gap" data-answer="b"></select>.</li>
+    </ol>
+
+    <h2>Rose, 35</h2>
+    <ol class="gaps">
+      <li>Early morning. Because <select class="gap" data-answer="f"></select> when other people are asleep, and the light is beautiful.</li>
+      <li>It depends. Because <select class="gap" data-answer="a"></select>!</li>
+      <li>May. Because the world is pale green, and asparagus is in season!</li>
+      <li>Fall. Because the leaves are red and yellow, and it's a time for a lot of wonderful fruit and vegetables. <select class="gap" data-answer="d"></select>!</li>
+      <li>Fourth of July. Because I love fireworks!</li>
+    </ol>
+
+    <div class="bar">
+      <button id="check">Check</button>
+      <button id="to-listening" style="display:none;">Move forward</button>
+      <span id="score"></span>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 3: LISTENING ============ -->
+  <section id="screen-listening" class="screen">
+    <h2>Listen and complete the table</h2>
+
+    <div class="audio-wrap">
+      <audio controls preload="none" src="https://nyairyg.github.io/verbose-happiness/33%20Track%2033.mp3"></audio>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="listen-step" id="step-fav">
+      <h3>Step 1 — What's your favorite …?</h3>
+      <table class="listen-table">
+        <colgroup>
+          <col class="col-q">
+          <col>
+        </colgroup>
+        <tbody>
+          <tr>
+            <td class="row-label">time of day – during the week</td>
+            <td><input type="text" data-key="weekday-fav" placeholder="e.g. morning"></td>
+          </tr>
+          <tr>
+            <td class="row-label">time of day – on the weekend</td>
+            <td><input type="text" data-key="weekend-fav" placeholder="e.g. evening"></td>
+          </tr>
+          <tr>
+            <td class="row-label">day of the week</td>
+            <td><input type="text" data-key="day-fav" placeholder="e.g. Saturday"></td>
+          </tr>
+          <tr>
+            <td class="row-label">month</td>
+            <td><input type="text" data-key="month-fav" placeholder="e.g. July"></td>
+          </tr>
+          <tr>
+            <td class="row-label">season</td>
+            <td><input type="text" data-key="season-fav" placeholder="e.g. summer"></td>
+          </tr>
+          <tr>
+            <td class="row-label">holiday</td>
+            <td><input type="text" data-key="holiday-fav" placeholder="e.g. Christmas"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bar">
+        <button id="check-fav">Check</button>
+        <span id="score-fav"></span>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="listen-step" id="step-why" hidden>
+      <h3>Step 2 — Why?</h3>
+      <table class="listen-table">
+        <colgroup>
+          <col class="col-q">
+          <col>
+        </colgroup>
+        <tbody>
+          <tr>
+            <td class="row-label">time of day – during the week</td>
+            <td><input type="text" data-key="weekday-why" placeholder="because …"></td>
+          </tr>
+          <tr>
+            <td class="row-label">time of day – on the weekend</td>
+            <td><input type="text" data-key="weekend-why" placeholder="because …"></td>
+          </tr>
+          <tr>
+            <td class="row-label">day of the week</td>
+            <td><input type="text" data-key="day-why" placeholder="because …"></td>
+          </tr>
+          <tr>
+            <td class="row-label">month</td>
+            <td><input type="text" data-key="month-why" placeholder="because …"></td>
+          </tr>
+          <tr>
+            <td class="row-label">season</td>
+            <td><input type="text" data-key="season-why" placeholder="because …"></td>
+          </tr>
+          <tr>
+            <td class="row-label">holiday</td>
+            <td><input type="text" data-key="holiday-why" placeholder="because …"></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="bar">
+        <button id="done-why">Done!</button>
+        <span id="score-why"></span>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  /* ---------- screen navigation ---------- */
+  document.querySelectorAll('[data-goto]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(btn.dataset.goto).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+  });
+
+  /* ==========================================================
+     SCREEN 2 — dropdown exercise
+     ========================================================== */
+  const OPTIONS = [
+    ['a', 'every week is different'],
+    ['b', 'I like making plans'],
+    ['c', 'I hate getting up early'],
+    ['d', 'I love cooking'],
+    ['e', 'the days are long'],
+    ['f', 'I like being awake']
+  ];
+
+  const selects = [...document.querySelectorAll('select.gap')];
+  const toListeningBtn = document.getElementById('to-listening');
+  const score = document.getElementById('score');
+
+  selects.forEach(sel => {
+    const ph = new Option('…', '');
+    ph.disabled = true;
+    ph.selected = true;
+    sel.add(ph);
+    OPTIONS.forEach(([key, text]) => sel.add(new Option(text, key)));
+    sel.addEventListener('change', () => {
+      sel.classList.remove('ok', 'bad');
+      toListeningBtn.style.display = 'none';
+      score.textContent = '';
+      score.classList.remove('done');
+    });
+  });
+
+  document.getElementById('check').addEventListener('click', () => {
+    let correct = 0;
+    selects.forEach(sel => {
+      sel.classList.remove('ok', 'bad');
+      if (!sel.value) return;
+      if (sel.value === sel.dataset.answer) {
+        sel.classList.add('ok');
+        correct++;
+      } else {
+        sel.classList.add('bad');
+      }
+    });
+    score.textContent = correct + ' / ' + selects.length + ' correct';
+    score.classList.toggle('done', correct === selects.length);
+    toListeningBtn.style.display = (correct === selects.length) ? '' : 'none';
+  });
+
+  toListeningBtn.addEventListener('click', () => {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-listening').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  });
+
+  /* ==========================================================
+     SCREEN 3 — listening (two steps)
+     ========================================================== */
+
+  function normalize(s) {
+    return s
+      .toLowerCase()
+      .replace(/[\u2018\u2019\u02BC\u0060\u00B4\u2032']/g, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  const LISTENING_KEY = {
+    weekday: [
+      'seven in the evening',
+      'seven', 'evening',
+      '7pm', '7 pm', '7 p.m.', '19:00', '19.00'
+    ],
+    weekend: [
+      'breakfast time',
+      'breakfast', 'morning'
+    ],
+    day:     ['friday'],
+    month:   ['may'],
+    season:  ['spring'],
+    holiday: ["new year's eve", 'new years eve', 'new year eve']
+  };
+
+  /* ---- Step 1: favorite ---- */
+  const favInputs = [...document.querySelectorAll('input[data-key$="-fav"]')];
+  const scoreFav = document.getElementById('score-fav');
+  const stepWhy = document.getElementById('step-why');
+
+  favInputs.forEach(input => {
+    input.addEventListener('input', () => input.classList.remove('ok', 'bad'));
+  });
+
+  document.getElementById('check-fav').addEventListener('click', () => {
+    let correct = 0;
+    favInputs.forEach(input => {
+      const row = input.dataset.key.replace(/-fav$/, '');
+      const value = normalize(input.value);
+      input.classList.remove('ok', 'bad');
+      if (!value) return;
+      const keywords = LISTENING_KEY[row] || [];
+      if (keywords.some(k => value.includes(normalize(k)))) {
+        input.classList.add('ok');
+        correct++;
+      } else {
+        input.classList.add('bad');
+      }
+    });
+
+    scoreFav.textContent = correct + ' / ' + favInputs.length + ' correct';
+    scoreFav.classList.toggle('done', correct === favInputs.length);
+
+    if (correct === favInputs.length) {
+      stepWhy.hidden = false;
+      stepWhy.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      stepWhy.hidden = true;
+      document.getElementById('score-why').textContent = '';
+      document.getElementById('score-why').classList.remove('done');
+    }
+  });
+
+  /* ---- Step 2: why ---- */
+  const whyInputs = [...document.querySelectorAll('input[data-key$="-why"]')];
+  const scoreWhy = document.getElementById('score-why');
+
+  whyInputs.forEach(input => {
+    input.addEventListener('input', () => {
+      scoreWhy.textContent = '';
+      scoreWhy.classList.remove('done');
+    });
+  });
+
+  document.getElementById('done-why').addEventListener('click', () => {
+    const empty = whyInputs.filter(i => !i.value.trim()).length;
+    if (empty === 0) {
+      scoreWhy.textContent = 'All done!';
+      scoreWhy.classList.add('done');
+    } else {
+      scoreWhy.textContent = empty + ' ' + (empty === 1 ? 'field' : 'fields') + ' empty';
+      scoreWhy.classList.remove('done');
+    }
+  });
+</script>
+</body>
+</html>
