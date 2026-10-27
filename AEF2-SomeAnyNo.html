@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz</title>
+<style>
+  :root{
+    --bg:#f4f4f2;
+    --card:#ffffff;
+    --text:#1a1a1a;
+    --line:#e6e6e2;
+    --ok:#2e9e6b;
+    --bad:#d9534f;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;min-height:100vh;display:grid;place-items:center;
+    background:var(--bg);color:var(--text);padding:24px;
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .card{
+    width:100%;max-width:560px;background:var(--card);
+    border:1px solid var(--line);border-radius:18px;padding:28px;
+    box-shadow:0 10px 30px rgba(0,0,0,.05);
+  }
+  .question{
+    font-size:20px;font-weight:600;letter-spacing:-.01em;
+    margin:0 0 20px;min-height:60px;
+  }
+  .options{display:grid;gap:10px}
+  .opt{
+    display:flex;align-items:center;gap:12px;width:100%;
+    padding:14px 16px;border:1px solid var(--line);border-radius:12px;
+    background:transparent;color:inherit;font:inherit;text-align:left;
+    cursor:pointer;transition:border-color .15s,background .15s;
+  }
+  .opt:hover:not(:disabled){border-color:#c9c9c3}
+  .opt:disabled{cursor:default}
+  .dot{
+    width:16px;height:16px;border-radius:50%;border:1.5px solid #c9c9c3;
+    flex:0 0 auto;transition:.15s;
+  }
+  .opt.selected{border-color:var(--text);background:#fafaf8}
+  .opt.selected .dot{border-color:var(--text);background:var(--text);box-shadow:inset 0 0 0 3px #fff}
+
+  .opt.correct{border-color:var(--ok);background:#f2faf6}
+  .opt.correct .dot{border-color:var(--ok);background:var(--ok);box-shadow:inset 0 0 0 3px #fff}
+
+  .opt.wrong{border-color:var(--bad);background:#fdf3f3}
+  .opt.wrong .dot{border-color:var(--bad);background:var(--bad);box-shadow:inset 0 0 0 3px #fff}
+
+  .actions{display:flex;gap:10px;margin-top:22px}
+  .btn{
+    flex:1;padding:13px 16px;border-radius:12px;font:inherit;font-weight:600;
+    border:1px solid transparent;cursor:pointer;transition:.15s;
+  }
+  .btn-primary{background:var(--text);color:#fff}
+  .btn-primary:hover:not(:disabled){opacity:.85}
+  .btn-ghost{background:transparent;color:var(--text);border-color:var(--line)}
+  .btn-ghost:hover:not(:disabled){border-color:#c9c9c3}
+  .btn:disabled{opacity:.35;cursor:not-allowed}
+
+  .done{display:none;text-align:center;padding:30px 0}
+  .done.show{display:block}
+  .done-title{
+    font-size:22px;font-weight:600;letter-spacing:-.01em;margin:0 0 8px;
+  }
+  .done-sub{
+    margin:0 0 24px;color:#7a7a74;
+  }
+  .done .btn{max-width:220px;margin:0 auto}
+  #quiz.hide{display:none}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div id="quiz">
+    <p class="question" id="question"></p>
+    <div class="options" id="options"></div>
+    <div class="actions">
+      <button class="btn btn-primary" id="check" type="button">Check</button>
+      <button class="btn btn-ghost" id="next" type="button">Next</button>
+    </div>
+  </div>
+
+  <div class="done" id="done">
+    <p class="done-title">Done</p>
+    <p class="done-sub">You’ve completed all the questions.</p>
+    <button class="btn btn-primary" id="restart" type="button">Start again</button>
+  </div>
+</div>
+
+<script>
+  const PEOPLE = ["somebody", "anybody", "nobody"];
+  const THINGS = ["something", "anything", "nothing"];
+  const PLACES = ["somewhere", "anywhere", "nowhere"];
+
+  const baseQuestions = [
+    { q: "There is a man at the door — ____ is waiting for you.", opts: PEOPLE, correct: 0 },
+    { q: "When I looked into the garden, I saw ____ behind the tree.", opts: PEOPLE, correct: 0 },
+    { q: "This bag was on the seat, so ____ left a bag on the bus.", opts: PEOPLE, correct: 0 },
+    { q: "I’m standing outside your house and the lights are on — is ____ at home?", opts: PEOPLE, correct: 1 },
+    { q: "I walked through the park and looked around, but I didn’t see ____.", opts: PEOPLE, correct: 1 },
+    { q: "I opened the classroom door, but ____ was in the classroom.", opts: PEOPLE, correct: 2 },
+    { q: "I can’t call him because ____ knows his phone number.", opts: PEOPLE, correct: 2 },
+    { q: "I can hear a noise in the kitchen! There is ____ there.", opts: PEOPLE, correct: 0 },
+    { q: "I moved here last week, so I don’t know ____ in this city.", opts: PEOPLE, correct: 1 },
+    { q: "The room is very dirty, but ____ wants to clean the room.", opts: PEOPLE, correct: 2 },
+
+    { q: "I have ____ for you. (I bought a gift).", opts: THINGS, correct: 0 },
+    { q: "She told a joke and said ____ funny.", opts: THINGS, correct: 0 },
+    { q: "My shoe feels strange — there is ____ in my shoe.", opts: THINGS, correct: 0 },
+    { q: "You look thirsty — do you want ____ to drink?", opts: THINGS, correct: 1 },
+    { q: "I wasn’t there and I didn’t hear the news, so I know ____ about it.", opts: THINGS, correct: 2 },
+    { q: "We need to go shopping because there is ____ in the fridge.", opts: THINGS, correct: 2 },
+    { q: "He looks worried... I know he did ____ wrong.", opts: THINGS, correct: 0 },
+    { q: "It is very dark, I can’t see ____!", opts: THINGS, correct: 1 },
+
+    { q: "It is cold here, so I want to go ____ warm.", opts: PLACES, correct: 0 },
+    { q: "I can’t find her, but she is ____ in the house.", opts: PLACES, correct: 0 },
+    { q: "We need a place to meet — let’s meet ____ near the station.", opts: PLACES, correct: 0 },
+    { q: "You look excited about your trip — are you going ____ this weekend?", opts: PLACES, correct: 1 },
+    { q: "I stayed at home all day, so I didn’t go ____ yesterday.", opts: PLACES, correct: 1 },
+    { q: "My legs hurt — is there ____ to sit?", opts: PLACES, correct: 1 },
+    { q: "His friends were away and his car broke down, so he had ____ to go last night.", opts: PLACES, correct: 2 },
+    { q: "The street is full of cars — there is ____ to park here.", opts: PLACES, correct: 2 },
+    { q: "We arrived late and the hotel was full, so we have ____ to sleep tonight.", opts: PLACES, correct: 2 },
+    { q: "I can’t find my glasses. I'm sure I left them ____ in the office.", opts: PLACES, correct: 0 },
+    { q: "I lost my bag! Did you see it ____? Small red one?", opts: PLACES, correct: 1 },
+    { q: "This village is very small — there isn’t ____ to buy proper food.", opts: PLACES, correct: 1 },
+    { q: "Ugh. It is midnight and all shops are closed. There is ____ open at this time!", opts: PLACES, correct: 2 }
+  ];
+
+  const quizEl   = document.getElementById("quiz");
+  const doneEl   = document.getElementById("done");
+  const qEl      = document.getElementById("question");
+  const optWrap  = document.getElementById("options");
+  const checkBtn = document.getElementById("check");
+  const nextBtn  = document.getElementById("next");
+  const restartBtn = document.getElementById("restart");
+
+  let deck = [];
+  let index = 0;
+  let selected = null;
+  let checked = false;
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function newDeck() {
+    deck = shuffle(baseQuestions.slice());
+    index = 0;
+  }
+
+  function render() {
+    const item = deck[index];
+    selected = null;
+    checked = false;
+
+    qEl.textContent = item.q;
+    optWrap.innerHTML = "";
+
+    item.opts.forEach((text, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "opt";
+
+      const dot = document.createElement("span");
+      dot.className = "dot";
+      const label = document.createElement("span");
+      label.textContent = text;
+
+      btn.append(dot, label);
+      btn.addEventListener("click", () => select(i));
+      optWrap.appendChild(btn);
+    });
+
+    checkBtn.disabled = true;
+    nextBtn.disabled = true;
+  }
+
+  function select(i) {
+    if (checked) return;
+    selected = i;
+    [...optWrap.children].forEach((el, n) => {
+      el.classList.toggle("selected", n === i);
+    });
+    checkBtn.disabled = false;
+  }
+
+  function check() {
+    if (selected === null || checked) return;
+    checked = true;
+
+    const correct = deck[index].correct;
+
+    [...optWrap.children].forEach((el, i) => {
+      el.classList.remove("selected");
+      el.disabled = true;
+      if (i === correct) el.classList.add("correct");
+      else if (i === selected) el.classList.add("wrong");
+    });
+
+    checkBtn.disabled = true;
+    nextBtn.disabled = false;
+  }
+
+  function showDone() {
+    quizEl.classList.add("hide");
+    doneEl.classList.add("show");
+  }
+
+  function showQuiz() {
+    doneEl.classList.remove("show");
+    quizEl.classList.remove("hide");
+  }
+
+  function next() {
+    index++;
+    if (index >= deck.length) {
+      showDone();
+      return;
+    }
+    render();
+  }
+
+  function restart() {
+    newDeck();
+    showQuiz();
+    render();
+  }
+
+  checkBtn.addEventListener("click", check);
+  nextBtn.addEventListener("click", next);
+  restartBtn.addEventListener("click", restart);
+
+  newDeck();
+  render();
+</script>
+
+</body>
+</html>
