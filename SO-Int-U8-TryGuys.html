@@ -181,42 +181,42 @@
 
   <div class="text" id="text">
 
-    <p>The Try Guys built their audience around a simple
-      <span class="gap" data-answer="premise"></span>:
-      take on experiences that are strange, awkward, difficult, or simply outside their
-      comfort zone and see what happens. The group first
-      <span class="gap" data-answer="emerged"></span> at BuzzFeed in 2014, with Keith
-      Habersberger, Zach Kornfeld, Eugene Lee Yang, and Ned Fulmer forming the original
-      <span class="gap" data-answer="lineup"></span>. Their videos
-      <span class="gap" data-answer="ranged"></span> from cooking and food challenges to
-      attempts at <span class="gap" data-answer="unfamiliar"></span> jobs, physical tests,
-      and socially uncomfortable situations &ndash; their formats rely on reality, comedy,
-      and challenges with no production <span class="gap" data-answer="demands"></span>
-      of more expensive genres.</p>
+    <p>The Try Guys built their audience around a
+      <span class="gap" data-answer="simple"></span> premise:
+      take on experiences that are
+      <span class="gap" data-answer="strange"></span>, awkward, difficult, or simply outside their
+      comfort zone and see what happens. The
+      <span class="gap" data-answer="group"></span> first emerged at BuzzFeed in 2014, with Keith
+      Habersberger, Zach Kornfeld, Eugene Lee Yang, and Ned Fulmer forming the
+      <span class="gap" data-answer="original"></span> lineup. Their
+      <span class="gap" data-answer="videos"></span> ranged from cooking and food challenges to
+      attempts at unfamiliar jobs, physical tests, and socially uncomfortable situations
+      &ndash; their formats rely on reality, comedy, and challenges with no
+      <span class="gap" data-answer="production"></span> demands of more expensive genres.</p>
 
-    <p>Years later, the group <span class="gap" data-answer="expanded"></span> beyond
-      YouTube. In May 2024, they introduced 2nd Try, a
-      <span class="gap" data-answer="subscription"></span> streaming service priced at
-      $4.99 per month or $49.99 <span class="gap" data-answer="annually"></span>.
-      Subscribers were to receive material that does not appear in the same form on
-      YouTube, including <span class="gap" data-answer="exclusive"></span> and uncensored
-      videos, unedited content, live streams, and early access to new episodes.</p>
+    <p>Years later, the group expanded beyond YouTube. In May 2024, they
+      <span class="gap" data-answer="introduced"></span> 2nd Try, a subscription streaming
+      service priced at $4.99 per month or $49.99 annually. Subscribers were to receive
+      material that does not appear in the same form on YouTube, including exclusive and
+      uncensored videos, unedited <span class="gap" data-answer="content"></span>, live streams,
+      and early <span class="gap" data-answer="access"></span> to new episodes.</p>
 
-    <p>The launch was <span class="gap" data-answer="preceded"></span> by months of
-      preparation: the team looked at independent media companies such as Dropout,
-      <span class="gap" data-answer="consulted"></span> people with experience building
-      subscription-based networks, and grew the creative team and cast before introducing
-      the service.</p>
+    <p>The launch was preceded by
+      <span class="gap" data-answer="months"></span> of preparation: the team looked at
+      independent media companies such as Dropout, consulted people with experience
+      <span class="gap" data-answer="building"></span> subscription-based networks, and grew the
+      creative <span class="gap" data-answer="team"></span> and cast before introducing the
+      service.</p>
 
     <p>As per their model, YouTube remained an important part of the offering rather than
-      being replaced. The existing library stayed free, and the group continued releasing
-      <span class="gap" data-answer="substantial"></span>, polished episodes on the
-      platform. Paying for 2nd Try was instead
-      <span class="gap" data-answer="positioned"></span> around additional access and
-      greater creative freedom. Throughout the process, they
-      <span class="gap" data-answer="emphasized"></span> their relationship with the
-      audience: they explained openly what the subscription makes possible and expressed
-      appreciation for the community that had supported them.</p>
+      being replaced. The existing library stayed
+      <span class="gap" data-answer="free"></span>, and the group
+      <span class="gap" data-answer="continued"></span> releasing substantial, polished episodes
+      on the platform. Paying for 2nd Try was instead positioned around additional access and
+      greater creative <span class="gap" data-answer="freedom"></span>. Throughout the process,
+      they emphasized their relationship with the audience: they explained openly what the
+      subscription makes possible and expressed appreciation for the community that had
+      supported them.</p>
 
   </div>
 
@@ -235,10 +235,10 @@
   const gapEls = Array.from(document.querySelectorAll('.gap'));
 
   const words = [
-    'premise', 'emerged', 'lineup', 'ranged', 'unfamiliar',
-    'demands', 'expanded', 'subscription', 'annually', 'exclusive',
-    'preceded', 'consulted', 'substantial', 'positioned', 'emphasized',
-    'quarterly', 'withdrew', 'modest', 'fragile', 'declined'
+    'simple', 'strange', 'group', 'original', 'videos',
+    'production', 'introduced', 'content', 'access', 'months',
+    'building', 'team', 'free', 'continued', 'freedom',
+    'easy', 'fast', 'small', 'early', 'open'
   ];
 
   let selected = null;
@@ -289,7 +289,6 @@
     scoreEl.textContent = '';
   }
 
-  // Build word bank
   shuffle(words).forEach(function (w) {
     const chip = document.createElement('button');
     chip.type = 'button';
@@ -300,7 +299,6 @@
     bank.appendChild(chip);
   });
 
-  // Gap interactions
   gapEls.forEach(function (gap) {
     gap.dataset.filled = '';
     gap.addEventListener('click', function () {
@@ -313,7 +311,6 @@
     });
   });
 
-  // Check
   document.getElementById('check').addEventListener('click', function () {
     let correct = 0;
     let filled = 0;
@@ -336,7 +333,6 @@
     }
   });
 
-  // Reset
   document.getElementById('reset').addEventListener('click', function () {
     gapEls.forEach(release);
     clearSelection();
