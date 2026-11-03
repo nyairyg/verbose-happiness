@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fill in the gaps</title>
+<style>
+  :root{
+    --bg:#f7f5f0;
+    --card:#fdfcf9;
+    --ink:#26241f;
+    --muted:#8c877c;
+    --line:#ddd8cc;
+    --accent:#3f7d4f;
+    --wrong:#b4544a;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{height:100%;}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    justify-content:center;
+    padding:56px 24px 96px;
+  }
+
+  .page{
+    width:100%;
+    max-width:720px;
+  }
+
+  h1{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:19px;
+    font-weight:400;
+    letter-spacing:.01em;
+    margin:0 0 6px;
+  }
+
+  .hint{
+    font-size:12.5px;
+    color:var(--muted);
+    margin:0 0 28px;
+    letter-spacing:.02em;
+  }
+
+  .bank{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    padding:16px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-bottom:34px;
+  }
+
+  .chip{
+    font:inherit;
+    font-size:13px;
+    line-height:1;
+    padding:8px 13px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:#fff;
+    color:var(--ink);
+    cursor:pointer;
+    transition:background .15s ease,border-color .15s ease,opacity .15s ease,transform .15s ease;
+  }
+
+  .chip:hover{border-color:#bdb7aa;}
+
+  .chip.selected{
+    background:var(--ink);
+    border-color:var(--ink);
+    color:#fdfcf9;
+  }
+
+  .chip.used{
+    opacity:.22;
+    pointer-events:none;
+  }
+
+  .text{
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:16.5px;
+    line-height:2.05;
+    margin:0;
+    letter-spacing:.004em;
+  }
+
+  .text p{margin:0 0 22px;}
+
+  .gap{
+    display:inline-block;
+    min-width:92px;
+    padding:1px 8px;
+    margin:0 2px;
+    text-align:center;
+    vertical-align:baseline;
+    border-bottom:1.5px solid #c3bdae;
+    border-radius:4px 4px 0 0;
+    color:var(--muted);
+    font-size:15px;
+    cursor:pointer;
+    transition:background .15s ease,border-color .15s ease,color .15s ease;
+  }
+
+  .gap:hover{background:#fffdf7;}
+
+  .gap.filled{
+    background:#fff;
+    color:var(--ink);
+    border-bottom-color:#bdb7aa;
+  }
+
+  .gap.correct{
+    color:var(--accent);
+    border-bottom-color:var(--accent);
+    background:#f3f8f3;
+  }
+
+  .gap.incorrect{
+    color:var(--wrong);
+    border-bottom-color:var(--wrong);
+    background:#fbf3f2;
+  }
+
+  .actions{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-top:36px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+  }
+
+  button.action{
+    font:inherit;
+    font-size:13px;
+    letter-spacing:.02em;
+    padding:10px 20px;
+    border-radius:8px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:#fdfcf9;
+    cursor:pointer;
+    transition:opacity .15s ease;
+  }
+
+  button.action.ghost{
+    background:transparent;
+    color:var(--ink);
+    border-color:var(--line);
+  }
+
+  button.action:hover{opacity:.82;}
+
+  .score{
+    font-size:13px;
+    color:var(--muted);
+    margin-left:auto;
+    letter-spacing:.02em;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <h1>Fill in the gaps</h1>
+  <p class="hint">15 gaps &middot; 20 words &middot; click a word, then click a gap</p>
+
+  <div class="bank" id="bank"></div>
+
+  <div class="text" id="text">
+
+    <p>The Try Guys built their audience around a simple
+      <span class="gap" data-answer="premise"></span>:
+      take on experiences that are strange, awkward, difficult, or simply outside their
+      comfort zone and see what happens. The group first
+      <span class="gap" data-answer="emerged"></span> at BuzzFeed in 2014, with Keith
+      Habersberger, Zach Kornfeld, Eugene Lee Yang, and Ned Fulmer forming the original
+      <span class="gap" data-answer="lineup"></span>. Their videos
+      <span class="gap" data-answer="ranged"></span> from cooking and food challenges to
+      attempts at <span class="gap" data-answer="unfamiliar"></span> jobs, physical tests,
+      and socially uncomfortable situations &ndash; their formats rely on reality, comedy,
+      and challenges with no production <span class="gap" data-answer="demands"></span>
+      of more expensive genres.</p>
+
+    <p>Years later, the group <span class="gap" data-answer="expanded"></span> beyond
+      YouTube. In May 2024, they introduced 2nd Try, a
+      <span class="gap" data-answer="subscription"></span> streaming service priced at
+      $4.99 per month or $49.99 <span class="gap" data-answer="annually"></span>.
+      Subscribers were to receive material that does not appear in the same form on
+      YouTube, including <span class="gap" data-answer="exclusive"></span> and uncensored
+      videos, unedited content, live streams, and early access to new episodes.</p>
+
+    <p>The launch was <span class="gap" data-answer="preceded"></span> by months of
+      preparation: the team looked at independent media companies such as Dropout,
+      <span class="gap" data-answer="consulted"></span> people with experience building
+      subscription-based networks, and grew the creative team and cast before introducing
+      the service.</p>
+
+    <p>As per their model, YouTube remained an important part of the offering rather than
+      being replaced. The existing library stayed free, and the group continued releasing
+      <span class="gap" data-answer="substantial"></span>, polished episodes on the
+      platform. Paying for 2nd Try was instead
+      <span class="gap" data-answer="positioned"></span> around additional access and
+      greater creative freedom. Throughout the process, they
+      <span class="gap" data-answer="emphasized"></span> their relationship with the
+      audience: they explained openly what the subscription makes possible and expressed
+      appreciation for the community that had supported them.</p>
+
+  </div>
+
+  <div class="actions">
+    <button class="action" id="check" type="button">Check</button>
+    <button class="action ghost" id="reset" type="button">Reset</button>
+    <span class="score" id="score"></span>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  const bank = document.getElementById('bank');
+  const scoreEl = document.getElementById('score');
+  const gapEls = Array.from(document.querySelectorAll('.gap'));
+
+  const words = [
+    'premise', 'emerged', 'lineup', 'ranged', 'unfamiliar',
+    'demands', 'expanded', 'subscription', 'annually', 'exclusive',
+    'preceded', 'consulted', 'substantial', 'positioned', 'emphasized',
+    'quarterly', 'withdrew', 'modest', 'fragile', 'declined'
+  ];
+
+  let selected = null;
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function clearSelection() {
+    if (selected) selected.classList.remove('selected');
+    selected = null;
+  }
+
+  function selectChip(chip) {
+    if (chip === selected) {
+      clearSelection();
+      return;
+    }
+    clearSelection();
+    selected = chip;
+    chip.classList.add('selected');
+  }
+
+  function release(gap) {
+    if (gap._chip) {
+      gap._chip.classList.remove('used');
+      gap._chip = null;
+    }
+    gap.dataset.filled = '';
+    gap.textContent = '';
+    gap.classList.remove('filled', 'correct', 'incorrect');
+  }
+
+  function place(gap, chip) {
+    if (gap.dataset.filled) release(gap);
+    gap.dataset.filled = chip.dataset.word;
+    gap.textContent = chip.dataset.word;
+    gap.classList.add('filled');
+    gap.classList.remove('correct', 'incorrect');
+    chip.classList.add('used');
+    gap._chip = chip;
+    clearSelection();
+    scoreEl.textContent = '';
+  }
+
+  // Build word bank
+  shuffle(words).forEach(function (w) {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip';
+    chip.textContent = w;
+    chip.dataset.word = w;
+    chip.addEventListener('click', function () { selectChip(chip); });
+    bank.appendChild(chip);
+  });
+
+  // Gap interactions
+  gapEls.forEach(function (gap) {
+    gap.dataset.filled = '';
+    gap.addEventListener('click', function () {
+      if (gap.dataset.filled) {
+        release(gap);
+        scoreEl.textContent = '';
+      } else if (selected) {
+        place(gap, selected);
+      }
+    });
+  });
+
+  // Check
+  document.getElementById('check').addEventListener('click', function () {
+    let correct = 0;
+    let filled = 0;
+
+    gapEls.forEach(function (gap) {
+      gap.classList.remove('correct', 'incorrect');
+      if (!gap.dataset.filled) return;
+      filled++;
+      if (gap.dataset.filled === gap.dataset.answer) {
+        gap.classList.add('correct');
+        correct++;
+      } else {
+        gap.classList.add('incorrect');
+      }
+    });
+
+    scoreEl.textContent = correct + ' / ' + gapEls.length + ' correct';
+    if (filled < gapEls.length) {
+      scoreEl.textContent += ' \u00b7 ' + (gapEls.length - filled) + ' empty';
+    }
+  });
+
+  // Reset
+  document.getElementById('reset').addEventListener('click', function () {
+    gapEls.forEach(release);
+    clearSelection();
+    scoreEl.textContent = '';
+  });
+})();
+</script>
+
+</body>
+</html>
