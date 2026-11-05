@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to Survive the Winter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111114;
+    --ink-soft:#1a1a1f;
+    --muted:#6f6f78;
+    --faint:#9a9aa3;
+    --line:#ececef;
+    --bg:#fafafa;
+    --ok:#1f9d55;
+    --ok-bg:#f2fbf6;
+    --bad:#d94a4a;
+    --bad-bg:#fdf5f5;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter','Roboto',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings:'cv02','cv03','cv04','cv11';
+  }
+  .wrap{ max-width:760px; margin:0 auto; padding:56px 24px 110px; }
+
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:34px 34px 38px;
+    box-shadow:0 1px 2px rgba(17,17,20,.03),
+               0 18px 40px -28px rgba(17,17,20,.30);
+    animation:fade .36s cubic-bezier(.22,.7,.3,1);
+  }
+  @keyframes fade{
+    from{ opacity:0; transform:translateY(7px); }
+    to{ opacity:1; transform:none; }
+  }
+
+  .title{
+    margin:0 0 24px;
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:-.02em;
+    color:var(--ink);
+  }
+
+  .subhead{
+    margin:36px 0 8px;
+    font-size:15px;
+    font-weight:600;
+    color:var(--ink);
+    letter-spacing:-.01em;
+  }
+  /* первый подзаголовок идёт после вводного абзаца — даём ему такой же отступ */
+  .subhead:first-of-type{ margin-top:36px; }
+
+  .passage{
+    margin:0;
+    font-size:16.5px;
+    line-height:2.2;
+    color:var(--ink-soft);
+    letter-spacing:-.002em;
+  }
+
+  /* вводный абзац: добавляем воздух снизу, чтобы не прилипал к «~ Get moving» */
+  .card > .passage:first-of-type{ margin-bottom:4px; }
+
+  .blank{
+    font-family:inherit;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    background-color:#fff;
+    border:none;
+    border-bottom:1.5px dashed #d3d3da;
+    border-radius:6px 6px 0 0;
+    padding:1px 20px 2px 8px;
+    margin:0 2px;
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    vertical-align:baseline;
+    line-height:1.45;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M2 4l3 3 3-3' fill='none' stroke='%239a9aa3' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 5px center;
+    transition:border-color .18s ease, background-color .18s ease, box-shadow .18s ease, color .18s ease;
+  }
+  .blank:hover{ border-bottom-color:var(--ink); background-color:#fafafa; }
+  .blank:focus{ outline:none; border-bottom-color:var(--ink); box-shadow:0 1.5px 0 0 var(--ink); }
+  .blank.ok{ color:var(--ok); border-bottom:1.5px solid var(--ok); background-color:var(--ok-bg); }
+  .blank.bad{ color:var(--bad); border-bottom:1.5px solid var(--bad); background-color:var(--bad-bg); }
+
+  .hint{
+    display:inline-block;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ok);
+    background:#eefaf2;
+    border-radius:5px;
+    padding:1px 6px;
+    margin-left:5px;
+    vertical-align:2px;
+    animation:fade .25s ease;
+  }
+
+  .score{
+    margin-top:20px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:24px 28px;
+    display:flex;
+    align-items:center;
+    gap:24px;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    animation:fade .35s ease;
+  }
+  .score[hidden]{ display:none; }
+  .score-main{ display:flex; align-items:baseline; gap:14px; }
+  .score-num{ font-size:32px; font-weight:600; letter-spacing:-.03em; line-height:1; }
+  .score-num span{ font-size:15px; font-weight:400; color:var(--faint); letter-spacing:0; }
+  .score-msg{ font-size:14px; color:var(--muted); }
+
+  .nav{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:10px;
+    margin-top:26px;
+  }
+  .btn{
+    font-family:inherit;
+    font-size:14px;
+    font-weight:500;
+    letter-spacing:-.005em;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:#fff;
+    padding:11px 24px;
+    border-radius:11px;
+    cursor:pointer;
+    transition:transform .16s ease, background .16s ease, opacity .16s ease, border-color .16s ease;
+  }
+  .btn:hover{ background:#000; transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0); }
+  .btn.check{
+    background:transparent;
+    color:var(--ink);
+    border-color:var(--ink);
+  }
+  .btn.check:hover{ background:#f2f2f5; }
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink);
+    border-color:#e2e2e7;
+  }
+  .btn.ghost:hover{ background:#f4f4f6; border-color:#d3d3da; }
+  .btn[hidden]{ display:none; }
+
+  @media (max-width:560px){
+    .wrap{ padding:36px 18px 90px; }
+    .card{ padding:24px 20px 30px; border-radius:16px; }
+    .title{ font-size:20px; margin-bottom:20px; }
+    .subhead{ margin-top:28px; }
+    .subhead:first-of-type{ margin-top:28px; }
+    .passage{ font-size:16px; line-height:2.1; }
+    .score{ padding:20px; gap:16px; }
+    .btn{ padding:10px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <section class="card">
+
+    <h1 class="title">How to Survive the Winter</h1>
+
+    <p class="passage">
+      If you're in the middle of a long, dark winter and beginning to feel a little low, spending another cold weekend alone, don't worry. Here are some things you can do to make yourself feel better.
+    </p>
+
+    <h2 class="subhead">~ Get moving</h2>
+    <p class="passage">
+      Exercise is one of the best things you can do. Remember that doing exercise can get a little
+      <select class="blank" data-answer='["bored","boring"]' aria-label="Gap 1">
+        <option value="" selected disabled>···</option>
+        <option value="bored">bored</option>
+        <option value="boring">boring</option>
+      </select>
+      — try different things. Go swimming, go for a walk, etc.
+    </p>
+
+    <h2 class="subhead">~ Eat chocolate</h2>
+    <p class="passage">
+      The newspapers have been very
+      <select class="blank" data-answer='["exciting","excited"]' aria-label="Gap 2">
+        <option value="" selected disabled>···</option>
+        <option value="exciting">exciting</option>
+        <option value="excited">excited</option>
+      </select>
+      recently about reports that chocolate is good for you — and it seems to be true. Chocolate contains tryptophan, which makes you feel happier and more
+      <select class="blank" data-answer='["relaxed","relaxing"]' aria-label="Gap 3">
+        <option value="" selected disabled>···</option>
+        <option value="relaxed">relaxed</option>
+        <option value="relaxing">relaxing</option>
+      </select>.
+    </p>
+
+    <h2 class="subhead">~ Book a vacation or a weekend away</h2>
+    <p class="passage">
+      It always helps to do something different. A vacation somewhere hot — or a skiing vacation — can mean you get to see the sun. But if you don't have much money or you're
+      <select class="blank" data-answer='["frightened","frightening"]' aria-label="Gap 4">
+        <option value="" selected disabled>···</option>
+        <option value="frightened">frightened</option>
+        <option value="frightening">frightening</option>
+      </select>
+      of flying, a weekend away close to home also gives you something to look forward to.
+    </p>
+
+    <h2 class="subhead">~ Read a book</h2>
+    <p class="passage">
+      Turn off your phone and the TV, and shut down your laptop. Go to your local bookstore. These usually have all kinds of
+      <select class="blank" data-answer='["interesting","interested"]' aria-label="Gap 5">
+        <option value="" selected disabled>···</option>
+        <option value="interesting">interesting</option>
+        <option value="interested">interested</option>
+      </select>
+      books you can read.
+    </p>
+
+    <h2 class="subhead">~ See people</h2>
+    <p class="passage">
+      Not only online, but in real life. Invite people to your house for dinner. In the middle of winter, an evening in front of the fire with family and friends is really
+      <select class="blank" data-answer='["relaxed","relaxing"]' aria-label="Gap 6">
+        <option value="" selected disabled>···</option>
+        <option value="relaxed">relaxed</option>
+        <option value="relaxing">relaxing</option>
+      </select>.
+    </p>
+
+  </section>
+
+  <div class="score" id="score" hidden></div>
+
+  <nav class="nav">
+    <button class="btn ghost" id="reset" hidden>Start over</button>
+    <button class="btn check" id="check">Check</button>
+  </nav>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const checkBtn = document.getElementById("check");
+  const resetBtn = document.getElementById("reset");
+  const scoreEl  = document.getElementById("score");
+
+  const selects = Array.from(document.querySelectorAll("select.blank"));
+
+  const label = v => (v === "" ? "—" : v);
+
+  selects.forEach(sel => {
+    sel.addEventListener("change", () => {
+      sel.classList.remove("ok", "bad");
+      const hint = sel.nextElementSibling;
+      if (hint && hint.classList.contains("hint")) hint.remove();
+      hideScore();
+    });
+  });
+
+  function checkAll() {
+    let correct = 0;
+
+    selects.forEach(sel => {
+      const answers = JSON.parse(sel.dataset.answer);
+      const isRight = answers.includes(sel.value);
+
+      sel.classList.remove("ok", "bad");
+      const oldHint = sel.nextElementSibling;
+      if (oldHint && oldHint.classList.contains("hint")) oldHint.remove();
+
+      if (isRight) {
+        sel.classList.add("ok");
+        correct++;
+      } else {
+        sel.classList.add("bad");
+        const hint = document.createElement("span");
+        hint.className = "hint";
+        hint.textContent = label(answers[0]);
+        sel.after(hint);
+      }
+    });
+
+    renderScore(correct, selects.length);
+  }
+
+  function renderScore(correct, total) {
+    const pct = total ? correct / total : 0;
+
+    let message;
+    if (pct === 1)        message = "Perfect — every word in place.";
+    else if (pct >= 0.85) message = "Very close. Check the few marked in red.";
+    else if (pct >= 0.6)  message = "Good effort — review the red gaps.";
+    else                  message = "Have another look at the marked gaps and try again.";
+
+    scoreEl.innerHTML =
+      '<div class="score-main">' +
+        '<div class="score-num">' + correct + "<span>/" + total + "</span></div>" +
+        '<div class="score-msg">' + message + "</div>" +
+      "</div>";
+
+    scoreEl.hidden = false;
+    resetBtn.hidden = false;
+    scoreEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function hideScore() {
+    scoreEl.hidden = true;
+    scoreEl.innerHTML = "";
+    resetBtn.hidden = true;
+  }
+
+  function reset() {
+    selects.forEach(sel => {
+      sel.classList.remove("ok", "bad");
+      sel.value = "";
+      const hint = sel.nextElementSibling;
+      if (hint && hint.classList.contains("hint")) hint.remove();
+    });
+    hideScore();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  checkBtn.addEventListener("click", checkAll);
+  resetBtn.addEventListener("click", reset);
+})();
+</script>
+</body>
+</html>
