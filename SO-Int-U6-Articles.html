@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three Neighbours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#111114;
+    --ink-soft:#1a1a1f;
+    --muted:#6f6f78;
+    --faint:#9a9aa3;
+    --line:#ececef;
+    --line-soft:#f0f0f3;
+    --bg:#fafafa;
+    --ok:#1f9d55;
+    --ok-bg:#f2fbf6;
+    --bad:#d94a4a;
+    --bad-bg:#fdf5f5;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{ height:100%; }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter','Roboto',system-ui,-apple-system,'Segoe UI',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    font-feature-settings:'cv02','cv03','cv04','cv11';
+  }
+
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:56px 24px 110px;
+  }
+
+  /* ---------- progress ---------- */
+  .progress{
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+
+  .dots{ display:flex; gap:7px; }
+
+  .dot{
+    width:30px;
+    height:3px;
+    border-radius:99px;
+    background:#e6e6ea;
+    transition:background .28s ease, width .28s ease;
+  }
+
+  .dot.active{ background:var(--ink); width:44px; }
+
+  .step-label{
+    font-size:11.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--faint);
+    font-weight:500;
+  }
+
+  /* ---------- card ---------- */
+  .card{
+    display:none;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:34px 34px 38px;
+    margin-top:22px;
+    box-shadow:0 1px 2px rgba(17,17,20,.03),
+               0 18px 40px -28px rgba(17,17,20,.30);
+  }
+
+  .card.active{
+    display:block;
+    animation:fade .36s cubic-bezier(.22,.7,.3,1);
+  }
+
+  @keyframes fade{
+    from{ opacity:0; transform:translateY(7px); }
+    to{ opacity:1; transform:none; }
+  }
+
+  /* ---------- passage ---------- */
+  .passage{
+    margin:0;
+    font-size:16.5px;
+    line-height:2.2;
+    color:var(--ink-soft);
+    letter-spacing:-.002em;
+  }
+
+  /* ---------- inline dropdown ---------- */
+  .blank{
+    font-family:inherit;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    background-color:#fff;
+    border:none;
+    border-bottom:1.5px dashed #d3d3da;
+    border-radius:6px 6px 0 0;
+    padding:1px 20px 2px 8px;
+    margin:0 2px;
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    vertical-align:baseline;
+    line-height:1.45;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M2 4l3 3 3-3' fill='none' stroke='%239a9aa3' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 5px center;
+    transition:border-color .18s ease, background-color .18s ease, box-shadow .18s ease, color .18s ease;
+  }
+
+  .blank:hover{
+    border-bottom-color:var(--ink);
+    background-color:#fafafa;
+  }
+
+  .blank:focus{
+    outline:none;
+    border-bottom-color:var(--ink);
+    box-shadow:0 1.5px 0 0 var(--ink);
+  }
+
+  .blank.cap{ text-transform:capitalize; }
+
+  .blank.ok{
+    color:var(--ok);
+    border-bottom:1.5px solid var(--ok);
+    background-color:var(--ok-bg);
+  }
+
+  .blank.bad{
+    color:var(--bad);
+    border-bottom:1.5px solid var(--bad);
+    background-color:var(--bad-bg);
+  }
+
+  .hint{
+    display:inline-block;
+    font-size:12px;
+    font-weight:600;
+    color:var(--ok);
+    background:#eefaf2;
+    border-radius:5px;
+    padding:1px 6px;
+    margin-left:5px;
+    vertical-align:2px;
+    animation:fade .25s ease;
+  }
+
+  /* ---------- score ---------- */
+  .score{
+    margin-top:20px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:24px 28px;
+    display:flex;
+    align-items:center;
+    gap:24px;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    animation:fade .35s ease;
+  }
+
+  .score[hidden]{ display:none; }
+
+  .score-main{ display:flex; align-items:baseline; gap:14px; }
+
+  .score-num{
+    font-size:32px;
+    font-weight:600;
+    letter-spacing:-.03em;
+    line-height:1;
+  }
+
+  .score-num span{
+    font-size:15px;
+    font-weight:400;
+    color:var(--faint);
+    letter-spacing:0;
+  }
+
+  .score-msg{
+    font-size:14px;
+    color:var(--muted);
+  }
+
+  .breakdown{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .chip{
+    font-size:12px;
+    font-weight:500;
+    color:var(--muted);
+    background:#f6f6f8;
+    border-radius:7px;
+    padding:5px 10px;
+    letter-spacing:.01em;
+  }
+
+  .chip.perfect{ color:var(--ok); background:var(--ok-bg); }
+
+  /* ---------- nav ---------- */
+  .nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-top:26px;
+  }
+
+  .nav-right{
+    display:flex;
+    gap:10px;
+    margin-left:auto;
+  }
+
+  .btn{
+    font-family:inherit;
+    font-size:14px;
+    font-weight:500;
+    letter-spacing:-.005em;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:#fff;
+    padding:11px 24px;
+    border-radius:11px;
+    cursor:pointer;
+    transition:transform .16s ease, background .16s ease, opacity .16s ease, border-color .16s ease;
+  }
+
+  .btn:hover{ background:#000; transform:translateY(-1px); }
+  .btn:active{ transform:translateY(0); }
+
+  .btn:disabled{
+    opacity:.28;
+    cursor:not-allowed;
+    transform:none;
+  }
+
+  .btn.ghost{
+    background:transparent;
+    color:var(--ink);
+    border-color:#e2e2e7;
+  }
+
+  .btn.ghost:hover{
+    background:#f4f4f6;
+    border-color:#d3d3da;
+  }
+
+  .btn.ghost:disabled:hover{ background:transparent; border-color:#e2e2e7; }
+
+  .btn.check{
+    background:transparent;
+    color:var(--ink);
+    border-color:var(--ink);
+  }
+
+  .btn.check:hover{ background:#f2f2f5; }
+
+  .btn[hidden]{ display:none; }
+
+  @media (max-width:560px){
+    .wrap{ padding:36px 18px 90px; }
+    .card{ padding:24px 20px 30px; border-radius:16px; }
+    .passage{ font-size:16px; line-height:2.1; }
+    .score{ padding:20px; gap:16px; }
+    .btn{ padding:10px 18px; }
+    .nav-right{ gap:8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="progress">
+    <div class="dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="step-label" id="stepLabel">Step 1 of 3</div>
+  </div>
+
+  <main id="cards"></main>
+
+  <div class="score" id="score" hidden></div>
+
+  <nav class="nav">
+    <button class="btn ghost" id="back" disabled>Back</button>
+    <div class="nav-right">
+      <button class="btn check" id="check">Check</button>
+      <button class="btn" id="next" disabled>Next</button>
+    </div>
+  </nav>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------
+     Data
+     ------------------------------------------------------------ */
+
+  const OPTIONS = ["none", "a", "an", "the"];
+  const LABEL   = { none: "—" };
+  const label   = v => (LABEL[v] !== undefined ? LABEL[v] : v);
+
+  const STEPS = [
+    {
+      parts: [
+        "Honestly, I mostly keep to myself. I moved into ",
+        { a: "none" },
+        " this apartment building six months ago, and I only know my neighbors as ",
+        { a: "none" },
+        " blurry shapes in the hallway. We do the polite nod, the quick “hi, how are you?” that no one actually waits to hear ",
+        { a: "an" },
+        " answer to. It’s not that I’m unfriendly, I’m just busy. My life is mostly ",
+        { a: "none" },
+        " work and trying to see my actual friends. ",
+        { a: "the", cap: true },
+        " other day, my internet went out, and I had ",
+        { a: "none" },
+        " no idea who to ask if theirs was working too. It made me realize I don’t have ",
+        { a: "a" },
+        " single phone number from my floor. I guess there’s a kind of freedom in that anonymity, but sometimes it feels ",
+        { a: "a" },
+        " bit cold. Maybe I should at least learn ",
+        { a: "the" },
+        " name of the guy in 3B who always holds ",
+        { a: "the" },
+        " elevator."
+      ]
+    },
+    {
+      parts: [
+        "Oh, we know everyone on this street. We’ve lived here for over thirty years, so we’ve seen ",
+        { a: "none" },
+        " families grow up and ",
+        { a: "none" },
+        " new ones move in. It’s not like it used to be, of course. ",
+        { a: "none" },
+        " people are so busy now. But we still make an effort. I take ",
+        { a: "none" },
+        " some tomatoes from my garden over to the Millers, and I always ask about ",
+        { a: "none" },
+        " their daughter’s soccer games. When my husband had his heart scare last year, it was our neighbor, David, who drove us to the hospital. You can’t put ",
+        { a: "a" },
+        " price on that. It’s about looking out for each other, being part of ",
+        { a: "a" },
+        " little community. You don’t have to be ",
+        { a: "the" },
+        " best friend, but knowing you can knock on a door if you need ",
+        { a: "a" },
+        " cup of sugar or ",
+        { a: "a" },
+        " helping hand – that’s what makes a house a home."
+      ]
+    },
+    {
+      parts: [
+        "Having ",
+        { a: "none" },
+        " good neighbors has become incredibly important since the baby arrived. Before, we lived in ",
+        { a: "a" },
+        " different area and barely spoke to anyone. Now, we’ve hit ",
+        { a: "the" },
+        " jackpot. The couple ",
+        { a: "none" },
+        " next door, Sarah and Tom, have a toddler, so they get it. They brought over a casserole the first week we were home from ",
+        { a: "the" },
+        " hospital. Sarah gave me her number and said, “Text me if you just need to vent, or if you need someone to watch the monitor while you take a shower.” It’s been a lifesaver. We’ve started having ",
+        { a: ["none", "a"] },
+        " coffee together while the kids play. Knowing there’s someone right next door who understands ",
+        { a: "the" },
+        " chaos of this stage of life makes ",
+        { a: "a" },
+        " huge difference."
+      ]
+    }
+  ];
+
+  /* ------------------------------------------------------------
+     Elements
+     ------------------------------------------------------------ */
+
+  const cardsEl   = document.getElementById("cards");
+  const scoreEl   = document.getElementById("score");
+  const backBtn   = document.getElementById("back");
+  const checkBtn  = document.getElementById("check");
+  const nextBtn   = document.getElementById("next");
+  const dots      = Array.from(document.querySelectorAll(".dot"));
+  const stepLabel = document.getElementById("stepLabel");
+
+  const state = { step: 0, checked: new Set() };
+
+  /* ------------------------------------------------------------
+     Build
+     ------------------------------------------------------------ */
+
+  function buildSelect(stepIndex, blankIndex, part) {
+    const sel = document.createElement("select");
+    sel.className = "blank" + (part.cap ? " cap" : "");
+    sel.dataset.answer = JSON.stringify([].concat(part.a));
+    sel.setAttribute("aria-label", "Gap " + (blankIndex + 1) + " in step " + (stepIndex + 1));
+
+    const placeholder = new Option("···", "", true, true);
+    placeholder.disabled = true;
+    sel.add(placeholder);
+
+    OPTIONS.forEach(v => sel.add(new Option(label(v), v)));
+
+    sel.addEventListener("change", () => {
+      sel.classList.remove("ok", "bad");
+      const hint = sel.nextElementSibling;
+      if (hint && hint.classList.contains("hint")) hint.remove();
+
+      /* editing invalidates the check for this step */
+      state.checked.delete(stepIndex);
+      hideScore();
+      updateNav();
+    });
+
+    return sel;
+  }
+
+  STEPS.forEach((step, si) => {
+    const card = document.createElement("section");
+    card.className = "card";
+    card.dataset.index = si;
+
+    const passage = document.createElement("p");
+    passage.className = "passage";
+
+    let blankIndex = 0;
+    step.parts.forEach(part => {
+      if (typeof part === "string") {
+        passage.appendChild(document.createTextNode(part));
+      } else {
+        passage.appendChild(buildSelect(si, blankIndex, part));
+        blankIndex++;
+      }
+    });
+
+    card.appendChild(passage);
+    cardsEl.appendChild(card);
+  });
+
+  const cards = Array.from(cardsEl.children);
+  const lastStep = STEPS.length - 1;
+
+  /* ------------------------------------------------------------
+     Navigation
+     ------------------------------------------------------------ */
+
+  function updateNav() {
+    const isLast = state.step === lastStep;
+    const isChecked = state.checked.has(state.step);
+
+    backBtn.disabled = state.step === 0;
+    checkBtn.textContent = isLast ? "Finish" : "Check";
+    nextBtn.hidden = isLast;
+    nextBtn.disabled = !isChecked;
+  }
+
+  function show(index) {
+    state.step = index;
+
+    cards.forEach((c, i) => c.classList.toggle("active", i === index));
+    dots.forEach((d, i) => d.classList.toggle("active", i === index));
+
+    stepLabel.textContent = "Step " + (index + 1) + " of " + STEPS.length;
+    updateNav();
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  backBtn.addEventListener("click", () => {
+    if (state.step > 0) show(state.step - 1);
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (state.checked.has(state.step) && state.step < lastStep) {
+      show(state.step + 1);
+    }
+  });
+
+  /* ------------------------------------------------------------
+     Check
+     ------------------------------------------------------------ */
+
+  function checkStep() {
+    const si = state.step;
+    const card = cards[si];
+
+    card.querySelectorAll("select.blank").forEach(sel => {
+      const answers = JSON.parse(sel.dataset.answer);
+      const isRight = answers.includes(sel.value);
+
+      sel.classList.remove("ok", "bad");
+      const oldHint = sel.nextElementSibling;
+      if (oldHint && oldHint.classList.contains("hint")) oldHint.remove();
+
+      if (isRight) {
+        sel.classList.add("ok");
+      } else {
+        sel.classList.add("bad");
+        const hint = document.createElement("span");
+        hint.className = "hint";
+        hint.textContent = label(answers[0]);
+        sel.after(hint);
+      }
+    });
+
+    state.checked.add(si);
+    updateNav();
+
+    if (si === lastStep) renderScore();
+  }
+
+  checkBtn.addEventListener("click", checkStep);
+
+  /* ------------------------------------------------------------
+     Score
+     ------------------------------------------------------------ */
+
+  function computeScores() {
+    return cards.map(card => {
+      const sels = card.querySelectorAll("select.blank");
+      let ok = 0;
+      sels.forEach(s => { if (s.classList.contains("ok")) ok++; });
+      return { ok, total: sels.length };
+    });
+  }
+
+  function renderScore() {
+    const perStep = computeScores();
+    const correct = perStep.reduce((n, p) => n + p.ok, 0);
+    const total   = perStep.reduce((n, p) => n + p.total, 0);
+    const pct     = total ? correct / total : 0;
+
+    let message;
+    if (pct === 1)        message = "Perfect — every article in place.";
+    else if (pct >= 0.85) message = "Very close. Check the few marked in red.";
+    else if (pct >= 0.6)  message = "Good effort — review the red gaps.";
+    else                  message = "Have another look at the marked gaps and try again.";
+
+    const chips = perStep.map((p, i) => {
+      const cls = p.ok === p.total ? "chip perfect" : "chip";
+      return '<span class="' + cls + '">Step ' + (i + 1) + " · " + p.ok + "/" + p.total + "</span>";
+    }).join("");
+
+    scoreEl.innerHTML =
+      '<div class="score-main">' +
+        '<div class="score-num">' + correct + "<span>/" + total + "</span></div>" +
+        '<div class="score-msg">' + message + "</div>" +
+      "</div>" +
+      '<div class="breakdown">' + chips + "</div>" +
+      '<button class="btn ghost" id="reset">Start over</button>';
+
+    scoreEl.hidden = false;
+    document.getElementById("reset").addEventListener("click", reset);
+    scoreEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function hideScore() {
+    scoreEl.hidden = true;
+    scoreEl.innerHTML = "";
+  }
+
+  function reset() {
+    document.querySelectorAll("select.blank").forEach(sel => {
+      sel.classList.remove("ok", "bad");
+      sel.value = "";
+      const hint = sel.nextElementSibling;
+      if (hint && hint.classList.contains("hint")) hint.remove();
+    });
+
+    hideScore();
+    state.checked.clear();
+    show(0);
+  }
+
+  /* ------------------------------------------------------------
+     Init
+     ------------------------------------------------------------ */
+
+  show(0);
+})();
+</script>
+</body>
+</html>
