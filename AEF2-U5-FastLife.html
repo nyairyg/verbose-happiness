@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How fast is your life?</title>
+<style>
+  :root{
+    --bg:#fafaf8;
+    --ink:#111110;
+    --muted:#8a8a84;
+    --line:#dcdcd6;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  [hidden]{display:none !important}
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding:72px 24px 120px;
+  }
+
+  main{max-width:600px;margin:0 auto}
+
+  /* ---------- header ---------- */
+  .kicker{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:28px;
+  }
+
+  h1{
+    font-size:clamp(28px,6vw,44px);
+    font-weight:500;
+    letter-spacing:-.025em;
+    line-height:1.08;
+    margin-bottom:18px;
+  }
+
+  .lede{
+    color:var(--muted);
+    max-width:36ch;
+    margin-bottom:56px;
+  }
+
+  /* ---------- questions ---------- */
+  .q{
+    border-top:1px solid var(--line);
+    padding:26px 0;
+  }
+  .q:last-child{border-bottom:1px solid var(--line)}
+
+  .q-text{
+    display:flex;
+    gap:16px;
+    font-size:17px;
+    margin-bottom:18px;
+    max-width:54ch;
+  }
+
+  .num{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--muted);
+    padding-top:6px;
+    flex:0 0 auto;
+  }
+
+  .opts{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-left:32px;
+  }
+
+  .opt{
+    font:inherit;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    padding:10px 18px;
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:border-color .12s, background .12s, color .12s;
+  }
+  .opt:hover{border-color:var(--ink)}
+  .opt.is-on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .opt:focus-visible{outline:1px solid var(--ink);outline-offset:2px}
+
+  /* ---------- actions ---------- */
+  .actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-top:40px;
+  }
+
+  .count{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .submit{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    padding:14px 28px;
+    background:var(--ink);
+    color:var(--bg);
+    border:1px solid var(--ink);
+    cursor:pointer;
+  }
+  .submit:disabled{
+    background:transparent;
+    color:var(--muted);
+    border-color:var(--line);
+    cursor:not-allowed;
+  }
+
+  /* ---------- result ---------- */
+  .result-top{border-top:1px solid var(--ink);padding-top:32px}
+
+  .score-row{display:flex;align-items:baseline;gap:10px}
+
+  .score{
+    font-size:clamp(56px,14vw,88px);
+    font-weight:500;
+    letter-spacing:-.05em;
+    line-height:1;
+  }
+
+  .score-max{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.12em;
+    color:var(--muted);
+  }
+
+  .result-name{
+    font-size:22px;
+    font-weight:500;
+    letter-spacing:-.015em;
+    margin:24px 0 12px;
+  }
+
+  .result-text{
+    color:var(--muted);
+    max-width:48ch;
+  }
+
+  /* ---------- scale ---------- */
+  .scale{margin-top:36px}
+  .scale-track{position:relative;height:1px;background:var(--line)}
+  .scale-mark{
+    position:absolute;
+    top:-5px;
+    width:1px;
+    height:11px;
+    background:var(--ink);
+    transform:translateX(-50%);
+  }
+  .scale-labels{
+    display:flex;
+    justify-content:space-between;
+    margin-top:12px;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+
+  .retake{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    margin-top:48px;
+    background:none;
+    border:0;
+    padding:0 0 3px;
+    color:var(--ink);
+    border-bottom:1px solid var(--ink);
+    cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <section id="intro">
+    <p class="kicker">Questionnaire / 01</p>
+    <h1>How fast is your life?</h1>
+    <p class="lede">Six questions. Answer with often, sometimes, or never.</p>
+  </section>
+
+  <section id="quiz-section">
+    <div id="quiz"></div>
+    <div class="actions">
+      <span class="count" id="count">0 / 6 answered</span>
+      <button class="submit" id="submit" disabled>See result</button>
+    </div>
+  </section>
+
+  <section id="result" hidden></section>
+
+</main>
+
+<script>
+  const QUESTIONS = [
+    'Do people tell you that you talk too quickly?',
+    'Do you get impatient when other people are talking?',
+    'Are you the first person to finish your food at meal times?',
+    'When you are walking along a street, do you feel frustrated when you are behind people who are walking more slowly?',
+    'Do you get irritable if you sit for an hour without doing anything, e.g. waiting for the doctor?',
+    'Do you walk out of stores and restaurants if there is a line?'
+  ];
+
+  const OPTIONS = [
+    { label: 'Often',     value: 3 },
+    { label: 'Sometimes', value: 2 },
+    { label: 'Never',     value: 1 }
+  ];
+
+  const RESULTS = [
+    {
+      max: 9,
+      name: 'Slow lane',
+      text: 'Compared to most people you take things easy and don\u2019t get stressed by modern-day living. You are patient, relaxed and easygoing. Most of the time this is good news, but sometimes it can be a problem \u2014 are you sometimes late for appointments?'
+    },
+    {
+      max: 14,
+      name: 'Medium pace',
+      text: 'You are probably somebody who can change the speed at which you live depending on the situation.'
+    },
+    {
+      max: 18,
+      name: 'Fast lane',
+      text: 'You are rushing around and trying to do many different activities and projects at the same time. You are impatient and find it difficult to relax. You are probably very productive, but your relationships and health could suffer as a result.'
+    }
+  ];
+
+  const quizEl     = document.getElementById('quiz');
+  const countEl    = document.getElementById('count');
+  const submitEl   = document.getElementById('submit');
+  const resultEl   = document.getElementById('result');
+  const quizSecEl  = document.getElementById('quiz-section');
+
+  let answers = new Array(QUESTIONS.length).fill(null);
+
+  /* ---------- build ---------- */
+  function renderQuiz() {
+    quizEl.innerHTML = QUESTIONS.map((text, i) => `
+      <div class="q" data-index="${i}">
+        <p class="q-text">
+          <span class="num">${String(i + 1).padStart(2, '0')}</span>
+          <span>${text}</span>
+        </p>
+        <div class="opts" role="group" aria-label="Question ${i + 1}">
+          ${OPTIONS.map(o => `
+            <button type="button" class="opt" data-value="${o.value}" aria-pressed="false">${o.label}</button>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ---------- state ---------- */
+  function updateState() {
+    const done = answers.filter(a => a !== null).length;
+    countEl.textContent = `${done} / ${QUESTIONS.length} answered`;
+    submitEl.disabled = done < QUESTIONS.length;
+  }
+
+  /* ---------- events ---------- */
+  quizEl.addEventListener('click', e => {
+    const btn = e.target.closest('.opt');
+    if (!btn) return;
+
+    const block = btn.closest('.q');
+    const index = Number(block.dataset.index);
+
+    answers[index] = Number(btn.dataset.value);
+
+    block.querySelectorAll('.opt').forEach(b => {
+      const on = b === btn;
+      b.classList.toggle('is-on', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+
+    updateState();
+  });
+
+  submitEl.addEventListener('click', showResult);
+
+  /* ---------- result ---------- */
+  function showResult() {
+    const score = answers.reduce((a, b) => a + b, 0);
+    const res   = RESULTS.find(r => score <= r.max);
+    const pct   = ((score - 6) / 12) * 100;
+
+    resultEl.innerHTML = `
+      <div class="result-top">
+        <p class="kicker">Result</p>
+        <div class="score-row">
+          <span class="score">${score}</span>
+          <span class="score-max">/ 18</span>
+        </div>
+        <h2 class="result-name">${res.name}</h2>
+        <p class="result-text">${res.text}</p>
+
+        <div class="scale">
+          <div class="scale-track">
+            <div class="scale-mark" style="left:${pct}%"></div>
+          </div>
+          <div class="scale-labels">
+            <span>Slow</span>
+            <span>Medium</span>
+            <span>Fast</span>
+          </div>
+        </div>
+
+        <button class="retake" type="button" id="retake">Start again</button>
+      </div>
+    `;
+
+    quizSecEl.hidden = true;
+    resultEl.hidden = false;
+
+    document.getElementById('retake').addEventListener('click', reset);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function reset() {
+    answers = new Array(QUESTIONS.length).fill(null);
+    renderQuiz();
+    updateState();
+    resultEl.hidden = true;
+    quizSecEl.hidden = false;
+  }
+
+  /* ---------- init ---------- */
+  renderQuiz();
+  updateState();
+</script>
+</body>
+</html>
