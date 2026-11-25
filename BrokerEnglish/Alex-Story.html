@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alex's Story</title>
+<style>
+  :root {
+    --ink:    #000000;
+    --paper:  #fefcfc;
+    --gray:   #f2f2f2;
+    --line:   #c4c4c4;
+    --accent: #f39ba0;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, "Segoe UI", Roboto, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .app {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead { padding: 56px 0 32px; }
+
+  .masthead h1 {
+    margin: 0 0 10px;
+    font-size: 46px;
+    line-height: 0.98;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+
+  .masthead p {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: 0.01em;
+    color: #666666;
+  }
+
+  /* ---------- toolbar ---------- */
+
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 18px 0 14px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .score {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .btn {
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 11px 20px;
+    border: 1px solid var(--ink);
+    border-radius: 0;
+    background: var(--paper);
+    color: var(--ink);
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .btn:hover { background: var(--ink); color: var(--paper); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-primary:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--paper);
+  }
+
+  /* ---------- section label ---------- */
+
+  .section-label {
+    margin: 32px 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  /* ---------- word bank ---------- */
+
+  .bank {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 8px;
+    min-height: 76px;
+    padding: 16px;
+    margin-bottom: 36px;
+    background: var(--gray);
+    transition: background .12s;
+  }
+  .bank.over { background: #e2e2e2; }
+
+  /* ---------- tiles ---------- */
+
+  .tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 13px;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--paper);
+    background: var(--ink);
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    transition: background .12s;
+  }
+  .tile:hover { background: var(--accent); }
+  .tile.dragging { opacity: .25; }
+  .tile.locked { background: var(--ink); cursor: default; }
+  .tile.locked:hover { background: var(--ink); }
+
+  .tile.ghost {
+    position: fixed;
+    left: 0;
+    top: 0;
+    margin: 0;
+    z-index: 9999;
+    pointer-events: none;
+    background: var(--accent);
+    transform: scale(1.04);
+    opacity: 1;
+  }
+
+  /* ---------- text ---------- */
+
+  .text p {
+    margin: 0 0 24px;
+    font-size: 17px;
+    line-height: 2.6;
+  }
+  .text p:last-child { margin-bottom: 0; }
+
+  .gap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    min-width: 84px;
+    height: 32px;
+    margin: 0 4px;
+    padding: 0 4px;
+    background: transparent;
+    border-bottom: 1px solid var(--line);
+    transition: background .12s, border-color .12s;
+  }
+
+  .gap.over   { background: var(--gray); border-bottom-color: var(--ink); }
+  .gap.filled { border-bottom-color: var(--ink); }
+
+  .gap .tile { padding: 4px 9px; font-size: 14px; }
+
+  .gap.correct { border-bottom: 2px solid var(--ink); }
+  .gap.correct .tile { background: var(--ink); }
+
+  .gap.wrong { border-bottom: 2px solid var(--accent); animation: shake .3s; }
+  .gap.wrong .tile { background: var(--accent); }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-3px); }
+    75%      { transform: translateX(3px); }
+  }
+
+  /* ---------- feedback ---------- */
+
+  .feedback {
+    margin-top: 40px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    min-height: 18px;
+  }
+  .feedback.ok  { color: var(--ink); }
+  .feedback.err { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .app { padding: 0 16px 72px; }
+    .masthead { padding: 36px 0 24px; }
+    .masthead h1 { font-size: 32px; }
+    .text p { font-size: 16px; line-height: 2.5; }
+    .btn { padding: 10px 14px; letter-spacing: 0.12em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header class="masthead">
+    <h1>Fill the gaps</h1>
+    <p>Drag a word into each blank. Press Check when you are done.</p>
+  </header>
+
+  <div class="toolbar">
+    <div class="score" id="score">Score —</div>
+    <div class="actions">
+      <button class="btn btn-primary" id="check">Check</button>
+      <button class="btn" id="retry">Retry</button>
+      <button class="btn" id="reset">Reset</button>
+    </div>
+  </div>
+
+  <div class="section-label">Words</div>
+  <div class="bank" id="bank"></div>
+
+  <div class="text" id="text"></div>
+
+  <div class="feedback" id="feedback"></div>
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const TEXT = [
+    'Hi! I would like to tell you about my life. My name is Alex. I [ ] a real estate broker, and I [ ] in Dubai.',
+    'I [ ] in an office in the city center. My office [ ] very tall. From the window, I can see big buildings and the sea. It is beautiful! I [ ] with apartments and houses. I [ ] people buy and sell homes. I [ ] flats to clients. My job is hard, but it is interesting.',
+    'Every day I [ ] up at six o’clock. I have breakfast and [ ] coffee. Then I [ ] to work by metro. Dubai [ ] a very good metro. It is clean and fast.',
+    'Dubai is a very big and hot city. In summer, it is very hot here. I don’t [ ] to walk during the day. I [ ] in the evening, when it is not so hot. I often [ ] to the park or to the shops.',
+    'I [ ] in a small apartment. I [ ] a kitchen, a bedroom, and a living room. My apartment [ ] on the twentieth floor. I like to [ ] on the balcony and [ ] at the city.',
+    'I [ ] English at work. I am learning Arabic, but it is difficult. I [ ] a few words: “marhaba” means hello, and “shukran” means thank you.',
+    'On weekends, I [ ]. I [ ] in the pool or [ ] my friends. We [ ] and [ ] together. My friends [ ] real estate brokers too.',
+    'I [ ] my life in Dubai. My job is good, and the city is beautiful. But I [ ] my family. They [ ] far away. Every day I [ ] my mother. I [ ] to go home next year.',
+    'This is my story. Thank you for listening!'
+  ];
+
+  const ANSWERS = [
+    'am', 'live',
+    'work', 'is', 'work', 'help', 'show',
+    'get', 'drink', 'go', 'has',
+    'like', 'walk', 'go',
+    'live', 'have', 'is', 'sit', 'look',
+    'speak', 'know',
+    'relax', 'swim', 'meet', 'eat', 'talk', 'are',
+    'love', 'miss', 'live', 'call', 'want'
+  ];
+
+  const bankEl     = document.getElementById('bank');
+  const textEl     = document.getElementById('text');
+  const scoreEl    = document.getElementById('score');
+  const feedbackEl = document.getElementById('feedback');
+  const checkBtn   = document.getElementById('check');
+  const retryBtn   = document.getElementById('retry');
+  const resetBtn   = document.getElementById('reset');
+
+  let gaps = [];
+  let drag = null;
+
+  /* =========================================================
+     build
+     ========================================================= */
+
+  function buildText() {
+    textEl.innerHTML = '';
+    gaps = [];
+    let i = 0;
+
+    TEXT.forEach(function (paragraph) {
+      const p = document.createElement('p');
+      const chunks = paragraph.split('[ ]');
+
+      chunks.forEach(function (chunk, k) {
+        p.appendChild(document.createTextNode(chunk));
+        if (k < chunks.length - 1) {
+          const gap = document.createElement('span');
+          gap.className = 'gap';
+          gap.dataset.answer = ANSWERS[i];
+          p.appendChild(gap);
+          gaps.push(gap);
+          i++;
+        }
+      });
+
+      textEl.appendChild(p);
+    });
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }
+
+  function makeTile(word) {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.dataset.word = word;
+    tile.textContent = word;
+    tile.addEventListener('pointerdown', onPointerDown);
+    return tile;
+  }
+
+  function fillBank() {
+    bankEl.innerHTML = '';
+    shuffle(ANSWERS.slice()).forEach(function (word) {
+      bankEl.appendChild(makeTile(word));
+    });
+  }
+
+  /* =========================================================
+     drag & drop
+     ========================================================= */
+
+  function onPointerDown(e) {
+    const tile = e.currentTarget;
+    if (tile.classList.contains('locked')) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+
+    /* подчищаем возможный «зависший» предыдущий drag */
+    abortDrag();
+
+    const rect = tile.getBoundingClientRect();
+
+    drag = {
+      tile: tile,
+      id: e.pointerId,
+      dx: e.clientX - rect.left,
+      dy: e.clientY - rect.top,
+      x0: e.clientX,
+      y0: e.clientY,
+      w: rect.width,
+      h: rect.height,
+      active: false,
+      ghost: null
+    };
+
+    /* слушаем на window — событие доставится всегда, даже если
+       курсор/палец ушёл с плитки или плитку переместили в DOM */
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
+  }
+
+  function onPointerMove(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+
+    if (!drag.active) {
+      if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 4) return;
+      drag.active = true;
+
+      const ghost = drag.tile.cloneNode(true);
+      ghost.classList.add('ghost');
+      ghost.classList.remove('dragging', 'locked', 'over');
+      ghost.style.width = drag.w + 'px';
+      ghost.style.height = drag.h + 'px';
+      document.body.appendChild(ghost);
+
+      drag.ghost = ghost;
+      drag.tile.classList.add('dragging');
+    }
+
+    e.preventDefault();
+
+    drag.ghost.style.left = (e.clientX - drag.dx) + 'px';
+    drag.ghost.style.top  = (e.clientY - drag.dy) + 'px';
+
+    setHover(e.clientX, e.clientY);
+  }
+
+  function onPointerUp(e) {
+    if (!drag || e.pointerId !== drag.id) return;
+
+    const d = drag;
+    drag = null;
+
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+    window.removeEventListener('pointercancel', onPointerUp);
+
+    d.tile.classList.remove('dragging');
+    if (d.ghost && d.ghost.parentNode) d.ghost.parentNode.removeChild(d.ghost);
+
+    clearHover();
+
+    if (!d.active) return;
+    if (e.type === 'pointercancel') return;
+
+    const target = targetAt(e.clientX, e.clientY);
+    if (!target) return;
+
+    if (target.classList.contains('gap')) {
+      dropIntoGap(d.tile, target);
+    } else {
+      dropIntoBank(d.tile);
+    }
+  }
+
+  /* аварийная очистка состояния drag */
+  function abortDrag() {
+    if (!drag) return;
+
+    const d = drag;
+    drag = null;
+
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+    window.removeEventListener('pointercancel', onPointerUp);
+
+    d.tile.classList.remove('dragging');
+    if (d.ghost && d.ghost.parentNode) d.ghost.parentNode.removeChild(d.ghost);
+
+    clearHover();
+  }
+
+  function targetAt(x, y) {
+    const el = document.elementFromPoint(x, y);
+    if (!el) return null;
+    const gap = el.closest('.gap');
+    if (gap) return gap;
+    return el.closest('.bank');
+  }
+
+  function setHover(x, y) {
+    clearHover();
+    const t = targetAt(x, y);
+    if (!t) return;
+    if (t.classList.contains('gap') && t.querySelector('.locked')) return;
+    t.classList.add('over');
+  }
+
+  function clearHover() {
+    document.querySelectorAll('.over').forEach(function (el) {
+      el.classList.remove('over');
+    });
+  }
+
+  function dropIntoGap(tile, gap) {
+    if (tile.parentElement === gap) return;
+    if (gap.querySelector('.locked')) return;
+
+    const existing = gap.querySelector('.tile');
+    if (existing) bankEl.appendChild(existing);
+
+    const from = tile.parentElement;
+    if (from && from.classList.contains('gap')) {
+      from.classList.remove('filled', 'correct', 'wrong');
+    }
+
+    gap.classList.remove('correct', 'wrong');
+    gap.classList.add('filled');
+    gap.appendChild(tile);
+
+    resetFeedback();
+  }
+
+  function dropIntoBank(tile) {
+    if (tile.parentElement === bankEl) return;
+
+    const from = tile.parentElement;
+    bankEl.appendChild(tile);
+
+    if (from && from.classList.contains('gap')) {
+      from.classList.remove('filled', 'correct', 'wrong');
+    }
+
+    resetFeedback();
+  }
+
+  /* =========================================================
+     actions
+     ========================================================= */
+
+  function check() {
+    let correct = 0;
+
+    gaps.forEach(function (gap) {
+      gap.classList.remove('correct', 'wrong');
+      const tile = gap.querySelector('.tile');
+
+      if (tile && tile.dataset.word === gap.dataset.answer) {
+        gap.classList.add('correct');
+        tile.classList.add('locked');
+        correct++;
+      } else {
+        gap.classList.add('wrong');
+      }
+    });
+
+    scoreEl.textContent = 'Score ' + correct + '/' + gaps.length;
+
+    if (correct === gaps.length) {
+      feedbackEl.textContent = 'All correct — well done';
+      feedbackEl.className = 'feedback ok';
+    } else {
+      feedbackEl.textContent = 'Some answers are wrong — fix and check again';
+      feedbackEl.className = 'feedback err';
+    }
+  }
+
+  function retry() {
+    gaps.forEach(function (gap) {
+      gap.classList.remove('correct', 'wrong');
+    });
+
+    /* снимаем блокировку со ВСЕХ плиток, а не только с тех,
+       что лежат в пропусках */
+    document.querySelectorAll('.tile.locked').forEach(function (tile) {
+      tile.classList.remove('locked');
+    });
+
+    resetFeedback();
+  }
+
+  function reset() {
+    abortDrag();
+
+    gaps.forEach(function (gap) {
+      const tile = gap.querySelector('.tile');
+      if (tile) tile.remove();
+      gap.classList.remove('filled', 'correct', 'wrong');
+    });
+
+    fillBank();
+    resetFeedback();
+  }
+
+  function resetFeedback() {
+    scoreEl.textContent = 'Score —';
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'feedback';
+  }
+
+  /* =========================================================
+     init
+     ========================================================= */
+
+  buildText();
+  fillBank();
+
+  checkBtn.addEventListener('click', check);
+  retryBtn.addEventListener('click', retry);
+  resetBtn.addEventListener('click', reset);
+})();
+</script>
+
+</body>
+</html>
