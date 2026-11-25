@@ -29,7 +29,7 @@
   }
 
   .app {
-    max-width: 880px;
+    max-width: 1040px;
     margin: 0 auto;
     padding: 0 24px 96px;
   }
@@ -103,6 +103,16 @@
     color: var(--paper);
   }
 
+  /* ---------- two-column layout ---------- */
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 65fr) minmax(0, 35fr);
+    gap: 48px;
+    align-items: start;
+    padding-top: 36px;
+  }
+
   /* ---------- section label ---------- */
 
   .section-label {
@@ -113,6 +123,15 @@
     text-transform: uppercase;
   }
 
+  .side .section-label { margin: 0 0 8px; }
+
+  /* ---------- side column ---------- */
+
+  .side {
+    position: sticky;
+    top: 84px;
+  }
+
   /* ---------- word bank ---------- */
 
   .bank {
@@ -120,11 +139,13 @@
     flex-wrap: wrap;
     align-content: flex-start;
     gap: 8px;
-    min-height: 76px;
+    min-height: 220px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
     padding: 16px;
-    margin-bottom: 36px;
     background: var(--gray);
     transition: background .12s;
+    scrollbar-width: thin;
   }
   .bank.over { background: #e2e2e2; }
 
@@ -217,6 +238,22 @@
   .feedback.ok  { color: var(--ink); }
   .feedback.err { color: var(--accent); }
 
+  /* ---------- responsive ---------- */
+
+  @media (max-width: 780px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      padding-top: 28px;
+    }
+    .side { position: static; order: -1; }
+    .bank {
+      min-height: 76px;
+      max-height: none;
+      overflow: visible;
+    }
+  }
+
   @media (max-width: 600px) {
     .app { padding: 0 16px 72px; }
     .masthead { padding: 36px 0 24px; }
@@ -244,10 +281,16 @@
     </div>
   </div>
 
-  <div class="section-label">Words</div>
-  <div class="bank" id="bank"></div>
+  <div class="layout">
 
-  <div class="text" id="text"></div>
+    <div class="text" id="text"></div>
+
+    <aside class="side">
+      <div class="section-label">Words</div>
+      <div class="bank" id="bank"></div>
+    </aside>
+
+  </div>
 
   <div class="feedback" id="feedback"></div>
 
