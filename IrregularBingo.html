@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verb Bingo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    font-family: "Bitter", Georgia, serif; font-weight: 400;
+    background: #faf8f3;
+  }
+  #card {
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    gap: 0; width: min(94vw, 600px); aspect-ratio: 1.95 / 1;
+    border: 1px solid #222;
+  }
+  .cell {
+    min-width: 0; min-height: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    background: var(--c); border-right: 1px solid #222; border-bottom: 1px solid #222; color: #2a2a2a; cursor: pointer; user-select: none;
+    font-size: clamp(14px, 3.6vw, 20px);
+    transition: background .25s, color .25s;
+  }
+  .cell:nth-child(3n) { border-right: 0; }
+  .cell:nth-child(n+7) { border-bottom: 0; }
+  .cell.done { background: var(--m); color: #9a9a9a; text-decoration: line-through; }
+  #shuffle {
+    font: inherit; font-size: 14px; color: #faf8f3; background: #222; cursor: pointer;
+    border: 1px solid #222; padding: 6px 18px; opacity: 0; pointer-events: none; transition: opacity .3s;
+  }
+  #shuffle.show { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body>
+<div id="card"></div>
+<button id="shuffle" onclick="location.reload()">Shuffle</button>
+<script>
+const VERBS = `become became become
+begin began begun
+break broke broken
+build built built
+catch caught caught
+choose chose chosen
+come came come
+cut cut cut
+do did done
+drive drove driven
+fall fell fallen
+feel felt felt
+fight fought fought
+find found found
+forget forgot forgotten
+hit hit hit
+meet met met
+ride rode ridden
+send sent sent
+sing sang sung
+speak spoke spoken
+take took taken
+teach taught taught
+tell told told
+think thought thought
+understand understood understood
+wake woke woken
+win won won
+write wrote written`.split("\n").map(l => l.split(" "));
+
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+const hue = Math.floor(Math.random() * 360);
+document.body.style.setProperty("--c", `hsl(${hue} 65% 86%)`);
+document.body.style.setProperty("--m", `hsl(${hue} 12% 92%)`);
+
+const card = document.getElementById("card");
+shuffle(VERBS.slice()).slice(0, 9).forEach(([, v2, v3]) => {
+  const c = document.createElement("div");
+  c.className = "cell";
+  c.innerHTML = `<span>${v2}</span><span>${v3}</span>`;
+  c.onclick = () => {
+    c.classList.toggle("done");
+    document.getElementById("shuffle").classList.toggle("show", document.querySelectorAll(".cell.done").length === 9);
+  };
+  card.appendChild(c);
+});
+</script>
+</body>
+</html>
